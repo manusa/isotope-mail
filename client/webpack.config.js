@@ -1,4 +1,4 @@
-const Webpack = require('webpack');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const DIST_DIR = __dirname + '/dist';
@@ -34,7 +34,7 @@ module.exports = {
         extensions: ['*', '.js', '.jsx']
     },
     plugins: [
-        new Webpack.HotModuleReplacementPlugin(),
+        new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
             template: "./src/index.html",
             filename: "./index.html"

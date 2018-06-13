@@ -4,8 +4,10 @@
   "description": "MN web mail client",
   "main": "index.js",
   "scripts": {
-    "build": "webpack -p",
-    "start": "webpack-dev-server --config ./webpack.config.js --mode development",
+    "build": "./node_modules/.bin/webpack -p --mode production",
+    "build-win": "./node_modules/.bin/webpack.cmd -p --mode production",
+    "start": "./node_modules/.bin/webpack-dev-server --config ./webpack.config.js --mode development",
+    "start-win": "./node_modules/.bin/webpack-dev-server.cmd --config ./webpack.config.js --mode development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -21,6 +23,7 @@
     }
   ],
   "dependencies": {
+    "compression": "^1.7.2",
     "react": "^16.4.0",
     "react-dom": "^16.4.0"
   },
@@ -29,6 +32,7 @@
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
+    "eslint": "^4.19.1",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "react-hot-loader": "^4.3.1",
