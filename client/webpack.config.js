@@ -1,11 +1,12 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
+const SRC_DIR = __dirname + '/src';
 const DIST_DIR = __dirname + '/dist';
 
 module.exports = {
     entry: [
-        __dirname + '/src/index.jsx',
+        SRC_DIR + '/index.jsx',
         'react-hot-loader/patch'
     ],
     output: {
@@ -25,7 +26,8 @@ module.exports = {
             {
                 test: /\.(html)$/,
                 use: {
-                    loader: 'html-loader'
+                    loader: 'html-loader',
+                    options: { minimize: true }
                 }
             }
         ]
@@ -36,7 +38,7 @@ module.exports = {
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
-            template: "./src/index.html",
+            template: SRC_DIR + "/index.html",
             filename: "./index.html"
         })
     ],
