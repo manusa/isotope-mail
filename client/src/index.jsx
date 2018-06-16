@@ -1,11 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
-const title = 'Hello world!';
+import App from './App';
 
 ReactDOM.render(
-    <div>{title}</div>,
-    document.getElementById('app')
+    <App />,
+    document.getElementById('root')
 );
 
 module.hot.accept();
