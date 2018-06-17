@@ -1,5 +1,5 @@
 const webpack = require('webpack');
-const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const SRC_DIR = __dirname + '/src';
 const DIST_DIR = __dirname + '/dist';
@@ -25,10 +25,12 @@ module.exports = {
       },
       {
         test: /\.(scss|sass|css)$/,
+        exclude: /node_modules/,
         loaders: ['style-loader', 'css-loader', 'sass-loader']
       },
       {
         test: /\.(html)$/,
+        exclude: /node_modules/,
         use: {
           loader: 'html-loader',
           options: {minimize: true}
@@ -42,8 +44,8 @@ module.exports = {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
-      template: SRC_DIR + "/index.html",
-      filename: "./index.html"
+      template: SRC_DIR + '/index.html',
+      filename: './index.html'
     })
   ],
   devServer: {
