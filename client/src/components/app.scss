@@ -1,7 +1,18 @@
-@import '../../node_modules/@material/top-app-bar/mdc-top-app-bar';
+@import '../styles/partials/variables';
+//noinspection CssUnknownTarget
+@import '@material/drawer/mdc-drawer';
+//noinspection CssUnknownTarget
+@import '@material/list/mdc-list';
+
 
 .app {
-  .topAppBar {
-    @extend .mdc-top-app-bar;
+  .drawer {
+    @extend .mdc-drawer--permanent;
+    width: $drawerWidth;
+    height: 100vh;
+    border-right: none;
+    .drawer-content {
+      overflow-y: auto;
+    }
   }
 }

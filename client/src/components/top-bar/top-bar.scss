@@ -1,0 +1,8 @@
+@import '../../styles/partials/variables';
+@import '@material/top-app-bar/mdc-top-app-bar';
+
+.topBar {
+  @extend .mdc-top-app-bar;
+  margin-left: $drawerWidth;
+  width: calc(100% - #{$drawerWidth});
+}
