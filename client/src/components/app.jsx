@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
+import mdcList from '@material/list/mdc-list.scss';
+import FolderList from './folders/folder-list';
 import TopBar from './top-bar/top-bar';
-// import barStyles from '@material/top-app-bar/mdc-top-app-bar.scss'; // If want to use inline styles barStyles['mdc-top-app-bar__row']
 import styles from './app.scss';
 
 class App extends Component {
@@ -12,11 +13,13 @@ class App extends Component {
         <nav className={styles.drawer}>
           <div className={styles['mdc-drawer__toolbar-spacer']}></div>
           <div className={`${styles['mdc-drawer__content']} ${styles['drawer-content']}`}>
-            <nav className={styles['mdc-list']}>
-              <Link className={`${styles['mdc-list-item']}`} to='/mui-components'>
-                <i className={`material-icons ${styles['mdc-list-item__graphic']}`}>inbox</i>Inbox
+            <nav className={mdcList['mdc-list']}>
+              <Link className={`${mdcList['mdc-list-item']}`} to='/mui-components'>
+                <i className={`material-icons ${mdcList['mdc-list-item__graphic']}`}>inbox</i>
+                Inbox
               </Link>
             </nav>
+            <FolderList></FolderList>
           </div>
         </nav>
       </div>
