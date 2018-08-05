@@ -22,9 +22,12 @@
   ],
   "dependencies": {
     "@material-ui/core": "^1.4.2",
+    "@material-ui/icons": "^2.0.1",
+    "@material/top-app-bar": "^0.38.0",
     "compression": "^1.7.2",
     "react": "^16.4.0",
-    "react-dom": "^16.4.0"
+    "react-dom": "^16.4.0",
+    "react-router-dom": "^4.3.1"
   },
   "devDependencies": {
     "@babel/core": "7.0.0-beta.42",

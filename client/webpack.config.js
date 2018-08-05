@@ -31,7 +31,7 @@ module.exports = {
       },
       {
         test: /\.(scss|sass|css)$/,
-        exclude: /node_modules/,
+        exclude: /node_modules\/(?!@material\/).*/,
         loaders: [
           MiniCssExtractPlugin.loader,
           {
@@ -43,7 +43,12 @@ module.exports = {
               localIdentName: '[local]___[hash:base64:5]'
             }
           },
-          'sass-loader'
+          {
+            loader: 'sass-loader',
+            options: {
+              includePaths: ['./node_modules']
+            }
+          }
         ]
       },
       {

@@ -1,3 +1,7 @@
+@import '../../node_modules/@material/top-app-bar/mdc-top-app-bar';
+
 .app {
-  padding: 20px;
+  .topAppBar {
+    @extend .mdc-top-app-bar;
+  }
 }

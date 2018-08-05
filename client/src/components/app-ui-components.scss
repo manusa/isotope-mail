@@ -1,0 +1,12 @@
+$drawerWidth: 240px;
+
+.app {
+  padding: 20px;
+  .appBar {
+    margin-left: $drawerWidth;
+    width: calc(100% - #{$drawerWidth});
+  }
+  .drawerPaper {
+    width: $drawerWidth;
+  }
+}
