@@ -1,9 +1,11 @@
 @import '../../styles/partials/variables';
 
 .side-bar.drawer {
-  width: $drawerWidth;
   height: 100vh;
   border-right: none;
+  &.open {
+    width: $drawerWidth;
+  }
   .drawer-content {
     overflow-y: auto;
   }
