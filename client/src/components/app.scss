@@ -1,0 +1,21 @@
+@import '../styles/partials/variables';
+
+.app {
+  display: flex;
+  .message-grid-wrapper {
+    flex-grow: 1;
+    .message-grid {
+      margin: 16px;
+      background-color: #ffffff;
+    }
+    .fab-container {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: 120px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+}

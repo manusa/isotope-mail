@@ -1,0 +1,15 @@
+@import '../../styles/partials/variables';
+
+.side-bar {
+  min-height: 100vh;
+  border-right: none;
+  &.open {
+    width: $drawerWidth;
+  }
+  .drawer {
+    position: fixed;
+    .drawer-content {
+      overflow-y: auto;
+    }
+  }
+}

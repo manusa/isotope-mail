@@ -1,10 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import Routes from './routes/routes';
 
 ReactDOM.render(
-  <App/>,
+  <Routes />,
   document.getElementById('root')
 );
 
-module.hot.accept();
+if (module.hot) {
+  module.hot.accept();
+}
