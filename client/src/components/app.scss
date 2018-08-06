@@ -8,5 +8,14 @@
       margin: 16px;
       background-color: #ffffff;
     }
+    .fab-container {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: 120px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
   }
 }

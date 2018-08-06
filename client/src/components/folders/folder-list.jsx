@@ -2,11 +2,7 @@ import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import FolderItem from './folder-item';
 import mainCss from '../../styles/main.scss';
-
-const folders = [
-  {name: 'First'},
-  {name: 'Second'}
-];
+import PropTypes from 'prop-types';
 
 class FolderList extends Component {
   render() {
@@ -16,10 +12,14 @@ class FolderList extends Component {
           <i className={`material-icons ${mainCss['mdc-list-item__graphic']}`}>inbox</i>
           Inbox
         </Link>
-        {folders.map((folder, index) => <FolderItem key={index} label={folder.name}></FolderItem>)}
+        {this.props.folderList.map((folder, index) => <FolderItem key={index} label={folder.name}></FolderItem>)}
       </nav>
     );
   }
 }
+
+FolderList.propTypes = {
+  folderList: PropTypes.array.isRequired
+};
 
 export default FolderList;

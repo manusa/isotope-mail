@@ -12,13 +12,13 @@ class SideBar extends Component {
 
   render() {
     return (
-      <aside className={`${styles['side-bar']} ${styles.drawer}
+      <aside className={`${styles['side-bar']}
       ${mainCss['mdc-drawer--persistent']} ${mainCss['mdc-drawer--animating']}
        ${this.getCollapsedClassName()}`}>
-        <nav className={`${mainCss['mdc-drawer__drawer']}`}>
+        <nav className={`${styles.drawer} ${mainCss['mdc-drawer__drawer']}`}>
           <div className={mainCss['mdc-drawer__toolbar-spacer']}></div>
           <div className={`${mainCss['mdc-drawer__content']} ${styles['drawer-content']}`}>
-            <FolderList></FolderList>
+            <FolderList folderList={this.props.folderList} />
           </div>
         </nav>
       </aside>
@@ -33,7 +33,8 @@ class SideBar extends Component {
 
 
 SideBar.propTypes = {
-  collapsed: PropTypes.bool.isRequired
+  collapsed: PropTypes.bool.isRequired,
+  folderList: PropTypes.array.isRequired
 };
 
 export default SideBar;

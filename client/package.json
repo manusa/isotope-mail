@@ -36,6 +36,7 @@
     "@babel/preset-react": "7.0.0-beta.42",
     "@babel/runtime": "7.0.0-beta.42",
     "@material/drawer": "^0.38.0",
+    "@material/fab": "^0.38.0",
     "@material/list": "^0.38.0",
     "@material/top-app-bar": "^0.38.0",
     "babel-loader": "^8.0.0-beta.4",

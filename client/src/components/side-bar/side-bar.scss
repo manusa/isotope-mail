@@ -1,12 +1,15 @@
 @import '../../styles/partials/variables';
 
-.side-bar.drawer {
-  height: 100vh;
+.side-bar {
+  min-height: 100vh;
   border-right: none;
   &.open {
     width: $drawerWidth;
   }
-  .drawer-content {
-    overflow-y: auto;
+  .drawer {
+    position: fixed;
+    .drawer-content {
+      overflow-y: auto;
+    }
   }
 }
