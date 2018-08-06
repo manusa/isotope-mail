@@ -1,8 +1,11 @@
 @import '../../styles/partials/variables';
-@import '@material/top-app-bar/mdc-top-app-bar';
+@import '@material/drawer/slidable/variables';
 
 .topBar {
-  @extend .mdc-top-app-bar;
-  margin-left: $drawerWidth;
-  width: calc(100% - #{$drawerWidth});
+  transition: $mdc-slidable-drawer-transition-close;
+  &.with-side-bar {
+    margin-left: $drawerWidth;
+    width: calc(100% - #{$drawerWidth});
+    transition: $mdc-slidable-drawer-transition-open;
+  }
 }

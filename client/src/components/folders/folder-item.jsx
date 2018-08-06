@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Link from 'react-router-dom/Link';
-import mdcList from '@material/list/mdc-list.scss';
+import mainCss from '../../styles/main.scss';
 
 class FolderItem extends Component {
   constructor(props) {
@@ -10,8 +10,8 @@ class FolderItem extends Component {
 
   render() {
     return (
-      <Link className={mdcList['mdc-list-item']} to='#'>
-        <span className={`material-icons ${mdcList['mdc-list-item__graphic']}`}>folder</span>
+      <Link className={mainCss['mdc-list-item']} to='#'>
+        <span className={`material-icons ${mainCss['mdc-list-item__graphic']}`}>folder</span>
         {this.state.linkText}
       </Link>
     );

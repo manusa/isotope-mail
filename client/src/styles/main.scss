@@ -1,3 +1,8 @@
 @import 'partials/variables';
 @import 'partials/fonts';
 @import 'partials/base';
+
+// Third-party
+@import '@material/drawer/mdc-drawer';
+@import  '@material/list/mdc-list';
+@import  '@material/top-app-bar/mdc-top-app-bar';

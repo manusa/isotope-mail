@@ -1,0 +1,10 @@
+@import '../../styles/partials/variables';
+
+.side-bar.drawer {
+  width: $drawerWidth;
+  height: 100vh;
+  border-right: none;
+  .drawer-content {
+    overflow-y: auto;
+  }
+}
