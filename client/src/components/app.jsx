@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import TopBar from './top-bar/top-bar';
 import SideBar from './side-bar/side-bar';
+import {addFolder} from '../actions/folders';
 import mainCss from '../styles/main.scss';
 import styles from './app.scss';
 
@@ -11,10 +13,6 @@ class App extends Component {
       sideBar: {
         collapsed: false
       },
-      folders: [
-        {name: 'First'},
-        {name: 'Second'}
-      ],
       messages: [
         {subject: 'This is a message'},
         {subject: 'This is another message'}
@@ -56,11 +54,7 @@ class App extends Component {
   }
 
   addFolder() {
-    const folders = this.state.folders;
-    folders.push({name: `Folder ${folders.length + 1}`});
-    this.setState({
-      folders: folders
-    });
+    this.props.dispatch(addFolder({name: 'New Folder'}));
   }
 
   addMessage() {
@@ -72,4 +66,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default connect()(App);

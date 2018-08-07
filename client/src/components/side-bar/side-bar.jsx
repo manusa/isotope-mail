@@ -18,7 +18,7 @@ class SideBar extends Component {
         <nav className={`${styles.drawer} ${mainCss['mdc-drawer__drawer']}`}>
           <div className={mainCss['mdc-drawer__toolbar-spacer']}></div>
           <div className={`${mainCss['mdc-drawer__content']} ${styles['drawer-content']}`}>
-            <FolderList folderList={this.props.folderList} />
+            <FolderList />
           </div>
         </nav>
       </aside>
@@ -31,10 +31,8 @@ class SideBar extends Component {
   }
 }
 
-
 SideBar.propTypes = {
-  collapsed: PropTypes.bool.isRequired,
-  folderList: PropTypes.array.isRequired
+  collapsed: PropTypes.bool.isRequired
 };
 
 export default SideBar;

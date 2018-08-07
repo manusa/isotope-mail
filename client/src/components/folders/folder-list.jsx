@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import FolderItem from './folder-item';
 import mainCss from '../../styles/main.scss';
-import PropTypes from 'prop-types';
 
 class FolderList extends Component {
   render() {
@@ -22,4 +23,10 @@ FolderList.propTypes = {
   folderList: PropTypes.array.isRequired
 };
 
-export default FolderList;
+const mapStateToProps = state => ({
+  folderList: state.folders
+});
+
+const mapDispatchToProps = dispatch => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(FolderList);
