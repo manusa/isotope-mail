@@ -55,7 +55,8 @@ class App extends Component {
 
 App.propTypes = {
   messages: PropTypes.array.isRequired,
-  addFolder: PropTypes.func.isRequired
+  addFolder: PropTypes.func.isRequired,
+  addMessage: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
