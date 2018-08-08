@@ -1,17 +1,17 @@
 import {combineReducers} from 'redux';
 import folders from './folders';
+import messages from './messages';
 
 export const initialState = {
   folders: [
-    {name: 'First'},
-    {name: 'Second'}
+    {name: 'Example folder'}
   ],
   messages: [
-    {subject: 'This is a message'},
-    {subject: 'This is another message'}
+    {subject: 'This is a message sample'}
   ]
 };
 
 export default combineReducers({
-  folders: folders
+  folders: folders,
+  messages: messages
 });
