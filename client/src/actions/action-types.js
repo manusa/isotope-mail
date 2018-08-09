@@ -1,4 +1,5 @@
 export const ActionTypes = {
   ADD_FOLDER: 'ADD_FOLDER',
+  RESET_FOLDERS: 'RESET_FOLDERS',
   ADD_MESSAGE: 'ADD_MESSAGE'
 };
