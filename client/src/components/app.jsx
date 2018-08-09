@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import TopBar from './top-bar/top-bar';
 import SideBar from './side-bar/side-bar';
-import {addFolder} from '../actions/folders';
+import {getFolders} from '../services/folder';
 import {addMessage} from '../actions/messages';
 import mainCss from '../styles/main.scss';
 import styles from './app.scss';
@@ -65,7 +65,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   addFolder: () => {
-    dispatch(addFolder({name: 'New Folder'}));
+    // dispatch(addFolder({name: 'New Folder'}));
+    getFolders(dispatch);
   },
 
   addMessage: () => {

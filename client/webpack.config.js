@@ -8,6 +8,8 @@ const DIST_DIR = __dirname + '/dist';
 
 module.exports = {
   entry: [
+    'babel-polyfill',
+    'whatwg-fetch',
     SRC_DIR + '/index.jsx',
     'react-hot-loader/patch'
   ],

@@ -10,16 +10,16 @@ import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-08.
  */
 @Configuration
-@EnableWebMvc
 @ComponentScan("com.marcnuri.mailclient.api")
 @EnableConfigurationProperties(ServerProperties.class)
+@Import({WebConfiguration.class})
 public class MailClientApiConfiguration {
 
     private static final String IMAP_SERVER = "IMAP_SERVER";
