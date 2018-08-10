@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import FolderList from '../folders/folder-list';
+import FolderContainer from '../folders/folder-container';
 import mainCss from '../../styles/main.scss';
 import styles from './side-bar.scss';
 
@@ -18,7 +18,7 @@ class SideBar extends Component {
         <nav className={`${styles.drawer} ${mainCss['mdc-drawer__drawer']}`}>
           <div className={mainCss['mdc-drawer__toolbar-spacer']}></div>
           <div className={`${mainCss['mdc-drawer__content']} ${styles['drawer-content']}`}>
-            <FolderList />
+            <FolderContainer />
           </div>
         </nav>
       </aside>

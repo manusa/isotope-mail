@@ -45,7 +45,9 @@ public class ImapService {
         try {
             final IMAPStore imapStore = getImapStore();
             IMAPFolder rootFolder = (IMAPFolder)imapStore.getDefaultFolder();
-            return Stream.of(rootFolder.list()).map(Folder::from).collect(Collectors.toList());
+            final List<Folder> ret = Stream.of(rootFolder.list()).map(Folder::from).collect(Collectors.toList());
+            imapStore.close();
+            return ret;
         } catch (MessagingException ex) {
             log.error("Error loading folders", ex);
             throw  new MailClientException(ex.getMessage());

@@ -1,0 +1,13 @@
+@import '../../styles/partials/variables';
+
+.listItem {
+  height: 36px;
+
+  .graphic {
+    margin-right: $default-spacing;
+  }
+
+  .primaryText {
+    margin: 0px;
+  }
+}

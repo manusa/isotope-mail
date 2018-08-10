@@ -2,9 +2,13 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
+const getLocalIdent = require('css-loader/lib/getLocalIdent');
+const path = require('path');
+
 const devMode = process.env.NODE_ENV !== 'production';
 const SRC_DIR = __dirname + '/src';
 const DIST_DIR = __dirname + '/dist';
+const GLOBAL_STYLES = 'styles/main.scss';
 
 module.exports = {
   entry: [
@@ -42,7 +46,23 @@ module.exports = {
               modules: true,
               sourceMap: true,
               importLoaders: 1,
-              localIdentName: '[local]___[hash:base64:5]'
+              localIdentName: '[local]___[hash:base64:5]',
+              /**
+               * Custom function to replace the CSS class name only if it's not part of
+               * the global application styles
+               *
+               * @param loaderContext
+               * @param localIdentName
+               * @param exportName
+               * @param options
+               * @returns {*}
+               */
+              getLocalIdent: (loaderContext, localIdentName, exportName, options) => {
+                const resourcePath = path.relative(SRC_DIR, loaderContext.resourcePath).replace(/\\/g, '/');
+                return resourcePath === GLOBAL_STYLES ?
+                  exportName :
+                  getLocalIdent(loaderContext, localIdentName, exportName, options);
+              }
             }
           },
           {
