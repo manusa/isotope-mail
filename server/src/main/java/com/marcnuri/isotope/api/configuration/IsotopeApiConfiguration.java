@@ -3,7 +3,7 @@
  *
  * Created on 2018-08-08, 16:35
  */
-package com.marcnuri.mailclient.api.configuration;
+package com.marcnuri.isotope.api.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -17,10 +17,10 @@ import org.springframework.core.env.Environment;
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-08.
  */
 @Configuration
-@ComponentScan("com.marcnuri.mailclient.api")
+@ComponentScan("com.marcnuri.isotope.api")
 @EnableConfigurationProperties(ServerProperties.class)
 @Import({WebConfiguration.class})
-public class MailClientApiConfiguration {
+public class IsotopeApiConfiguration {
 
     private static final String IMAP_SERVER = "IMAP_SERVER";
     private static final String IMAP_PORT = "IMAP_PORT";
@@ -30,7 +30,7 @@ public class MailClientApiConfiguration {
     private final Environment environment;
 
     @Autowired
-    public MailClientApiConfiguration(Environment environment) {
+    public IsotopeApiConfiguration(Environment environment) {
         this.environment = environment;
     }
 

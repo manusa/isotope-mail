@@ -46,6 +46,7 @@ class App extends Component {
 
   componentDidMount() {
     this.props.resetFolders();
+    document.title = this.props.application.title;
   }
 
   toggleSideBar() {
@@ -59,6 +60,7 @@ class App extends Component {
 }
 
 App.propTypes = {
+  application: PropTypes.object.isRequired,
   messages: PropTypes.array.isRequired,
   resetFolders: PropTypes.func.isRequired,
   addFolder: PropTypes.func.isRequired,
@@ -66,6 +68,7 @@ App.propTypes = {
 };
 
 const mapStateToProps = state => ({
+  application: state.application,
   messages: state.messages
 });
 

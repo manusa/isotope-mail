@@ -3,7 +3,7 @@
  *
  * Created on Nov 17, 2012, 9:23:13 AM
  */
-package com.marcnuri.mailclient.api.configuration;
+package com.marcnuri.isotope.api.configuration;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
@@ -36,7 +36,7 @@ public class AllowAllSSLSocketFactory extends SSLSocketFactory {
             sslcontext.init(null,
                     new TrustManager[]{new AlwaysTrustManager()},
                     new java.security.SecureRandom());
-            sslSocketFactory = (SSLSocketFactory) sslcontext.getSocketFactory();
+            sslSocketFactory = sslcontext.getSocketFactory();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

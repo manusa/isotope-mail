@@ -3,9 +3,9 @@
  *
  * Created on 2018-08-08, 16:31
  */
-package com.marcnuri.mailclient.api.folder;
+package com.marcnuri.isotope.api.folder;
 
-import com.marcnuri.mailclient.api.exception.MailClientException;
+import com.marcnuri.isotope.api.exception.IsotopeException;
 
 import javax.mail.MessagingException;
 import java.io.Serializable;
@@ -142,7 +142,7 @@ public class Folder implements Serializable {
                 ret.setDeletedMessageCount(mailFolder.getDeletedMessageCount());
                 ret.setChildren(Stream.of(mailFolder.list()).map(Folder::from).toArray(Folder[]::new));
             } catch (MessagingException e) {
-                throw new MailClientException("Error parsing IMAP Folder");
+                throw new IsotopeException("Error parsing IMAP Folder");
             }
         } else {
             ret = null;
