@@ -3,7 +3,8 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import TopBar from './top-bar/top-bar';
 import SideBar from './side-bar/side-bar';
-import {getFolders} from '../services/folder';
+import {FolderTypes, getFolders} from '../services/folder';
+import {addFolder} from '../actions/folders';
 import {addMessage} from '../actions/messages';
 import mainCss from '../styles/main.scss';
 import styles from './app.scss';
@@ -43,6 +44,10 @@ class App extends Component {
     );
   }
 
+  componentDidMount() {
+    this.props.resetFolders();
+  }
+
   toggleSideBar() {
     const toggleCollapsed = !this.state.sideBar.collapsed;
     this.setState({
@@ -55,6 +60,7 @@ class App extends Component {
 
 App.propTypes = {
   messages: PropTypes.array.isRequired,
+  resetFolders: PropTypes.func.isRequired,
   addFolder: PropTypes.func.isRequired,
   addMessage: PropTypes.func.isRequired
 };
@@ -64,11 +70,13 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  addFolder: () => {
+  resetFolders: () => {
     // dispatch(addFolder({name: 'New Folder'}));
     getFolders(dispatch);
   },
-
+  addFolder: () => {
+    dispatch(addFolder({fullURL: 'FU', name: 'New Folder', type: FolderTypes.FOLDER, children: []}));
+  },
   addMessage: () => {
     dispatch(addMessage({subject: 'New Message'}));
   }
