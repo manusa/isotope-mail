@@ -10,7 +10,9 @@ class FolderList extends Component {
       this.props.folderList
         .map(folder =>
           <Fragment key={folder.fullURL}>
-            <FolderItem label={folder.name} graphic={folder.type.icon} />
+            <FolderItem label={folder.name} graphic={folder.type.icon}
+              unreadMessageCount={folder.unreadMessageCount}
+              newMessageCount={folder.newMessageCount}/>
             {(folder.children.length > 0 ?
               <nav className={`${mainCss['mdc-list']} ${styles.childList}`}>
                 <FolderList folderList={folder.children} />
