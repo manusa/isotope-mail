@@ -1,19 +1,27 @@
-$base-background-color: #e9e9e9;
-$base-color: #333333;
-$base-font-size: 14px;
-$base-font-weight: 400;
-$base-font-family: 'Roboto';
-
 // Material Design Theme colors
 $mdc-theme-primary: #324148;
 $mdc-theme-on-primary: #ffffff;
 $mdc-theme-background: #dddddd;
 
-
-// Layout variables
+// Layout
 $default-spacing: 16px;
 
-// Drawer variables
+// Drawer
 $drawerWidth: 240px;
+
+
+// Fonts
+$font-weight-lighter: lighter;
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+$font-weight-bolder: bolder;
+
+// Base
+$base-background-color: #e9e9e9;
+$base-color: #333333;
+$base-font-size: 14px;
+$base-font-weight: $font-weight-normal;
+$base-font-family: 'Roboto';
 
 

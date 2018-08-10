@@ -9,5 +9,9 @@
 
   .primaryText {
     margin: 0px;
+
+    &.hasNewMessages {
+      font-weight: $font-weight-bold;
+    }
   }
 }

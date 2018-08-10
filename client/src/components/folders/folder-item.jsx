@@ -12,8 +12,10 @@ class FolderItem extends Component {
         <span className={`material-icons ${mainCss['mdc-list-item__graphic']} ${styles.graphic}`}>
           {this.props.graphic}
         </span>
-        <span className={`${mainCss['mdc-list-item__primary-text']} ${styles.primaryText}`}>
+        <span className={`${mainCss['mdc-list-item__primary-text']} ${styles.primaryText}
+          ${this.props.newMessageCount > 0 ? styles.hasNewMessages : ''}`}>
           {this.props.label}
+          {this.props.unreadMessageCount > 0 ? ` (${this.props.unreadMessageCount})` : ''}
         </span>
       </Link>
     );
@@ -22,11 +24,15 @@ class FolderItem extends Component {
 
 FolderItem.propTypes = {
   graphic: PropTypes.string,
-  label: PropTypes.string.isRequired
+  label: PropTypes.string.isRequired,
+  unreadMessageCount: PropTypes.number,
+  newMessageCount: PropTypes.number
 };
 
 Spinner.defaultProps = {
-  graphic: 'folder'
+  graphic: 'folder',
+  unreadMessageCount: 0,
+  newMessageCount: 0
 };
 
 export default FolderItem;
