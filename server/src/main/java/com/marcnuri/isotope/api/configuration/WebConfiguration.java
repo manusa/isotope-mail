@@ -3,7 +3,7 @@
  *
  * Created on 2018-08-09, 7:55
  */
-package com.marcnuri.mailclient.api.configuration;
+package com.marcnuri.isotope.api.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

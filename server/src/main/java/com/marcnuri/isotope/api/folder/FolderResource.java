@@ -3,9 +3,9 @@
  *
  * Created on 2018-08-08, 16:32
  */
-package com.marcnuri.mailclient.api.folder;
+package com.marcnuri.isotope.api.folder;
 
-import com.marcnuri.mailclient.api.imap.ImapService;
+import com.marcnuri.isotope.api.imap.ImapService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;

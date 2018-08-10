@@ -3,12 +3,12 @@
  *
  * Created on 2018-08-08, 16:34
  */
-package com.marcnuri.mailclient.api.imap;
+package com.marcnuri.isotope.api.imap;
 
-import com.marcnuri.mailclient.api.configuration.AllowAllSSLSocketFactory;
-import com.marcnuri.mailclient.api.configuration.MailClientApiConfiguration;
-import com.marcnuri.mailclient.api.exception.MailClientException;
-import com.marcnuri.mailclient.api.folder.Folder;
+import com.marcnuri.isotope.api.configuration.AllowAllSSLSocketFactory;
+import com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration;
+import com.marcnuri.isotope.api.exception.IsotopeException;
+import com.marcnuri.isotope.api.folder.Folder;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPSSLStore;
 import com.sun.mail.imap.IMAPStore;
@@ -34,10 +34,10 @@ public class ImapService {
 
     private static final Logger log = LoggerFactory.getLogger(ImapService.class);
 
-    private final MailClientApiConfiguration configuration;
+    private final IsotopeApiConfiguration configuration;
 
     @Autowired
-    public ImapService(MailClientApiConfiguration configuration) {
+    public ImapService(IsotopeApiConfiguration configuration) {
         this.configuration = configuration;
     }
 
@@ -50,7 +50,7 @@ public class ImapService {
             return ret;
         } catch (MessagingException ex) {
             log.error("Error loading folders", ex);
-            throw  new MailClientException(ex.getMessage());
+            throw  new IsotopeException(ex.getMessage());
         }
     }
 
