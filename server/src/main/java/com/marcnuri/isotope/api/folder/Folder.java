@@ -6,22 +6,28 @@
 package com.marcnuri.isotope.api.folder;
 
 import com.marcnuri.isotope.api.exception.IsotopeException;
+import com.marcnuri.isotope.api.resource.IsotopeResource;
+import com.sun.mail.imap.IMAPFolder;
 
 import javax.mail.MessagingException;
+import javax.mail.URLName;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-08.
  */
-public class Folder implements Serializable {
+public class Folder extends IsotopeResource implements Serializable {
 
     private static final long serialVersionUID = 8624907999271453862L;
 
+    private String folderId;
     private String name;
     private char separator;
+    private Long UIDValidity;
     private String fullName;
     private String fullURL;
     private int messageCount;
@@ -30,6 +36,13 @@ public class Folder implements Serializable {
     private int deletedMessageCount;
     private Folder[] children;
 
+    public String getFolderId() {
+        return folderId;
+    }
+
+    public void setFolderId(String folderId) {
+        this.folderId = folderId;
+    }
 
     public String getName() {
         return name;
@@ -45,6 +58,14 @@ public class Folder implements Serializable {
 
     public void setSeparator(char separator) {
         this.separator = separator;
+    }
+
+    public Long getUIDValidity() {
+        return UIDValidity;
+    }
+
+    public void setUIDValidity(Long UIDValidity) {
+        this.UIDValidity = UIDValidity;
     }
 
     public String getFullName() {
@@ -107,13 +128,16 @@ public class Folder implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         Folder folder = (Folder) o;
         return separator == folder.separator &&
                 messageCount == folder.messageCount &&
                 newMessageCount == folder.newMessageCount &&
                 unreadMessageCount == folder.unreadMessageCount &&
                 deletedMessageCount == folder.deletedMessageCount &&
+                Objects.equals(folderId, folder.folderId) &&
                 Objects.equals(name, folder.name) &&
+                Objects.equals(UIDValidity, folder.UIDValidity) &&
                 Objects.equals(fullName, folder.fullName) &&
                 Objects.equals(fullURL, folder.fullURL) &&
                 Arrays.equals(children, folder.children);
@@ -122,25 +146,29 @@ public class Folder implements Serializable {
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(name, separator, fullName, fullURL, messageCount, newMessageCount, unreadMessageCount, deletedMessageCount);
+        int result = Objects.hash(super.hashCode(), folderId, name, separator, UIDValidity, fullName, fullURL, messageCount, newMessageCount, unreadMessageCount, deletedMessageCount);
         result = 31 * result + Arrays.hashCode(children);
         return result;
     }
 
-    public static Folder from(javax.mail.Folder mailFolder) {
+    public static Folder from(IMAPFolder mailFolder) {
         final Folder ret;
         if (mailFolder != null) {
             ret = new Folder();
             ret.setName(mailFolder.getName());
             try {
+                ret.setFolderId(toBase64Id(mailFolder.getURLName()));
                 ret.setSeparator(mailFolder.getSeparator());
+                ret.setUIDValidity(mailFolder.getUIDValidity());
                 ret.setFullName(mailFolder.getFullName());
                 ret.setFullURL(mailFolder.getURLName().toString());
                 ret.setMessageCount(mailFolder.getMessageCount());
                 ret.setNewMessageCount(mailFolder.getNewMessageCount());
                 ret.setUnreadMessageCount(mailFolder.getUnreadMessageCount());
                 ret.setDeletedMessageCount(mailFolder.getDeletedMessageCount());
-                ret.setChildren(Stream.of(mailFolder.list()).map(Folder::from).toArray(Folder[]::new));
+                ret.setChildren(Stream.of(mailFolder.list())
+                        .map(IMAPFolder.class::cast)
+                        .map(Folder::from).toArray(Folder[]::new));
             } catch (MessagingException e) {
                 throw new IsotopeException("Error parsing IMAP Folder");
             }
@@ -148,5 +176,22 @@ public class Folder implements Serializable {
             ret = null;
         }
         return ret;
+    }
+
+
+    public static URLName toId(String base64Id) {
+        return new URLName(decodeId(base64Id));
+    }
+
+    public static String toBase64Id(URLName id) {
+        return encodeId(id.toString());
+    }
+
+    private static String encodeId(String id) {
+        return Base64.getUrlEncoder().encodeToString(id.getBytes());
+    }
+
+    private static String decodeId(String encodedId) {
+        return new String(Base64.getUrlDecoder().decode(encodedId));
     }
 }

@@ -23,7 +23,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     private static final String DEVELOPMENT_PROFILE = "dev";
 
-    private final Environment environment;
+    private Environment environment;
 
     @Autowired
     public WebConfiguration(Environment environment) {
@@ -36,4 +36,5 @@ public class WebConfiguration implements WebMvcConfigurer {
             registry.addMapping("/v1/**");
         }
     }
+
 }

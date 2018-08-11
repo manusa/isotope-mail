@@ -1,4 +1,4 @@
-import {backendRequest, resetFolders} from '../actions/folders';
+import {backendRequest, setFolders} from '../actions/folders';
 
 export const FolderTypes = Object.freeze({
   INBOX: {serverName: 'INBOX', icon: 'inbox'},
@@ -25,7 +25,7 @@ export function getFolders(dispatch) {
   fetch('http://localhost:9010/v1/folders')
     .then(response => (response.json()))
     .then(json =>
-      dispatch(resetFolders(processFolders(json)))
+      dispatch(setFolders(processFolders(json)))
     );
 }
 

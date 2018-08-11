@@ -8,7 +8,8 @@ import Spinner from '../spinner/spinner';
 class FolderItem extends Component {
   render() {
     return (
-      <Link className={`${mainCss['mdc-list-item']} ${styles.listItem}`} to='#'>
+      <Link className={`${mainCss['mdc-list-item']} ${styles.listItem}`} to={'#'}
+        onClick={this.props.onClick}>
         <span className={`material-icons ${mainCss['mdc-list-item__graphic']} ${styles.graphic}`}>
           {this.props.graphic}
         </span>
@@ -25,6 +26,7 @@ class FolderItem extends Component {
 FolderItem.propTypes = {
   graphic: PropTypes.string,
   label: PropTypes.string.isRequired,
+  onClick: PropTypes.func,
   unreadMessageCount: PropTypes.number,
   newMessageCount: PropTypes.number
 };

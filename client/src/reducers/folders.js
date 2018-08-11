@@ -5,13 +5,13 @@ const folders = (state = initialState.folders, action) => {
   switch (action.type) {
     case ActionTypes.FOLDERS_BE_REQUEST:
       return {...state, activeRequests: state.activeRequests + 1};
-    case ActionTypes.FOLDERS_ADD:
-      return {...state, items: [...state.items, action.payload]};
-    case ActionTypes.FOLDERS_RESET:
+    case ActionTypes.FOLDERS_SET:
       return {...state,
         items: [...action.payload],
         activeRequests: state.activeRequests - 1
       };
+    case ActionTypes.FOLDERS_ADD:
+      return {...state, items: [...state.items, action.payload]};
     default:
       return state;
   }
