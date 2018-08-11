@@ -11,9 +11,10 @@ export const initialState = {
     items: [],
     activeRequests: 0
   },
-  messages: [
-    {subject: 'This is a message sample'}
-  ]
+  messages: {
+    items: [],
+    activeRequests: 0
+  }
 };
 
 // https://github.com/reduxjs/redux/issues/749#issuecomment-164327121

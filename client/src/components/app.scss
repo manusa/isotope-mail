@@ -1,13 +1,22 @@
 @import '../styles/partials/variables';
+@import '@material/drawer/slidable/variables';
 
 .app {
   display: flex;
   .message-grid-wrapper {
     flex-grow: 1;
+    transition: $mdc-slidable-drawer-transition-close;
+
+    &.with-side-bar {
+      width: calc(100% - #{$drawerWidth});
+      transition: $mdc-slidable-drawer-transition-open;
+    }
+
     .message-grid {
       margin: $default-spacing;
       background-color: #ffffff;
     }
+
     .fab-container {
       position: fixed;
       right: $default-spacing;

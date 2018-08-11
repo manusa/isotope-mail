@@ -5,14 +5,16 @@ import Spinner from '../spinner/spinner';
 import FolderList from './folder-list';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
+import {getMessages} from '../../services/message';
 
 class FolderContainer extends Component {
+
   render() {
     return (
       <nav className={`${mainCss['mdc-list']}`}>
         <Spinner visible={this.props.activeRequests > 0 && this.props.folderList.length === 0}
           canvasClassName={styles.spinnerCanvas} />
-        <FolderList folderList={this.props.folderList} />
+        <FolderList folderList={this.props.folderList} onClickFolder={this.props.onClickFolder.bind(this)} />
       </nav>
     );
   }
@@ -28,6 +30,10 @@ const mapStateToProps = state => ({
   folderList: state.folders.items
 });
 
-const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  onClickFolder: folder => {
+    getMessages(dispatch, folder);
+  }
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(FolderContainer);
