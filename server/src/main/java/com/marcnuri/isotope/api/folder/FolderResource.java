@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -52,12 +53,19 @@ public class FolderResource {
         return ResponseEntity.ok(imapServiceFactory.getObject().getMessages(Folder.toId(folderId)));
     }
 
+    private static Folder[] addLinks(Folder... folders) {
+        Stream.of(folders).forEach(FolderResource::addLinks);
+        return folders;
+    }
+
     private static List<Folder> addLinks(List<Folder> folders) {
         folders.forEach(FolderResource::addLinks);
         return folders;
     }
+
     private static Folder addLinks(Folder folder) {
         folder.add(linkTo(methodOn(FolderResource.class).getMessages(folder.getFolderId())).withRel(REL_MESSAGES));
+        addLinks(folder.getChildren());
         return folder;
     }
 }

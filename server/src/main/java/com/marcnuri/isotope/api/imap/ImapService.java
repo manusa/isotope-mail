@@ -25,6 +25,7 @@ import javax.mail.FetchProfile;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.URLName;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -92,8 +93,9 @@ public class ImapService {
         if (!folder.isOpen()) {
             folder.open(READ_ONLY);
         }
-        final javax.mail.Message[] messages = folder.getMessages(1,
-                20 > folder.getMessageCount() ? folder.getMessageCount() : 20);
+        final int returnedMessages = 20;
+        final javax.mail.Message[] messages = folder.getMessages(folder.getMessageCount() <= returnedMessages ?
+                1 : folder.getMessageCount() - returnedMessages, folder.getMessageCount());
         final FetchProfile fp = new FetchProfile();
         fp.add(FetchProfile.Item.ENVELOPE);
         fp.add(FetchProfile.Item.FLAGS);
@@ -101,6 +103,7 @@ public class ImapService {
         folder.fetch(messages, fp);
         return Stream.of(messages)
                 .map(m -> Message.from(folder, (IMAPMessage)m))
+                .sorted(Comparator.comparingLong(Message::getUID).reversed())
                 .collect(Collectors.toList());
     }
 
