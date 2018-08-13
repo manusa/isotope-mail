@@ -93,7 +93,7 @@ public class ImapService {
         if (!folder.isOpen()) {
             folder.open(READ_ONLY);
         }
-        final int returnedMessages = 20;
+        final int returnedMessages = 40;
         final javax.mail.Message[] messages = folder.getMessages(folder.getMessageCount() <= returnedMessages ?
                 1 : folder.getMessageCount() - returnedMessages, folder.getMessageCount());
         final FetchProfile fp = new FetchProfile();

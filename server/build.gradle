@@ -29,6 +29,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-hateoas')
 	compile('com.sun.mail:javax.mail:1.6.1')
+	compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('com.marcnuri:spring-common-test:0.0.2')
 }
