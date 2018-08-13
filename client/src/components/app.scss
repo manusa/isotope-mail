@@ -6,6 +6,7 @@
   .message-grid-wrapper {
     flex-grow: 1;
     transition: $mdc-slidable-drawer-transition-close;
+    display: flex;
 
     &.with-side-bar {
       width: calc(100% - #{$drawerWidth});
@@ -15,6 +16,7 @@
     .message-grid {
       margin: $default-spacing;
       background-color: #ffffff;
+      flex-grow: 1;
     }
 
     .fab-container {

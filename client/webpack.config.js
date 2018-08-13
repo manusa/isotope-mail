@@ -14,6 +14,7 @@ module.exports = {
   entry: [
     'babel-polyfill',
     'whatwg-fetch',
+    'abortcontroller-polyfill',
     SRC_DIR + '/index.jsx',
     'react-hot-loader/patch'
   ],

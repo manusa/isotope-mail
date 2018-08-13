@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 
 import javax.annotation.PreDestroy;
-import javax.mail.FetchProfile;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.URLName;
+import javax.mail.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
@@ -93,11 +90,11 @@ public class ImapService {
         if (!folder.isOpen()) {
             folder.open(READ_ONLY);
         }
-        final int returnedMessages = 40;
-        final javax.mail.Message[] messages = folder.getMessages(folder.getMessageCount() <= returnedMessages ?
-                1 : folder.getMessageCount() - returnedMessages, folder.getMessageCount());
+        final javax.mail.Message[] messages = folder.getMessages();
         final FetchProfile fp = new FetchProfile();
         fp.add(FetchProfile.Item.ENVELOPE);
+        fp.add(UIDFolder.FetchProfileItem.UID);
+        folder.fetch(folder.getMessages(), fp);
         fp.add(FetchProfile.Item.FLAGS);
         fp.add(FetchProfile.Item.SIZE);
         folder.fetch(messages, fp);
@@ -154,4 +151,5 @@ public class ImapService {
         ret.put("mail.imaps.host", configuration.getImapHost());
         return ret;
     }
+
 }
