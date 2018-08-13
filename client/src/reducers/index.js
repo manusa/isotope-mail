@@ -13,6 +13,7 @@ export const initialState = {
   },
   messages: {
     items: [],
+    cache: {},
     activeRequests: 0
   }
 };
