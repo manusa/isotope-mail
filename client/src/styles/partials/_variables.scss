@@ -16,12 +16,20 @@ $font-weight-light: 300;
 $font-weight-normal: 400;
 $font-weight-bold: 700;
 $font-weight-bolder: bolder;
+$font-size-body: 1rem;
+$font-size-body-2: 0.875 * $font-size-body;
 
 // Base
 $base-background-color: #e9e9e9;
 $base-color: #333333;
-$base-font-size: 14px;
+$base-font-size: $font-size-body;
 $base-font-weight: $font-weight-normal;
 $base-font-family: 'Roboto';
+$base-h1-size: 6 * $font-size-body;
+$base-h2-size: 3.75 * $font-size-body;
+$base-h3-size: 3 * $font-size-body;
+$base-h4-size: 2.125 * $font-size-body;
+$base-h5-size: 1.5 * $font-size-body;
+$base-h6-size: 1.25 * $font-size-body;
 
 

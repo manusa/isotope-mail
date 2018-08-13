@@ -1,5 +1,47 @@
+@import '../../styles/partials/variables';
 
 .messageList {
-  .subject {
+
+  .list {
+    padding: 0;
+
+    .item {
+      display: flex;
+      flex-flow: row nowrap;
+      font-weight: $font-weight-bold;
+      font-size: $font-size-body-2;
+      height: 32px;
+      border: 1px solid lighten($mdc-theme-background, 10%);
+
+      &.seen {
+        font-weight: $font-weight-normal;
+      }
+
+      .from {
+        width: 200px;
+        min-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .subject {
+        flex-grow: 1;
+        margin-left: $default-spacing;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .receivedDate {
+        width: 90px;
+        min-width: 90px;
+        text-align: right;
+      }
+      .size {
+        width: 85px;
+        min-width: 85px;
+        text-align: right;
+      }
+
+    }
   }
 }

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.stream.Stream;
@@ -18,7 +17,6 @@ import java.util.stream.Stream;
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-09.
  */
 @Configuration
-@EnableWebMvc
 public class WebConfiguration implements WebMvcConfigurer {
 
     private static final String DEVELOPMENT_PROFILE = "dev";

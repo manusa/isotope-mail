@@ -9,3 +9,33 @@ body {
   margin: 0;
   padding: 0;
 }
+
+h1 {
+  font-size: $base-h1-size;
+  font-weight: $font-weight-light;
+}
+
+h2 {
+  font-size: $base-h2-size;
+  font-weight: $font-weight-light;
+}
+
+h3 {
+  font-size: $base-h3-size;
+  font-weight: $font-weight-normal;
+}
+
+h4 {
+  font-size: $base-h4-size;
+  font-weight: $font-weight-normal;
+}
+
+h5 {
+  font-size: $base-h5-size;
+  font-weight: $font-weight-normal;
+}
+
+h6 {
+  font-size: $base-h6-size;
+  font-weight: $font-weight-normal;
+}
