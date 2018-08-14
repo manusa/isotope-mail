@@ -6,7 +6,7 @@ import {backendRequest, backendRequestCompleted, updateCache} from '../actions/m
  * @param folder
  * @param signal {AbortSignal}
  */
-export function getMessages(dispatch, folder, signal) {
+export function updateFolderMessagesCache(dispatch, folder, signal) {
   dispatch(backendRequest());
   fetch(folder._links.messages.href, {signal})
     .then(response => {
