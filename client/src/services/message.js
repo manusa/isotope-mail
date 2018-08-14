@@ -9,9 +9,7 @@ import {backendRequest, backendRequestCompleted, loadFromCache, setMessages, upd
 export function getMessages(dispatch, folder, signal) {
   dispatch(backendRequest());
   dispatch(loadFromCache(folder));
-  // TODO: remove hardcoded URL
-  const url = folder && folder._links && folder._links.messages ? folder._links.messages.href :
-    `http://localhost:9010/v1/folders/${folder}/messages`;
+  const url = folder._links.messages.href;
   fetch(url, {signal})
     .then(response => {
       dispatch(backendRequestCompleted());
@@ -20,10 +18,7 @@ export function getMessages(dispatch, folder, signal) {
     .then(response => (response.json()))
     .then(json => {
       dispatch(setMessages(json));
-      // TODO: remove when removing hardcoded URL
-      if (folder._links) {
-        dispatch(updateCache(folder, json));
-      }
+      dispatch(updateCache(folder, json));
     })
     .catch(error => {
       dispatch(backendRequestCompleted());

@@ -8,6 +8,7 @@ export const initialState = {
     title: 'Isotope Mail Client'
   },
   folders: {
+    selected: {},
     items: [],
     activeRequests: 0
   },
