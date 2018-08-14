@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import Spinner from '../spinner/spinner';
 import {FolderTypes} from '../../services/folder';
 import FolderList from './folder-list';
-import {getMessages} from '../../services/message';
+import {updateFolderMessagesCache} from '../../services/message';
 import {selectFolder} from '../../actions/folders';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
@@ -65,7 +65,7 @@ const mapDispatchToProps = dispatch => ({
       abortControllerWrapper.abortController.abort();
     }
     abortControllerWrapper.abortController = new AbortController();
-    getMessages(dispatch, folder, abortControllerWrapper.abortController.signal);
+    updateFolderMessagesCache(dispatch, folder, abortControllerWrapper.abortController.signal);
   }
 });
 

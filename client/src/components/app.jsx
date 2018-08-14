@@ -5,7 +5,6 @@ import TopBar from './top-bar/top-bar';
 import SideBar from './side-bar/side-bar';
 import MessageList from './message-list/message-list';
 import {FolderTypes, getFolders} from '../services/folder';
-import {getMessages} from '../services/message';
 import {addFolder} from '../actions/folders';
 import {addMessage} from '../actions/messages';
 import mainCss from '../styles/main.scss';
