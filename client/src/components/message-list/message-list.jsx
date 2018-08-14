@@ -17,15 +17,15 @@ class MessageList extends Component {
   render() {
     return (
       <div className={`${styles.messageList} ${this.props.className}`}>
-        <Spinner visible={this.props.messages.activeRequests > 0 && this.props.messages.items.length === 0} />
-        {this.props.messages.items.length === 0 ? null :
+        <Spinner visible={this.props.activeRequests > 0 && this.props.messages.length === 0} />
+        {this.props.messages.length === 0 ? null :
           <ul className={`${mainCss['mdc-list']} ${styles.list}`}>
             <AutoSizer defaultHeight={100}>
               {({height, width}) => (
                 <List rowRenderer={this.renderItem.bind(this)}
                   height={height}
                   width={width}
-                  rowCount={this.props.messages.items.length}
+                  rowCount={this.props.messages.length}
                   rowHeight={32}
                 />
               )}
@@ -37,7 +37,7 @@ class MessageList extends Component {
   }
 
   renderItem({index, key, style}) {
-    const message = this.props.messages.items[index];
+    const message = this.props.messages[index];
     return (
       <li key={key} style={style} className={`${mainCss['mdc-list-item']}
                 ${styles.item} ${message.seen ? styles.seen : ''}`} >
@@ -60,7 +60,9 @@ MessageList.defaultProps = {
 
 const mapStateToProps = state => ({
   selectedFolder: state.folders.selected,
-  messages: state.messages
+  activeRequests: state.messages.activeRequests,
+  messages: state.folders.selected.folderId && state.messages.cache[state.folders.selected.folderId] ?
+    Array.from(state.messages.cache[state.folders.selected.folderId].values()) : []
 });
 
 const mapDispatchToProps = dispatch => ({ });

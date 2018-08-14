@@ -13,7 +13,6 @@ export const initialState = {
     activeRequests: 0
   },
   messages: {
-    items: [],
     cache: {},
     activeRequests: 0
   }
