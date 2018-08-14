@@ -48,9 +48,7 @@ class MessageList extends Component {
       </li>
     );
   }
-
 }
-
 
 MessageList.propTypes = {
   className: PropTypes.string
@@ -61,6 +59,7 @@ MessageList.defaultProps = {
 };
 
 const mapStateToProps = state => ({
+  selectedFolder: state.folders.selected,
   messages: state.messages
 });
 

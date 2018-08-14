@@ -44,7 +44,6 @@ class App extends Component {
 
   componentDidMount() {
     this.props.resetFolders();
-    this.props.resetMessages();
     document.title = this.props.application.title;
   }
 
@@ -62,7 +61,6 @@ App.propTypes = {
   application: PropTypes.object.isRequired,
   resetFolders: PropTypes.func.isRequired,
   addFolder: PropTypes.func.isRequired,
-  resetMessages: PropTypes.func.isRequired,
   addMessage: PropTypes.func.isRequired
 };
 
@@ -76,9 +74,6 @@ const mapDispatchToProps = dispatch => ({
   },
   addFolder: () => {
     dispatch(addFolder({fullURL: 'FU', name: 'New Folder', type: FolderTypes.FOLDER, children: []}));
-  },
-  resetMessages: () => {
-    getMessages(dispatch, 'INBOX');
   },
   addMessage: () => {
     dispatch(addMessage({subject: 'New Message'}));
