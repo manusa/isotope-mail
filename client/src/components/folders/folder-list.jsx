@@ -11,12 +11,14 @@ class FolderList extends Component {
         .map(folder =>
           <Fragment key={folder.fullURL}>
             <FolderItem label={folder.name} graphic={folder.type.icon}
+              selected={this.props.selectedFolder && folder.folderId === this.props.selectedFolder.folderId}
               onClick={this.props.onClickFolder.bind(this, folder)}
               unreadMessageCount={folder.unreadMessageCount}
               newMessageCount={folder.newMessageCount}/>
             {(folder.children.length > 0 ?
               <nav className={`${mainCss['mdc-list']} ${styles.childList}`}>
-                <FolderList folderList={folder.children} onClickFolder={this.props.onClickFolder} />
+                <FolderList folderList={folder.children} onClickFolder={this.props.onClickFolder}
+                  selectedFolder={this.props.selectedFolder} />
               </nav> :
               null
             )}
@@ -29,6 +31,7 @@ class FolderList extends Component {
 
 FolderList.propTypes = {
   folderList: PropTypes.array.isRequired,
+  selectedFolder: PropTypes.object,
   onClickFolder: PropTypes.func
 };
 

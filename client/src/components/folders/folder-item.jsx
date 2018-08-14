@@ -1,14 +1,15 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import {FolderTypes} from '../../services/folder';
 import styles from './folder-item.scss';
 import mainCss from '../../styles/main.scss';
-import Spinner from '../spinner/spinner';
 
 class FolderItem extends Component {
   render() {
     return (
-      <a className={`${mainCss['mdc-list-item']} ${styles.listItem}`}
-        onClick={this.props.onClick}>
+      <a className={`${mainCss['mdc-list-item']} ${styles.listItem}
+        ${this.props.selected ? mainCss['mdc-list-item--selected'] : ''}`}
+      onClick={this.props.onClick}>
         <span className={`material-icons ${mainCss['mdc-list-item__graphic']} ${styles.graphic}`}>
           {this.props.graphic}
         </span>
@@ -25,13 +26,15 @@ class FolderItem extends Component {
 FolderItem.propTypes = {
   graphic: PropTypes.string,
   label: PropTypes.string.isRequired,
+  selected: PropTypes.bool.isRequired,
   onClick: PropTypes.func,
   unreadMessageCount: PropTypes.number,
   newMessageCount: PropTypes.number
 };
 
-Spinner.defaultProps = {
-  graphic: 'folder',
+FolderItem.defaultProps = {
+  graphic: FolderTypes.FOLDER.icon,
+  selected: false,
   unreadMessageCount: 0,
   newMessageCount: 0
 };

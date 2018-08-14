@@ -1,4 +1,4 @@
-import {backendRequest, backendRequestCompleted, loadFromCache, setMessages, updateCache} from '../actions/messages';
+import {backendRequest, backendRequestCompleted, updateCache} from '../actions/messages';
 
 /**
  *
@@ -8,16 +8,13 @@ import {backendRequest, backendRequestCompleted, loadFromCache, setMessages, upd
  */
 export function getMessages(dispatch, folder, signal) {
   dispatch(backendRequest());
-  dispatch(loadFromCache(folder));
-  const url = folder._links.messages.href;
-  fetch(url, {signal})
+  fetch(folder._links.messages.href, {signal})
     .then(response => {
       dispatch(backendRequestCompleted());
       return response;
     })
     .then(response => (response.json()))
     .then(json => {
-      dispatch(setMessages(json));
       dispatch(updateCache(folder, json));
     })
     .catch(error => {
