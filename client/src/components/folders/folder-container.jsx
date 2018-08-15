@@ -31,9 +31,9 @@ class FolderContainer extends Component {
     this.loadInbox();
   }
 
-  // componentDidUpdate(prevProps, prevState, snapshot) {
-  //   // this.loadInbox();
-  // }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    this.loadInbox();
+  }
 
   loadInbox() {
     // Initial list of folders loaded -> Select INBOX

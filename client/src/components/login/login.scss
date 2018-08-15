@@ -1,0 +1,49 @@
+@import '../../styles/partials/variables';
+
+$port-field-width: 100px;
+.login {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .card {
+    padding: $default-spacing;
+    width: 60%;
+
+    .title {
+      font-size: $font-size-body * 1.8;
+      text-align: center;
+    }
+
+    .subtitle {
+      margin-top: $default-spacing / 2;
+      font-size: $font-size-body * 1.5;
+      color: lighten($base-color, 25%);
+      text-align: center;
+    }
+
+    .fullWidth {
+      width: 100%;
+    }
+
+    .server {
+      width: 100%;
+      display: flex;
+
+      .serverHost {
+        margin-right: $default-spacing;
+        flex-grow: 1;
+      }
+
+      .serverPort {
+        width: $port-field-width;
+      }
+    }
+
+    .loginButton {
+      margin-top: $default-spacing;
+    }
+  }
+}

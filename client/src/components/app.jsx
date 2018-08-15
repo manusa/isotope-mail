@@ -18,12 +18,13 @@ class App extends Component {
         collapsed: false
       }
     };
+    this.toggleSideBar = this.toggleSideBar.bind(this);
   }
 
   render() {
     return (
       <div className={styles.app}>
-        <TopBar sideBarCollapsed={this.state.sideBar.collapsed} sideBarToggle={this.toggleSideBar.bind(this)}/>
+        <TopBar sideBarCollapsed={this.state.sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
         <SideBar collapsed={this.state.sideBar.collapsed}/>
         <div className={`${mainCss['mdc-top-app-bar--fixed-adjust']} ${styles['message-grid-wrapper']}
           ${this.state.sideBar.collapsed ? '' : styles['with-side-bar']}`}>

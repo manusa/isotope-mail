@@ -5,7 +5,8 @@ import messages from './messages';
 
 export const initialState = {
   application: {
-    title: 'Isotope Mail Client'
+    title: 'Isotope Mail Client',
+    user: {}
   },
   folders: {
     selected: {},

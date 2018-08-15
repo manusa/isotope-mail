@@ -4,7 +4,11 @@
 @import 'partials/spinner';
 
 // Third-party
+@import '@material/button/mdc-button';
+@import '@material/card/mdc-card';
 @import '@material/drawer/mdc-drawer';
 @import '@material/fab/mdc-fab';
-@import  '@material/list/mdc-list';
-@import  '@material/top-app-bar/mdc-top-app-bar';
+@import '@material/line-ripple/mdc-line-ripple';
+@import '@material/list/mdc-list';
+@import '@material/textfield/mdc-text-field';
+@import '@material/top-app-bar/mdc-top-app-bar';
