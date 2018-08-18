@@ -69,8 +69,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  resetFolders: () => {
-    getFolders(dispatch);
+  resetFolders: credentials => {
+    getFolders(dispatch, credentials);
   },
   addFolder: () => {
     dispatch(addFolder({fullURL: 'FU', name: 'New Folder', type: FolderTypes.FOLDER, children: []}));
@@ -80,4 +80,8 @@ const mapDispatchToProps = dispatch => ({
   }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
+  resetFolders: () => dispatchProps.resetFolders(stateProps.application.user.credentials)
+}));
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(App);

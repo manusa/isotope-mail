@@ -5,7 +5,7 @@ import mainCss from '../../styles/main.scss';
 class Spinner extends Component {
   render() {
     return this.props.visible ? (
-      <div className={mainCss.spinner}>
+      <div className={`${mainCss.spinner} ${this.props.className}`}>
         <svg className={`${mainCss.canvas} ${this.props.canvasClassName}`} width="55px" height="55px" viewBox="0 0 54 54"
           xmlns="http://www.w3.org/2000/svg">
           <circle className={`${mainCss.path} ${this.props.pathClassName}`}
@@ -18,11 +18,13 @@ class Spinner extends Component {
 
 Spinner.propTypes = {
   visible: PropTypes.bool,
+  className: PropTypes.string,
   canvasClassName: PropTypes.string,
   pathClassName: PropTypes.string
 };
 
 Spinner.defaultProps = {
+  className: '',
   canvasClassName: '',
   pathClassName: ''
 };

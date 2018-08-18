@@ -6,6 +6,7 @@ import {login} from '../../services/application';
 import TextField from '../form/text-field/text-field';
 import mainCss from '../../styles/main.scss';
 import styles from './login.scss';
+import Spinner from '../spinner/spinner';
 
 class Login extends Component {
   constructor(props) {
@@ -28,6 +29,7 @@ class Login extends Component {
     }
     return (
       <div className={styles.login}>
+        <Spinner visible={this.props.application.activeRequests > 0} className={styles.spinner}/>
         <div className={`${mainCss['mdc-card']} ${styles.card}`}>
           <header>
             <h1 className={styles.title}>{this.props.application.title}</h1>

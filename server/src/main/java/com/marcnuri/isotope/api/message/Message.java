@@ -19,6 +19,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -150,7 +151,7 @@ public class Message extends IsotopeResource implements Serializable {
     }
 
     private static List<String> processAddress(Address... addresses) {
-        return Stream.of(addresses)
+        return Stream.of(Optional.ofNullable(addresses).orElse(new Address[0]))
                 .map(address -> {
                     if (address instanceof InternetAddress) {
                         final InternetAddress internetAddress = (InternetAddress) address;

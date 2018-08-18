@@ -1,6 +1,8 @@
-import {setUserCredentials} from '../actions/application';
+import {backendRequest, backendRequestCompleted, setUserCredentials} from '../actions/application';
+import {toJson} from './fetch';
 
 export function login(dispatch, credentials) {
+  dispatch(backendRequest());
   fetch('http://localhost:9010/v1/application/login', {
     method: 'POST',
     headers: {
@@ -8,8 +10,15 @@ export function login(dispatch, credentials) {
     },
     body: JSON.stringify(credentials)
   })
-    .then(response => (response.json()))
-    .then(json =>
-      dispatch(setUserCredentials(json))
-    );
+    .then(response => {
+      dispatch(backendRequestCompleted());
+      return response;
+    })
+    .then(toJson)
+    .then(({encrypted, salt}) =>
+      dispatch(setUserCredentials({encrypted, salt}))
+    )
+    .catch(error => {
+      dispatch(backendRequestCompleted());
+    });
 }
