@@ -6,9 +6,11 @@
 package com.marcnuri.isotope.api.imap;
 
 import com.marcnuri.isotope.api.configuration.AllowAllSSLSocketFactory;
-import com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration;
+import com.marcnuri.isotope.api.credentials.Credentials;
+import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.folder.Folder;
+import com.marcnuri.isotope.api.http.HttpHeaders;
 import com.marcnuri.isotope.api.message.Message;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
@@ -22,6 +24,8 @@ import org.springframework.web.context.annotation.RequestScope;
 
 import javax.annotation.PreDestroy;
 import javax.mail.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
@@ -37,17 +41,22 @@ import static javax.mail.Folder.READ_ONLY;
 @RequestScope
 public class ImapService {
 
-    private static final String IMAPS_PROTOCOL = "imaps";
-
     private static final Logger log = LoggerFactory.getLogger(ImapService.class);
 
-    private final IsotopeApiConfiguration configuration;
+    private static final String IMAPS_PROTOCOL = "imaps";
+
+    private final HttpServletRequest httpServletRequest;
+
+    private CredentialsService credentialsService;
 
     private IMAPStore imapStore;
 
     @Autowired
-    public ImapService(IsotopeApiConfiguration configuration) {
-        this.configuration = configuration;
+    public ImapService(
+            HttpServletRequest httpServletRequest, CredentialsService credentialsService) {
+
+        this.httpServletRequest = httpServletRequest;
+        this.credentialsService = credentialsService;
     }
 
     public List<Folder> getFolders() {
@@ -56,7 +65,7 @@ public class ImapService {
             return Stream.of(rootFolder.list())
                     .map(IMAPFolder.class::cast)
                     .map(Folder::from).collect(Collectors.toList());
-        } catch (MessagingException ex) {
+        } catch (MessagingException | IOException ex) {
             log.error("Error loading folders", ex);
             throw  new IsotopeException(ex.getMessage());
         }
@@ -68,7 +77,7 @@ public class ImapService {
             final List<Message> ret = getMessages(folder);
             folder.close();
             return ret;
-        } catch (MessagingException ex) {
+        } catch (MessagingException | IOException ex) {
             log.error("Error loading messages for folder: " + folderId.toString(), ex);
             throw  new IsotopeException(ex.getMessage());
         }
@@ -80,9 +89,25 @@ public class ImapService {
             final List<Message> ret = getMessages(folder);
             folder.close();
             return ret;
-        } catch (MessagingException ex) {
+        } catch (MessagingException | IOException ex) {
             log.error("Error loading messages for folder: " + folderName, ex);
             throw  new IsotopeException(ex.getMessage());
+        }
+    }
+
+    /**
+     * Checks if specified {@link Credentials} are valid and returns a new Credentials object with
+     * encrypted values.
+     *
+     * @param credentials
+     * @return
+     */
+    public Credentials checkCredentials(Credentials credentials) {
+        try {
+            getImapStore(credentials).getDefaultFolder();
+            return credentialsService.encrypt(credentials);
+        } catch (MessagingException | IOException e) {
+            throw new IsotopeException("Error while logging in", e);
         }
     }
 
@@ -115,15 +140,20 @@ public class ImapService {
         }
     }
 
-    private IMAPStore getImapStore() throws MessagingException {
+    private IMAPStore getImapStore() throws IOException, MessagingException {
+        final Credentials credentials = credentialsService.decrypt(httpServletRequest.getHeader(HttpHeaders.ISOTOPE_CRDENTIALS),
+                httpServletRequest.getHeader(HttpHeaders.ISOTOPE_SALT));
+        return getImapStore(credentials);
+    }
+    private IMAPStore getImapStore(Credentials credentials) throws MessagingException {
         if (imapStore == null) {
             final Session session = Session.getInstance(initMailProperties(), null);
             imapStore = (IMAPSSLStore) session.getStore(IMAPS_PROTOCOL);
             imapStore.connect(
-                    configuration.getImapHost(),
-                    configuration.getImapPort(),
-                    configuration.getImapUser(),
-                    configuration.getImapPassword());
+                    credentials.getServerHost(),
+                    credentials.getServerPort(),
+                    credentials.getUser(),
+                    credentials.getPassword());
         }
         return imapStore;
     }
@@ -137,7 +167,7 @@ public class ImapService {
         ret.put("mail.imap.starttls.enable", true);
 
 //        ret.put("mail.smtps.socketFactory.port", getMailServerSmtpPort());
-        ret.put("mail.imaps.socketFactory.port", configuration.getImapPort());
+//        ret.put("mail.imaps.socketFactory.port", configuration.getImapPort());
 
         ret.put("mail.smtps.socketFactory.class", AllowAllSSLSocketFactory.class.getName());
         ret.put("mail.imaps.socketFactory.class", AllowAllSSLSocketFactory.class.getName());
@@ -148,7 +178,7 @@ public class ImapService {
         ret.put("mail.smtps.auth", true);
 
 //        ret.put("mail.smtps.host", getMailServerHost());
-        ret.put("mail.imaps.host", configuration.getImapHost());
+//        ret.put("mail.imaps.host", configuration.getImapHost());
         return ret;
     }
 

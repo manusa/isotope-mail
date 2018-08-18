@@ -20,6 +20,8 @@ import java.util.Map;
  */
 public class LinkSerializer extends StdSerializer<List<Link>> {
 
+    protected static final String HREF = "href";
+
     public LinkSerializer() {
         this(null);
     }
@@ -36,9 +38,9 @@ public class LinkSerializer extends StdSerializer<List<Link>> {
         }
         gen.writeEndObject();
     }
-    private static final Map toEntry(Link link) {
-        final Map fields = new HashMap<String, String>(1);
-        fields.put("href", link.getHref());
+    private static Map toEntry(Link link) {
+        final Map<String, String> fields = new HashMap<>(1);
+        fields.put(HREF, link.getHref());
         return fields;
     }
 }

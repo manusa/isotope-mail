@@ -53,20 +53,26 @@ FolderContainer.propTypes = {
 };
 
 const mapStateToProps = state => ({
+  application: state.application,
   activeRequests: state.folders.activeRequests,
   selectedFolder: state.folders.selected,
   folderList: state.folders.items
 });
 
 const mapDispatchToProps = dispatch => ({
-  selectFolder: (abortControllerWrapper, folder) => {
+  selectFolder: (abortControllerWrapper, folder, credentials) => {
     dispatch(selectFolder(folder));
     if (abortControllerWrapper && abortControllerWrapper.abortController) {
       abortControllerWrapper.abortController.abort();
     }
     abortControllerWrapper.abortController = new AbortController();
-    updateFolderMessagesCache(dispatch, folder, abortControllerWrapper.abortController.signal);
+    updateFolderMessagesCache(dispatch, credentials, folder, abortControllerWrapper.abortController.signal);
   }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(FolderContainer);
+const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
+  selectFolder: (abortControllerWrapper, folder) =>
+    dispatchProps.selectFolder(abortControllerWrapper, folder, stateProps.application.user.credentials)
+}));
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(FolderContainer);

@@ -7,6 +7,8 @@ package com.marcnuri.isotope.api.credentials;
 
 import com.marcnuri.isotope.api.resource.IsotopeResource;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -17,10 +19,33 @@ public class Credentials extends IsotopeResource implements Serializable {
 
     private static final long serialVersionUID = -3763522029969923952L;
 
+    private String encrypted;
+    private String salt;
+    @NotNull(groups=Login.class)
     private String serverHost;
+    @NotNull(groups=Login.class)
+    @Positive(groups=Login.class)
     private Integer serverPort;
+    @NotNull(groups=Login.class)
     private String user;
+    @NotNull(groups=Login.class)
     private String password;
+
+    public String getEncrypted() {
+        return encrypted;
+    }
+
+    public void setEncrypted(String encrypted) {
+        this.encrypted = encrypted;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
 
     public String getServerHost() {
         return serverHost;
@@ -60,7 +85,9 @@ public class Credentials extends IsotopeResource implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Credentials that = (Credentials) o;
-        return Objects.equals(serverHost, that.serverHost) &&
+        return Objects.equals(encrypted, that.encrypted) &&
+                Objects.equals(salt, that.salt) &&
+                Objects.equals(serverHost, that.serverHost) &&
                 Objects.equals(serverPort, that.serverPort) &&
                 Objects.equals(user, that.user) &&
                 Objects.equals(password, that.password);
@@ -69,6 +96,13 @@ public class Credentials extends IsotopeResource implements Serializable {
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), serverHost, serverPort, user, password);
+        return Objects.hash(super.hashCode(), encrypted, salt, serverHost, serverPort, user, password);
     }
+
+
+    /**
+     * Validation Group interface for login
+     */
+    public interface Login {}
+
 }
