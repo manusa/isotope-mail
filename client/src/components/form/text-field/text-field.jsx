@@ -37,6 +37,7 @@ class TextField extends Component {
   componentDidMount() {
     if (this.props.focused) {
       this.inputRef.current.focus();
+      this.inputRef.current.selectionStart = this.inputRef.current.selectionEnd = this.inputRef.current.value.length;
     }
   }
   onFocus() {
