@@ -43,11 +43,11 @@ class Login extends Component {
               <TextField key='serverPort' id='serverPort' fieldClass={styles.serverPort}
                 type='number' min='0'
                 value={this.state.values.serverPort} onChange={this.onFieldChange}
-                focused={this.isFocused('serverPort')} required={true} label='Port'/>
+                focused={this.isFocused('serverPort')} required={true} autoComplete='on' label='Port'/>
             </div>
             <TextField id='user' fieldClass={styles.fullWidth}
               value={this.state.values.user} onChange={this.onFieldChange}
-              focused={this.isFocused('user')} required={true} label='User'/>
+              focused={this.isFocused('user')} required={true} autoComplete='on' label='User'/>
             <TextField id='password' type={'password'} fieldClass={styles.fullWidth}
               value={this.state.values.password} onChange={this.onFieldChange}
               focused={this.isFocused('password')} required={true} label='Password'/>
