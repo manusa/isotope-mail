@@ -59,18 +59,22 @@ class App extends Component {
 
 App.propTypes = {
   application: PropTypes.object.isRequired,
+  folders: PropTypes.object.isRequired,
   resetFolders: PropTypes.func.isRequired,
   addFolder: PropTypes.func.isRequired,
   addMessage: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-  application: state.application
+  application: state.application,
+  folders: state.folders
 });
 
 const mapDispatchToProps = dispatch => ({
-  resetFolders: credentials => {
-    getFolders(dispatch, credentials);
+  resetFolders: (credentials, preloadFistLevel) => {
+    if (preloadFistLevel) {
+      getFolders(dispatch, credentials);
+    }
     getFolders(dispatch, credentials, true);
   },
   addFolder: () => {
@@ -82,7 +86,9 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
-  resetFolders: () => dispatchProps.resetFolders(stateProps.application.user.credentials)
+  resetFolders: () =>
+    // Preload first level only if folders weren't loaded previously (session storage)
+    dispatchProps.resetFolders(stateProps.application.user.credentials, stateProps.folders.items.length === 0)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(App);

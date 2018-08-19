@@ -67,9 +67,12 @@ const mapDispatchToProps = dispatch => ({
       abortControllerWrapper.abortController.abort();
     }
     abortControllerWrapper.abortController = new AbortController();
-    // Initial load of folder's messages should be partial
-    if (cachedFolderMessagesMap instanceof Map === false) {
-      updateFolderMessagesCache(dispatch, credentials, folder, abortControllerWrapper.abortController.signal, 1, 30);
+    // Performance: Perform an initial load of the latest (30*) messages in the folder
+    const initialLoadMessageCount = 30;
+    if (cachedFolderMessagesMap instanceof Map === false
+      && folder.messageCount >= initialLoadMessageCount) {
+      updateFolderMessagesCache(dispatch, credentials, folder, abortControllerWrapper.abortController.signal,
+        folder.messageCount - initialLoadMessageCount, folder.messageCount);
     }
     resetFolderMessagesCache(dispatch, credentials, folder, abortControllerWrapper.abortController.signal);
   }

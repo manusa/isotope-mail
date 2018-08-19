@@ -33,7 +33,6 @@ export function updateFolderMessagesCache(dispatch, credentials, folder, signal,
   if (start >= 0 && end >= 0) {
     url.search = new URLSearchParams({start, end}).toString();
   }
-  console.log('UPDATING ' + url);
   dispatch(backendRequest());
   fetch(url, {
     method: 'GET',
