@@ -24,6 +24,7 @@ Spinner.propTypes = {
 };
 
 Spinner.defaultProps = {
+  visible: true,
   className: '',
   canvasClassName: '',
   pathClassName: ''

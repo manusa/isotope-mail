@@ -32,6 +32,10 @@ class MessageList extends Component {
             </AutoSizer>
           </ul>
         }
+        {this.props.activeRequests > 0 && this.props.messages.length > 0 ?
+          (<Spinner className={styles.listSpinner} canvasClassName={styles.listSpinnerCanvas} />) :
+          null
+        }
       </div>
     );
   }

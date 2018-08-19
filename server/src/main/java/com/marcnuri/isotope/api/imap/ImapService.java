@@ -19,6 +19,7 @@ import com.sun.mail.imap.IMAPStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -59,42 +60,6 @@ public class ImapService {
         this.credentialsService = credentialsService;
     }
 
-    public List<Folder> getFolders() {
-        try {
-            final IMAPFolder rootFolder = (IMAPFolder)getImapStore().getDefaultFolder();
-            return Stream.of(rootFolder.list())
-                    .map(IMAPFolder.class::cast)
-                    .map(Folder::from).collect(Collectors.toList());
-        } catch (MessagingException | IOException ex) {
-            log.error("Error loading folders", ex);
-            throw  new IsotopeException(ex.getMessage());
-        }
-    }
-
-    public List<Message> getMessages(URLName folderId) {
-        try {
-            final IMAPFolder folder = (IMAPFolder)getImapStore().getFolder(folderId);
-            final List<Message> ret = getMessages(folder);
-            folder.close();
-            return ret;
-        } catch (MessagingException | IOException ex) {
-            log.error("Error loading messages for folder: " + folderId.toString(), ex);
-            throw  new IsotopeException(ex.getMessage());
-        }
-    }
-
-    public List<Message> getMessages(String folderName) {
-        try {
-            final IMAPFolder folder = (IMAPFolder)getImapStore().getFolder(folderName);
-            final List<Message> ret = getMessages(folder);
-            folder.close();
-            return ret;
-        } catch (MessagingException | IOException ex) {
-            log.error("Error loading messages for folder: " + folderName, ex);
-            throw  new IsotopeException(ex.getMessage());
-        }
-    }
-
     /**
      * Checks if specified {@link Credentials} are valid and returns a new Credentials object with
      * encrypted values.
@@ -111,11 +76,43 @@ public class ImapService {
         }
     }
 
-    private List<Message> getMessages(IMAPFolder folder) throws MessagingException {
+    public List<Folder> getFolders(@Nullable  Boolean loadChildren) {
+        try {
+            final IMAPFolder rootFolder = (IMAPFolder)getImapStore().getDefaultFolder();
+            return Stream.of(rootFolder.list())
+                    .map(IMAPFolder.class::cast)
+                    .map(mf -> Folder.from(mf, loadChildren))
+                    .collect(Collectors.toList());
+        } catch (MessagingException | IOException ex) {
+            log.error("Error loading folders", ex);
+            throw  new IsotopeException(ex.getMessage());
+        }
+    }
+
+    public List<Message> getMessages(URLName folderId, @Nullable Integer start, @Nullable Integer end) {
+        try {
+            final IMAPFolder folder = (IMAPFolder)getImapStore().getFolder(folderId);
+            final List<Message> ret = getMessages(folder, start, end);
+            folder.close();
+            return ret;
+        } catch (MessagingException | IOException ex) {
+            log.error("Error loading messages for folder: " + folderId.toString(), ex);
+            throw  new IsotopeException(ex.getMessage());
+        }
+    }
+
+    private List<Message> getMessages(
+            IMAPFolder folder, @Nullable Integer start, @Nullable Integer end) throws MessagingException {
+
         if (!folder.isOpen()) {
             folder.open(READ_ONLY);
         }
-        final javax.mail.Message[] messages = folder.getMessages();
+        final javax.mail.Message[] messages;
+        if (start != null && end != null) {
+            messages = folder.getMessages(start, end > folder.getMessageCount() ? folder.getMessageCount() : end);
+        } else {
+            messages = folder.getMessages();
+        }
         final FetchProfile fp = new FetchProfile();
         fp.add(FetchProfile.Item.ENVELOPE);
         fp.add(UIDFolder.FetchProfileItem.UID);

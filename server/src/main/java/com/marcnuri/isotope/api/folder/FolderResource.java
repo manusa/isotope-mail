@@ -13,6 +13,7 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -39,18 +40,18 @@ public class FolderResource {
     }
 
     @RequestMapping(path = "", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
-    public ResponseEntity<List<Folder>> getFolders() {
-        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().getFolders()));
-    }
+    public ResponseEntity<List<Folder>> getFolders(
+            @RequestParam(value = "loadChildren", required = false) Boolean loadChildren) {
 
-    @RequestMapping(path = "/INBOX/messages", method = GET)
-    public ResponseEntity<List<Message>> getInboxMessages() {
-        return ResponseEntity.ok(imapServiceFactory.getObject().getMessages("INBOX"));
+        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().getFolders(loadChildren)));
     }
 
     @RequestMapping(path = "/{folderId}/messages", method = GET)
-    public ResponseEntity<List<Message>> getMessages(@PathVariable("folderId") String folderId) {
-        return ResponseEntity.ok(imapServiceFactory.getObject().getMessages(Folder.toId(folderId)));
+    public ResponseEntity<List<Message>> getMessages(
+            @PathVariable("folderId") String folderId, @RequestParam(value = "start", required = false) Integer start,
+            @RequestParam(value = "end", required = false) Integer end) {
+
+        return ResponseEntity.ok(imapServiceFactory.getObject().getMessages(Folder.toId(folderId), start, end));
     }
 
     private static Folder[] addLinks(Folder... folders) {
@@ -64,7 +65,8 @@ public class FolderResource {
     }
 
     private static Folder addLinks(Folder folder) {
-        folder.add(linkTo(methodOn(FolderResource.class).getMessages(folder.getFolderId())).withRel(REL_MESSAGES));
+        folder.add(linkTo(methodOn(FolderResource.class).getMessages(folder.getFolderId(), null, null))
+                .withRel(REL_MESSAGES).expand());
         addLinks(folder.getChildren());
         return folder;
     }

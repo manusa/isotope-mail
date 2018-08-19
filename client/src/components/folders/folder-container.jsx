@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import Spinner from '../spinner/spinner';
 import {FolderTypes} from '../../services/folder';
 import FolderList from './folder-list';
-import {updateFolderMessagesCache} from '../../services/message';
+import {resetFolderMessagesCache, updateFolderMessagesCache} from '../../services/message';
 import {selectFolder} from '../../actions/folders';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
@@ -56,23 +56,29 @@ const mapStateToProps = state => ({
   application: state.application,
   activeRequests: state.folders.activeRequests,
   selectedFolder: state.folders.selected,
-  folderList: state.folders.items
+  folderList: state.folders.items,
+  messages: state.messages
 });
 
 const mapDispatchToProps = dispatch => ({
-  selectFolder: (abortControllerWrapper, folder, credentials) => {
+  selectFolder: (abortControllerWrapper, folder, credentials, cachedFolderMessagesMap) => {
     dispatch(selectFolder(folder));
     if (abortControllerWrapper && abortControllerWrapper.abortController) {
       abortControllerWrapper.abortController.abort();
     }
     abortControllerWrapper.abortController = new AbortController();
-    updateFolderMessagesCache(dispatch, credentials, folder, abortControllerWrapper.abortController.signal);
+    // Initial load of folder's messages should be partial
+    if (cachedFolderMessagesMap instanceof Map === false) {
+      updateFolderMessagesCache(dispatch, credentials, folder, abortControllerWrapper.abortController.signal, 1, 30);
+    }
+    resetFolderMessagesCache(dispatch, credentials, folder, abortControllerWrapper.abortController.signal);
   }
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
   selectFolder: (abortControllerWrapper, folder) =>
-    dispatchProps.selectFolder(abortControllerWrapper, folder, stateProps.application.user.credentials)
+    dispatchProps.selectFolder(abortControllerWrapper, folder, stateProps.application.user.credentials,
+      stateProps.messages.cache[folder.folderId])
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(FolderContainer);

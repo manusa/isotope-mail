@@ -21,9 +21,13 @@ function processFolders(initialFolders) {
   return folders;
 }
 
-export function getFolders(dispatch, credentials) {
+export function getFolders(dispatch, credentials, loadChildren) {
+  const url = new URL('http://localhost:9010/v1/folders');
+  if (loadChildren) {
+    url.search = new URLSearchParams({loadChildren: true}).toString();
+  }
   dispatch(backendRequest());
-  fetch('http://localhost:9010/v1/folders', {
+  fetch(url, {
     method: 'GET',
     headers: credentialsHeaders(credentials)
   })
