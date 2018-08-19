@@ -71,6 +71,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   resetFolders: credentials => {
     getFolders(dispatch, credentials);
+    getFolders(dispatch, credentials, true);
   },
   addFolder: () => {
     dispatch(addFolder({fullURL: 'FU', name: 'New Folder', type: FolderTypes.FOLDER, children: []}));

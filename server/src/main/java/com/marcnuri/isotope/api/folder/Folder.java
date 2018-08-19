@@ -8,6 +8,7 @@ package com.marcnuri.isotope.api.folder;
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.resource.IsotopeResource;
 import com.sun.mail.imap.IMAPFolder;
+import org.springframework.lang.Nullable;
 
 import javax.mail.MessagingException;
 import javax.mail.URLName;
@@ -23,6 +24,8 @@ import java.util.stream.Stream;
 public class Folder extends IsotopeResource implements Serializable {
 
     private static final long serialVersionUID = 8624907999271453862L;
+
+    private static final Folder[] EMPTY_FOLDERS = {};
 
     private String folderId;
     private String name;
@@ -151,7 +154,7 @@ public class Folder extends IsotopeResource implements Serializable {
         return result;
     }
 
-    public static Folder from(IMAPFolder mailFolder) {
+    public static Folder from(IMAPFolder mailFolder, @Nullable Boolean loadChildren) {
         final Folder ret;
         if (mailFolder != null) {
             ret = new Folder();
@@ -166,9 +169,13 @@ public class Folder extends IsotopeResource implements Serializable {
                 ret.setNewMessageCount(mailFolder.getNewMessageCount());
                 ret.setUnreadMessageCount(mailFolder.getUnreadMessageCount());
                 ret.setDeletedMessageCount(mailFolder.getDeletedMessageCount());
-                ret.setChildren(Stream.of(mailFolder.list())
-                        .map(IMAPFolder.class::cast)
-                        .map(Folder::from).toArray(Folder[]::new));
+                if (Boolean.TRUE.equals(loadChildren)) {
+                    ret.setChildren(Stream.of(mailFolder.list())
+                            .map(IMAPFolder.class::cast)
+                            .map(mf -> from(mf, true)).toArray(Folder[]::new));
+                } else {
+                    ret.setChildren(EMPTY_FOLDERS);
+                }
             } catch (MessagingException e) {
                 throw new IsotopeException("Error parsing IMAP Folder");
             }

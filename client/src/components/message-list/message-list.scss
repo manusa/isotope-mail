@@ -1,8 +1,12 @@
 @import '../../styles/partials/variables';
 
 .messageList {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   .list {
+    flex: 1;
     padding: 0;
     height: 100%;
 
@@ -46,6 +50,13 @@
         text-align: right;
       }
 
+    }
+  }
+
+  .listSpinner {
+
+    .listSpinnerCanvas {
+      width: 16px;
     }
   }
 }

@@ -45,7 +45,12 @@ public class CredentialsService {
         if(encrypted == null || encrypted.isEmpty() || salt == null || salt.isEmpty()) {
             throw new AuthenticationException("Missing encrypted credentials");
         }
-        final TextEncryptor encryptor = Encryptors.text(isotopeApiConfiguration.getEncryptionPassword(), salt);
-        return objectMapper.readValue(encryptor.decrypt(encrypted), Credentials.class);
+        try {
+            final TextEncryptor encryptor = Encryptors.text(isotopeApiConfiguration.getEncryptionPassword(), salt);
+            return objectMapper.readValue(encryptor.decrypt(encrypted), Credentials.class);
+        } catch(IllegalStateException ex) {
+            throw new AuthenticationException("Key or salt is not compatible with encrypted credentials" +
+                    " (Server has changed the password or user tampered with credentials.", ex);
+        }
     }
 }

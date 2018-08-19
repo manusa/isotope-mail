@@ -39,7 +39,7 @@ class Login extends Component {
             <div className={styles.server}>
               <TextField id='serverHost' fieldClass={styles.serverHost}
                 value={this.state.values.serverHost} onChange={this.onFieldChange}
-                focused={this.isFocused('serverHost')} required={true} label='Host'/>
+                focused={this.isFocused('serverHost')} required={true} autoComplete='on' label='Host'/>
               <TextField key='serverPort' id='serverPort' fieldClass={styles.serverPort}
                 type='number' min='0'
                 value={this.state.values.serverPort} onChange={this.onFieldChange}
