@@ -11,6 +11,6 @@ before_install:
   - npm install --prefix ./client ./client
 
 script:
-  - ./server/gradlew -p ./server/ check
+  - ./server/gradlew -p ./server/ check || travis_terminate 1
   - npm run --prefix ./client build
 
