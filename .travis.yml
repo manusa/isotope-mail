@@ -4,7 +4,7 @@ services:
   - docker
 
 before_install:
-  - npm install ./client
+  - npm install --prefix ./client ./client
 
 script:
   - ./server/gradlew -p ./server/ check
