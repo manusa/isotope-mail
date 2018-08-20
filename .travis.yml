@@ -1,0 +1,12 @@
+language: java
+
+services:
+  - docker
+
+before_install:
+  - npm install ./client
+
+script:
+  - ./server/gradlew -p ./server/ check
+  - npm run --prefix ./client build
+
