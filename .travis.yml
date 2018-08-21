@@ -14,3 +14,5 @@ script:
   - ./server/gradlew -p ./server/ check || travis_terminate 1
   - npm run --prefix ./client build
 
+after_success:
+  - docker build -f Dockerfile -t marcnuri/isotope:client-latest ./client
