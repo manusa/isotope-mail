@@ -25,5 +25,9 @@ export function saveState(state) {
   Object.entries(state.messages.cache).forEach(e => {
     newState.messages.cache[e[0]] = Array.from(e[1].values());
   });
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+  } catch (e) {
+    console.log('Session storage is full');
+  }
 }

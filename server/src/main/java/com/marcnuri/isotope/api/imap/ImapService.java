@@ -109,7 +109,12 @@ public class ImapService {
         }
         final javax.mail.Message[] messages;
         if (start != null && end != null) {
-            messages = folder.getMessages(start, end > folder.getMessageCount() ? folder.getMessageCount() : end);
+            // start / end message counts may no longer match, recalculate index if necessary
+            if (end > folder.getMessageCount()) {
+                start = folder.getMessageCount() - (end - start);
+                end = folder.getMessageCount();
+            }
+            messages = folder.getMessages(start < 1 ? 1 : start, end);
         } else {
             messages = folder.getMessages();
         }

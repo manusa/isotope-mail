@@ -18,6 +18,8 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import static javax.mail.Folder.HOLDS_MESSAGES;
+
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-08.
  */
@@ -162,13 +164,15 @@ public class Folder extends IsotopeResource implements Serializable {
             try {
                 ret.setFolderId(toBase64Id(mailFolder.getURLName()));
                 ret.setSeparator(mailFolder.getSeparator());
-                ret.setUIDValidity(mailFolder.getUIDValidity());
                 ret.setFullName(mailFolder.getFullName());
                 ret.setFullURL(mailFolder.getURLName().toString());
-                ret.setMessageCount(mailFolder.getMessageCount());
-                ret.setNewMessageCount(mailFolder.getNewMessageCount());
-                ret.setUnreadMessageCount(mailFolder.getUnreadMessageCount());
-                ret.setDeletedMessageCount(mailFolder.getDeletedMessageCount());
+                if ((mailFolder.getType() & HOLDS_MESSAGES) != 0) {
+                    ret.setUIDValidity(mailFolder.getUIDValidity());
+                    ret.setMessageCount(mailFolder.getMessageCount());
+                    ret.setNewMessageCount(mailFolder.getNewMessageCount());
+                    ret.setUnreadMessageCount(mailFolder.getUnreadMessageCount());
+                    ret.setDeletedMessageCount(mailFolder.getDeletedMessageCount());
+                }
                 if (Boolean.TRUE.equals(loadChildren)) {
                     ret.setChildren(Stream.of(mailFolder.list())
                             .map(IMAPFolder.class::cast)
@@ -177,7 +181,7 @@ public class Folder extends IsotopeResource implements Serializable {
                     ret.setChildren(EMPTY_FOLDERS);
                 }
             } catch (MessagingException e) {
-                throw new IsotopeException("Error parsing IMAP Folder");
+                throw new IsotopeException("Error parsing IMAP Folder", e);
             }
         } else {
             ret = null;
