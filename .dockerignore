@@ -2,3 +2,4 @@
 
 !./docker/**
 !./client/dist/**
+!./server/build/libs/**
