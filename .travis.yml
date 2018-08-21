@@ -1,18 +1,19 @@
 branches:
   only:
   - master
-
 language: java
-
 services:
-  - docker
-
+- docker
 before_install:
-  - npm install --prefix ./client ./client
-
+- npm install --prefix ./client ./client
 script:
-  - ./server/gradlew -p ./server/ check || travis_terminate 1
-  - npm run --prefix ./client build
-
+- ./server/gradlew -p ./server/ check || travis_terminate 1
+- npm run --prefix ./client build
 after_success:
-  - docker build -f ./client/Dockerfile -t marcnuri/isotope:client-latest ./client
+- docker build -f ./client/Dockerfile -t marcnuri/isotope:client-latest ./client || travis_terminate 1
+- echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+- docker push marcnuri/isotope:client-latest
+env:
+  global:
+  - secure: E1axURzNrnoTj/+8sj0ov1hDGj1kdF0R2ixqc1Y4ue+ZtageCjjqHxyQRk7R+hQ1pCiNJxI7TeQ3qF2ETk/GRA+0h+51wUXx6PURPbF4iMWinwHA6DL5mtrJYsI1Kjcj2gmtAea3tgmDYHzU+6HEYBYjnjZ2IZHQVXp3x6DWxAJ8VnCapOVn72wDWhEhfrYbKaSlOmBzjafR4oElwROmxt3xyDZGT4yvmWcUZc0JgW8tzHlbmk+4+gHXqyAsIWtNYvVzezT9EwGCRTE3xu22LEbAdUCY5WSqGFDtWegOGzdb6LDlTOj7bVzCgwVlNpBbcg349+Ls6/gbd57sXH3s6IT1wgcSxbmRgwOANqfwbUqIPfhwqgeyL+08BYx3TW3Eo/qWWU3TjRiS6qyvVs2ceoW3QUEV7ri+XtR50+XE6JRQR9/EXHV/SZo54jgnKOiuzfe/f9Qcs+FVZdsNTLnQlS8hskv5G8ayEWyWEvoYorGTP528kt35wOgOiaLjvNLTO4s6BKYKgyPY5/gE5P9hPcsZLZfcorTEgzUSb9fnn7zb0bCT7NojJGO70nsstxV2QA5DLrPAdDdGNNYe4UhRwsxCzQSCtnh85kxP9A/wlg9pPKr862WJbBXIO4s3zLrtOKvLIIwqZbkIkuH5j7biB0lYhzKPVND/NaStYyqot+k=
+  - secure: J7u3qZi35QplnA4U2y23Ofg3m9DCwVMYwHB/cizc/hR9rxHUnVCY+XCMFkfmjl+nd0EqhSrDnj+VzG+tzXK3RRMDrzd301rSXywasAdx7JBqBbFK0xrwqUO4Jlx+TVUW5a06GfoPop3pibYUMUO/GAP5gdk2M0sNE9pJ4Mp64AsA06LSiUaKFm+GDvJYKgDXlco93XNoeTNhuoJt/0MyDZBUpWeeAIAj8i5KOIzbgHICFCX49sOae1wSGnrINsn27FEY57oRkd03eNT4dnX13Ba2aLA/wyaApqwiJo560YVGPZyjYwQ7i8SkkTYT/OG6ER272hrQeU8xJot5bJH9pH9ZTJ+UDj7fJyOpCxp2kjKoUqUuUUXqYVUe+T1aY69klVuP90H2aqydrRntVUHkFQiO7AfEzWlAvGTLIRPSxuOtAXNkIkIifCXXg+1LEUmUEzWr1wRBojle+CGz/2YRHT4smFB4DS0tjXcgZSkUWmgMiEQ0dp7FhsqjdTNtWa64RPdZszRGh1H3Fuwu8VRiG31QKURciXckbS3hMOQjIUwgAhBG+oIe/teOtxD/s1+FeoB54WmcSYEaQasCYpbKQZqSl2NUYpLd89V7ef7eA6mwwwLIpsM45wVrPfn5F1z7ulxYtWLf+8nNfu0IwKQQFxtLgYtgeTyu07lsn9/sCSQ=
