@@ -15,4 +15,4 @@ script:
   - npm run --prefix ./client build
 
 after_success:
-  - docker build -f Dockerfile -t marcnuri/isotope:client-latest ./client
+  - docker build -f ./client/Dockerfile -t marcnuri/isotope:client-latest ./client
