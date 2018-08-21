@@ -3,7 +3,11 @@ import {toJson} from './fetch';
 
 export function login(dispatch, credentials) {
   dispatch(backendRequest());
-  fetch('http://localhost:9010/v1/application/login', {
+  let url = '/v1/application/login';
+  if (process.env.NODE_ENV === 'development') {
+    url = 'http://localhost:9010/v1/application/login';
+  }
+  fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
