@@ -1,18 +1,24 @@
 branches:
   only:
   - master
+
 language: java
+
 services:
 - docker
+
 before_install:
 - npm install --prefix ./client ./client
+
 script:
 - ./server/gradlew -p ./server/ check || travis_terminate 1
 - npm run --prefix ./client build
+
 after_success:
-- docker build -f ./client/Dockerfile -t marcnuri/isotope:client-latest ./client || travis_terminate 1
+- docker build -f ./Dockerfile-client-client -t marcnuri/isotope:client-latest ./ || travis_terminate 1
 - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
 - docker push marcnuri/isotope:client-latest
+
 env:
   global:
   - secure: E1axURzNrnoTj/+8sj0ov1hDGj1kdF0R2ixqc1Y4ue+ZtageCjjqHxyQRk7R+hQ1pCiNJxI7TeQ3qF2ETk/GRA+0h+51wUXx6PURPbF4iMWinwHA6DL5mtrJYsI1Kjcj2gmtAea3tgmDYHzU+6HEYBYjnjZ2IZHQVXp3x6DWxAJ8VnCapOVn72wDWhEhfrYbKaSlOmBzjafR4oElwROmxt3xyDZGT4yvmWcUZc0JgW8tzHlbmk+4+gHXqyAsIWtNYvVzezT9EwGCRTE3xu22LEbAdUCY5WSqGFDtWegOGzdb6LDlTOj7bVzCgwVlNpBbcg349+Ls6/gbd57sXH3s6IT1wgcSxbmRgwOANqfwbUqIPfhwqgeyL+08BYx3TW3Eo/qWWU3TjRiS6qyvVs2ceoW3QUEV7ri+XtR50+XE6JRQR9/EXHV/SZo54jgnKOiuzfe/f9Qcs+FVZdsNTLnQlS8hskv5G8ayEWyWEvoYorGTP528kt35wOgOiaLjvNLTO4s6BKYKgyPY5/gE5P9hPcsZLZfcorTEgzUSb9fnn7zb0bCT7NojJGO70nsstxV2QA5DLrPAdDdGNNYe4UhRwsxCzQSCtnh85kxP9A/wlg9pPKr862WJbBXIO4s3zLrtOKvLIIwqZbkIkuH5j7biB0lYhzKPVND/NaStYyqot+k=

@@ -5,7 +5,8 @@ LABEL MAINTAINER "Marc Nuri" <marc@marcnuri.com>
 
 EXPOSE 80
 
-COPY ./dist /usr/share/nginx/html
+COPY ./docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY ./client/dist /usr/share/nginx/html
 
 CMD nginx -g 'daemon off;'
 
