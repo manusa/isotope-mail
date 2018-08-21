@@ -3,7 +3,7 @@ import {toJson} from './fetch';
 
 export function login(dispatch, credentials) {
   dispatch(backendRequest());
-  let url = '/v1/application/login';
+  let url = '/api/v1/application/login';
   if (process.env.NODE_ENV === 'development') {
     url = 'http://localhost:9010/v1/application/login';
   }
