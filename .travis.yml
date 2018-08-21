@@ -15,8 +15,8 @@ script:
 - npm run --prefix ./client build
 
 after_success:
-- docker build -f ./Dockerfile-client-client -t marcnuri/isotope:client-latest ./ || travis_terminate 1
-- echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+- docker build -f ./Dockerfile-client -t marcnuri/isotope:client-latest ./ || travis_terminate 1
+- echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin || travis_terminate 1
 - docker push marcnuri/isotope:client-latest
 
 env:
