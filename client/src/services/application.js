@@ -7,6 +7,27 @@ import {setFolders} from '../actions/folders';
 import {setCache} from '../actions/messages';
 import {resetFolderMessagesCache} from './message';
 
+/**
+ * @typedef {Object} Credentials
+ * @property {string} serverHost - IMAP host
+ * @property {string} serverPort - IMAP port
+ * @property {string} user - User
+ * @property {string} password - Password
+ */
+/**
+ * Performs a login to the IMAP server using the API.
+ *
+ * If the server validates the credentials, previous state is reloaded (if exists) from IndexedDB.
+ *
+ * If previous state exists, message cache, folder list, and selected folder will be pre-populated with existing values.
+ * An initial call to the backend will be made to refresh the list of messages of the selected folder.
+ *
+ * If a previous state doesn't exist, an initial load of the first level folders will be requested to the server.
+ *
+ * @param dispatch {Dispatch & function}
+ * @param credentials {Credentials}
+ * @returns {Promise<void>}
+ */
 export async function login(dispatch, credentials) {
   dispatch(backendRequest());
   let url = '/api/v1/application/login';
