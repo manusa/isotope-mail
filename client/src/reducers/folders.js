@@ -1,7 +1,7 @@
-import {initialState} from './';
+import {INITIAL_STATE} from './';
 import {ActionTypes} from '../actions/action-types';
 
-const folders = (state = initialState.folders, action) => {
+const folders = (state = INITIAL_STATE.folders, action) => {
   switch (action.type) {
     case ActionTypes.FOLDERS_BE_REQUEST:
       return {...state, activeRequests: state.activeRequests + 1};
@@ -12,8 +12,6 @@ const folders = (state = initialState.folders, action) => {
       };
     case ActionTypes.FOLDERS_ADD:
       return {...state, items: [...state.items, action.payload]};
-    case ActionTypes.FOLDERS_SELECT:
-      return {...state, selected: {...action.payload}};
     default:
       return state;
   }

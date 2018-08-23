@@ -3,10 +3,11 @@ import application from './application';
 import folders from './folders';
 import messages from './messages';
 
-export const initialState = {
+export const INITIAL_STATE = {
   application: {
     title: 'Isotope Mail Client',
     user: {},
+    selectedFolder: {},
     activeRequests: 0
   },
   folders: {
