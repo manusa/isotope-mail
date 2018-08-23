@@ -3,20 +3,34 @@ import sjcl from 'sjcl';
 
 const DATABASE_NAME = 'isotope';
 const DATABASE_VERSION = 1;
-const STATE_MESSAGES_STORE = 'state_messages';
+const STATE_STORE = 'state';
 
+/**
+ * Opens a connection to the IndexedDB for Isotope's database
+ *
+ * @returns {Promise<DB>}
+ * @private
+ */
 function _openDatabase() {
   return idb.open(DATABASE_NAME, DATABASE_VERSION,
     upgradeDb => {
-      if (!upgradeDb.objectStoreNames.contains(STATE_MESSAGES_STORE)) {
-        upgradeDb.createObjectStore(STATE_MESSAGES_STORE, {keyPath: 'key'});
+      if (!upgradeDb.objectStoreNames.contains(STATE_STORE)) {
+        upgradeDb.createObjectStore(STATE_STORE, {keyPath: 'key'});
       }
     });
 }
 
+/**
+ * Opens a connection to the IndexedDB for Isotope's database.
+ *
+ * If the database exists but the state store doesn't, the DB is deleted and recreated.
+ *
+ * @returns {Promise<DB>}
+ * @private
+ */
 async function _openDatabaseSafe() {
   let db = await _openDatabase();
-  if (!db.objectStoreNames.contains(STATE_MESSAGES_STORE)) {
+  if (!db.objectStoreNames.contains(STATE_STORE)) {
     // Corrupted DB, recreate
     db.close();
     await idb.delete(DATABASE_NAME);
@@ -25,10 +39,18 @@ async function _openDatabaseSafe() {
   return db;
 }
 
+/**
+ * Tries to recover a persisted state for the given userID and uses the hash as the cypher password to decrypt the
+ * store value.
+ *
+ * @param userId {string}
+ * @param hash {string}
+ * @returns {Promise<*>}
+ */
 export async function recoverState(userId, hash) {
   const db = await _openDatabaseSafe();
-  const tx = db.transaction([STATE_MESSAGES_STORE], 'readonly');
-  const store = tx.objectStore(STATE_MESSAGES_STORE);
+  const tx = db.transaction([STATE_STORE], 'readonly');
+  const store = tx.objectStore(STATE_STORE);
   const encryptedState = await store.get(userId);
   if (!encryptedState) {
     return null;
@@ -43,20 +65,13 @@ export async function recoverState(userId, hash) {
   return recoveredState;
 }
 
-export async function recoverStateByState(state) {
-  if (state.application.user.id && state.application.user.hash) {
-    return recoverState(state.application.user.id, state.application.user.hash);
-  }
-  return null;
-}
-
 /**
  * Persists the message cache and folder items from the provided state into the Browser IndexedDB.
  *
  * Stored entities are encrypted using the user hash {@link #login}
  *
  * @param state
- * @returns {Promise<null>}
+ * @returns {Promise<void>}
  */
 export async function persistState(state) {
   // Only persist state if it contains a folder and message cache (don't overwrite previously stored state with this info)
@@ -74,8 +89,8 @@ export async function persistState(state) {
     const encryptedState = sjcl.encrypt(state.application.user.hash, stateString);
     try {
       const db = await _openDatabaseSafe();
-      const tx = db.transaction([STATE_MESSAGES_STORE], 'readwrite');
-      const store = tx.objectStore(STATE_MESSAGES_STORE);
+      const tx = db.transaction([STATE_STORE], 'readwrite');
+      const store = tx.objectStore(STATE_STORE);
       await store.put({key: state.application.user.id, value: encryptedState});
       await tx.complete;
       db.close();
@@ -83,5 +98,4 @@ export async function persistState(state) {
       console.log(e);
     }
   }
-  return null;
 }

@@ -1,39 +1,48 @@
-import {persistState, recoverStateByState} from './indexed-db';
+import {persistState, recoverState} from './indexed-db';
 import {INITIAL_STATE} from '../reducers';
 
-const STORAGE_KEY = 'ISOTOPE_MAIL_CLIENT_STATE';
+const KEY_USER_ID = 'KEY_USER_ID';
+const KEY_HASH = 'KEY_HASH';
 
 function emptyState() {
   return JSON.parse(JSON.stringify(INITIAL_STATE));
 }
 
+/**
+ * Loads the Redux Store state back from the Browser's IndexedDB.
+ *
+ * It first checks the Browser's session storage to retrieve the hashed user id and the hashed user credentials.
+ *
+ * Hashed user id will be used as the key in the IndexedDB and the credential hash as the cypher password.
+ *
+ * @returns {Promise<*>}
+ */
 export async function loadState() {
   const state = emptyState();
-  const sessionStoredState = sessionStorage.getItem(STORAGE_KEY);
-  if (sessionStoredState === null) {
-    return state;
+  const userId = sessionStorage.getItem(KEY_USER_ID);
+  const hash = sessionStorage.getItem(KEY_HASH);
+  if (userId !== null && hash !== null) {
+    const dbState = await recoverState(userId, hash);
+    if (dbState && dbState !== null) {
+      state.application = {...dbState.application}
+      state.folders.items = [...dbState.folders.items];
+      state.messages.cache = {...dbState.messages.cache};
+    }
   }
-  const sessionState = JSON.parse(sessionStoredState);
-  state.application = sessionState.application;
-
-  const dbState = await recoverStateByState(state);
-  if (dbState && dbState !== null) {
-    sessionState.folders.items = [...dbState.folders.items];
-    sessionState.messages.cache = {...dbState.messages.cache};
-  }
-  return sessionState;
+  return state;
 }
 
+/**
+ * Stores the current Redux Store state into the Browser's IndexedDB using an encryption algorithm under a hashed key.
+ *
+ * In order to be able to retrieve back the state from the indexed db, the hashed user id and the hashed user credentials
+ * will be used as key and cypher password.
+ *
+ * @param state
+ */
 export function saveState(state) {
-  try {
-    // Store only application in session storage
-    const stateForSessionStorage = emptyState();
-    stateForSessionStorage.application = {...state.application};
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(stateForSessionStorage));
+  sessionStorage.setItem(KEY_USER_ID, state.application.user.id);
+  sessionStorage.setItem(KEY_HASH, state.application.user.hash);
 
-    // Store in IndexedDb (Encrypted)
-    persistState(state);
-  } catch (e) {
-    console.log('Session storage is full');
-  }
+  persistState(state);
 }
