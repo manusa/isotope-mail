@@ -3,8 +3,13 @@ import {ActionTypes} from './action-types';
 export const backendRequest = () => ({type: ActionTypes.MESSAGES_BE_REQUEST});
 export const backendRequestCompleted = () => ({type: ActionTypes.MESSAGES_BE_REQUEST_COMPLETED});
 
-export const setCache = (folder, messages) => ({
+export const setCache = cache => ({
   type: ActionTypes.MESSAGES_SET_CACHE,
+  payload: cache
+});
+
+export const setFolderCache = (folder, messages) => ({
+  type: ActionTypes.MESSAGES_SET_FOLDER_CACHE,
   payload: {folder, messages}
 });
 

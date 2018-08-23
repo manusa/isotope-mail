@@ -63,10 +63,11 @@ MessageList.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  selectedFolder: state.folders.selected,
+  selectedFolder: state.application.selectedFolder,
   activeRequests: state.messages.activeRequests,
-  messages: state.folders.selected.folderId && state.messages.cache[state.folders.selected.folderId] ?
-    Array.from(state.messages.cache[state.folders.selected.folderId].values()) : []
+  messages: state.application.selectedFolder.folderId
+    && state.messages.cache[state.application.selectedFolder.folderId] ?
+    Array.from(state.messages.cache[state.application.selectedFolder.folderId].values()) : []
 });
 
 const mapDispatchToProps = dispatch => ({ });

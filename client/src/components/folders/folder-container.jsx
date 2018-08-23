@@ -5,7 +5,7 @@ import Spinner from '../spinner/spinner';
 import {FolderTypes} from '../../services/folder';
 import FolderList from './folder-list';
 import {resetFolderMessagesCache, updateFolderMessagesCache} from '../../services/message';
-import {selectFolder} from '../../actions/folders';
+import {selectFolder} from '../../actions/application';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
 
@@ -55,7 +55,7 @@ FolderContainer.propTypes = {
 const mapStateToProps = state => ({
   application: state.application,
   activeRequests: state.folders.activeRequests,
-  selectedFolder: state.folders.selected,
+  selectedFolder: state.application.selectedFolder,
   folderList: state.folders.items,
   messages: state.messages
 });

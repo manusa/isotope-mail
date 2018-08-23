@@ -1,32 +1,38 @@
+import {persistState, recoverStateByState} from './indexed-db';
+import {INITIAL_STATE} from '../reducers';
+
 const STORAGE_KEY = 'ISOTOPE_MAIL_CLIENT_STATE';
 
 function emptyState() {
-  return {};
+  return JSON.parse(JSON.stringify(INITIAL_STATE));
 }
 
-export function loadState() {
-  const storedState = sessionStorage.getItem(STORAGE_KEY);
-  if (storedState === null) {
-    return emptyState();
+export async function loadState() {
+  const state = emptyState();
+  const sessionStoredState = sessionStorage.getItem(STORAGE_KEY);
+  if (sessionStoredState === null) {
+    return state;
   }
-  const recoveredState = JSON.parse(storedState);
-  // Convert Array to Map after recovering
-  Object.entries(recoveredState.messages.cache).forEach(e => {
-    recoveredState.messages.cache[e[0]] = new Map(e[1].map(m => [m.uid, m]));
-  });
-  return recoveredState;
+  const sessionState = JSON.parse(sessionStoredState);
+  state.application = sessionState.application;
+
+  const dbState = await recoverStateByState(state);
+  if (dbState && dbState !== null) {
+    sessionState.folders.items = [...dbState.folders.items];
+    sessionState.messages.cache = {...dbState.messages.cache};
+  }
+  return sessionState;
 }
 
 export function saveState(state) {
-  // Convert Maps to Arrays before saving
-  const newState = {...state};
-  newState.messages = {...state.messages};
-  newState.messages.cache = {};
-  Object.entries(state.messages.cache).forEach(e => {
-    newState.messages.cache[e[0]] = Array.from(e[1].values());
-  });
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(newState));
+    // Store only application in session storage
+    const stateForSessionStorage = emptyState();
+    stateForSessionStorage.application = {...state.application};
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(stateForSessionStorage));
+
+    // Store in IndexedDb (Encrypted)
+    persistState(state);
   } catch (e) {
     console.log('Session storage is full');
   }

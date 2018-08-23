@@ -1,4 +1,4 @@
-import {backendRequest, backendRequestCompleted, setCache, updateCache} from '../actions/messages';
+import {backendRequest, backendRequestCompleted, setFolderCache, updateCache} from '../actions/messages';
 import {credentialsHeaders, toJson} from './fetch';
 
 /**
@@ -21,7 +21,7 @@ export function resetFolderMessagesCache(dispatch, credentials, folder, signal) 
     })
     .then(toJson)
     .then(json => {
-      dispatch(setCache(folder, json));
+      dispatch(setFolderCache(folder, json));
     })
     .catch(error => {
       dispatch(backendRequestCompleted());

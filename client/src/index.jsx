@@ -6,17 +6,22 @@ import Routes from './routes/routes';
 import rootReducer from './reducers';
 import {loadState, saveState} from './services/state';
 
-const store = createStore(rootReducer, loadState(),
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+async function init () {
+  const previousState = await loadState();
+  const store = createStore(rootReducer, previousState,
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
-store.subscribe(() => saveState(store.getState()));
+  store.subscribe(() => saveState(store.getState()));
 
-ReactDOM.render(
-  <Provider store={store}>
-    <Routes />
-  </Provider>,
-  document.getElementById('root')
-);
+  ReactDOM.render(
+    <Provider store={store}>
+      <Routes />
+    </Provider>,
+    document.getElementById('root')
+  );
+}
+
+init();
 
 if (module.hot) {
   module.hot.accept();
