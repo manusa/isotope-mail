@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import Spinner from '../spinner/spinner';
-import {FolderTypes} from '../../services/folder';
+import {FolderTypes, getFolders} from '../../services/folder';
 import FolderList from './folder-list';
 import {resetFolderMessagesCache, updateFolderMessagesCache} from '../../services/message';
 import {selectFolder} from '../../actions/application';
@@ -28,6 +28,7 @@ class FolderContainer extends Component {
   }
 
   componentDidMount() {
+    this.props.resetFolders();
     this.loadInbox();
   }
 
@@ -49,6 +50,7 @@ class FolderContainer extends Component {
 FolderContainer.propTypes = {
   activeRequests: PropTypes.number.isRequired,
   folderList: PropTypes.array.isRequired,
+  resetFolders: PropTypes.func,
   selectFolder: PropTypes.func
 };
 
@@ -61,6 +63,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+  resetFolders: credentials => {
+    getFolders(dispatch, credentials, true);
+  },
   selectFolder: (abortControllerWrapper, folder, credentials, cachedFolderMessagesMap) => {
     dispatch(selectFolder(folder));
     if (abortControllerWrapper && abortControllerWrapper.abortController) {
@@ -79,6 +84,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
+  resetFolders: () => dispatchProps.resetFolders(stateProps.application.user.credentials),
   selectFolder: (abortControllerWrapper, folder) =>
     dispatchProps.selectFolder(abortControllerWrapper, folder, stateProps.application.user.credentials,
       stateProps.messages.cache[folder.folderId])
