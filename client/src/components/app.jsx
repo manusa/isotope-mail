@@ -43,7 +43,6 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.props.resetFolders();
     document.title = this.props.application.title;
   }
 
@@ -60,7 +59,6 @@ class App extends Component {
 App.propTypes = {
   application: PropTypes.object.isRequired,
   folders: PropTypes.object.isRequired,
-  resetFolders: PropTypes.func.isRequired,
   addFolder: PropTypes.func.isRequired,
   addMessage: PropTypes.func.isRequired
 };
@@ -71,12 +69,6 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  resetFolders: (credentials, preloadFistLevel) => {
-    if (preloadFistLevel) {
-      getFolders(dispatch, credentials);
-    }
-    getFolders(dispatch, credentials, true);
-  },
   addFolder: () => {
     dispatch(addFolder({fullURL: 'FU', name: 'New Folder', type: FolderTypes.FOLDER, children: []}));
   },
@@ -85,10 +77,4 @@ const mapDispatchToProps = dispatch => ({
   }
 });
 
-const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
-  resetFolders: () =>
-    // Preload first level only if folders weren't loaded previously (session storage)
-    dispatchProps.resetFolders(stateProps.application.user.credentials, stateProps.folders.items.length === 0)
-}));
-
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);

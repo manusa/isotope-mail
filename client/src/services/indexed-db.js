@@ -30,6 +30,9 @@ export async function recoverState(userId, hash) {
   const tx = db.transaction([STATE_MESSAGES_STORE], 'readonly');
   const store = tx.objectStore(STATE_MESSAGES_STORE);
   const encryptedState = await store.get(userId);
+  if (!encryptedState) {
+    return null;
+  }
   const decryptedState = sjcl.decrypt(hash, encryptedState.value);
   const recoveredState = JSON.parse(decryptedState);
   // Convert Array to Map after recovering
@@ -47,7 +50,14 @@ export async function recoverStateByState(state) {
   return null;
 }
 
-
+/**
+ * Persists the message cache and folder items from the provided state into the Browser IndexedDB.
+ *
+ * Stored entities are encrypted using the user hash {@link #login}
+ *
+ * @param state
+ * @returns {Promise<null>}
+ */
 export async function persistState(state) {
   // Only persist state if it contains a folder and message cache (don't overwrite previously stored state with this info)
   if (state.application.user.id && state.application.user.hash

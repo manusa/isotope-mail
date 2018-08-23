@@ -1,9 +1,11 @@
 import sjcl from 'sjcl';
-import {backendRequest, backendRequestCompleted, setUserCredentials} from '../actions/application';
+import {backendRequest, backendRequestCompleted, selectFolder, setUserCredentials} from '../actions/application';
 import {toJson} from './fetch';
 import {recoverState} from './indexed-db';
+import {getFolders} from './folder';
 import {setFolders} from '../actions/folders';
 import {setCache} from '../actions/messages';
+import {resetFolderMessagesCache} from './message';
 
 export async function login(dispatch, credentials) {
   dispatch(backendRequest());
@@ -32,8 +34,14 @@ export async function login(dispatch, credentials) {
     // Reload data from indexedDb
     const recoveredState = await recoverState(userId, hash);
     if (recoveredState !== null) {
-      dispatch(setFolders(recoveredState.folders.items));
+      await dispatch(setFolders(recoveredState.folders.items));
+      dispatch(selectFolder(recoveredState.application.selectedFolder));
       dispatch(setCache(recoveredState.messages.cache));
+      // Refresh currently selected folder
+      resetFolderMessagesCache(dispatch, validatedCredentials, recoveredState.application.selectedFolder, null);
+    } else {
+      // Retrieve first level folders to show something ASAP
+      getFolders(dispatch, validatedCredentials, false);
     }
   }
 }
