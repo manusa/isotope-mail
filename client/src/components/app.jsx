@@ -44,6 +44,13 @@ class App extends Component {
 
   componentDidMount() {
     document.title = this.props.application.title;
+    this.refreshPoll = setInterval(() => {
+      this.props.reloadFolders();
+    }, 30000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.refreshPoll);
   }
 
   toggleSideBar() {
@@ -59,6 +66,7 @@ class App extends Component {
 App.propTypes = {
   application: PropTypes.object.isRequired,
   folders: PropTypes.object.isRequired,
+  reloadFolders: PropTypes.func,
   addFolder: PropTypes.func.isRequired,
   addMessage: PropTypes.func.isRequired
 };
@@ -69,6 +77,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+  reloadFolders: credentials => getFolders(dispatch, credentials, true),
   addFolder: () => {
     dispatch(addFolder({fullURL: 'FU', name: 'New Folder', type: FolderTypes.FOLDER, children: []}));
   },
@@ -77,4 +86,8 @@ const mapDispatchToProps = dispatch => ({
   }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
+  reloadFolders: () => dispatchProps.reloadFolders(stateProps.application.user.credentials)
+}));
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(App);
