@@ -6,11 +6,18 @@ import Routes from './routes/routes';
 import rootReducer from './reducers';
 import {loadState, saveState} from './services/state';
 
+/**
+ * Starts application asynchronously once all of the required information is available (loadState)
+ *
+ * @returns {Promise<void>}
+ */
 async function init () {
   const previousState = await loadState();
-  const store = createStore(rootReducer, previousState,
-    process.env.NODE_ENV === 'development'
-    && window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+  let enhancer;
+  if (process.env.NODE_ENV === 'development' && window.__REDUX_DEVTOOLS_EXTENSION__) {
+    enhancer = window.__REDUX_DEVTOOLS_EXTENSION__();
+  }
+  const store = createStore(rootReducer, previousState, enhancer);
 
   store.subscribe(() => saveState(store.getState()));
 
