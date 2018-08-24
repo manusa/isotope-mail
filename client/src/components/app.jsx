@@ -44,13 +44,16 @@ class App extends Component {
 
   componentDidMount() {
     document.title = this.props.application.title;
-    this.refreshPoll = setInterval(() => {
-      this.props.reloadFolders();
-    }, 30000);
+    this.refreshPoll();
   }
 
   componentWillUnmount() {
-    clearInterval(this.refreshPoll);
+    clearTimeout(this.refreshPollTimeout);
+  }
+
+  refreshPoll() {
+    this.props.reloadFolders();
+    this.refreshPollTimeout = setTimeout(() => this.refreshPoll(), 15000);
   }
 
   toggleSideBar() {
