@@ -9,6 +9,7 @@ import {addFolder} from '../actions/folders';
 import {addMessage} from '../actions/messages';
 import mainCss from '../styles/main.scss';
 import styles from './app.scss';
+import {resetFolderMessagesCache} from '../services/message';
 
 class App extends Component {
   constructor(props) {
@@ -51,9 +52,21 @@ class App extends Component {
     clearTimeout(this.refreshPollTimeout);
   }
 
-  refreshPoll() {
-    this.props.reloadFolders();
-    this.refreshPollTimeout = setTimeout(() => this.refreshPoll(), 15000);
+  /**
+   * Poll function that will refresh the folder list and the INBOX folder.
+   *
+   * @returns {Promise<void>}
+   */
+  async refreshPoll() {
+    const folderPromise = this.props.reloadFolders();
+    const inbox = this.props.folders.items.find(f => f.type === FolderTypes.INBOX);
+    if (inbox) {
+      const messagePromise = this.props.reloadMessageCache(inbox);
+      await Promise.all([folderPromise, messagePromise]);
+    } else {
+      await folderPromise;
+    }
+    this.refreshPollTimeout = setTimeout(() => this.refreshPoll(), this.props.application.pollInterval);
   }
 
   toggleSideBar() {
@@ -70,6 +83,7 @@ App.propTypes = {
   application: PropTypes.object.isRequired,
   folders: PropTypes.object.isRequired,
   reloadFolders: PropTypes.func,
+  reloadMessageCache: PropTypes.func,
   addFolder: PropTypes.func.isRequired,
   addMessage: PropTypes.func.isRequired
 };
@@ -81,6 +95,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   reloadFolders: credentials => getFolders(dispatch, credentials, true),
+  reloadMessageCache: (credentials, folder) => resetFolderMessagesCache(dispatch, credentials, folder),
   addFolder: () => {
     dispatch(addFolder({fullURL: 'FU', name: 'New Folder', type: FolderTypes.FOLDER, children: []}));
   },
@@ -90,7 +105,8 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
-  reloadFolders: () => dispatchProps.reloadFolders(stateProps.application.user.credentials)
+  reloadFolders: () => dispatchProps.reloadFolders(stateProps.application.user.credentials),
+  reloadMessageCache: folder => dispatchProps.reloadMessageCache(stateProps.application.user.credentials, folder)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(App);

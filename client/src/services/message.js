@@ -8,9 +8,9 @@ import {credentialsHeaders, toJson} from './fetch';
  * @param folder
  * @param signal {AbortSignal}
  */
-export function resetFolderMessagesCache(dispatch, credentials, folder, signal) {
+export async function resetFolderMessagesCache(dispatch, credentials, folder, signal) {
   dispatch(backendRequest());
-  fetch(folder._links.messages.href, {
+  return fetch(folder._links.messages.href, {
     method: 'GET',
     headers: credentialsHeaders(credentials),
     signal: signal

@@ -21,7 +21,7 @@ function processFolders(initialFolders) {
   return folders;
 }
 
-export function getFolders(dispatch, credentials, loadChildren) {
+export async function getFolders(dispatch, credentials, loadChildren) {
   let url = new URL('/api/v1/folders', window.location.origin);
   if (process.env.NODE_ENV === 'development') {
     url = new URL('http://localhost:9010/v1/folders');
@@ -30,7 +30,7 @@ export function getFolders(dispatch, credentials, loadChildren) {
     url.search = new URLSearchParams({loadChildren: true}).toString();
   }
   dispatch(backendRequest());
-  fetch(url, {
+  return fetch(url, {
     method: 'GET',
     headers: credentialsHeaders(credentials)
   })
