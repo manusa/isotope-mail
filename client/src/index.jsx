@@ -9,7 +9,8 @@ import {loadState, saveState} from './services/state';
 async function init () {
   const previousState = await loadState();
   const store = createStore(rootReducer, previousState,
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+    process.env.NODE_ENV === 'development'
+    && window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
   store.subscribe(() => saveState(store.getState()));
 
