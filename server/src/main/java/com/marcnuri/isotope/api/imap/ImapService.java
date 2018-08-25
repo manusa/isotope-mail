@@ -121,7 +121,6 @@ public class ImapService {
         final FetchProfile fp = new FetchProfile();
         fp.add(FetchProfile.Item.ENVELOPE);
         fp.add(UIDFolder.FetchProfileItem.UID);
-        folder.fetch(folder.getMessages(), fp);
         fp.add(FetchProfile.Item.FLAGS);
         fp.add(FetchProfile.Item.SIZE);
         folder.fetch(messages, fp);
