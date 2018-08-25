@@ -19,7 +19,7 @@ async function init () {
   }
   const store = createStore(rootReducer, previousState, enhancer);
 
-  store.subscribe(() => saveState(store.getState()));
+  store.subscribe(() => saveState(store.dispatch, store.getState()));
 
   ReactDOM.render(
     <Provider store={store}>

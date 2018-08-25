@@ -1,6 +1,7 @@
 import idb from 'idb';
 import sjcl from 'sjcl';
 import {processFolders} from './folder';
+import {setError} from '../actions/application';
 
 const DATABASE_NAME = 'isotope';
 const DATABASE_VERSION = 1;
@@ -76,10 +77,11 @@ export async function recoverState(userId, hash) {
  *
  * Stored entities are encrypted using the user hash {@link #login}
  *
+ * @param dispatch {(Dispatch<any>|function)}
  * @param state
  * @returns {Promise<void>}
  */
-export async function persistState(state) {
+export async function persistState(dispatch, state) {
   // Only persist state if it contains a folder and message cache (don't overwrite previously stored state with this info)
   if (state.application.user.id && state.application.user.hash
     && state.folders.items.length > 0 && Object.keys(state.messages.cache).length > 0) {
@@ -100,8 +102,14 @@ export async function persistState(state) {
       await store.put({key: state.application.user.id, value: encryptedState});
       await tx.complete;
       db.close();
+      if (state.application.errors.diskQuotaExceeded) {
+        dispatch(setError('diskQuotaExceeded', false));
+      }
     } catch (e) {
-      console.log(e);
+      console.log(`${e} ${e.name}`);
+      if (e.name === 'QuotaExceededError' && !state.application.errors.diskQuotaExceeded) {
+        dispatch(setError('diskQuotaExceeded', true));
+      }
     }
   }
 }

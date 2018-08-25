@@ -38,11 +38,12 @@ export async function loadState() {
  * In order to be able to retrieve back the state from the indexed db, the hashed user id and the hashed user credentials
  * will be used as key and cypher password.
  *
+ * @param dispatch {(Dispatch<any>|function)}
  * @param state
  */
-export function saveState(state) {
+export function saveState(dispatch, state) {
   sessionStorage.setItem(KEY_USER_ID, state.application.user.id);
   sessionStorage.setItem(KEY_HASH, state.application.user.hash);
 
-  persistState(state);
+  persistState(dispatch, state);
 }

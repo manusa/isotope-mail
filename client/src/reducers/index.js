@@ -9,6 +9,9 @@ export const INITIAL_STATE = {
     user: {},
     selectedFolder: {},
     pollInterval: 15000,
+    errors: {
+      diskQuotaExceeded: false
+    },
     activeRequests: 0
   },
   folders: {

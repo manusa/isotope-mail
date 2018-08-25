@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import FolderContainer from '../folders/folder-container';
 import mainCss from '../../styles/main.scss';
@@ -19,6 +20,12 @@ class SideBar extends Component {
           <div className={mainCss['mdc-drawer__toolbar-spacer']}></div>
           <div className={`${mainCss['mdc-drawer__content']} ${styles['drawer-content']}`}>
             <FolderContainer />
+            <div className={styles['error-container']}>
+              {(this.props.errors.diskQuotaExceeded ?
+                <span className='material-icons'>
+                disc_full
+                </span> : null)}
+            </div>
           </div>
         </nav>
       </aside>
@@ -32,7 +39,12 @@ class SideBar extends Component {
 }
 
 SideBar.propTypes = {
-  collapsed: PropTypes.bool.isRequired
+  collapsed: PropTypes.bool.isRequired,
+  errors: PropTypes.object.isRequired
 };
 
-export default SideBar;
+const mapStateToProps = state => ({
+  errors: state.application.errors
+});
+
+export default connect(mapStateToProps)(SideBar);

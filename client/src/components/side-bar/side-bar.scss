@@ -8,8 +8,15 @@
   }
   .drawer {
     position: fixed;
+
     .drawer-content {
       overflow-y: auto;
+
+      .error-container {
+        display: flex;
+        justify-content: center;
+        color: $mdc-theme-secondary;
+      }
     }
   }
 }
