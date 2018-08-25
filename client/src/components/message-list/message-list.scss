@@ -24,6 +24,11 @@
         font-weight: $font-weight-normal;
       }
 
+      &.deleted {
+        color: lighten($base-color, 45%);
+        font-style: italic;
+      }
+
       .from {
         margin-left: $default-spacing / 2;
         width: 200px;

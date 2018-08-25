@@ -44,7 +44,8 @@ class MessageList extends Component {
     const message = this.props.messages[index];
     return (
       <li key={key} style={style} className={`${mainCss['mdc-list-item']}
-                ${styles.item} ${message.seen ? styles.seen : ''}`} >
+                ${styles.item} ${message.seen ? styles.seen : ''}
+                ${message.deleted ? styles.deleted : ''}`} >
         <span className={styles.from}>{parseFrom(message.from)}</span>
         <span className={styles.subject}>{message.subject}</span>
         <span className={styles.receivedDate}>{prettyDate(message.receivedDate)}</span>
