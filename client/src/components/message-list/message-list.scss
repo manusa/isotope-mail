@@ -1,6 +1,7 @@
 @import '../../styles/partials/variables';
 
 .messageList {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -54,7 +55,11 @@
   }
 
   .listSpinner {
+    position: absolute;
+    bottom: 0px;
+    z-index: 2;
     height: 25px;
+    width: 100%;
 
     .listSpinnerCanvas {
       width: 16px;

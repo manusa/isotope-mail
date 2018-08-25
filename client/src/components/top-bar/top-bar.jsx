@@ -11,7 +11,8 @@ class TopBar extends Component {
 
   render() {
     return (
-      <header className={`${styles.topBar} ${this.props.sideBarCollapsed ? '' : styles['with-side-bar']}
+      <header className={`${styles.topBar} ${styles['with-custom-styles']}
+      ${this.props.sideBarCollapsed ? '' : styles['with-side-bar']}
       ${mainCss['mdc-top-app-bar']} ${mainCss['mdc-top-app-bar--fixed']}`}>
         <div className={mainCss['mdc-top-app-bar__row']}>
           <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-start']}`}>

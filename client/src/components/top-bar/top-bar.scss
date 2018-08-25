@@ -1,8 +1,14 @@
 @import '../../styles/partials/variables';
 @import '@material/drawer/slidable/variables';
+@import '@material/top-app-bar/mixins';
 
 .topBar {
   transition: $mdc-slidable-drawer-transition-close;
+
+  &.with-custom-styles{
+    @include mdc-top-app-bar-fill-color($mdc-theme-secondary);
+  }
+
   &.with-side-bar {
     margin-left: $drawerWidth;
     width: calc(100% - #{$drawerWidth});
