@@ -68,7 +68,15 @@ const mapStateToProps = state => ({
   activeRequests: state.messages.activeRequests,
   messages: state.application.selectedFolder.folderId
     && state.messages.cache[state.application.selectedFolder.folderId] ?
-    Array.from(state.messages.cache[state.application.selectedFolder.folderId].values()) : []
+    Array.from(state.messages.cache[state.application.selectedFolder.folderId].values())
+      .sort((a, b) => {
+        if (a.receivedDate > b.receivedDate) {
+          return -1;
+        } else if (a.receivedDate < b.receivedDate) {
+          return 1;
+        }
+        return 0;
+      }) : []
 });
 
 const mapDispatchToProps = dispatch => ({ });
