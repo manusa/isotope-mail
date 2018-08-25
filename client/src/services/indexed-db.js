@@ -1,5 +1,6 @@
 import idb from 'idb';
 import sjcl from 'sjcl';
+import {processFolders} from './folder';
 
 const DATABASE_NAME = 'isotope';
 const DATABASE_VERSION = 1;
@@ -61,6 +62,11 @@ export async function recoverState(userId, hash) {
   Object.entries(recoveredState.messages.cache).forEach(e => {
     recoveredState.messages.cache[e[0]] = new Map(e[1].map(m => [m.uid, m]));
   });
+  //  Process folders
+  recoveredState.folders.items = processFolders(recoveredState.folders.items);
+  if (recoveredState.application.selectedFolder) {
+    recoveredState.application.selectedFolder = processFolders([recoveredState.application.selectedFolder])[0];
+  }
   db.close();
   return recoveredState;
 }

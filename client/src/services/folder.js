@@ -6,7 +6,13 @@ export const FolderTypes = Object.freeze({
   FOLDER: {serverName: 'na', icon: 'folder'}
 })
 
-function processFolders(initialFolders) {
+/**
+ * Processes an initial folder list and adds the corresponding {@link FolderTypes}
+ *
+ * @param initialFolders {Array}
+ * @returns {Array}
+ */
+export function processFolders(initialFolders) {
   const folders = [];
   initialFolders.map(folder => {
     if (folder.name.toUpperCase() === FolderTypes.INBOX.serverName) {
@@ -30,13 +36,13 @@ export async function getFolders(dispatch, credentials, loadChildren) {
     url.search = new URLSearchParams({loadChildren: true}).toString();
   }
   dispatch(backendRequest());
-  return fetch(url, {
+  const response = await fetch(url, {
     method: 'GET',
     headers: credentialsHeaders(credentials)
-  })
-    .then(toJson)
-    .then(json =>
-      dispatch(setFolders(processFolders(json)))
-    );
+  });
+  const folders = await toJson(response);
+  const processedFolders = processFolders(folders);
+  dispatch(setFolders(processedFolders));
+  return processedFolders;
 }
 

@@ -2,7 +2,7 @@ import sjcl from 'sjcl';
 import {backendRequest, backendRequestCompleted, selectFolder, setUserCredentials} from '../actions/application';
 import {toJson} from './fetch';
 import {recoverState} from './indexed-db';
-import {getFolders} from './folder';
+import {FolderTypes, getFolders} from './folder';
 import {setFolders} from '../actions/folders';
 import {setCache} from '../actions/messages';
 import {resetFolderMessagesCache} from './message';
@@ -58,11 +58,19 @@ export async function login(dispatch, credentials) {
       await dispatch(setFolders(recoveredState.folders.items));
       dispatch(selectFolder(recoveredState.application.selectedFolder));
       dispatch(setCache(recoveredState.messages.cache));
-      // Refresh currently selected folder
-      resetFolderMessagesCache(dispatch, validatedCredentials, recoveredState.application.selectedFolder, null);
+      // Refresh currently selected folder (if it's ot INBOX)
+      if (FolderTypes.INBOX !== recoveredState.application.selectedFolder) {
+        resetFolderMessagesCache(dispatch, validatedCredentials, recoveredState.application.selectedFolder, null);
+      }
     } else {
       // Retrieve first level folders to show something ASAP
-      getFolders(dispatch, validatedCredentials, false);
+      const folders = await getFolders(dispatch, validatedCredentials, false);
+      // Retrieve INBOX
+      const inbox = folders.find(f => f.type === FolderTypes.INBOX);
+      if (inbox) {
+        dispatch(selectFolder(inbox));
+        resetFolderMessagesCache(dispatch, validatedCredentials, inbox, null);
+      }
     }
   }
 }
