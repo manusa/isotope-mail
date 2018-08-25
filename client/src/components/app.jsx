@@ -45,11 +45,24 @@ class App extends Component {
 
   componentDidMount() {
     document.title = this.props.application.title;
-    this.refreshPoll();
+    this.startPoll();
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    this.startPoll();
   }
 
   componentWillUnmount() {
     clearTimeout(this.refreshPollTimeout);
+  }
+
+  startPoll() {
+    // Start polling when everything is ready
+    if (this.props.application.selectedFolder.folderId && this.props.folders.items.length > 0
+      && !this.pollStarted) {
+      this.pollStarted = true;
+      this.refreshPoll();
+    }
   }
 
   /**
@@ -58,14 +71,10 @@ class App extends Component {
    * @returns {Promise<void>}
    */
   async refreshPoll() {
-    let toAwait = this.props.reloadFolders();
-    const inbox = this.props.folders.items.find(f => f.type === FolderTypes.INBOX);
-    if (inbox) {
-      const messagePromise = this.props.reloadMessageCache(inbox);
-      toAwait = Promise.all([toAwait, messagePromise]);
-    }
-    await toAwait;
-    this.refreshPollTimeout = setTimeout(() => this.refreshPoll(), this.props.application.pollInterval);
+    const folderPromise = this.props.reloadFolders();
+    const messagePromise = this.props.reloadMessageCache(this.props.application.selectedFolder);
+    await Promise.all([folderPromise, messagePromise]);
+    this.refreshPollTimeout = setTimeout(this.refreshPoll.bind(this), this.props.application.pollInterval);
   }
 
   toggleSideBar() {

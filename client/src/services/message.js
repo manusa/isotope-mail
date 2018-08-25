@@ -9,23 +9,26 @@ import {credentialsHeaders, toJson} from './fetch';
  * @param signal {AbortSignal}
  */
 export async function resetFolderMessagesCache(dispatch, credentials, folder, signal) {
-  dispatch(backendRequest());
-  return fetch(folder._links.messages.href, {
-    method: 'GET',
-    headers: credentialsHeaders(credentials),
-    signal: signal
-  })
-    .then(response => {
-      dispatch(backendRequestCompleted());
-      return response;
+  if (folder && folder._links) {
+    dispatch(backendRequest());
+    return fetch(folder._links.messages.href, {
+      method: 'GET',
+      headers: credentialsHeaders(credentials),
+      signal: signal
     })
-    .then(toJson)
-    .then(json => {
-      dispatch(setFolderCache(folder, json));
-    })
-    .catch(error => {
-      dispatch(backendRequestCompleted());
-    });
+      .then(response => {
+        dispatch(backendRequestCompleted());
+        return response;
+      })
+      .then(toJson)
+      .then(json => {
+        dispatch(setFolderCache(folder, json));
+      })
+      .catch(error => {
+        dispatch(backendRequestCompleted());
+      });
+  }
+  return null;
 }
 
 export function updateFolderMessagesCache(dispatch, credentials, folder, signal, start, end) {

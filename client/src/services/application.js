@@ -51,21 +51,17 @@ export async function login(dispatch, credentials) {
   dispatch(backendRequestCompleted());
   if (response.ok) {
     const validatedCredentials = await toJson(response);
-    await dispatch(setUserCredentials(userId, hash, validatedCredentials));
+    dispatch(setUserCredentials(userId, hash, validatedCredentials));
     // Reload data from indexedDb
     const recoveredState = await recoverState(userId, hash);
     if (recoveredState !== null) {
+      await dispatch(setCache(recoveredState.messages.cache));
       await dispatch(setFolders(recoveredState.folders.items));
       dispatch(selectFolder(recoveredState.application.selectedFolder));
-      dispatch(setCache(recoveredState.messages.cache));
-      // Refresh currently selected folder (if it's ot INBOX)
-      if (FolderTypes.INBOX !== recoveredState.application.selectedFolder) {
-        resetFolderMessagesCache(dispatch, validatedCredentials, recoveredState.application.selectedFolder, null);
-      }
     } else {
       // Retrieve first level folders to show something ASAP
       const folders = await getFolders(dispatch, validatedCredentials, false);
-      // Retrieve INBOX
+      // Retrieve and select INBOX folder so that user has something in the screen
       const inbox = folders.find(f => f.type === FolderTypes.INBOX);
       if (inbox) {
         dispatch(selectFolder(inbox));
