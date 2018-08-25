@@ -71,9 +71,13 @@ class App extends Component {
    * @returns {Promise<void>}
    */
   async refreshPoll() {
-    const folderPromise = this.props.reloadFolders();
-    const messagePromise = this.props.reloadMessageCache(this.props.application.selectedFolder);
-    await Promise.all([folderPromise, messagePromise]);
+    try {
+      const folderPromise = this.props.reloadFolders();
+      const messagePromise = this.props.reloadMessageCache(this.props.application.selectedFolder);
+      await Promise.all([folderPromise, messagePromise]);
+    } catch (e) {
+      console.log(`Error in refresh poll: ${e}`);
+    }
     this.refreshPollTimeout = setTimeout(this.refreshPoll.bind(this), this.props.application.pollInterval);
   }
 
