@@ -21,7 +21,14 @@ module.exports = {
   output: {
     path: DIST_DIR,
     publicPath: '/',
-    filename: 'bundle.js'
+    filename: '[name].bundle.js'
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendors: { test: /[\\/]node_modules[\\/]/, name: "vendor", chunks: "all" }
+      }
+    }
   },
   module: {
     rules: [
