@@ -12,6 +12,8 @@ const application = (state = INITIAL_STATE.application, action) => {
         id: action.payload.userId, hash: action.payload.hash, credentials: action.payload.credentials}};
     case ActionTypes.APPLICATION_FOLDER_SELECT:
       return {...state, selectedFolder: {...action.payload}};
+    case ActionTypes.APPLICATION_MESSAGE_SELECT:
+      return {...state, selectedMessage: {...action.payload}};
     case ActionTypes.APPLICATION_ERROR_SET:
       const errorsSetState = {...state};
       errorsSetState.errors = {...state.erro}

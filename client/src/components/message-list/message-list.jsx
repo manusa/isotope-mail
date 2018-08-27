@@ -4,12 +4,13 @@ import PropTypes from 'prop-types';
 import {AutoSizer, List} from 'react-virtualized';
 import Spinner from '../spinner/spinner';
 import {prettyDate, prettySize} from '../../services/prettify';
+import {selectMessage} from '../../actions/application';
 import mainCss from '../../styles/main.scss';
 import styles from './message-list.scss';
 
 function parseFrom(from) {
   const firstFrom = from && from.length > 0 ? from[0] : '';
-  const formattedFrom = firstFrom.match(/^\"([^\"]*?)\"/);
+  const formattedFrom = firstFrom.match(/^\"(.*)\"/);
   return formattedFrom !== null ? formattedFrom[1] : firstFrom;
 }
 
@@ -43,7 +44,8 @@ class MessageList extends Component {
   renderItem({index, key, style}) {
     const message = this.props.messages[index];
     return (
-      <li key={key} style={style} className={`${mainCss['mdc-list-item']}
+      <li key={key} style={style} onClick={ () => this.props.selectMessage(message) }
+        className={`${mainCss['mdc-list-item']}
                 ${styles.item} ${message.seen ? styles.seen : ''}
                 ${message.deleted ? styles.deleted : ''}`} >
         <span className={styles.from}>{parseFrom(message.from)}</span>
@@ -79,6 +81,8 @@ const mapStateToProps = state => ({
       }) : []
 });
 
-const mapDispatchToProps = dispatch => ({ });
+const mapDispatchToProps = dispatch => ({
+  selectMessage: message => dispatch(selectMessage(message))
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(MessageList);

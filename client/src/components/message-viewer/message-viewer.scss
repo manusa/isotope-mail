@@ -1,0 +1,53 @@
+@import '../../styles/partials/variables';
+
+.messageViewer {
+  position: relative;
+  padding: $default-spacing;
+
+  .header {
+
+    h1.subject {
+      margin-top: 0;
+      font-size: 1.25 * $font-size-body;
+      font-weight: $font-weight-normal * 1.25;
+
+      .folder {
+        margin-left: $default-spacing;
+        height: 15px;
+        line-height: 15px;
+        font-size: 11px;
+      }
+    }
+
+    .fromDate {
+      display: flex;
+      flex-flow: row nowrap;
+      min-width: 0;
+
+      .from {
+        display: inline-block;
+        flex-grow: 1;
+        min-width: 0;
+        width: 1px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        .name {
+          font-size: 1.15 * $font-size-body;
+          margin-right: $default-spacing / 2;
+        }
+
+        .email {
+          color: lighten($base-color, 45%);
+          font-style: italic;
+        }
+      }
+
+      .date {
+        display: inline-block;
+        white-space: nowrap;
+      }
+    }
+  }
+}

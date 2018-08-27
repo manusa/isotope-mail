@@ -19,6 +19,7 @@
       padding: 0px;
       height: 32px;
       border: 1px solid lighten($mdc-theme-background, 10%);
+      cursor: pointer;
 
       &.seen {
         font-weight: $font-weight-normal;

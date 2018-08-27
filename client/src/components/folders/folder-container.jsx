@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import Spinner from '../spinner/spinner';
 import FolderList from './folder-list';
 import {resetFolderMessagesCache, updateFolderMessagesCache} from '../../services/message';
-import {selectFolder} from '../../actions/application';
+import {selectFolder, selectMessage} from '../../actions/application';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
 
@@ -44,6 +44,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   selectFolder: (abortControllerWrapper, folder, credentials, cachedFolderMessagesMap) => {
     dispatch(selectFolder(folder));
+    dispatch(selectMessage(null));
     if (abortControllerWrapper && abortControllerWrapper.abortController) {
       abortControllerWrapper.abortController.abort();
     }

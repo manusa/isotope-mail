@@ -85,7 +85,9 @@ export async function persistState(dispatch, state) {
   // Only persist state if it contains a folder and message cache (don't overwrite previously stored state with this info)
   if (state.application.user.id && state.application.user.hash
     && state.folders.items.length > 0 && Object.keys(state.messages.cache).length > 0) {
+    // Clone state
     const newState = {...state};
+    newState.application = {...state.application};
     newState.folders = {...state.folders};
     newState.folders.items = [...state.folders.items];
     newState.messages = {...state.messages};
@@ -93,8 +95,12 @@ export async function persistState(dispatch, state) {
     Object.entries(state.messages.cache).forEach(e => {
       newState.messages.cache[e[0]] = Array.from(e[1].values());
     });
+
+    // Encrypt state
     const stateString = JSON.stringify(newState);
     const encryptedState = sjcl.encrypt(state.application.user.hash, stateString);
+
+    // Persist state
     try {
       const db = await _openDatabaseSafe();
       const tx = db.transaction([STATE_STORE], 'readwrite');

@@ -1,9 +1,10 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import TopBar from './top-bar/top-bar';
 import SideBar from './side-bar/side-bar';
 import MessageList from './message-list/message-list';
+import MessageViewer from './message-viewer/message-viewer';
 import {FolderTypes, getFolders} from '../services/folder';
 import {addFolder} from '../actions/folders';
 import {addMessage} from '../actions/messages';
@@ -27,17 +28,23 @@ class App extends Component {
       <div className={styles.app}>
         <TopBar sideBarCollapsed={this.state.sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
         <SideBar collapsed={this.state.sideBar.collapsed}/>
-        <div className={`${mainCss['mdc-top-app-bar--fixed-adjust']} ${styles['message-grid-wrapper']}
-          ${this.state.sideBar.collapsed ? '' : styles['with-side-bar']}`}>
-          <MessageList className={styles['message-grid']} />
-          <div className={styles['fab-container']}>
-            <button className={`${mainCss['mdc-fab']}`} onClick={this.props.addMessage.bind(this)}>
-              <span className={`material-icons ${mainCss['mdc-fab__icon']}`}>edit</span>
-            </button>
-            <button className={`${mainCss['mdc-fab']}`} onClick={this.props.addFolder.bind(this)}>
-              <span className={`material-icons ${mainCss['mdc-fab__icon']}`}>folder</span>
-            </button>
-          </div>
+        <div className={`${mainCss['mdc-top-app-bar--fixed-adjust']} ${styles['content-wrapper']}
+            ${this.state.sideBar.collapsed ? '' : styles['with-side-bar']}`}>
+          {!this.props.application.selectedMessage || Object.keys(this.props.application.selectedMessage).length === 0 ?
+            <Fragment>
+              <MessageList className={styles['message-grid']} />
+              <div className={styles['fab-container']}>
+                <button className={`${mainCss['mdc-fab']}`} onClick={this.props.addMessage.bind(this)}>
+                  <span className={`material-icons ${mainCss['mdc-fab__icon']}`}>edit</span>
+                </button>
+                <button className={`${mainCss['mdc-fab']}`} onClick={this.props.addFolder.bind(this)}>
+                  <span className={`material-icons ${mainCss['mdc-fab__icon']}`}>folder</span>
+                </button>
+              </div>
+            </Fragment>
+            :
+            <MessageViewer className={styles['message-viewer']} />
+          }
         </div>
       </div>
     );
