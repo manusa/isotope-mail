@@ -1,5 +1,7 @@
 import {backendRequest, backendRequestCompleted, setFolderCache, updateCache} from '../actions/messages';
 import {credentialsHeaders, toJson} from './fetch';
+import {persistMessageCache} from './indexed-db';
+import {KEY_HASH, KEY_USER_ID} from './state';
 
 /**
  *
@@ -23,6 +25,8 @@ export async function resetFolderMessagesCache(dispatch, credentials, folder, si
       .then(toJson)
       .then(json => {
         dispatch(setFolderCache(folder, json));
+        // Manually persist newest version of message cache
+        persistMessageCache(sessionStorage.getItem(KEY_USER_ID), sessionStorage.getItem(KEY_HASH), folder, json);
       })
       .catch(error => {
         dispatch(backendRequestCompleted());
