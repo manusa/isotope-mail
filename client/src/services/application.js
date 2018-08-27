@@ -36,10 +36,10 @@ export async function login(dispatch, credentials) {
   }
   // Will be used as the key in the IndexedDB
   const userId = sjcl.codec.hex.fromBits(
-    sjcl.hash.sha256.hash(`${credentials.serverHost}-${credentials.user}`));
+    sjcl.hash.sha256.hash(`${credentials.serverHost}|${credentials.user}`));
   // Will be used as the encryption password to store state in the IndexedDB
   const hash = sjcl.codec.hex.fromBits(
-    sjcl.hash.sha256.hash(`${credentials.serverHost}-${credentials.user}-${credentials.password}`));
+    sjcl.hash.sha256.hash(`${credentials.serverHost}|${credentials.user}|${credentials.password}`));
 
   const response = await fetch(url, {
     method: 'POST',

@@ -1,8 +1,8 @@
 import {persistState, recoverState} from './indexed-db';
 import {INITIAL_STATE} from '../reducers';
 
-const KEY_USER_ID = 'KEY_USER_ID';
-const KEY_HASH = 'KEY_HASH';
+export const KEY_USER_ID = 'KEY_USER_ID';
+export const KEY_HASH = 'KEY_HASH';
 
 function emptyState() {
   return JSON.parse(JSON.stringify(INITIAL_STATE));

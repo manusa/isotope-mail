@@ -6,6 +6,7 @@ import {setError} from '../actions/application';
 const DATABASE_NAME = 'isotope';
 const DATABASE_VERSION = 1;
 const STATE_STORE = 'state';
+const MESSAGE_CACHE_STORE = 'message_cache';
 
 /**
  * Opens a connection to the IndexedDB for Isotope's database
@@ -18,6 +19,10 @@ function _openDatabase() {
     upgradeDb => {
       if (!upgradeDb.objectStoreNames.contains(STATE_STORE)) {
         upgradeDb.createObjectStore(STATE_STORE, {keyPath: 'key'});
+      }
+      if (!upgradeDb.objectStoreNames.contains(MESSAGE_CACHE_STORE)) {
+        const messageCacheStore = upgradeDb.createObjectStore(MESSAGE_CACHE_STORE, {keyPath: 'key'});
+        messageCacheStore.createIndex('userId', 'userId', {unique: false});
       }
     });
 }
@@ -41,6 +46,22 @@ async function _openDatabaseSafe() {
   return db;
 }
 
+async function _recoverMessageCache(userId, hash) {
+  const ret = {};
+  const db = await _openDatabaseSafe();
+  const tx = db.transaction([MESSAGE_CACHE_STORE], 'readonly');
+  const store = tx.objectStore(MESSAGE_CACHE_STORE);
+  const index = store.index('userId');
+  const keys = await index.getAllKeys(IDBKeyRange.only(userId));
+  for (const key of keys) {
+    const encryptedMessageCache = await store.get(key);
+    const messages = JSON.parse(sjcl.decrypt(hash, encryptedMessageCache.messages))
+    ret[sjcl.decrypt(hash, encryptedMessageCache.folderId)] =
+      new Map(messages.map(m => [m.uid, m]));
+  }
+  return ret;
+}
+
 /**
  * Tries to recover a persisted state for the given userID and uses the hash as the cypher password to decrypt the
  * store value.
@@ -59,10 +80,8 @@ export async function recoverState(userId, hash) {
   }
   const decryptedState = sjcl.decrypt(hash, encryptedState.value);
   const recoveredState = JSON.parse(decryptedState);
-  // Convert Array to Map after recovering
-  Object.entries(recoveredState.messages.cache).forEach(e => {
-    recoveredState.messages.cache[e[0]] = new Map(e[1].map(m => [m.uid, m]));
-  });
+  // Recover message cache from other store
+  recoveredState.messages.cache = await _recoverMessageCache(userId, hash);
   //  Process folders
   recoveredState.folders.items = processFolders(recoveredState.folders.items);
   if (recoveredState.application.selectedFolder) {
@@ -73,7 +92,7 @@ export async function recoverState(userId, hash) {
 }
 
 /**
- * Persists the message cache and folder items from the provided state into the Browser IndexedDB.
+ * Persists the message cache and folder items from the provided state into the Browser IndexedDB state store.
  *
  * Stored entities are encrypted using the user hash {@link #login}
  *
@@ -90,9 +109,9 @@ export async function persistState(dispatch, state) {
     newState.folders.items = [...state.folders.items];
     newState.messages = {...state.messages};
     newState.messages.cache = {};
-    Object.entries(state.messages.cache).forEach(e => {
-      newState.messages.cache[e[0]] = Array.from(e[1].values());
-    });
+    // Object.entries(state.messages.cache).forEach(e => {
+    //   newState.messages.cache[e[0]] = Array.from(e[1].values());
+    // });
     const stateString = JSON.stringify(newState);
     const encryptedState = sjcl.encrypt(state.application.user.hash, stateString);
     try {
@@ -112,4 +131,33 @@ export async function persistState(dispatch, state) {
       }
     }
   }
+}
+
+/**
+ * Persists the provided array of messages into the Browser IndexedDB message cache store for the
+ * specified userId and folder
+ *
+ * Stored entities are encrypted using the user hash {@link #login}
+ *
+ * @param userId
+ * @param hash
+ * @param folder {object}
+ * @param messages {Array}
+ * @returns {Promise<void>}
+ */
+export async function persistMessageCache(userId, hash, folder, messages) {
+  const db = await _openDatabaseSafe();
+  const tx = db.transaction([MESSAGE_CACHE_STORE], 'readwrite');
+  const store = tx.objectStore(MESSAGE_CACHE_STORE);
+  const messageCache = {
+    // Key will not be used for data retrieval, index will be used instead
+    // Key is only used to overwrite previous versions of the message cache, a has is enough
+    key: sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(`${userId}|${folder.folderId}`)),
+    userId: userId,
+    folderId: sjcl.encrypt(hash, folder.folderId),
+    messages: sjcl.encrypt(hash, JSON.stringify(messages))
+  }
+  await store.put(messageCache);
+  await tx.complete;
+  db.close();
 }
