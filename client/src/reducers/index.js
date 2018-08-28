@@ -8,6 +8,7 @@ export const INITIAL_STATE = {
     title: 'Isotope Mail Client',
     user: {},
     selectedFolder: {},
+    selectedMessage: null,
     pollInterval: 15000,
     errors: {
       diskQuotaExceeded: false
@@ -15,7 +16,6 @@ export const INITIAL_STATE = {
     activeRequests: 0
   },
   folders: {
-    selected: {},
     items: [],
     activeRequests: 0
   },

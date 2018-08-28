@@ -13,9 +13,12 @@ export const FolderTypes = Object.freeze({
  * @returns {Array}
  */
 export function processFolders(initialFolders) {
+  if (!initialFolders) {
+    return null;
+  }
   const folders = [];
   initialFolders.map(folder => {
-    if (folder.name.toUpperCase() === FolderTypes.INBOX.serverName) {
+    if (folder.name && folder.name.toUpperCase() === FolderTypes.INBOX.serverName) {
       folder.type = FolderTypes.INBOX;
       folders.unshift(folder);
     } else {
