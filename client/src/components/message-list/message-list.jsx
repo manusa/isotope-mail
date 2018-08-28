@@ -5,6 +5,7 @@ import {AutoSizer, List} from 'react-virtualized';
 import Spinner from '../spinner/spinner';
 import {prettyDate, prettySize} from '../../services/prettify';
 import {selectMessage} from '../../actions/application';
+import {readMessage} from '../../services/message';
 import mainCss from '../../styles/main.scss';
 import styles from './message-list.scss';
 
@@ -15,6 +16,11 @@ function parseFrom(from) {
 }
 
 class MessageList extends Component {
+  constructor(props) {
+    super(props);
+    this.abortControllerWrapper = {};
+  }
+
   render() {
     return (
       <div className={`${styles.messageList} ${this.props.className}`}>
@@ -44,7 +50,7 @@ class MessageList extends Component {
   renderItem({index, key, style}) {
     const message = this.props.messages[index];
     return (
-      <li key={key} style={style} onClick={ () => this.props.selectMessage(message) }
+      <li key={key} style={style} onClick={ () => this.props.selectMessage(this.abortControllerWrapper, message) }
         className={`${mainCss['mdc-list-item']}
                 ${styles.item} ${message.seen ? styles.seen : ''}
                 ${message.deleted ? styles.deleted : ''}`} >
@@ -66,6 +72,7 @@ MessageList.defaultProps = {
 };
 
 const mapStateToProps = state => ({
+  credentials: state.application.user.credentials,
   selectedFolder: state.application.selectedFolder,
   activeRequests: state.messages.activeRequests,
   messages: state.application.selectedFolder.folderId
@@ -82,7 +89,19 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  selectMessage: message => dispatch(selectMessage(message))
+  selectMessage: (abortControllerWrapper, folder, message, credentials) => {
+    dispatch(selectMessage(message));
+    if (abortControllerWrapper && abortControllerWrapper.abortController) {
+      abortControllerWrapper.abortController.abort();
+    }
+    abortControllerWrapper.abortController = new AbortController();
+    readMessage(dispatch, credentials, folder, message, abortControllerWrapper.abortController.signal);
+  }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(MessageList);
+const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
+  selectMessage: (abortControllerWrapper, message) =>
+    dispatchProps.selectMessage(abortControllerWrapper, stateProps.selectedFolder, message, stateProps.credentials)
+}));
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(MessageList);

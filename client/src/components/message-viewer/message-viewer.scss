@@ -3,8 +3,11 @@
 .messageViewer {
   position: relative;
   padding: $default-spacing;
+  display: flex;
+  flex-direction: column;
 
   .header {
+    width: 100%;
 
     h1.subject {
       margin-top: 0;
@@ -49,5 +52,25 @@
         white-space: nowrap;
       }
     }
+
+    .to {
+      color: lighten($base-color, 45%);
+
+      .name {
+        margin-right: $default-spacing / 2;
+        color: lighten($base-color, 25%);
+      }
+
+    }
+  }
+
+  .body {
+    flex: 1;
+    height: 0px;
+    margin-top: $default-spacing;
+    max-width: 100%;
+    width: 100%;
+    display: inline-block;
+    overflow: auto;
   }
 }

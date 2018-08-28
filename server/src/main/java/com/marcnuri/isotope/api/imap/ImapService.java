@@ -16,6 +16,8 @@ import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPSSLStore;
 import com.sun.mail.imap.IMAPStore;
+import org.apache.commons.io.IOUtils;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ import org.springframework.web.context.annotation.RequestScope;
 
 import javax.annotation.PreDestroy;
 import javax.mail.*;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Comparator;
@@ -126,8 +130,34 @@ public class ImapService {
         folder.fetch(messages, fp);
         return Stream.of(messages)
                 .map(m -> Message.from(folder, (IMAPMessage)m))
-                .sorted(Comparator.comparingLong(Message::getUID).reversed())
+                .sorted(Comparator.comparingLong(Message::getUid).reversed())
                 .collect(Collectors.toList());
+    }
+
+    public Message getMessage(URLName folderId, Long uid) {
+        try {
+            final IMAPFolder folder = (IMAPFolder)getImapStore().getFolder(folderId);
+            if (!folder.isOpen()) {
+                folder.open(READ_ONLY);
+            }
+            final IMAPMessage imapMessage = (IMAPMessage)folder.getMessageByUID(uid);
+            final Message ret = Message.from(folder, imapMessage);
+            final Object content = imapMessage.getContent();
+            if (content instanceof Multipart) {
+                ret.setContent(parseMultipart((Multipart) content));
+            } else if (content instanceof MimeMessage
+                    && ((MimeMessage) content).getContentType().toLowerCase().contains("html")) {
+                ret.setContent(content.toString());
+            } else {
+                //Preserve formatting
+                ret.setContent(String.format("<pre>%s</pre>", content.toString()));
+            }
+            folder.close();
+            return ret;
+        } catch (MessagingException | IOException ex) {
+            log.error("Error loading messages for folder: " + folderId.toString(), ex);
+            throw  new IsotopeException(ex.getMessage());
+        }
     }
 
     @PreDestroy
@@ -183,4 +213,40 @@ public class ImapService {
         return ret;
     }
 
+    private static String parseMultipart(Multipart mp)
+            throws MessagingException, IOException {
+        String ret = null;
+        for (int it = 0; it < mp.getCount(); it++) {
+            final BodyPart bp = mp.getBodyPart(it);
+            if (ret == null && bp.getContentType().toLowerCase().startsWith("text/plain")) {
+                ret = bp.getContent().toString();
+            }
+            if (bp.getContentType().toLowerCase().startsWith("text/html")) {
+                ret = (bp.getContent().toString());
+            }
+            if (bp.getContentType().toLowerCase().startsWith("multipart/")) {
+                ret = parseMultipart((Multipart) bp.getContent());
+            }
+            if (bp.getContentType().toLowerCase().startsWith("image/")
+                    && bp instanceof MimeBodyPart
+                    && ((MimeBodyPart) bp).getContentID() != null) {
+                final String cid = ((MimeBodyPart) bp).getContentID().replace("<", "").replace(">", "");
+                if (ret != null && cid != null && ret.contains(cid)) {
+                    String contentType = bp.getContentType();
+                    if (contentType.contains(";")) {
+                        contentType = contentType.substring(0, contentType.indexOf(";"));
+                    }
+                    final String base64 = Base64.encodeBase64String(IOUtils.toByteArray(bp.getInputStream()))
+                            .replace("\r", "").replace("\n", "");
+
+                    ret = ret.replace("cid:" + cid,
+                            String.format("data:%s;%s,%s",
+                                    contentType,
+                                    ((MimeBodyPart) bp).getEncoding(),
+                                    base64));
+                }
+            }
+        }
+        return ret;
+    }
 }

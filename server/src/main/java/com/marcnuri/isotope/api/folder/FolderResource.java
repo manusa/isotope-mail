@@ -51,7 +51,16 @@ public class FolderResource {
             @PathVariable("folderId") String folderId, @RequestParam(value = "start", required = false) Integer start,
             @RequestParam(value = "end", required = false) Integer end) {
 
-        return ResponseEntity.ok(imapServiceFactory.getObject().getMessages(Folder.toId(folderId), start, end));
+        return ResponseEntity.ok(addLinks(folderId,
+                imapServiceFactory.getObject().getMessages(Folder.toId(folderId), start, end)));
+    }
+
+    @RequestMapping(path = "/{folderId}/messages/{messageId}", method = GET)
+    public ResponseEntity<Message> getMessage(
+            @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId) {
+
+        return ResponseEntity.ok(addLinks(folderId,
+                imapServiceFactory.getObject().getMessage(Folder.toId(folderId), messageId)));
     }
 
     private static Folder[] addLinks(Folder... folders) {
@@ -69,5 +78,21 @@ public class FolderResource {
                 .withRel(REL_MESSAGES).expand());
         addLinks(folder.getChildren());
         return folder;
+    }
+
+    private static Message[] addLinks(String folderId, Message... messages) {
+        Stream.of(messages).forEach(m -> addLinks(folderId, m));
+        return messages;
+    }
+
+    private static List<Message> addLinks(String folderId, List<Message> messages) {
+        messages.forEach(m -> addLinks(folderId, m));
+        return messages;
+    }
+
+    private static Message addLinks(String folderId, Message message) {
+        message.add(linkTo(methodOn(FolderResource.class).getMessage(folderId, message.getUid()))
+                .withSelfRel().expand());
+        return message;
     }
 }

@@ -1,6 +1,7 @@
 import {backendRequest, backendRequestCompleted, setFolderCache, updateCache} from '../actions/messages';
 import {credentialsHeaders, toJson} from './fetch';
 import {persistMessageCache} from './indexed-db';
+import {refreshMessage} from '../actions/application';
 import {KEY_HASH, KEY_USER_ID} from './state';
 
 /**
@@ -57,4 +58,18 @@ export function updateFolderMessagesCache(dispatch, credentials, folder, signal,
     .catch(error => {
       dispatch(backendRequestCompleted());
     });
+}
+
+export async function readMessage(dispatch, credentials, folder, message, signal) {
+  if (message &&  message._links) {
+    return fetch(message._links.self.href, {
+      method: 'GET',
+      headers: credentialsHeaders(credentials),
+      signal: signal
+    })
+      .then(toJson)
+      .then(completeMessage => {
+        dispatch(refreshMessage(folder, completeMessage));
+      });
+  }
 }

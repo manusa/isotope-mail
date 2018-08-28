@@ -14,6 +14,12 @@ const application = (state = INITIAL_STATE.application, action) => {
       return {...state, selectedFolder: {...action.payload}};
     case ActionTypes.APPLICATION_MESSAGE_SELECT:
       return {...state, selectedMessage: {...action.payload}};
+    case ActionTypes.APPLICATION_MESSAGE_REFRESH:
+      if (state.selectedFolder.folderId === action.payload.folder.folderId
+        && state.selectedMessage.uid === action.payload.message.uid) {
+        return {...state, selectedMessage: {...action.payload.message}};
+      }
+      return state;
     case ActionTypes.APPLICATION_ERROR_SET:
       const errorsSetState = {...state};
       errorsSetState.errors = {...state.erro}
