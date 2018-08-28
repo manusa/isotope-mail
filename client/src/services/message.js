@@ -1,3 +1,6 @@
+import {
+  backendRequest as aBackendRequest,
+  backendRequestCompleted as aBackendRequestCompleted} from '../actions/application';
 import {backendRequest, backendRequestCompleted, setFolderCache, updateCache} from '../actions/messages';
 import {credentialsHeaders, toJson} from './fetch';
 import {persistMessageCache} from './indexed-db';
@@ -29,9 +32,7 @@ export async function resetFolderMessagesCache(dispatch, credentials, folder, si
         // Manually persist newest version of message cache
         persistMessageCache(sessionStorage.getItem(KEY_USER_ID), sessionStorage.getItem(KEY_HASH), folder, json);
       })
-      .catch(error => {
-        dispatch(backendRequestCompleted());
-      });
+      .catch(() => dispatch(backendRequestCompleted()));
   }
   return null;
 }
@@ -55,21 +56,32 @@ export function updateFolderMessagesCache(dispatch, credentials, folder, signal,
     .then(json => {
       dispatch(updateCache(folder, json));
     })
-    .catch(error => {
-      dispatch(backendRequestCompleted());
-    });
+    .catch(() => dispatch(backendRequestCompleted()));
 }
 
-export async function readMessage(dispatch, credentials, folder, message, signal) {
-  if (message &&  message._links) {
-    return fetch(message._links.self.href, {
+/**
+ *
+ * @param dispatch
+ * @param credentials
+ * @param folder
+ * @param message {object}
+ * @param signal
+ */
+export function readMessage(dispatch, credentials, folder, message, signal) {
+  if (message && message._links) {
+    dispatch(aBackendRequest())
+    fetch(message._links.self.href, {
       method: 'GET',
       headers: credentialsHeaders(credentials),
       signal: signal
     })
+      .then(response => {
+        dispatch(aBackendRequestCompleted());
+        return response;
+      })
       .then(toJson)
       .then(completeMessage => {
         dispatch(refreshMessage(folder, completeMessage));
-      });
+      }).catch(() => dispatch(aBackendRequestCompleted()));
   }
 }
