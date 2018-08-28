@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import DOMPurify from 'dompurify';
+import Spinner from '../spinner/spinner';
 import mainCss from '../../styles/main.scss';
 import styles from './message-viewer.scss';
 
@@ -50,6 +51,10 @@ class MessageViewer extends Component {
             <span className={styles.email}>{firstTo.email ? `<${firstTo.email}>` : ''}</span>
           </div>
         </div>
+        {this.props.activeRequests > 0 ?
+          (<Spinner className={styles.listSpinner} canvasClassName={styles.listSpinnerCanvas} />) :
+          null
+        }
         <div className={styles.body} dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(message.content)}}>
         </div>
       </div>
@@ -58,6 +63,7 @@ class MessageViewer extends Component {
 }
 
 MessageViewer.propTypes = {
+  activeRequests: PropTypes.number,
   selectedMessage: PropTypes.object,
   className: PropTypes.string
 };
@@ -67,6 +73,7 @@ MessageViewer.defaultProps = {
 };
 
 const mapStateToProps = state => ({
+  activeRequests: state.application.activeRequests,
   selectedFolder: state.application.selectedFolder,
   selectedMessage: state.application.selectedMessage
 });
