@@ -72,5 +72,9 @@
     width: 100%;
     display: inline-block;
     overflow: auto;
+
+    img {
+      max-width: 100%;
+    }
   }
 }
