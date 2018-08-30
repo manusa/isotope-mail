@@ -74,6 +74,7 @@ public class ImapService {
      */
     public Credentials checkCredentials(Credentials credentials) {
         try {
+            credentialsService.checkHost(credentials);
             getImapStore(credentials).getDefaultFolder();
             return credentialsService.encrypt(credentials);
         } catch (MessagingException | IOException e) {

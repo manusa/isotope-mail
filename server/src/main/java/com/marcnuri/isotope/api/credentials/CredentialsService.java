@@ -16,6 +16,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-15.
@@ -30,6 +31,13 @@ public class CredentialsService {
     public CredentialsService(ObjectMapper objectMapper, IsotopeApiConfiguration isotopeApiConfiguration) {
         this.objectMapper = objectMapper;
         this.isotopeApiConfiguration = isotopeApiConfiguration;
+    }
+
+    public void checkHost(Credentials credentials) {
+        final Set<String> trustedHosts = isotopeApiConfiguration.getTrustedHosts();
+        if (!trustedHosts.isEmpty() && !trustedHosts.contains(credentials.getServerHost())){
+            throw new AuthenticationException("Host is not allowed");
+        }
     }
 
     public Credentials encrypt(Credentials credentials) throws JsonProcessingException {
