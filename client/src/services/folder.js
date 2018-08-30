@@ -2,8 +2,11 @@ import {backendRequest, setFolders} from '../actions/folders';
 import {credentialsHeaders, toJson} from './fetch';
 
 export const FolderTypes = Object.freeze({
-  INBOX: {serverName: 'INBOX', icon: 'inbox'},
-  FOLDER: {serverName: 'na', icon: 'folder'}
+  INBOX: {serverName: 'INBOX', icon: 'inbox', position: 0},
+  DRAFTS: {attribute: '\\Drafts', icon: 'drafts', position: 1},
+  SENT: {attribute: '\\Sent', icon: 'send', position: 2},
+  TRASH: {attribute: '\\Trash', icon: 'delete', position: 3},
+  FOLDER: {icon: 'folder'}
 })
 
 /**
@@ -17,16 +20,32 @@ export function processFolders(initialFolders) {
     return null;
   }
   const folders = [];
+  const specialFolders = [];
   initialFolders.map(folder => {
     if (folder.name && folder.name.toUpperCase() === FolderTypes.INBOX.serverName) {
       folder.type = FolderTypes.INBOX;
-      folders.unshift(folder);
+      specialFolders.splice(folder.type.position, 0, folder);
     } else {
       folder.type = FolderTypes.FOLDER;
-      folders.push(folder);
+      // Identify special folder
+      let special = false;
+      for (const t of [FolderTypes.DRAFTS, FolderTypes.SENT, FolderTypes.TRASH]) {
+        if (folder.attributes && folder.attributes.includes(t.attribute)) {
+          folder.type = t;
+          specialFolders.splice(folder.type.position, 0, folder);
+          special = true;
+          break;
+        }
+      }
+      // If regular folder just add to the folder array
+      if (!special) {
+        folders.push(folder);
+      }
     }
     folder.children = processFolders(folder.children);
   });
+  // Insert special folders in specific positions
+  specialFolders.reverse().forEach(f => folders.unshift(f));
   return folders;
 }
 

@@ -13,9 +13,7 @@ import org.springframework.lang.Nullable;
 import javax.mail.MessagingException;
 import javax.mail.URLName;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static javax.mail.Folder.HOLDS_MESSAGES;
@@ -27,6 +25,7 @@ public class Folder extends IsotopeResource implements Serializable {
 
     private static final long serialVersionUID = 8624907999271453862L;
 
+    private static final String ATTR_HAS_NO_CHILDREN = "\\HasNoChildren";
     private static final Folder[] EMPTY_FOLDERS = {};
 
     private String folderId;
@@ -35,6 +34,7 @@ public class Folder extends IsotopeResource implements Serializable {
     private Long UIDValidity;
     private String fullName;
     private String fullURL;
+    private Set<String> attributes;
     private int messageCount;
     private int newMessageCount;
     private int unreadMessageCount;
@@ -87,6 +87,14 @@ public class Folder extends IsotopeResource implements Serializable {
 
     public void setFullURL(String fullURL) {
         this.fullURL = fullURL;
+    }
+
+    public Set<String> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Set<String> attributes) {
+        this.attributes = attributes;
     }
 
     public int getMessageCount() {
@@ -145,13 +153,14 @@ public class Folder extends IsotopeResource implements Serializable {
                 Objects.equals(UIDValidity, folder.UIDValidity) &&
                 Objects.equals(fullName, folder.fullName) &&
                 Objects.equals(fullURL, folder.fullURL) &&
+                Objects.equals(attributes, folder.attributes) &&
                 Arrays.equals(children, folder.children);
     }
 
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(super.hashCode(), folderId, name, separator, UIDValidity, fullName, fullURL, messageCount, newMessageCount, unreadMessageCount, deletedMessageCount);
+        int result = Objects.hash(super.hashCode(), folderId, name, separator, UIDValidity, fullName, fullURL, attributes, messageCount, newMessageCount, unreadMessageCount, deletedMessageCount);
         result = 31 * result + Arrays.hashCode(children);
         return result;
     }
@@ -166,6 +175,7 @@ public class Folder extends IsotopeResource implements Serializable {
                 ret.setSeparator(mailFolder.getSeparator());
                 ret.setFullName(mailFolder.getFullName());
                 ret.setFullURL(mailFolder.getURLName().toString());
+                ret.setAttributes(new HashSet<>(Arrays.asList(mailFolder.getAttributes())));
                 if ((mailFolder.getType() & HOLDS_MESSAGES) != 0) {
                     ret.setUIDValidity(mailFolder.getUIDValidity());
                     ret.setMessageCount(mailFolder.getMessageCount());
@@ -173,7 +183,7 @@ public class Folder extends IsotopeResource implements Serializable {
                     ret.setUnreadMessageCount(mailFolder.getUnreadMessageCount());
                     ret.setDeletedMessageCount(mailFolder.getDeletedMessageCount());
                 }
-                if (Boolean.TRUE.equals(loadChildren)) {
+                if (Boolean.TRUE.equals(loadChildren) && !ret.getAttributes().contains(ATTR_HAS_NO_CHILDREN)) {
                     ret.setChildren(Stream.of(mailFolder.list())
                             .map(IMAPFolder.class::cast)
                             .map(mf -> from(mf, true)).toArray(Folder[]::new));
