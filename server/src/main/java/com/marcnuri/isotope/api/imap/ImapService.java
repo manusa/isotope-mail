@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static javax.mail.Folder.READ_ONLY;
+import static javax.mail.Folder.READ_WRITE;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-08.
@@ -138,9 +139,10 @@ public class ImapService {
         try {
             final IMAPFolder folder = (IMAPFolder)getImapStore().getFolder(folderId);
             if (!folder.isOpen()) {
-                folder.open(READ_ONLY);
+                folder.open(READ_WRITE);
             }
             final IMAPMessage imapMessage = (IMAPMessage)folder.getMessageByUID(uid);
+            imapMessage.setFlag(Flags.Flag.SEEN, true);
             final Message ret = Message.from(folder, imapMessage);
             final Object content = imapMessage.getContent();
             if (content instanceof Multipart) {
@@ -193,12 +195,8 @@ public class ImapService {
         final Properties ret = new Properties();
         ret.put("mail.smtp.ssl.enable", true);
         ret.put("mail.imap.ssl.enable", true);
-
         ret.put("mail.smtp.starttls.enable", true);
         ret.put("mail.imap.starttls.enable", true);
-
-//        ret.put("mail.smtps.socketFactory.port", getMailServerSmtpPort());
-//        ret.put("mail.imaps.socketFactory.port", configuration.getImapPort());
 
         ret.put("mail.smtps.socketFactory.class", AllowAllSSLSocketFactory.class.getName());
         ret.put("mail.imaps.socketFactory.class", AllowAllSSLSocketFactory.class.getName());

@@ -82,6 +82,10 @@ export function readMessage(dispatch, credentials, folder, message, signal) {
       .then(toJson)
       .then(completeMessage => {
         dispatch(refreshMessage(folder, completeMessage));
+        // Update folder cache with message marked as read (don't store content in cache)
+        const messageWithNoContent = {...completeMessage};
+        delete messageWithNoContent.content;
+        dispatch(updateCache(folder, [messageWithNoContent]));
       }).catch(() => dispatch(aBackendRequestCompleted()));
   }
 }
