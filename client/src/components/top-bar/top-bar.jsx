@@ -1,9 +1,10 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {selectMessage} from '../../actions/application';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
+import {FolderTypes} from '../../services/folder';
 
 class TopBar extends Component {
   constructor(props) {
@@ -11,6 +12,12 @@ class TopBar extends Component {
   }
 
   render() {
+    const isMessageViewer = this.props.selectedMessage && Object.keys(this.props.selectedMessage).length > 0;
+    let title = this.props.title;
+    if (this.props.selectedFolder && this.props.selectedFolder.name
+      && this.props.selectedFolder.type !== FolderTypes.INBOX) {
+      title = `${this.props.selectedFolder.name} - ${title}`;
+    }
     return (
       <header className={`${styles.topBar} ${styles['with-custom-styles']}
       ${this.props.sideBarCollapsed ? '' : styles['with-side-bar']}
@@ -21,15 +28,16 @@ class TopBar extends Component {
               className={`material-icons ${mainCss['mdc-top-app-bar__navigation-icon']}`}>
               menu
             </button>
-            {this.props.selectedMessage && Object.keys(this.props.selectedMessage).length > 0 ?
-              <button onClick={() => this.props.selectMessage(null)}
-                className={`material-icons ${mainCss['mdc-top-app-bar__navigation-icon']}`}>
-                arrow_back
-              </button>
+            {isMessageViewer ?
+              <Fragment>
+                <button onClick={() => this.props.selectMessage(null)}
+                  className={`material-icons ${mainCss['mdc-top-app-bar__navigation-icon']}`}>
+                  arrow_back
+                </button>
+              </Fragment>
               :
-              null
+              <span className={mainCss['mdc-top-app-bar__title']}>{title}</span>
             }
-            <span className={mainCss['mdc-top-app-bar__title']}>{this.props.title}</span>
           </section>
         </div>
       </header>
@@ -39,14 +47,15 @@ class TopBar extends Component {
 
 TopBar.propTypes = {
   title: PropTypes.string.isRequired,
-  selected: PropTypes.object,
+  selectedFolder: PropTypes.object,
+  selectMessage: PropTypes.object,
   sideBarToggle: PropTypes.func.isRequired,
-  sideBarCollapsed: PropTypes.bool.isRequired,
-  selectMessage: PropTypes.func
+  sideBarCollapsed: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = state => ({
   title: state.application.title,
+  selectedFolder: state.application.selectedFolder,
   selectedMessage: state.application.selectedMessage
 });
 
