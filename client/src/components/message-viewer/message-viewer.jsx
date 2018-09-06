@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import DOMPurify from 'dompurify';
 import Spinner from '../spinner/spinner';
+import {selectFolder, selectMessage} from '../../actions/application';
 import mainCss from '../../styles/main.scss';
 import styles from './message-viewer.scss';
 
@@ -29,7 +30,7 @@ class MessageViewer extends Component {
         <div className={styles.header}>
           <h1 className={styles.subject}>
             {this.props.selectedMessage.subject}
-            <div className={`${styles.folder} ${mainCss['mdc-chip']}`}>
+            <div className={`${styles.folder} ${mainCss['mdc-chip']}`} onClick={() => this.onFolderClick(folder)}>
               <div className={mainCss['mdc-chip__text']}>{folder.name}</div>
             </div>
           </h1>
@@ -65,7 +66,7 @@ class MessageViewer extends Component {
     DOMPurify.addHook('afterSanitizeAttributes', node => {
       // set all elements owning target to target=_blank
       if ('target' in node) {
-        node.setAttribute('target','_blank');
+        node.setAttribute('target', '_blank');
       }
       // set non-HTML/MathML links to xlink:show=new
       if (!node.hasAttribute('target')
@@ -74,6 +75,10 @@ class MessageViewer extends Component {
         node.setAttribute('xlink:show', 'new');
       }
     });
+  }
+
+  onFolderClick(folder) {
+    this.props.showFolder(folder);
   }
 }
 
@@ -93,4 +98,11 @@ const mapStateToProps = state => ({
   selectedMessage: state.application.selectedMessage
 });
 
-export default connect(mapStateToProps)(MessageViewer);
+const mapDispatchToProps = dispatch => ({
+  showFolder: folder => {
+    dispatch(selectMessage(null));
+    dispatch(selectFolder(folder));
+  }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(MessageViewer);

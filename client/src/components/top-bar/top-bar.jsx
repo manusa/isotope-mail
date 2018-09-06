@@ -62,4 +62,5 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   selectMessage: message => dispatch(selectMessage(message))
 });
+
 export default connect(mapStateToProps, mapDispatchToProps)(TopBar);
