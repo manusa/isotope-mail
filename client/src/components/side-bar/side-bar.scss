@@ -9,14 +9,14 @@
   .drawer {
     position: fixed;
 
+    .error-container {
+      display: flex;
+      width: 100%;
+      color: $mdc-theme-secondary;
+    }
+
     .drawer-content {
       overflow-y: auto;
-
-      .error-container {
-        display: flex;
-        justify-content: center;
-        color: $mdc-theme-secondary;
-      }
     }
   }
 }

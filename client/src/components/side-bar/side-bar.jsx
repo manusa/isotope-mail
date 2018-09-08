@@ -17,15 +17,16 @@ class SideBar extends Component {
       ${mainCss['mdc-drawer--persistent']} ${mainCss['mdc-drawer--animating']}
        ${this.getCollapsedClassName()}`}>
         <nav className={`${styles.drawer} ${mainCss['mdc-drawer__drawer']}`}>
-          <div className={mainCss['mdc-drawer__toolbar-spacer']}></div>
-          <div className={`${mainCss['mdc-drawer__content']} ${styles['drawer-content']}`}>
-            <FolderContainer />
+          <div className={mainCss['mdc-drawer__toolbar-spacer']}>
             <div className={styles['error-container']}>
               {(this.props.errors.diskQuotaExceeded ?
                 <span className='material-icons'>
                 disc_full
                 </span> : null)}
             </div>
+          </div>
+          <div className={`${mainCss['mdc-drawer__content']} ${styles['drawer-content']}`}>
+            <FolderContainer />
           </div>
         </nav>
       </aside>
