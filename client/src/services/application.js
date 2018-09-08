@@ -30,10 +30,7 @@ import {resetFolderMessagesCache} from './message';
  */
 export async function login(dispatch, credentials) {
   dispatch(backendRequest());
-  let url = '/api/v1/application/login';
-  if (process.env.NODE_ENV === 'development') {
-    url = 'http://localhost:9010/v1/application/login';
-  }
+  const url = '/api/v1/application/login';
   // Will be used as the key in the IndexedDB
   const userId = sjcl.codec.hex.fromBits(
     sjcl.hash.sha256.hash(`${credentials.serverHost}|${credentials.user}`));

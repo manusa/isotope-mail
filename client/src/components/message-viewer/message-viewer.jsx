@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
 import DOMPurify from 'dompurify';
 import Spinner from '../spinner/spinner';
@@ -20,6 +21,7 @@ function addressGroups(address) {
 
 class MessageViewer extends Component {
   render() {
+    const t = this.props.t;
     const folder = this.props.selectedFolder;
     const message = this.props.selectedMessage;
     const firstFrom = addressGroups(message.from && message.from.length > 0 ? message.from[0] : '');
@@ -47,7 +49,7 @@ class MessageViewer extends Component {
             </div>
           </div>
           <div className={styles.to}>
-            <label>to: </label>
+            <label>{t('messageViewer.to')}: </label>
             <span className={styles.name}>{firstTo.name}</span>
             <span className={styles.email}>{firstTo.email ? `<${firstTo.email}>` : ''}</span>
           </div>
@@ -105,4 +107,4 @@ const mapDispatchToProps = dispatch => ({
   }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(MessageViewer);
+export default connect(mapStateToProps, mapDispatchToProps)(translate()(MessageViewer));

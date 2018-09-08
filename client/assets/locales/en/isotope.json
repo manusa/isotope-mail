@@ -1,0 +1,15 @@
+{
+  "login": {
+    "Login": "Login",
+    "Host": "Host",
+    "Port": "Port",
+    "User": "User",
+    "Password": "Password",
+    "actions": {
+      "Login": "Login"
+    }
+  },
+  "messageViewer":{
+    "to": "to"
+  }
+}

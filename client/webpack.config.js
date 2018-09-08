@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const getLocalIdent = require('css-loader/lib/getLocalIdent');
 const path = require('path');
@@ -8,6 +9,7 @@ const path = require('path');
 const devMode = process.env.NODE_ENV !== 'production';
 const SRC_DIR = __dirname + '/src';
 const DIST_DIR = __dirname + '/dist';
+const ASSETS_DIR = __dirname + '/assets';
 const GLOBAL_STYLES = 'styles/main.scss';
 
 module.exports = {
@@ -106,6 +108,11 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: devMode ? '[name].css' : '[name].[hash].css',
       chunkFilename: devMode ? '[id].css' : '[id].[hash].css',
+    }),
+    new CopyWebpackPlugin([{
+      from: ASSETS_DIR, fromArgs: {cache: false}, to: `assets`, force: true
+    }], {
+      copyUnmodified: true
     })
   ],
   devServer: {
@@ -113,6 +120,12 @@ module.exports = {
     historyApiFallback: true,
     hot: true,
     host: '0.0.0.0',
-    port: 9000
+    port: 9000,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:9010',
+        pathRewrite: {'^/api' : ''}
+      }
+    }
   }
 };
