@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {createStore} from 'redux';
 import {Provider} from 'react-redux';
+import {I18nextProvider} from 'react-i18next';
+import i18n from './services/i18n';
 import Routes from './routes/routes';
 import rootReducer from './reducers';
 import {loadState, saveState} from './services/state';
@@ -23,7 +25,9 @@ async function init () {
 
   ReactDOM.render(
     <Provider store={store}>
-      <Routes />
+      <I18nextProvider i18n={i18n}>
+        <Routes />
+      </I18nextProvider>
     </Provider>,
     document.getElementById('root')
   );

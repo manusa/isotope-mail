@@ -1,0 +1,15 @@
+{
+  "login": {
+    "Login": "Acceso",
+    "Host": "Servidor",
+    "Port": "Puerto",
+    "User": "Usuario",
+    "Password": "Contraseña",
+    "actions": {
+      "Login": "Acceder"
+    }
+  },
+  "messageViewer":{
+    "to": "para"
+  }
+}

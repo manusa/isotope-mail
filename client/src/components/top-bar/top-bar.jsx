@@ -48,7 +48,7 @@ class TopBar extends Component {
 TopBar.propTypes = {
   title: PropTypes.string.isRequired,
   selectedFolder: PropTypes.object,
-  selectMessage: PropTypes.object,
+  selectMessage: PropTypes.func.isRequired,
   sideBarToggle: PropTypes.func.isRequired,
   sideBarCollapsed: PropTypes.bool.isRequired
 };
