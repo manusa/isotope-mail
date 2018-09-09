@@ -1,0 +1,123 @@
+@import 'variables';
+@import 'mixins';
+
+// Variables
+// Override before including tooltip to customize
+$isotip-color: #ffffff !default;
+$isotip-background-color: #616161 !default;
+$isotip-font-family: 'Work Sans' !default;
+$isotip-font-size: 10px !default;
+$isotip-margin: 12px !default;
+$isotip-transition-in-time: 0.150s !default;
+$isotip-transition-out-time: 0.075s !default;
+
+
+// Allowed positions [isotip-position] (top, top-start, top-end, bottom, bottom-start, bottom-end)
+// Allowed sizes [isotip-size] (medium)
+[isotip] {
+  position: relative;
+
+  &::before {
+    position: absolute;
+    visibility: hidden;
+    content: attr(isotip);
+
+    font-family: $isotip-font-family;
+    font-size: $isotip-font-size;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: $isotip-color;
+    padding: 8px;
+    text-align: center;
+    border-radius: 4px;
+
+    // Animation -> Fade Out
+    opacity: 0.4;
+    transition: all $isotip-transition-out-time;
+    background: $isotip-background-color;
+  }
+
+
+  &:hover::before,
+  &:focus::before {
+    visibility: visible;
+    z-index: 999;
+
+    // Animation -> Fade In
+    opacity: 1;
+    transition: all $isotip-transition-in-time;
+  }
+
+  &[isotip-size='small']::before {
+    white-space: normal;
+    width: 75px;
+    padding: 6px;
+  }
+
+  &[isotip-size='medium']::before {
+    white-space: normal;
+    width: 150px;
+  }
+
+  &[isotip-position="top"]::before,
+  &[isotip-position="bottom"]::before {
+    left: 50%;
+    @include transform(translateX(-50%));
+  }
+
+  &[isotip-position="top"]::before,
+  &[isotip-position="top-start"]::before,
+  &[isotip-position="top-end"]::before{
+    bottom: 100%;
+    margin-bottom: $isotip-margin;
+  }
+
+  &[isotip-position="bottom"]::before,
+  &[isotip-position="bottom-start"]::before,
+  &[isotip-position="bottom-end"]::before {
+    top: 100%;
+    margin-top: $isotip-margin;
+  }
+
+  &[isotip-position="top-start"]::before,
+  &[isotip-position="bottom-start"]::before {
+    left: 0;
+    @include transform(translateX(0));
+  }
+
+  &[isotip-position="top-end"]::before,
+  &[isotip-position="bottom-end"]::before {
+    right: 0;
+    @include transform(translateX(0));
+  }
+
+  //--------------------------------------------------
+  // Animation hacks, translate + scale can't be animated separately with just one pseudo element
+  // Grow Animation for centered tooltips
+  &[isotip-position="top"]:hover::before,
+  &[isotip-position="bottom"]:hover::before,
+  &[isotip-position="top"]:focus::before,
+  &[isotip-position="bottom"]:hover::before {
+    animation: scaleCenter $isotip-transition-in-time;
+    @keyframes scaleCenter {
+      0%   {transform: scale(0) translateX(-50%);}
+      100% {transform: scale(1) translateX(-50%);}
+    }
+  }
+
+  // Grow Animation for rest of tooltips
+  &[isotip-position="top-start"]:hover::before,
+  &[isotip-position="top-end"]:hover::before,
+  &[isotip-position="bottom-start"]:hover::before,
+  &[isotip-position="bottom-end"]:hover::before,
+  &[isotip-position="top-start"]:focus::before,
+  &[isotip-position="top-end"]:focus::before,
+  &[isotip-position="bottom-start"]:focus::before,
+  &[isotip-position="bottom-end"]:focus::before {
+    animation: scale $isotip-transition-in-time;
+    @keyframes scale {
+      0%   {transform: scale(0) translateX(0);}
+      100% {transform: scale(1) translateX(0);}
+    }
+  }
+}

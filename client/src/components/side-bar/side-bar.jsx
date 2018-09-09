@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
 import FolderContainer from '../folders/folder-container';
 import mainCss from '../../styles/main.scss';
@@ -12,6 +13,7 @@ class SideBar extends Component {
   }
 
   render() {
+    const t = this.props.t;
     return (
       <aside className={`${styles['side-bar']}
       ${mainCss['mdc-drawer--persistent']} ${mainCss['mdc-drawer--animating']}
@@ -19,8 +21,14 @@ class SideBar extends Component {
         <nav className={`${styles.drawer} ${mainCss['mdc-drawer__drawer']}`}>
           <div className={mainCss['mdc-drawer__toolbar-spacer']}>
             <div className={styles['error-container']}>
+              {(location.protocol !== 'https:' ?
+                <span className='material-icons' isotip={t('sideBar.errors.noSSL')}
+                  isotip-position='bottom-start' isotip-size='small'>
+                lock_open
+                </span> : null)}
               {(this.props.errors.diskQuotaExceeded ?
-                <span className='material-icons'>
+                <span className='material-icons' isotip={t('sideBar.errors.diskQuotaExceeded')}
+                  isotip-position='bottom-start' isotip-size='small'>
                 disc_full
                 </span> : null)}
             </div>
@@ -48,4 +56,4 @@ const mapStateToProps = state => ({
   errors: state.application.errors
 });
 
-export default connect(mapStateToProps)(SideBar);
+export default connect(mapStateToProps)(translate()(SideBar));

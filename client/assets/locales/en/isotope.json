@@ -9,6 +9,12 @@
       "Login": "Login"
     }
   },
+  "sideBar": {
+    "errors": {
+      "noSSL": "Connection to server is not secure",
+      "diskQuotaExceeded": "Disk quota exceeded (IndexedDB)"
+    }
+  },
   "messageViewer":{
     "to": "to"
   }

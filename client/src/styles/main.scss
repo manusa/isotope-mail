@@ -1,7 +1,9 @@
 @import 'partials/variables';
+@import 'partials/mixins';
 @import 'partials/fonts';
 @import 'partials/base';
 @import 'partials/spinner';
+@import 'partials/tooltip';
 
 // Third-party
 @import '@material/button/mdc-button';

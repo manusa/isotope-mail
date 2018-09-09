@@ -9,6 +9,12 @@
       "Login": "Acceder"
     }
   },
+  "sideBar": {
+    "errors": {
+      "noSSL": "La conexión al servidor no es segura",
+      "diskQuotaExceeded": "Cuota de disco sobrepasada (IndexedDB)"
+    }
+  },
   "messageViewer":{
     "to": "para"
   }
