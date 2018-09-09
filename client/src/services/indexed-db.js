@@ -52,12 +52,14 @@ async function _recoverMessageCache(userId, hash) {
   const tx = db.transaction([MESSAGE_CACHE_STORE], 'readonly');
   const store = tx.objectStore(MESSAGE_CACHE_STORE);
   const index = store.index('userId');
-  const keys = await index.getAllKeys(IDBKeyRange.only(userId));
-  for (const key of keys) {
-    const encryptedMessageCache = await store.get(key);
-    const messages = JSON.parse(sjcl.decrypt(hash, encryptedMessageCache.messages))
-    ret[sjcl.decrypt(hash, encryptedMessageCache.folderId)] =
-      new Map(messages.map(m => [m.uid, m]));
+  if (index.getAllKeys) { // TODO: Fix EDGE compatibility
+    const keys = await index.getAllKeys(IDBKeyRange.only(userId));
+    for (const key of keys) {
+      const encryptedMessageCache = await store.get(key);
+      const messages = JSON.parse(sjcl.decrypt(hash, encryptedMessageCache.messages))
+      ret[sjcl.decrypt(hash, encryptedMessageCache.folderId)] =
+        new Map(messages.map(m => [m.uid, m]));
+    }
   }
   return ret;
 }
