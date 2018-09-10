@@ -24,7 +24,7 @@ export function processFolders(initialFolders) {
   initialFolders.map(folder => {
     if (folder.name && folder.name.toUpperCase() === FolderTypes.INBOX.serverName) {
       folder.type = FolderTypes.INBOX;
-      specialFolders.splice(folder.type.position, 0, folder);
+      specialFolders[folder.type.position] = folder;
     } else {
       folder.type = FolderTypes.FOLDER;
       // Identify special folder
@@ -32,7 +32,7 @@ export function processFolders(initialFolders) {
       for (const t of [FolderTypes.DRAFTS, FolderTypes.SENT, FolderTypes.TRASH]) {
         if (folder.attributes && folder.attributes.includes(t.attribute)) {
           folder.type = t;
-          specialFolders.splice(folder.type.position, 0, folder);
+          specialFolders[folder.type.position] = folder;
           special = true;
           break;
         }
