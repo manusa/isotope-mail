@@ -5,6 +5,7 @@
  */
 package com.marcnuri.isotope.api.folder;
 
+import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.imap.ImapService;
 import com.marcnuri.isotope.api.message.Message;
 import org.springframework.beans.factory.ObjectFactory;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -32,35 +34,39 @@ public class FolderResource {
 
     private static final String REL_MESSAGES = "messages";
 
+    private final CredentialsService credentialsService;
     private final ObjectFactory<ImapService> imapServiceFactory;
 
     @Autowired
-    public FolderResource(ObjectFactory<ImapService> imapServiceFactory) {
+    public FolderResource(CredentialsService credentialsService, ObjectFactory<ImapService> imapServiceFactory) {
+        this.credentialsService = credentialsService;
         this.imapServiceFactory = imapServiceFactory;
     }
 
     @RequestMapping(path = "", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<List<Folder>> getFolders(
-            @RequestParam(value = "loadChildren", required = false) Boolean loadChildren) {
+            HttpServletRequest request, @RequestParam(value = "loadChildren", required = false) Boolean loadChildren) {
 
-        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().getFolders(loadChildren)));
+        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject()
+                .getFolders(credentialsService.fromRequest(request), loadChildren)));
     }
 
     @RequestMapping(path = "/{folderId}/messages", method = GET)
     public ResponseEntity<List<Message>> getMessages(
+            HttpServletRequest request,
             @PathVariable("folderId") String folderId, @RequestParam(value = "start", required = false) Integer start,
             @RequestParam(value = "end", required = false) Integer end) {
 
-        return ResponseEntity.ok(addLinks(folderId,
-                imapServiceFactory.getObject().getMessages(Folder.toId(folderId), start, end)));
+        return ResponseEntity.ok(addLinks(folderId, imapServiceFactory.getObject()
+                .getMessages(credentialsService.fromRequest(request), Folder.toId(folderId), start, end)));
     }
 
     @RequestMapping(path = "/{folderId}/messages/{messageId}", method = GET)
     public ResponseEntity<Message> getMessage(
-            @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId) {
+            HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId) {
 
-        return ResponseEntity.ok(addLinks(folderId,
-                imapServiceFactory.getObject().getMessage(Folder.toId(folderId), messageId)));
+        return ResponseEntity.ok(addLinks(folderId, imapServiceFactory.getObject()
+                .getMessage(credentialsService.fromRequest(request), Folder.toId(folderId), messageId)));
     }
 
     private static Folder[] addLinks(Folder... folders) {
@@ -74,7 +80,8 @@ public class FolderResource {
     }
 
     private static Folder addLinks(Folder folder) {
-        folder.add(linkTo(methodOn(FolderResource.class).getMessages(folder.getFolderId(), null, null))
+        folder.add(linkTo(methodOn(FolderResource.class)
+                .getMessages(null, folder.getFolderId(), null, null))
                 .withRel(REL_MESSAGES).expand());
         addLinks(folder.getChildren());
         return folder;
@@ -91,7 +98,7 @@ public class FolderResource {
     }
 
     private static Message addLinks(String folderId, Message message) {
-        message.add(linkTo(methodOn(FolderResource.class).getMessage(folderId, message.getUid()))
+        message.add(linkTo(methodOn(FolderResource.class).getMessage(null, folderId, message.getUid()))
                 .withSelfRel().expand());
         return message;
     }

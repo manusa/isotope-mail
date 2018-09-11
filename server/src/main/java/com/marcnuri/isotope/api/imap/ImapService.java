@@ -10,7 +10,6 @@ import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.folder.Folder;
-import com.marcnuri.isotope.api.http.HttpHeaders;
 import com.marcnuri.isotope.api.message.Message;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
@@ -29,7 +28,6 @@ import javax.annotation.PreDestroy;
 import javax.mail.*;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -51,17 +49,12 @@ public class ImapService {
 
     private static final String IMAPS_PROTOCOL = "imaps";
 
-    private final HttpServletRequest httpServletRequest;
-
     private CredentialsService credentialsService;
 
     private IMAPStore imapStore;
 
     @Autowired
-    public ImapService(
-            HttpServletRequest httpServletRequest, CredentialsService credentialsService) {
-
-        this.httpServletRequest = httpServletRequest;
+    public ImapService(CredentialsService credentialsService) {
         this.credentialsService = credentialsService;
     }
 
@@ -82,26 +75,28 @@ public class ImapService {
         }
     }
 
-    public List<Folder> getFolders(@Nullable  Boolean loadChildren) {
+    public List<Folder> getFolders(Credentials credentials, @Nullable  Boolean loadChildren) {
         try {
-            final IMAPFolder rootFolder = (IMAPFolder)getImapStore().getDefaultFolder();
+            final IMAPFolder rootFolder = (IMAPFolder)getImapStore(credentials).getDefaultFolder();
             return Stream.of(rootFolder.list())
                     .map(IMAPFolder.class::cast)
                     .map(mf -> Folder.from(mf, loadChildren))
                     .collect(Collectors.toList());
-        } catch (MessagingException | IOException ex) {
+        } catch (MessagingException ex) {
             log.error("Error loading folders", ex);
             throw  new IsotopeException(ex.getMessage());
         }
     }
 
-    public List<Message> getMessages(URLName folderId, @Nullable Integer start, @Nullable Integer end) {
+    public List<Message> getMessages(
+            Credentials credentials, URLName folderId, @Nullable Integer start, @Nullable Integer end) {
+
         try {
-            final IMAPFolder folder = (IMAPFolder)getImapStore().getFolder(folderId);
+            final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
             final List<Message> ret = getMessages(folder, start, end);
             folder.close();
             return ret;
-        } catch (MessagingException | IOException ex) {
+        } catch (MessagingException ex) {
             log.error("Error loading messages for folder: " + folderId.toString(), ex);
             throw  new IsotopeException(ex.getMessage());
         }
@@ -136,9 +131,9 @@ public class ImapService {
                 .collect(Collectors.toList());
     }
 
-    public Message getMessage(URLName folderId, Long uid) {
+    public Message getMessage(Credentials credentials, URLName folderId, Long uid) {
         try {
-            final IMAPFolder folder = (IMAPFolder)getImapStore().getFolder(folderId);
+            final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
             if (!folder.isOpen()) {
                 folder.open(READ_WRITE);
             }
@@ -174,11 +169,6 @@ public class ImapService {
         }
     }
 
-    private IMAPStore getImapStore() throws IOException, MessagingException {
-        final Credentials credentials = credentialsService.decrypt(httpServletRequest.getHeader(HttpHeaders.ISOTOPE_CRDENTIALS),
-                httpServletRequest.getHeader(HttpHeaders.ISOTOPE_SALT));
-        return getImapStore(credentials);
-    }
     private IMAPStore getImapStore(Credentials credentials) throws MessagingException {
         if (imapStore == null) {
             final Session session = Session.getInstance(initMailProperties(), null);

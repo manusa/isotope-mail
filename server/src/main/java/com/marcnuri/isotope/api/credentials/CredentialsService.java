@@ -9,12 +9,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration;
 import com.marcnuri.isotope.api.exception.AuthenticationException;
+import com.marcnuri.isotope.api.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Set;
 
@@ -37,6 +39,22 @@ public class CredentialsService {
         final Set<String> trustedHosts = isotopeApiConfiguration.getTrustedHosts();
         if (!trustedHosts.isEmpty() && !trustedHosts.contains(credentials.getServerHost())){
             throw new AuthenticationException("Host is not allowed");
+        }
+    }
+
+    /**
+     * Parses {@link HttpServletRequest} for isotope credentials to decode them and return
+     * a valid {@link Credentials} object.
+     *
+     * @param httpServletRequest
+     * @return
+     */
+    public  Credentials fromRequest(HttpServletRequest httpServletRequest) {
+        try {
+            return decrypt(httpServletRequest.getHeader(HttpHeaders.ISOTOPE_CRDENTIALS),
+                    httpServletRequest.getHeader(HttpHeaders.ISOTOPE_SALT));
+        } catch(IOException ex) {
+            throw new AuthenticationException("Invalid credentials", ex);
         }
     }
 
