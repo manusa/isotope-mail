@@ -12,7 +12,7 @@ public class HttpHeaders {
 
     private HttpHeaders() {}
 
-    public static String ISOTOPE_EXCEPTION = "X-Isotope-Exception";
-    public static String ISOTOPE_CRDENTIALS = "X-Isotope-Credentials";
-    public static String ISOTOPE_SALT = "X-Isotope-Salt";
+    public static final String ISOTOPE_EXCEPTION = "X-Isotope-Exception";
+    public static final String ISOTOPE_CRDENTIALS = "X-Isotope-Credentials";
+    public static final String ISOTOPE_SALT = "X-Isotope-Salt";
 }

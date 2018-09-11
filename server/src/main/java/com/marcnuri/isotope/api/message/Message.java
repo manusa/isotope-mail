@@ -7,13 +7,10 @@ package com.marcnuri.isotope.api.message;
 
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.resource.IsotopeResource;
-import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
 
-import javax.mail.Address;
-import javax.mail.Flags;
+import javax.mail.*;
 import javax.mail.Message.RecipientType;
-import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import java.io.Serializable;
 import java.time.ZoneId;
@@ -162,7 +159,7 @@ public class Message extends IsotopeResource implements Serializable {
      * @param imapMessage
      * @return
      */
-    public static Message from(IMAPFolder folder, IMAPMessage imapMessage) {
+    public static <F extends Folder & UIDFolder> Message from(F folder, IMAPMessage imapMessage) {
         final Message ret;
         if (imapMessage != null) {
             ret = new Message();

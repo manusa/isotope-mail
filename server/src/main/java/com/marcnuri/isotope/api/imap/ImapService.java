@@ -102,7 +102,7 @@ public class ImapService {
         }
     }
 
-    private List<Message> getMessages(
+    private List<Message>  getMessages(
             IMAPFolder folder, @Nullable Integer start, @Nullable Integer end) throws MessagingException {
 
         if (!folder.isOpen()) {
@@ -223,7 +223,7 @@ public class ImapService {
                 if (ret != null && cid != null && ret.contains(cid)) {
                     String contentType = bp.getContentType();
                     if (contentType.contains(";")) {
-                        contentType = contentType.substring(0, contentType.indexOf(";"));
+                        contentType = contentType.substring(0, contentType.indexOf(';'));
                     }
                     final String base64 = Base64.encodeBase64String(IOUtils.toByteArray(bp.getInputStream()))
                             .replace("\r", "").replace("\n", "");

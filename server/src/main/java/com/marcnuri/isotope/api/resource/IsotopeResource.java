@@ -25,6 +25,7 @@ public class IsotopeResource extends ResourceSupport {
     @JsonProperty("_links")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonSerialize(using = LinkSerializer.class)
+    @Override
     public List<Link> getLinks() {
         return super.getLinks();
     }

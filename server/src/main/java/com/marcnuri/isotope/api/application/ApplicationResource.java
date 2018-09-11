@@ -13,11 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-15.
@@ -35,7 +34,7 @@ public class ApplicationResource {
         this.imapService = imapService;
     }
 
-    @RequestMapping(path = "/login", method = POST, produces = MediaTypes.HAL_JSON_VALUE)
+    @PostMapping(path = "/login", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Credentials> login(
             @Validated(Credentials.Login.class) @RequestBody Credentials credentials) {
 

@@ -12,10 +12,7 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -43,7 +40,7 @@ public class FolderResource {
         this.imapServiceFactory = imapServiceFactory;
     }
 
-    @RequestMapping(path = "", method = GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(path = "", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<List<Folder>> getFolders(
             HttpServletRequest request, @RequestParam(value = "loadChildren", required = false) Boolean loadChildren) {
 
@@ -51,7 +48,7 @@ public class FolderResource {
                 .getFolders(credentialsService.fromRequest(request), loadChildren)));
     }
 
-    @RequestMapping(path = "/{folderId}/messages", method = GET)
+    @GetMapping(path = "/{folderId}/messages")
     public ResponseEntity<List<Message>> getMessages(
             HttpServletRequest request,
             @PathVariable("folderId") String folderId, @RequestParam(value = "start", required = false) Integer start,
@@ -61,7 +58,7 @@ public class FolderResource {
                 .getMessages(credentialsService.fromRequest(request), Folder.toId(folderId), start, end)));
     }
 
-    @RequestMapping(path = "/{folderId}/messages/{messageId}", method = GET)
+    @GetMapping(path = "/{folderId}/messages/{messageId}")
     public ResponseEntity<Message> getMessage(
             HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId) {
 
