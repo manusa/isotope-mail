@@ -18,7 +18,6 @@ function parseFrom(from) {
 class MessageList extends Component {
   constructor(props) {
     super(props);
-    this.abortControllerWrapper = {};
   }
 
   render() {
@@ -50,7 +49,7 @@ class MessageList extends Component {
   renderItem({index, key, style}) {
     const message = this.props.messages[index];
     return (
-      <li key={key} style={style} onClick={ () => this.props.selectMessage(this.abortControllerWrapper, message) }
+      <li key={key} style={style} onClick={ () => this.props.selectMessage(message) }
         className={`${mainCss['mdc-list-item']}
                 ${styles.item} ${message.seen ? styles.seen : ''}
                 ${message.deleted ? styles.deleted : ''}`} >
@@ -89,19 +88,15 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  selectMessage: (abortControllerWrapper, folder, message, credentials) => {
+  selectMessage: (folder, message, credentials) => {
     dispatch(selectMessage(message));
-    if (abortControllerWrapper && abortControllerWrapper.abortController) {
-      abortControllerWrapper.abortController.abort();
-    }
-    abortControllerWrapper.abortController = new AbortController();
-    readMessage(dispatch, credentials, folder, message, abortControllerWrapper.abortController.signal);
+    readMessage(dispatch, credentials, folder, message);
   }
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
-  selectMessage: (abortControllerWrapper, message) =>
-    dispatchProps.selectMessage(abortControllerWrapper, stateProps.selectedFolder, message, stateProps.credentials)
+  selectMessage: (message) =>
+    dispatchProps.selectMessage(stateProps.selectedFolder, message, stateProps.credentials)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(MessageList);

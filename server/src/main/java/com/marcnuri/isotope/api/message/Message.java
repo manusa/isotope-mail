@@ -42,6 +42,7 @@ public class Message extends IsotopeResource implements Serializable {
     private Boolean recent;
     private Boolean deleted;
     private String content;
+    private List<Attachment> attachments;
 
     public Long getUid() {
         return uid;
@@ -123,6 +124,14 @@ public class Message extends IsotopeResource implements Serializable {
         this.content = content;
     }
 
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -138,13 +147,14 @@ public class Message extends IsotopeResource implements Serializable {
                 Objects.equals(seen, message.seen) &&
                 Objects.equals(recent, message.recent) &&
                 Objects.equals(deleted, message.deleted) &&
-                Objects.equals(content, message.content);
+                Objects.equals(content, message.content) &&
+                Objects.equals(attachments, message.attachments);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), uid, from, recipients, subject, receivedDate, size, seen, recent, deleted, content);
+        return Objects.hash(super.hashCode(), uid, from, recipients, subject, receivedDate, size, seen, recent, deleted, content, attachments);
     }
 
     /**

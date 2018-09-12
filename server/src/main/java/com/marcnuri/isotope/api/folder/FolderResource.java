@@ -7,6 +7,7 @@ package com.marcnuri.isotope.api.folder;
 
 import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.imap.ImapService;
+import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +16,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-08.
@@ -30,6 +31,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public class FolderResource {
 
     private static final String REL_MESSAGES = "messages";
+    private static final String REL_DOWNLOAD = "download";
 
     private final CredentialsService credentialsService;
     private final ObjectFactory<ImapService> imapServiceFactory;
@@ -66,6 +68,17 @@ public class FolderResource {
                 .getMessage(credentialsService.fromRequest(request), Folder.toId(folderId), messageId)));
     }
 
+    @GetMapping(path = "/{folderId}/messages/{messageId}/attachments/{id}")
+    public ResponseEntity<Void> getAttachment(
+            HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId,
+            @PathVariable("id") String id, @RequestParam(name="contentId", required = false) Boolean contentId,
+            HttpServletResponse response) {
+
+        imapServiceFactory.getObject().readAttachment(response, credentialsService.fromRequest(request),
+                Folder.toId(folderId), messageId, id, contentId);
+        return ResponseEntity.ok().build();
+    }
+
     private static Folder[] addLinks(Folder... folders) {
         Stream.of(folders).forEach(FolderResource::addLinks);
         return folders;
@@ -98,5 +111,23 @@ public class FolderResource {
         message.add(linkTo(methodOn(FolderResource.class).getMessage(null, folderId, message.getUid()))
                 .withSelfRel().expand());
         return message;
+    }
+
+    private static Attachment[] addLinks(String folderId, Message message, Attachment... attachments) {
+        Stream.of(attachments).forEach(a -> addLinks(folderId, message, a));
+        return attachments;
+    }
+
+    public static List<Attachment> addLinks(String folderId, Message message, List<Attachment> attachments) {
+        attachments.forEach(a -> addLinks(folderId, message, a));
+        return attachments;
+    }
+
+    private static Attachment addLinks(String folderId, Message message, Attachment attachment) {
+        final boolean isContentId = attachment.getContentId() != null && !attachment.getContentId().isEmpty();
+        attachment.add(linkTo(methodOn(FolderResource.class).getAttachment(null, folderId, message.getUid(),
+                isContentId ? attachment.getContentId() : attachment.getFileName(), isContentId, null))
+                .withRel(REL_DOWNLOAD).expand());
+        return attachment;
     }
 }

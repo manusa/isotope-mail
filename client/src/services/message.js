@@ -1,11 +1,32 @@
 import {
   backendRequest as aBackendRequest,
-  backendRequestCompleted as aBackendRequestCompleted} from '../actions/application';
+  backendRequestCompleted as aBackendRequestCompleted, replaceMessageEmbeddedImages
+} from '../actions/application';
 import {backendRequest, backendRequestCompleted, setFolderCache, updateCache} from '../actions/messages';
 import {credentialsHeaders, toJson} from './fetch';
 import {persistMessageCache} from './indexed-db';
 import {refreshMessage} from '../actions/application';
 import {KEY_HASH, KEY_USER_ID} from './state';
+
+/**
+ * Object to store the different AbortController that will be used in the service methods to fetch from the API backend.
+ *
+ * @type {Object}
+ * @private
+ */
+const _abortControllerWrappers = {};
+
+function _readContent(dispatch, credentials, folder, message, signal, attachment) {
+  fetch(attachment._links.download.href, {
+    method: 'GET',
+    headers: credentialsHeaders(credentials),
+    signal: signal
+  })
+    .then(response => response.blob())
+    .then(blob => {
+      dispatch(replaceMessageEmbeddedImages(folder, message, attachment, blob));
+    });
+}
 
 /**
  *
@@ -65,10 +86,16 @@ export function updateFolderMessagesCache(dispatch, credentials, folder, signal,
  * @param credentials
  * @param folder
  * @param message {object}
- * @param signal
  */
-export function readMessage(dispatch, credentials, folder, message, signal) {
+export function readMessage(dispatch, credentials, folder, message) {
+  // Abort + signal
   if (message && message._links) {
+    if (_abortControllerWrappers.readMessageAbortController) {
+      _abortControllerWrappers.readMessageAbortController.abort();
+    }
+    _abortControllerWrappers.readMessageAbortController = new AbortController();
+    const signal = _abortControllerWrappers.readMessageAbortController.signal;
+
     dispatch(aBackendRequest())
     fetch(message._links.self.href, {
       method: 'GET',
@@ -86,6 +113,12 @@ export function readMessage(dispatch, credentials, folder, message, signal) {
         const messageWithNoContent = {...completeMessage};
         delete messageWithNoContent.content;
         dispatch(updateCache(folder, [messageWithNoContent]));
+        // Read message's embedded images
+        completeMessage.attachments
+          .filter(a => a.contentId && a.contentId.length > 0)
+          .filter(a => a.contentType.toLowerCase().indexOf('image/') === 0)
+          .forEach(a => _readContent(dispatch, credentials, folder, message, signal, a));
       }).catch(() => dispatch(aBackendRequestCompleted()));
   }
 }
+

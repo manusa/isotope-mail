@@ -10,6 +10,7 @@ import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.folder.Folder;
+import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
@@ -20,6 +21,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
@@ -28,13 +30,17 @@ import javax.annotation.PreDestroy;
 import javax.mail.*;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.marcnuri.isotope.api.folder.Folder.toBase64Id;
+import static com.marcnuri.isotope.api.folder.FolderResource.addLinks;
 import static javax.mail.Folder.READ_ONLY;
 import static javax.mail.Folder.READ_WRITE;
 
@@ -103,7 +109,7 @@ public class ImapService {
     }
 
     private List<Message>  getMessages(
-            IMAPFolder folder, @Nullable Integer start, @Nullable Integer end) throws MessagingException {
+            @NonNull IMAPFolder folder, @Nullable Integer start, @Nullable Integer end) throws MessagingException {
 
         if (!folder.isOpen()) {
             folder.open(READ_ONLY);
@@ -142,7 +148,9 @@ public class ImapService {
             final Message ret = Message.from(folder, imapMessage);
             final Object content = imapMessage.getContent();
             if (content instanceof Multipart) {
-                ret.setContent(parseMultipart((Multipart) content));
+                ret.setAttachments(addLinks(toBase64Id(folderId), ret,
+                        extractAttachments((Multipart) content, null)));
+                ret.setContent(extractContent((Multipart) content));
             } else if (content instanceof MimeMessage
                     && ((MimeMessage) content).getContentType().toLowerCase().contains("html")) {
                 ret.setContent(content.toString());
@@ -156,6 +164,35 @@ public class ImapService {
             log.error("Error loading messages for folder: " + folderId.toString(), ex);
             throw  new IsotopeException(ex.getMessage());
         }
+    }
+
+    public void readAttachment(
+            HttpServletResponse response, Credentials credentials, URLName folderId, Long messageId,
+            String id, Boolean isContentId) {
+        try {
+            final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
+            if (!folder.isOpen()) {
+                folder.open(READ_ONLY);
+            }
+            final IMAPMessage imapMessage = (IMAPMessage)folder.getMessageByUID(messageId);
+            final Object content = imapMessage.getContent();
+            if (content instanceof Multipart) {
+                final BodyPart bp = getBodypart((Multipart)content, id, isContentId);
+                if (bp != null) {
+                    response.setContentType(bp.getContentType());
+//                    response.setContentLength(bp.getSize());
+                    bp.getDataHandler().writeTo(response.getOutputStream());
+                    response.getOutputStream().flush();
+                } else {
+                    // TODO: Build specific exception
+                    throw new IsotopeException("NOT FOUND");
+                }
+            }
+        } catch (MessagingException | IOException ex) {
+            log.error("Error loading messages for folder: " + folderId.toString(), ex);
+            throw  new IsotopeException(ex.getMessage());
+        }
+
     }
 
     @PreDestroy
@@ -199,6 +236,87 @@ public class ImapService {
 
 //        ret.put("mail.smtps.host", getMailServerHost());
 //        ret.put("mail.imaps.host", configuration.getImapHost());
+        return ret;
+    }
+
+    private static List<Attachment> extractAttachments(@NonNull Multipart mp, @Nullable List<Attachment> attachments)
+            throws MessagingException, IOException {
+
+        if (attachments == null){
+            attachments = new ArrayList<>();
+        }
+        for (int it = 0; it < mp.getCount(); it++) {
+            final BodyPart bp = mp.getBodyPart(it);
+            if (bp.getContentType().toLowerCase().startsWith("multipart/")) {
+                extractAttachments((Multipart) bp.getContent(), attachments);
+            }
+            if (bp.getContentType().toLowerCase().startsWith("image/")
+                    && bp instanceof MimeBodyPart
+                    && ((MimeBodyPart) bp).getContentID() != null) {
+                attachments.add(new Attachment(
+                        ((MimeBodyPart) bp).getContentID(), bp.getFileName(), bp.getContentType(), bp.getSize()));
+            }
+            if (bp.getDisposition() != null && bp.getDisposition().equalsIgnoreCase(Part.ATTACHMENT)) {
+                attachments.add(new Attachment(null, bp.getFileName(), bp.getContentType(), bp.getSize()));
+            }
+        }
+        return attachments;
+    }
+
+    private static BodyPart getBodypart(@NonNull Multipart mp, @NonNull String id, Boolean contentId)
+            throws MessagingException, IOException {
+
+        // Embedded contentId
+        if (Boolean.TRUE.equals(contentId)) {
+            return getEmbeddedBodypart(mp, id);
+        }
+        // Attachment
+        else {
+            for (int it = 0; it < mp.getCount(); it++) {
+                final BodyPart bp = mp.getBodyPart(it);
+                if (bp.getDisposition() != null && Part.ATTACHMENT.equalsIgnoreCase(bp.getDisposition())
+                        && id.equals(bp.getFileName())) {
+                    return bp;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static BodyPart getEmbeddedBodypart(@NonNull Multipart mp, @NonNull String contentId)
+            throws MessagingException, IOException {
+
+        for (int it = 0; it < mp.getCount(); it++) {
+            final BodyPart bp = mp.getBodyPart(it);
+            if (bp.getContentType().toLowerCase().startsWith("multipart/")) {
+                final BodyPart nestedBodyPart = getEmbeddedBodypart((Multipart) bp.getContent(), contentId);
+                if (nestedBodyPart != null){
+                    return nestedBodyPart;
+                }
+            }
+            if (bp.getContentType().toLowerCase().startsWith("image/") && bp instanceof MimeBodyPart
+                    && contentId.equals(((MimeBodyPart) bp).getContentID())) {
+                return bp;
+            }
+        }
+        return null;
+    }
+
+    private static String extractContent(@NonNull Multipart mp) throws MessagingException, IOException {
+
+        String ret = null;
+        for (int it = 0; it < mp.getCount(); it++) {
+            final BodyPart bp = mp.getBodyPart(it);
+            if (ret == null && bp.getContentType().toLowerCase().startsWith("text/plain")) {
+                ret = bp.getContent().toString();
+            }
+            if (bp.getContentType().toLowerCase().startsWith("text/html")) {
+                ret = (bp.getContent().toString());
+            }
+            if (bp.getContentType().toLowerCase().startsWith("multipart/")) {
+                ret = extractContent((Multipart) bp.getContent());
+            }
+        }
         return ret;
     }
 

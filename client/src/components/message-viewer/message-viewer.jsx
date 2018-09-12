@@ -2,9 +2,9 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
-import DOMPurify from 'dompurify';
 import Spinner from '../spinner/spinner';
 import {selectFolder, selectMessage} from '../../actions/application';
+import sanitize from '../../services/sanitize';
 import mainCss from '../../styles/main.scss';
 import styles from './message-viewer.scss';
 
@@ -58,25 +58,10 @@ class MessageViewer extends Component {
           (<Spinner className={styles.listSpinner} canvasClassName={styles.listSpinnerCanvas} />) :
           null
         }
-        <div className={styles.body} dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(message.content)}}>
+        <div className={styles.body} dangerouslySetInnerHTML={{__html: sanitize.sanitize(message.content)}}>
         </div>
       </div>
     );
-  }
-
-  componentDidMount() {
-    DOMPurify.addHook('afterSanitizeAttributes', node => {
-      // set all elements owning target to target=_blank
-      if ('target' in node) {
-        node.setAttribute('target', '_blank');
-      }
-      // set non-HTML/MathML links to xlink:show=new
-      if (!node.hasAttribute('target')
-        && (node.hasAttribute('xlink:href')
-          || node.hasAttribute('href'))) {
-        node.setAttribute('xlink:show', 'new');
-      }
-    });
   }
 
   onFolderClick(folder) {
