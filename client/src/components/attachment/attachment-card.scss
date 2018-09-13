@@ -1,0 +1,24 @@
+@import '../../styles/partials/variables';
+
+.attachment {
+  display: block;
+  background-color: darken($base-background-color, 0.05);
+  margin-right: 6px;
+  padding: 6px;
+  max-width: 150px;
+  overflow: hidden;
+
+  cursor: pointer;
+
+  .fileName {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .size {
+    display: block;
+    font-size: 0.75 * $font-size-body;
+  }
+}

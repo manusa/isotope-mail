@@ -7,6 +7,7 @@ import {selectFolder, selectMessage} from '../../actions/application';
 import sanitize from '../../services/sanitize';
 import mainCss from '../../styles/main.scss';
 import styles from './message-viewer.scss';
+import AttachmentCard from '../attachment/attachment-card';
 
 function addressGroups(address) {
   const ret = {
@@ -27,6 +28,7 @@ class MessageViewer extends Component {
     const firstFrom = addressGroups(message.from && message.from.length > 0 ? message.from[0] : '');
     const to = message.recipients.filter(r => r.type === 'To');
     const firstTo = addressGroups(to && to.length > 0 ? to[0].address : '');
+    const attachments = message.attachments ? message.attachments.filter(a => !a.contentId) : [];
     return (
       <div className={`${this.props.className} ${styles.messageViewer}`}>
         <div className={styles.header}>
@@ -52,6 +54,9 @@ class MessageViewer extends Component {
             <label>{t('messageViewer.to')}: </label>
             <span className={styles.name}>{firstTo.name}</span>
             <span className={styles.email}>{firstTo.email ? `<${firstTo.email}>` : ''}</span>
+          </div>
+          <div className={styles.attachments}>
+            {attachments.map((a, index) => <AttachmentCard key={index} attachment={a} />)}
           </div>
         </div>
         {this.props.activeRequests > 0 ?
