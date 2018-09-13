@@ -6,6 +6,7 @@
 package com.marcnuri.isotope.api.imap;
 
 import com.marcnuri.isotope.api.configuration.AllowAllSSLSocketFactory;
+import com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration;
 import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.exception.IsotopeException;
@@ -21,6 +22,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -54,13 +56,17 @@ public class ImapService {
     private static final Logger log = LoggerFactory.getLogger(ImapService.class);
 
     private static final String IMAPS_PROTOCOL = "imaps";
+    private static final String MULTIPART_MIME_TYPE = "multipart/";
+
+    private final IsotopeApiConfiguration isotopeApiConfiguration;
 
     private CredentialsService credentialsService;
 
     private IMAPStore imapStore;
 
     @Autowired
-    public ImapService(CredentialsService credentialsService) {
+    public ImapService(IsotopeApiConfiguration isotopeApiConfiguration, CredentialsService credentialsService) {
+        this.isotopeApiConfiguration = isotopeApiConfiguration;
         this.credentialsService = credentialsService;
     }
 
@@ -148,9 +154,9 @@ public class ImapService {
             final Message ret = Message.from(folder, imapMessage);
             final Object content = imapMessage.getContent();
             if (content instanceof Multipart) {
-                ret.setAttachments(addLinks(toBase64Id(folderId), ret,
-                        extractAttachments((Multipart) content, null)));
                 ret.setContent(extractContent((Multipart) content));
+                ret.setAttachments(addLinks(toBase64Id(folderId), ret,
+                        extractAttachments(ret, (Multipart) content, null)));
             } else if (content instanceof MimeMessage
                     && ((MimeMessage) content).getContentType().toLowerCase().contains("html")) {
                 ret.setContent(content.toString());
@@ -180,7 +186,6 @@ public class ImapService {
                 final BodyPart bp = getBodypart((Multipart)content, id, isContentId);
                 if (bp != null) {
                     response.setContentType(bp.getContentType());
-//                    response.setContentLength(bp.getSize());
                     bp.getDataHandler().writeTo(response.getOutputStream());
                     response.getOutputStream().flush();
                 } else {
@@ -204,6 +209,47 @@ public class ImapService {
                 log.error("Error closing IMAP Store", ex);
             }
         }
+    }
+
+    /**
+     * Returns a list of  {@link Attachment}s and replaces embedded images in {@link Message#content} if they are
+     * small in order to avoid future calls to the API which may result more expensive.
+     *
+     * @param finalMessage
+     * @param mp
+     * @param attachments
+     * @return
+     * @throws MessagingException
+     * @throws IOException
+     */
+    private List<Attachment> extractAttachments(
+            @NonNull Message finalMessage, @NonNull Multipart mp, @Nullable List<Attachment> attachments)
+            throws MessagingException, IOException {
+
+        if (attachments == null){
+            attachments = new ArrayList<>();
+        }
+        for (int it = 0; it < mp.getCount(); it++) {
+            final BodyPart bp = mp.getBodyPart(it);
+            if (bp.getContentType().toLowerCase().startsWith(MULTIPART_MIME_TYPE)) {
+                extractAttachments(finalMessage, (Multipart) bp.getContent(), attachments);
+            }
+            if (bp.getContentType().toLowerCase().startsWith("image/")
+                    && bp instanceof MimeBodyPart
+                    && ((MimeBodyPart) bp).getContentID() != null) {
+                // If image is "not too big" embed as base64 data uri - successive IMAP connections will be more expensive
+                if (bp.getSize() <= isotopeApiConfiguration.getEmbeddedImageSizeThreshold()) {
+                    finalMessage.setContent(replaceEmbeddedImage(finalMessage.getContent(), (MimeBodyPart)bp));
+                } else {
+                    attachments.add(new Attachment(
+                            ((MimeBodyPart) bp).getContentID(), bp.getFileName(), bp.getContentType(), bp.getSize()));
+                }
+            }
+            if (bp.getDisposition() != null && bp.getDisposition().equalsIgnoreCase(Part.ATTACHMENT)) {
+                attachments.add(new Attachment(null, bp.getFileName(), bp.getContentType(), bp.getSize()));
+            }
+        }
+        return attachments;
     }
 
     private IMAPStore getImapStore(Credentials credentials) throws MessagingException {
@@ -234,34 +280,9 @@ public class ImapService {
 
         ret.put("mail.smtps.auth", true);
 
-//        ret.put("mail.smtps.host", getMailServerHost());
-//        ret.put("mail.imaps.host", configuration.getImapHost());
         return ret;
     }
 
-    private static List<Attachment> extractAttachments(@NonNull Multipart mp, @Nullable List<Attachment> attachments)
-            throws MessagingException, IOException {
-
-        if (attachments == null){
-            attachments = new ArrayList<>();
-        }
-        for (int it = 0; it < mp.getCount(); it++) {
-            final BodyPart bp = mp.getBodyPart(it);
-            if (bp.getContentType().toLowerCase().startsWith("multipart/")) {
-                extractAttachments((Multipart) bp.getContent(), attachments);
-            }
-            if (bp.getContentType().toLowerCase().startsWith("image/")
-                    && bp instanceof MimeBodyPart
-                    && ((MimeBodyPart) bp).getContentID() != null) {
-                attachments.add(new Attachment(
-                        ((MimeBodyPart) bp).getContentID(), bp.getFileName(), bp.getContentType(), bp.getSize()));
-            }
-            if (bp.getDisposition() != null && bp.getDisposition().equalsIgnoreCase(Part.ATTACHMENT)) {
-                attachments.add(new Attachment(null, bp.getFileName(), bp.getContentType(), bp.getSize()));
-            }
-        }
-        return attachments;
-    }
 
     private static BodyPart getBodypart(@NonNull Multipart mp, @NonNull String id, Boolean contentId)
             throws MessagingException, IOException {
@@ -288,7 +309,7 @@ public class ImapService {
 
         for (int it = 0; it < mp.getCount(); it++) {
             final BodyPart bp = mp.getBodyPart(it);
-            if (bp.getContentType().toLowerCase().startsWith("multipart/")) {
+            if (bp.getContentType().toLowerCase().startsWith(MULTIPART_MIME_TYPE)) {
                 final BodyPart nestedBodyPart = getEmbeddedBodypart((Multipart) bp.getContent(), contentId);
                 if (nestedBodyPart != null){
                     return nestedBodyPart;
@@ -302,58 +323,55 @@ public class ImapService {
         return null;
     }
 
-    private static String extractContent(@NonNull Multipart mp) throws MessagingException, IOException {
+    private static String extractContent(@NonNull Multipart mp)
+            throws MessagingException, IOException {
 
-        String ret = null;
+        String ret = "";
         for (int it = 0; it < mp.getCount(); it++) {
             final BodyPart bp = mp.getBodyPart(it);
-            if (ret == null && bp.getContentType().toLowerCase().startsWith("text/plain")) {
+            if (ret == null && bp.getContentType().toLowerCase().startsWith(MediaType.TEXT_PLAIN_VALUE)) {
                 ret = bp.getContent().toString();
             }
-            if (bp.getContentType().toLowerCase().startsWith("text/html")) {
+            if (bp.getContentType().toLowerCase().startsWith(MediaType.TEXT_HTML_VALUE)) {
                 ret = (bp.getContent().toString());
             }
-            if (bp.getContentType().toLowerCase().startsWith("multipart/")) {
+            if (bp.getContentType().toLowerCase().startsWith(MULTIPART_MIME_TYPE)) {
                 ret = extractContent((Multipart) bp.getContent());
             }
         }
         return ret;
     }
 
-    private static String parseMultipart(Multipart mp)
+    /**
+     * Replaces content image cid urls (<code>&lt;img src='cid:1234' /&gt;</code>) by Base64 data urls for every occurrence
+     * of the provided {@link MimeBodyPart}.
+     *
+     * If no occurrences are found, same content is returned.
+     *
+     * @param content
+     * @param imageBodyPart
+     * @return
+     * @throws MessagingException
+     * @throws IOException
+     */
+    private static String replaceEmbeddedImage(String content, MimeBodyPart imageBodyPart)
             throws MessagingException, IOException {
-        String ret = null;
-        for (int it = 0; it < mp.getCount(); it++) {
-            final BodyPart bp = mp.getBodyPart(it);
-            if (ret == null && bp.getContentType().toLowerCase().startsWith("text/plain")) {
-                ret = bp.getContent().toString();
-            }
-            if (bp.getContentType().toLowerCase().startsWith("text/html")) {
-                ret = (bp.getContent().toString());
-            }
-            if (bp.getContentType().toLowerCase().startsWith("multipart/")) {
-                ret = parseMultipart((Multipart) bp.getContent());
-            }
-            if (bp.getContentType().toLowerCase().startsWith("image/")
-                    && bp instanceof MimeBodyPart
-                    && ((MimeBodyPart) bp).getContentID() != null) {
-                final String cid = ((MimeBodyPart) bp).getContentID().replace("<", "").replace(">", "");
-                if (ret != null && cid != null && ret.contains(cid)) {
-                    String contentType = bp.getContentType();
-                    if (contentType.contains(";")) {
-                        contentType = contentType.substring(0, contentType.indexOf(';'));
-                    }
-                    final String base64 = Base64.encodeBase64String(IOUtils.toByteArray(bp.getInputStream()))
-                            .replace("\r", "").replace("\n", "");
 
-                    ret = ret.replace("cid:" + cid,
-                            String.format("data:%s;%s,%s",
-                                    contentType,
-                                    ((MimeBodyPart) bp).getEncoding(),
-                                    base64));
-                }
+        final String cid = imageBodyPart.getContentID().replaceAll("[<>]", "");
+        if (content != null && cid != null && content.contains(cid)) {
+            String contentType = imageBodyPart.getContentType();
+            if (contentType.contains(";")) {
+                contentType = contentType.substring(0, contentType.indexOf(';'));
             }
+            final String base64 = Base64.encodeBase64String(IOUtils.toByteArray(imageBodyPart.getInputStream()))
+                    .replace("\r", "").replace("\n", "");
+            return content.replace("cid:" + cid,
+                    String.format("data:%s;%s,%s",
+                            contentType,
+                            imageBodyPart.getEncoding(),
+                            base64));
         }
-        return ret;
+        return content;
     }
+
 }

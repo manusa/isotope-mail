@@ -30,7 +30,11 @@ public class IsotopeApiConfiguration {
     private static final String ENCRYPTION_PASSWORD = "ENCRYPTION_PASSWORD";
     private static final String ENCRYPTION_PASSWORD_DEFAULT = "THIS IS THE ENCRYPTION PASSWORD DEFAULT " +
             "IN ORDER TO HAVE REAL SECURITY IT SHOULD BE REPLACED USING 'ENCRYPTION_PASSWORD' ENVIRONMENT VARIABLE";
+
     private static final String TRUSTED_HOSTS = "TRUSTED_HOSTS";
+
+    private static final String EMBEDDED_IMAGE_SIZE_THRESHOLD = "EMBEDDED_IMAGE_SIZE_THRESHOLD";
+    private static final long EMBEDDED_IMAGE_SIZE_THRESHOLD_DEFAULT_50KB = 51200L;
 
     private final Environment environment;
 
@@ -54,6 +58,10 @@ public class IsotopeApiConfiguration {
         final String trustedHosts = environment.getProperty(TRUSTED_HOSTS, "");
         return trustedHosts.isEmpty() ? Collections.emptySet() :
                 Stream.of(trustedHosts.split("\\,")).map(String::trim).collect(Collectors.toSet());
+    }
+
+    public long getEmbeddedImageSizeThreshold() {
+        return environment.getProperty(EMBEDDED_IMAGE_SIZE_THRESHOLD, Long.class, EMBEDDED_IMAGE_SIZE_THRESHOLD_DEFAULT_50KB);
     }
 
 }
