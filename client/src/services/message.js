@@ -126,9 +126,8 @@ export function downloadAttachment(credentials, attachment) {
   const fetch$ = fetch(attachment._links.download.href, {
     method: 'GET',
     headers: credentialsHeaders(credentials)
-  });
+  }).then(response => response.blob());
   fetch$
-    .then(response => response.blob())
     .then(blob => {
       if (navigator.msSaveBlob) {
         navigator.msSaveBlob(blob, attachment.fileName);
