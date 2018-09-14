@@ -55,15 +55,13 @@ class MessageViewer extends Component {
             <span className={styles.name}>{firstTo.name}</span>
             <span className={styles.email}>{firstTo.email ? `<${firstTo.email}>` : ''}</span>
           </div>
+        </div>
+        <div className={styles.body}>
+          <Spinner visible={this.props.activeRequests > 0}/>
           <div className={styles.attachments}>
             {attachments.map((a, index) => <AttachmentCard key={index} attachment={a} />)}
           </div>
-        </div>
-        {this.props.activeRequests > 0 ?
-          (<Spinner className={styles.listSpinner} canvasClassName={styles.listSpinnerCanvas} />) :
-          null
-        }
-        <div className={styles.body} dangerouslySetInnerHTML={{__html: sanitize.sanitize(message.content)}}>
+          <div dangerouslySetInnerHTML={{__html: sanitize.sanitize(message.content)}}></div>
         </div>
       </div>
     );

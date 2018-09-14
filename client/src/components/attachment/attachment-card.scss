@@ -1,24 +1,60 @@
 @import '../../styles/partials/variables';
 
 .attachment {
-  display: block;
-  background-color: darken($base-background-color, 0.05);
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  background-color: darken($base-background-color, 3%);
   margin-right: 6px;
   padding: 6px;
-  max-width: 150px;
-  overflow: hidden;
+  max-width: 200px;
 
   cursor: pointer;
 
-  .fileName {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  &:hover {
+    background-color: darken($base-background-color, 10%);
   }
 
-  .size {
-    display: block;
-    font-size: 0.75 * $font-size-body;
+  &.downloading {
+    cursor: initial;
+  }
+
+  .spinner {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(darken($base-background-color, 20%), 0.6);
+
+    .canvas {
+      height: 22px;
+    }
+  }
+
+  .icon {
+    margin-right: 6px;
+  }
+
+  .fileInfo {
+    overflow: hidden;
+
+    .fileName {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      font-size: 0.90 * $font-size-body;
+      color: lighten($base-color, 5%);
+    }
+
+    .size {
+      display: block;
+      font-size: 0.70 * $font-size-body;
+
+      color: lighten($base-color, 15%);
+    }
   }
 }

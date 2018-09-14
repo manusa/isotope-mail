@@ -63,10 +63,6 @@
 
     }
 
-    .attachments {
-      display: flex;
-      flex-direction: row;
-    }
   }
 
   .body {
@@ -77,6 +73,12 @@
     width: 100%;
     display: inline-block;
     overflow: auto;
+
+    .attachments {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: $default-spacing;
+    }
 
     img {
       max-width: 100%;

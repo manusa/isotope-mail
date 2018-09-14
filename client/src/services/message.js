@@ -122,3 +122,27 @@ export function readMessage(dispatch, credentials, folder, message) {
   }
 }
 
+export function downloadAttachment(credentials, attachment) {
+  const fetch$ = fetch(attachment._links.download.href, {
+    method: 'GET',
+    headers: credentialsHeaders(credentials)
+  });
+  fetch$
+    .then(response => response.blob())
+    .then(blob => {
+      if (navigator.msSaveBlob) {
+        navigator.msSaveBlob(blob, attachment.fileName);
+      } else {
+        const url = URL.createObjectURL(blob);
+        const tempLink = document.createElement('a');
+        tempLink.href = url;
+        tempLink.download = attachment.fileName;
+        document.body.appendChild(tempLink);
+        // tempLink.click();
+        tempLink.dispatchEvent(new MouseEvent(`click`, {bubbles: true, cancelable: true, view: window}));
+        document.body.removeChild(tempLink);
+        URL.revokeObjectURL(url);
+      }
+    });
+  return fetch$;
+}

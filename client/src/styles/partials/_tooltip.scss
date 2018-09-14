@@ -10,10 +10,13 @@ $isotip-font-size: 10px !default;
 $isotip-margin: 12px !default;
 $isotip-transition-in-time: 0.150s !default;
 $isotip-transition-out-time: 0.075s !default;
+$isotip-medium-width: 150px !default;
+$isotip-large-width: 250px !default;
+
 
 
 // Allowed positions [isotip-position] (top, top-start, top-end, bottom, bottom-start, bottom-end)
-// Allowed sizes [isotip-size] (medium)
+// Allowed sizes [isotip-size] (medium, large)
 [isotip] {
   position: relative;
 
@@ -56,7 +59,12 @@ $isotip-transition-out-time: 0.075s !default;
 
   &[isotip-size='medium']::before {
     white-space: normal;
-    width: 150px;
+    width: $isotip-medium-width;
+  }
+
+  &[isotip-size='large']::before {
+    white-space: normal;
+    width: $isotip-large-width;
   }
 
   &[isotip-position="top"]::before,
@@ -100,8 +108,8 @@ $isotip-transition-out-time: 0.075s !default;
   &[isotip-position="bottom"]:hover::before {
     animation: scaleCenter $isotip-transition-in-time;
     @keyframes scaleCenter {
-      0%   {transform: scale(0) translateX(-50%);}
-      100% {transform: scale(1) translateX(-50%);}
+      0%   {left: 0; transform: scale(0) translateX(0);}
+      100% {left: 50%; transform: scale(1) translateX(-50%);}
     }
   }
 
