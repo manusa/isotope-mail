@@ -9,11 +9,16 @@
   .drawer {
     position: fixed;
 
-    .error-container {
+    .top-container {
       display: flex;
+      align-items: center;
       width: 100%;
       cursor: default;
       color: $mdc-theme-secondary;
+
+      .toggle {
+        margin-left: auto;
+      }
     }
 
     .drawer-content {

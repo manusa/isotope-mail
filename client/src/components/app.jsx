@@ -27,7 +27,7 @@ class App extends Component {
     return (
       <div className={styles.app}>
         <TopBar sideBarCollapsed={this.state.sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
-        <SideBar collapsed={this.state.sideBar.collapsed}/>
+        <SideBar collapsed={this.state.sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
         <div className={`${mainCss['mdc-top-app-bar--fixed-adjust']} ${styles['content-wrapper']}
             ${this.state.sideBar.collapsed ? '' : styles['with-side-bar']}`}>
           {!this.props.application.selectedMessage || Object.keys(this.props.application.selectedMessage).length === 0 ?

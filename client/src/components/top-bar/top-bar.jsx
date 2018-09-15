@@ -12,6 +12,7 @@ class TopBar extends Component {
   }
 
   render() {
+    const collapsed = this.props.sideBarCollapsed;
     const isMessageViewer = this.props.selectedMessage && Object.keys(this.props.selectedMessage).length > 0;
     let title = this.props.title;
     if (this.props.selectedFolder && this.props.selectedFolder.name
@@ -20,14 +21,17 @@ class TopBar extends Component {
     }
     return (
       <header className={`${styles.topBar} ${styles['with-custom-styles']}
-      ${this.props.sideBarCollapsed ? '' : styles['with-side-bar']}
+      ${collapsed ? '' : styles['with-side-bar']}
       ${mainCss['mdc-top-app-bar']} ${mainCss['mdc-top-app-bar--fixed']}`}>
         <div className={mainCss['mdc-top-app-bar__row']}>
           <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-start']}`}>
-            <button onClick={this.props.sideBarToggle}
-              className={`material-icons ${mainCss['mdc-top-app-bar__navigation-icon']}`}>
-              menu
-            </button>
+            {collapsed ?
+              <button onClick={this.props.sideBarToggle}
+                className={`material-icons ${mainCss['mdc-top-app-bar__navigation-icon']}`}>
+                menu
+              </button> :
+              null
+            }
             {isMessageViewer ?
               <Fragment>
                 <button onClick={() => this.props.selectMessage(null)}

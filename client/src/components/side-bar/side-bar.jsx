@@ -20,7 +20,7 @@ class SideBar extends Component {
        ${this.getCollapsedClassName()}`}>
         <nav className={`${styles.drawer} ${mainCss['mdc-drawer__drawer']}`}>
           <div className={mainCss['mdc-drawer__toolbar-spacer']}>
-            <div className={styles['error-container']}>
+            <div className={styles['top-container']}>
               {(location.protocol !== 'https:' ?
                 <span className='material-icons' isotip={t('sideBar.errors.noSSL')}
                   isotip-position='bottom-start' isotip-size='small'>
@@ -31,6 +31,10 @@ class SideBar extends Component {
                   isotip-position='bottom-start' isotip-size='small'>
                 disc_full
                 </span> : null)}
+              <button onClick={this.props.sideBarToggle}
+                className={`material-icons ${mainCss['mdc-icon-button']} ${styles.toggle}`}>
+                keyboard_arrow_left
+              </button>
             </div>
           </div>
           <div className={`${mainCss['mdc-drawer__content']} ${styles['drawer-content']}`}>
@@ -42,12 +46,13 @@ class SideBar extends Component {
   }
 
   getCollapsedClassName() {
-    return this.props.collapsed ? '' :
-      `${styles.open} ${mainCss['mdc-drawer--open']}`;
+    return this.props.collapsed ? '' : `${styles.open} ${mainCss['mdc-drawer--open']}`;
   }
 }
 
 SideBar.propTypes = {
+  t: PropTypes.func.isRequired,
+  sideBarToggle: PropTypes.func.isRequired,
   collapsed: PropTypes.bool.isRequired,
   errors: PropTypes.object.isRequired
 };
