@@ -27,7 +27,9 @@ import java.util.stream.Stream;
 @Import({WebConfiguration.class})
 public class IsotopeApiConfiguration {
 
+    @SuppressWarnings("squid:S2068")
     private static final String ENCRYPTION_PASSWORD = "ENCRYPTION_PASSWORD";
+    @SuppressWarnings("squid:S2068")
     private static final String ENCRYPTION_PASSWORD_DEFAULT = "THIS IS THE ENCRYPTION PASSWORD DEFAULT " +
             "IN ORDER TO HAVE REAL SECURITY IT SHOULD BE REPLACED USING 'ENCRYPTION_PASSWORD' ENVIRONMENT VARIABLE";
 
