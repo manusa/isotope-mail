@@ -58,7 +58,7 @@ const mapDispatchToProps = dispatch => ({
       updateFolderMessagesCache(dispatch, credentials, folder, abortControllerWrapper.abortController.signal,
         folder.messageCount - initialLoadMessageCount, folder.messageCount);
     }
-    resetFolderMessagesCache(dispatch, credentials, folder, abortControllerWrapper.abortController.signal);
+    resetFolderMessagesCache(dispatch, credentials, folder);
   },
   moveMessage: (credentials, fromFolder, toFolder, message) => {
     moveMessage(dispatch, credentials, fromFolder, toFolder, message);

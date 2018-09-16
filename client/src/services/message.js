@@ -22,6 +22,18 @@ import {KEY_HASH, KEY_USER_ID} from './state';
  */
 const _abortControllerWrappers = {};
 
+/**
+ * Triggers the abort method of a the specified AbortController
+ *
+ * @param abortController {AbortController}
+ * @private
+ */
+function _abortFetch(abortController) {
+  if (abortController && abortController.abort) {
+    abortController.abort();
+  }
+}
+
 function _readContent(dispatch, credentials, folder, message, signal, attachment) {
   fetch(attachment._links.download.href, {
     method: 'GET',
@@ -41,8 +53,12 @@ function _readContent(dispatch, credentials, folder, message, signal, attachment
  * @param folder
  * @param signal {AbortSignal}
  */
-export async function resetFolderMessagesCache(dispatch, credentials, folder, signal) {
+export async function resetFolderMessagesCache(dispatch, credentials, folder) {
   if (folder && folder._links) {
+    _abortFetch(_abortControllerWrappers.resetFolderMessagesCacheAbortController);
+    _abortControllerWrappers.resetFolderMessagesCacheAbortController = new AbortController();
+    const signal = _abortControllerWrappers.resetFolderMessagesCacheAbortController.signal;
+
     dispatch(backendRequest());
     return fetch(folder._links.messages.href, {
       method: 'GET',
@@ -96,9 +112,7 @@ export function updateFolderMessagesCache(dispatch, credentials, folder, signal,
 export function readMessage(dispatch, credentials, folder, message) {
   // Abort + signal
   if (message && message._links) {
-    if (_abortControllerWrappers.readMessageAbortController) {
-      _abortControllerWrappers.readMessageAbortController.abort();
-    }
+    _abortFetch(_abortControllerWrappers.readMessageAbortController);
     _abortControllerWrappers.readMessageAbortController = new AbortController();
     const signal = _abortControllerWrappers.readMessageAbortController.signal;
 
@@ -153,6 +167,7 @@ export function downloadAttachment(credentials, attachment) {
 }
 
 export function moveMessage(dispatch, credentials, fromFolder, toFolder, message) {
+  _abortFetch(_abortControllerWrappers.resetFolderMessagesCacheAbortController);
   dispatch(deleteFromCache(fromFolder, [message]));
   fetch(message._links.move.href.replace('{toFolderId}', toFolder.folderId), {
     method: 'PUT',
