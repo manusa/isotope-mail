@@ -47,9 +47,11 @@ class MessageList extends Component {
   }
 
   renderItem({index, key, style}) {
+    const folder = this.props.selectedFolder;
     const message = this.props.messages[index];
     return (
       <li key={key} style={style} onClick={ () => this.props.selectMessage(message) }
+        draggable={true} onDragStart={event => this.onDragStart(event, folder, message)}
         className={`${mainCss['mdc-list-item']}
                 ${styles.item} ${message.seen ? styles.seen : ''}
                 ${message.deleted ? styles.deleted : ''}`} >
@@ -59,6 +61,11 @@ class MessageList extends Component {
         <span className={styles.size}>{prettySize(message.size)}</span>
       </li>
     );
+  }
+
+  onDragStart(event, fromFolder, message) {
+    const payload = {fromFolder, message};
+    event.dataTransfer.setData('application/json', JSON.stringify(payload));
   }
 }
 
@@ -95,7 +102,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
-  selectMessage: (message) =>
+  selectMessage: message =>
     dispatchProps.selectMessage(stateProps.selectedFolder, message, stateProps.credentials)
 }));
 

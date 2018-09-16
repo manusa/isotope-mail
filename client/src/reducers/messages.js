@@ -14,13 +14,22 @@ const messages = (state = INITIAL_STATE.messages, action) => {
       newState.cache[action.payload.folder.folderId] =
         new Map(action.payload.messages.map(m => [m.uid, m]));
       return newState;
-    case ActionTypes.MESSAGES_UPDATE_CACHE:
+    case ActionTypes.MESSAGES_UPDATE_CACHE: {
       const newUpdateState = {...state};
       if (newUpdateState.cache[action.payload.folder.folderId] instanceof Map === false) {
         newUpdateState.cache[action.payload.folder.folderId] = new Map();
       }
       action.payload.messages.forEach(m => newUpdateState.cache[action.payload.folder.folderId].set(m.uid, m));
       return newUpdateState;
+    }
+    case ActionTypes.MESSAGES_DELETE_FROM_CACHE: {
+      const newUpdateState = {...state};
+      if (newUpdateState.cache[action.payload.folder.folderId] instanceof Map === false) {
+        return state;
+      }
+      action.payload.messages.forEach(m => newUpdateState.cache[action.payload.folder.folderId].delete(m.uid));
+      return newUpdateState;
+    }
     case ActionTypes.ADD_MESSAGE:
       return {...state, items: [...state.items, action.payload]};
     default:

@@ -13,6 +13,7 @@ class FolderList extends Component {
             <FolderItem label={folder.name} graphic={folder.type.icon}
               selected={this.props.selectedFolder && folder.folderId === this.props.selectedFolder.folderId}
               onClick={this.props.onClickFolder.bind(this, folder)}
+              onDrop={event => this.onDrop(event, folder)}
               unreadMessageCount={folder.unreadMessageCount}
               newMessageCount={folder.newMessageCount}/>
             {(folder.children.length > 0 ?
@@ -26,18 +27,26 @@ class FolderList extends Component {
         )
     );
   }
+
+  onDrop(event, toFolder) {
+    event.preventDefault();
+    const payload = JSON.parse(event.dataTransfer.getData('application/json'));
+    this.props.onDropMessage(payload.fromFolder, toFolder, payload.message);
+  }
 }
 
 
 FolderList.propTypes = {
   folderList: PropTypes.array.isRequired,
   selectedFolder: PropTypes.object,
-  onClickFolder: PropTypes.func
+  onClickFolder: PropTypes.func,
+  onDropMessage: PropTypes.func
 };
 
 
 FolderList.defaultProps = {
-  onClickFolder: () => {}
+  onClickFolder: () => {},
+  onDropMessage: () => {}
 };
 
 export default FolderList;

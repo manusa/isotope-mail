@@ -124,7 +124,6 @@ module.exports = {
     port: 9000,
     proxy: {
       '/api': {
-        forward: 'http://localhost:9010',
         target: 'http://localhost:9010',
         pathRewrite: {'^/api' : ''},
         xfwd: true,
