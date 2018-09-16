@@ -9,11 +9,6 @@ import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
 
 class FolderContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.abortControllerWrapper = {};
-  }
-
   render() {
     return (
       <nav className={`${mainCss['mdc-list']}`}>
@@ -21,7 +16,7 @@ class FolderContainer extends Component {
           canvasClassName={styles.spinnerCanvas} />
         <FolderList folderList={this.props.folderList}
           selectedFolder={this.props.selectedFolder}
-          onClickFolder={this.props.selectFolder.bind(this, this.abortControllerWrapper)}
+          onClickFolder={this.props.selectFolder}
           onDropMessage={this.props.moveMessage}
         />
       </nav>
@@ -44,19 +39,16 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  selectFolder: (abortControllerWrapper, folder, credentials, cachedFolderMessagesMap) => {
+  selectFolder: (folder, credentials, cachedFolderMessagesMap) => {
     dispatch(selectFolder(folder));
-    dispatch(selectMessage(null));
-    if (abortControllerWrapper && abortControllerWrapper.abortController) {
-      abortControllerWrapper.abortController.abort();
-    }
-    abortControllerWrapper.abortController = new AbortController();
+    dispatch(selectMessage(null))
+
     // Performance: Perform an initial load of the latest (30*) messages in the folder
     const initialLoadMessageCount = 30;
     if (cachedFolderMessagesMap instanceof Map === false
       && folder.messageCount >= initialLoadMessageCount) {
-      updateFolderMessagesCache(dispatch, credentials, folder, abortControllerWrapper.abortController.signal,
-        folder.messageCount - initialLoadMessageCount, folder.messageCount);
+      updateFolderMessagesCache(
+        dispatch, credentials, folder, folder.messageCount - initialLoadMessageCount, folder.messageCount);
     }
     resetFolderMessagesCache(dispatch, credentials, folder);
   },
@@ -66,8 +58,8 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
-  selectFolder: (abortControllerWrapper, folder) =>
-    dispatchProps.selectFolder(abortControllerWrapper, folder, stateProps.application.user.credentials,
+  selectFolder: folder =>
+    dispatchProps.selectFolder(folder, stateProps.application.user.credentials,
       stateProps.messages.cache[folder.folderId]),
   moveMessage: (fromFolder, toFolder, message) => dispatchProps.moveMessage(stateProps.application.user.credentials,
     fromFolder, toFolder, message)

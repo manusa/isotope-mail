@@ -9,30 +9,18 @@ import {
   setFolderCache,
   updateCache
 } from '../actions/messages';
-import {credentialsHeaders, toJson} from './fetch';
+import {abortFetch, credentialsHeaders, toJson} from './fetch';
 import {persistMessageCache} from './indexed-db';
 import {refreshMessage} from '../actions/application';
 import {KEY_HASH, KEY_USER_ID} from './state';
 
 /**
- * Object to store the different AbortController that will be used in the service methods to fetch from the API backend.
+ * Object to store the different AbortController(s) that will be used in the service methods to fetch from the API backend.
  *
  * @type {Object}
  * @private
  */
 const _abortControllerWrappers = {};
-
-/**
- * Triggers the abort method of a the specified AbortController
- *
- * @param abortController {AbortController}
- * @private
- */
-function _abortFetch(abortController) {
-  if (abortController && abortController.abort) {
-    abortController.abort();
-  }
-}
 
 function _readContent(dispatch, credentials, folder, message, signal, attachment) {
   fetch(attachment._links.download.href, {
@@ -55,7 +43,7 @@ function _readContent(dispatch, credentials, folder, message, signal, attachment
  */
 export async function resetFolderMessagesCache(dispatch, credentials, folder) {
   if (folder && folder._links) {
-    _abortFetch(_abortControllerWrappers.resetFolderMessagesCacheAbortController);
+    abortFetch(_abortControllerWrappers.resetFolderMessagesCacheAbortController);
     _abortControllerWrappers.resetFolderMessagesCacheAbortController = new AbortController();
     const signal = _abortControllerWrappers.resetFolderMessagesCacheAbortController.signal;
 
@@ -80,7 +68,11 @@ export async function resetFolderMessagesCache(dispatch, credentials, folder) {
   return null;
 }
 
-export function updateFolderMessagesCache(dispatch, credentials, folder, signal, start, end) {
+export function updateFolderMessagesCache(dispatch, credentials, folder, start, end) {
+  abortFetch(_abortControllerWrappers.updateFolderMessagesCacheAbortController);
+  _abortControllerWrappers.updateFolderMessagesCacheAbortController = new AbortController();
+  const signal = _abortControllerWrappers.updateFolderMessagesCacheAbortController.signal;
+
   const url = new URL(folder._links.messages.href);
   if (start >= 0 && end >= 0) {
     url.search = new URLSearchParams({start, end}).toString();
@@ -112,7 +104,7 @@ export function updateFolderMessagesCache(dispatch, credentials, folder, signal,
 export function readMessage(dispatch, credentials, folder, message) {
   // Abort + signal
   if (message && message._links) {
-    _abortFetch(_abortControllerWrappers.readMessageAbortController);
+    abortFetch(_abortControllerWrappers.readMessageAbortController);
     _abortControllerWrappers.readMessageAbortController = new AbortController();
     const signal = _abortControllerWrappers.readMessageAbortController.signal;
 
@@ -167,7 +159,7 @@ export function downloadAttachment(credentials, attachment) {
 }
 
 export function moveMessage(dispatch, credentials, fromFolder, toFolder, message) {
-  _abortFetch(_abortControllerWrappers.resetFolderMessagesCacheAbortController);
+  abortFetch(_abortControllerWrappers.resetFolderMessagesCacheAbortController);
   dispatch(deleteFromCache(fromFolder, [message]));
   fetch(message._links.move.href.replace('{toFolderId}', toFolder.folderId), {
     method: 'PUT',

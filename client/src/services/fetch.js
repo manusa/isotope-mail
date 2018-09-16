@@ -17,6 +17,17 @@ export function toJson(response) {
 }
 
 /**
+ * Triggers the abort method of a the specified AbortController
+ *
+ * @param abortController {AbortController}
+ */
+export function abortFetch(abortController) {
+  if (abortController && abortController.abort) {
+    abortController.abort();
+  }
+}
+
+/**
  * Creates a new headers object including Isotope specific credentials headers for server authentication.
  *
  * @param {{}} credentials
