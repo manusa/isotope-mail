@@ -18,7 +18,9 @@ class FolderList extends Component {
               newMessageCount={folder.newMessageCount}/>
             {(folder.children.length > 0 ?
               <nav className={`${mainCss['mdc-list']} ${styles.childList}`}>
-                <FolderList folderList={folder.children} onClickFolder={this.props.onClickFolder}
+                <FolderList folderList={folder.children}
+                  onClickFolder={this.props.onClickFolder}
+                  onDropMessage={this.props.onDropMessage}
                   selectedFolder={this.props.selectedFolder} />
               </nav> :
               null
