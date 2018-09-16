@@ -9,6 +9,8 @@ import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.imap.ImapService;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -30,8 +33,11 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RequestMapping(path = "/v1/folders")
 public class FolderResource {
 
+    private static final Logger log = LoggerFactory.getLogger(FolderResource.class);
+
     private static final String REL_MESSAGES = "messages";
     private static final String REL_DOWNLOAD = "download";
+    private static final String REL_MOVE = "move";
 
     private final CredentialsService credentialsService;
     private final ObjectFactory<ImapService> imapServiceFactory;
@@ -46,6 +52,7 @@ public class FolderResource {
     public ResponseEntity<List<Folder>> getFolders(
             HttpServletRequest request, @RequestParam(value = "loadChildren", required = false) Boolean loadChildren) {
 
+        log.debug("Loading list of folders [children:{}]", loadChildren);
         return ResponseEntity.ok(addLinks(imapServiceFactory.getObject()
                 .getFolders(credentialsService.fromRequest(request), loadChildren)));
     }
@@ -56,6 +63,7 @@ public class FolderResource {
             @PathVariable("folderId") String folderId, @RequestParam(value = "start", required = false) Integer start,
             @RequestParam(value = "end", required = false) Integer end) {
 
+        log.debug("Loading list of messages for folder {} [Range: {}-{}]", folderId, start, end);
         return ResponseEntity.ok(addLinks(folderId, imapServiceFactory.getObject()
                 .getMessages(credentialsService.fromRequest(request), Folder.toId(folderId), start, end)));
     }
@@ -64,6 +72,7 @@ public class FolderResource {
     public ResponseEntity<Message> getMessage(
             HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId) {
 
+        log.debug("Loading message {} from folder {}", messageId, folderId);
         return ResponseEntity.ok(addLinks(folderId, imapServiceFactory.getObject()
                 .getMessage(credentialsService.fromRequest(request), Folder.toId(folderId), messageId)));
     }
@@ -74,9 +83,21 @@ public class FolderResource {
             @PathVariable("id") String id, @RequestParam(name="contentId", required = false) Boolean contentId,
             HttpServletResponse response) {
 
+        log.debug("Loading attachment {} from message {} from folder {}", id, messageId, folderId);
         imapServiceFactory.getObject().readAttachment(response, credentialsService.fromRequest(request),
                 Folder.toId(folderId), messageId, id, contentId);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping(path = "/{fromFolderId}/messages/{messageId}/folder/{toFolderId}")
+    public ResponseEntity<List<Message>> moveMessage(
+            HttpServletRequest request, @PathVariable("fromFolderId") String fromFolderId,
+            @PathVariable("messageId") Long messageId, @PathVariable("toFolderId") String toFolderId) {
+
+        log.debug("Moving message {} from folder {} to folder {}", messageId, fromFolderId, toFolderId);
+        return ResponseEntity.ok(addLinks(toFolderId, imapServiceFactory.getObject().moveMessages(
+                credentialsService.fromRequest(request), Folder.toId(fromFolderId), Folder.toId(toFolderId),
+                Arrays.asList(messageId))));
     }
 
     private static Folder[] addLinks(Folder... folders) {
@@ -110,6 +131,8 @@ public class FolderResource {
     private static Message addLinks(String folderId, Message message) {
         message.add(linkTo(methodOn(FolderResource.class).getMessage(null, folderId, message.getUid()))
                 .withSelfRel().expand());
+        message.add(linkTo(methodOn(FolderResource.class).moveMessage(null, folderId, message.getUid(),
+                null)).withRel(REL_MOVE));
         return message;
     }
 

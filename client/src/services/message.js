@@ -2,7 +2,13 @@ import {
   backendRequest as aBackendRequest,
   backendRequestCompleted as aBackendRequestCompleted, replaceMessageEmbeddedImages
 } from '../actions/application';
-import {backendRequest, backendRequestCompleted, setFolderCache, updateCache} from '../actions/messages';
+import {
+  backendRequest,
+  backendRequestCompleted,
+  deleteFromCache,
+  setFolderCache,
+  updateCache
+} from '../actions/messages';
 import {credentialsHeaders, toJson} from './fetch';
 import {persistMessageCache} from './indexed-db';
 import {refreshMessage} from '../actions/application';
@@ -96,7 +102,7 @@ export function readMessage(dispatch, credentials, folder, message) {
     _abortControllerWrappers.readMessageAbortController = new AbortController();
     const signal = _abortControllerWrappers.readMessageAbortController.signal;
 
-    dispatch(aBackendRequest())
+    dispatch(aBackendRequest());
     fetch(message._links.self.href, {
       method: 'GET',
       headers: credentialsHeaders(credentials),
@@ -138,10 +144,27 @@ export function downloadAttachment(credentials, attachment) {
         tempLink.download = attachment.fileName;
         document.body.appendChild(tempLink);
         // tempLink.click();
-        tempLink.dispatchEvent(new MouseEvent(`click`, {bubbles: true, cancelable: true, view: window}));
+        tempLink.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
         document.body.removeChild(tempLink);
         URL.revokeObjectURL(url);
       }
     });
   return fetch$;
+}
+
+export function moveMessage(dispatch, credentials, fromFolder, toFolder, message) {
+  dispatch(deleteFromCache(fromFolder, [message]));
+  fetch(message._links.move.href.replace('{toFolderId}', toFolder.folderId), {
+    method: 'PUT',
+    headers: credentialsHeaders(credentials)
+  })
+    .then(toJson)
+    .then(newMessages => {
+      if (Array.isArray(newMessages)) {
+        dispatch(updateCache(toFolder, newMessages));
+      }
+    })
+    .catch(() => {
+      dispatch(updateCache(fromFolder, [message]));
+    });
 }

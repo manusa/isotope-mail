@@ -9,14 +9,13 @@ import com.marcnuri.isotope.api.configuration.AllowAllSSLSocketFactory;
 import com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration;
 import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.credentials.CredentialsService;
+import com.marcnuri.isotope.api.exception.AuthenticationException;
 import com.marcnuri.isotope.api.exception.IsotopeException;
+import com.marcnuri.isotope.api.exception.NotFoundException;
 import com.marcnuri.isotope.api.folder.Folder;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
-import com.sun.mail.imap.IMAPFolder;
-import com.sun.mail.imap.IMAPMessage;
-import com.sun.mail.imap.IMAPSSLStore;
-import com.sun.mail.imap.IMAPStore;
+import com.sun.mail.imap.*; //NOSONAR
 import org.apache.commons.io.IOUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -56,6 +55,7 @@ public class ImapService {
     private static final Logger log = LoggerFactory.getLogger(ImapService.class);
 
     private static final String IMAPS_PROTOCOL = "imaps";
+    private static final String IMAP_CAPABILITY_CONDSTORE = "CONDSTORE";
     private static final String MULTIPART_MIME_TYPE = "multipart/";
 
     private final IsotopeApiConfiguration isotopeApiConfiguration;
@@ -74,8 +74,8 @@ public class ImapService {
      * Checks if specified {@link Credentials} are valid and returns a new Credentials object with
      * encrypted values.
      *
-     * @param credentials
-     * @return
+     * @param credentials to validate
+     * @return credentials object with encrypted values
      */
     public Credentials checkCredentials(Credentials credentials) {
         try {
@@ -83,7 +83,7 @@ public class ImapService {
             getImapStore(credentials).getDefaultFolder();
             return credentialsService.encrypt(credentials);
         } catch (MessagingException | IOException e) {
-            throw new IsotopeException("Error while logging in", e);
+            throw new AuthenticationException("Error while logging in", e);
         }
     }
 
@@ -104,43 +104,15 @@ public class ImapService {
             Credentials credentials, URLName folderId, @Nullable Integer start, @Nullable Integer end) {
 
         try {
-            final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
-            final List<Message> ret = getMessages(folder, start, end);
+            final IMAPStore store = getImapStore(credentials);
+            final IMAPFolder folder = (IMAPFolder)store.getFolder(folderId);
+            final List<Message> ret = getMessages(folder, start, end, store.hasCapability(IMAP_CAPABILITY_CONDSTORE));
             folder.close();
             return ret;
         } catch (MessagingException ex) {
             log.error("Error loading messages for folder: " + folderId.toString(), ex);
             throw  new IsotopeException(ex.getMessage());
         }
-    }
-
-    private List<Message>  getMessages(
-            @NonNull IMAPFolder folder, @Nullable Integer start, @Nullable Integer end) throws MessagingException {
-
-        if (!folder.isOpen()) {
-            folder.open(READ_ONLY);
-        }
-        final javax.mail.Message[] messages;
-        if (start != null && end != null) {
-            // start / end message counts may no longer match, recalculate index if necessary
-            if (end > folder.getMessageCount()) {
-                start = folder.getMessageCount() - (end - start);
-                end = folder.getMessageCount();
-            }
-            messages = folder.getMessages(start < 1 ? 1 : start, end);
-        } else {
-            messages = folder.getMessages();
-        }
-        final FetchProfile fp = new FetchProfile();
-        fp.add(FetchProfile.Item.ENVELOPE);
-        fp.add(UIDFolder.FetchProfileItem.UID);
-        fp.add(FetchProfile.Item.FLAGS);
-        fp.add(FetchProfile.Item.SIZE);
-        folder.fetch(messages, fp);
-        return Stream.of(messages)
-                .map(m -> Message.from(folder, (IMAPMessage)m))
-                .sorted(Comparator.comparingLong(Message::getUid).reversed())
-                .collect(Collectors.toList());
     }
 
     public Message getMessage(Credentials credentials, URLName folderId, Long uid) {
@@ -150,6 +122,10 @@ public class ImapService {
                 folder.open(READ_WRITE);
             }
             final IMAPMessage imapMessage = (IMAPMessage)folder.getMessageByUID(uid);
+            if (imapMessage == null) {
+                folder.close();
+                throw new NotFoundException("Message not found");
+            }
             imapMessage.setFlag(Flags.Flag.SEEN, true);
             final Message ret = Message.from(folder, imapMessage);
             final Object content = imapMessage.getContent();
@@ -189,8 +165,7 @@ public class ImapService {
                     bp.getDataHandler().writeTo(response.getOutputStream());
                     response.getOutputStream().flush();
                 } else {
-                    // TODO: Build specific exception
-                    throw new IsotopeException("NOT FOUND");
+                    throw new NotFoundException("Attachment not found");
                 }
             }
         } catch (MessagingException | IOException ex) {
@@ -198,6 +173,69 @@ public class ImapService {
             throw  new IsotopeException(ex.getMessage());
         }
 
+    }
+
+    /**
+     * Moves the provided messages from the specified folderId to the specified destination folderId.
+     *
+     * To maximize compatibility with IMAP servers, move is performed using a regular copy and delete in the originating
+     * folder, and a retrieval of messages in the target folder.
+     *
+     * @param credentials to authenticate the user in the IMAP server
+     * @param fromFolderId name of the originating folder
+     * @param toFolderId name of the target folder
+     * @param uids list of uids to move
+     * @return list of new messages in the target folder since the move operation started (may include additional messages)
+     */
+    public List<Message> moveMessages(Credentials credentials, URLName fromFolderId, URLName toFolderId, List<Long> uids) {
+        try {
+            final IMAPFolder fromFolder = (IMAPFolder)getImapStore(credentials).getFolder(fromFolderId);
+            fromFolder.open(READ_WRITE);
+            final IMAPFolder toFolder = (IMAPFolder)getImapStore(credentials).getFolder(toFolderId);
+            toFolder.open(READ_ONLY);
+            long toFolderNextUID = fromFolder.getUIDNext();
+            toFolder.close(false);
+
+            // Maximize IMAP compatibility, perform COPY and DELETE
+            final javax.mail.Message[] messagesToMove = Stream.of(fromFolder.getMessagesByUID(
+                    uids.stream().mapToLong(Long::longValue).toArray()))
+                    .filter(m -> !m.isExpunged())
+                    .toArray(javax.mail.Message[]::new);
+            if (messagesToMove.length > 0) {
+                fromFolder.copyMessages(messagesToMove, toFolder);
+                for (javax.mail.Message m : messagesToMove) {
+                    m.setFlag(Flags.Flag.DELETED, true);
+                }
+                fromFolder.expunge(messagesToMove);
+            }
+
+            // Retrieve new messages in target folder
+            toFolder.open(READ_ONLY);
+            javax.mail.Message[] newMessages;
+            int retries = 5;
+            final long sleepTimeMillis = 100L;
+            do { // copy operation may not have finished, wait a little
+                newMessages = toFolder.getMessagesByUID(toFolderNextUID, UIDFolder.LASTUID);
+                Thread.sleep(sleepTimeMillis);
+            } while(newMessages.length == 0 && retries > 0);
+            envelopeFetch(toFolder, newMessages);
+            final List<Message> ret = Stream.of(newMessages)
+                    .map(m -> Message.from(toFolder, (IMAPMessage)m))
+                    .sorted(Comparator.comparingLong(Message::getUid).reversed())
+                    .collect(Collectors.toList());
+            fromFolder.close(false);
+            toFolder.close(false);
+            return ret;
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            log.error("Error moving messages when waiting for COPY to complete", ex);
+            throw new IsotopeException(ex.getMessage(), ex);
+
+        } catch (MessagingException ex) {
+            log.error("Error moving messages", ex);
+            log.debug("Error moving messages from folder {} to folder {}", fromFolderId, toFolderId);
+            throw new IsotopeException(ex.getMessage(), ex);
+        }
     }
 
     @PreDestroy
@@ -209,6 +247,93 @@ public class ImapService {
                 log.error("Error closing IMAP Store", ex);
             }
         }
+    }
+
+
+    private IMAPStore getImapStore(Credentials credentials) throws MessagingException {
+        if (imapStore == null) {
+            final Session session = Session.getInstance(initMailProperties(), null);
+            imapStore = (IMAPSSLStore) session.getStore(IMAPS_PROTOCOL);
+            imapStore.connect(
+                    credentials.getServerHost(),
+                    credentials.getServerPort(),
+                    credentials.getUser(),
+                    credentials.getPassword());
+        }
+        return imapStore;
+    }
+
+    private Properties initMailProperties() {
+        final Properties ret = new Properties();
+        ret.put("mail.smtp.ssl.enable", true);
+        ret.put("mail.imap.ssl.enable", true);
+        ret.put("mail.smtp.starttls.enable", true);
+        ret.put("mail.imap.starttls.enable", true);
+
+        ret.put("mail.smtps.socketFactory.class", AllowAllSSLSocketFactory.class.getName());
+        ret.put("mail.imaps.socketFactory.class", AllowAllSSLSocketFactory.class.getName());
+
+        ret.put("mail.smtps.socketFactory.fallback", false);
+        ret.put("mail.imaps.socketFactory.fallback", false);
+
+        ret.put("mail.smtps.auth", true);
+
+        return ret;
+    }
+
+    /**
+     * Fetches the envelope and basic "lightweight" fields from the provided {@link javax.mail.Message} array.
+     *
+     * @param folder the folder where the messages are located
+     * @param messages array of messages for which to fetch information
+     * @throws MessagingException for other javax.mail failures
+     */
+    private static void envelopeFetch(javax.mail.Folder folder, javax.mail.Message[] messages)
+    throws MessagingException {
+
+        final FetchProfile fp = new FetchProfile();
+        fp.add(FetchProfile.Item.ENVELOPE);
+        fp.add(UIDFolder.FetchProfileItem.UID);
+        fp.add(IMAPFolder.FetchProfileItem.HEADERS);
+        fp.add(FetchProfile.Item.FLAGS);
+        fp.add(FetchProfile.Item.SIZE);
+        folder.fetch(messages, fp);
+    }
+
+    private List<Message> getMessages(
+            @NonNull IMAPFolder folder, @Nullable Integer start, @Nullable Integer end, boolean fetchModseq)
+            throws MessagingException {
+
+        if (!folder.isOpen()) {
+            folder.open(READ_ONLY);
+        }
+        final javax.mail.Message[] messages;
+        if (start != null && end != null) {
+            // start / end message counts may no longer match, recalculate index if necessary
+            if (end > folder.getMessageCount()) {
+                start = folder.getMessageCount() - (end - start);
+                end = folder.getMessageCount();
+            }
+            messages = folder.getMessages(start < 1 ? 1 : start, end);
+        } else {
+            messages = folder.getMessages();
+        }
+        envelopeFetch(folder, messages);
+        final Long highestModseq;
+        if (fetchModseq) {
+            highestModseq = folder.getHighestModSeq() == -1L ?
+                    ((IMAPMessage) messages[messages.length - 1]).getModSeq() : folder.getHighestModSeq();
+        } else {
+            highestModseq = null;
+        }
+        return Stream.of(messages)
+                .map(m -> Message.from(folder, (IMAPMessage)m))
+                .map(m -> {
+                    m.setModseq(highestModseq);
+                    return m;
+                })
+                .sorted(Comparator.comparingLong(Message::getUid).reversed())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -251,38 +376,6 @@ public class ImapService {
         }
         return attachments;
     }
-
-    private IMAPStore getImapStore(Credentials credentials) throws MessagingException {
-        if (imapStore == null) {
-            final Session session = Session.getInstance(initMailProperties(), null);
-            imapStore = (IMAPSSLStore) session.getStore(IMAPS_PROTOCOL);
-            imapStore.connect(
-                    credentials.getServerHost(),
-                    credentials.getServerPort(),
-                    credentials.getUser(),
-                    credentials.getPassword());
-        }
-        return imapStore;
-    }
-
-    private Properties initMailProperties() {
-        final Properties ret = new Properties();
-        ret.put("mail.smtp.ssl.enable", true);
-        ret.put("mail.imap.ssl.enable", true);
-        ret.put("mail.smtp.starttls.enable", true);
-        ret.put("mail.imap.starttls.enable", true);
-
-        ret.put("mail.smtps.socketFactory.class", AllowAllSSLSocketFactory.class.getName());
-        ret.put("mail.imaps.socketFactory.class", AllowAllSSLSocketFactory.class.getName());
-
-        ret.put("mail.smtps.socketFactory.fallback", false);
-        ret.put("mail.imaps.socketFactory.fallback", false);
-
-        ret.put("mail.smtps.auth", true);
-
-        return ret;
-    }
-
 
     private static BodyPart getBodypart(@NonNull Multipart mp, @NonNull String id, Boolean contentId)
             throws MessagingException, IOException {
@@ -348,17 +441,17 @@ public class ImapService {
      *
      * If no occurrences are found, same content is returned.
      *
-     * @param content
-     * @param imageBodyPart
-     * @return
-     * @throws MessagingException
-     * @throws IOException
+     * @param content e-mail message content to replace cid urls
+     * @param imageBodyPart body part of the replaceable cid url
+     * @return a string with the original content with replaced image cid urls
+     * @throws MessagingException for javax.mail failures
+     * @throws IOException for IO failures
      */
     private static String replaceEmbeddedImage(String content, MimeBodyPart imageBodyPart)
             throws MessagingException, IOException {
 
         final String cid = imageBodyPart.getContentID().replaceAll("[<>]", "");
-        if (content != null && cid != null && content.contains(cid)) {
+        if (content != null && content.contains(cid)) {
             String contentType = imageBodyPart.getContentType();
             if (contentType.contains(";")) {
                 contentType = contentType.substring(0, contentType.indexOf(';'));

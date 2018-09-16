@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import Spinner from '../spinner/spinner';
 import FolderList from './folder-list';
-import {resetFolderMessagesCache, updateFolderMessagesCache} from '../../services/message';
+import {moveMessage, resetFolderMessagesCache, updateFolderMessagesCache} from '../../services/message';
 import {selectFolder, selectMessage} from '../../actions/application';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
@@ -21,7 +21,9 @@ class FolderContainer extends Component {
           canvasClassName={styles.spinnerCanvas} />
         <FolderList folderList={this.props.folderList}
           selectedFolder={this.props.selectedFolder}
-          onClickFolder={this.props.selectFolder.bind(this, this.abortControllerWrapper)} />
+          onClickFolder={this.props.selectFolder.bind(this, this.abortControllerWrapper)}
+          onDropMessage={this.props.moveMessage}
+        />
       </nav>
     );
   }
@@ -57,13 +59,18 @@ const mapDispatchToProps = dispatch => ({
         folder.messageCount - initialLoadMessageCount, folder.messageCount);
     }
     resetFolderMessagesCache(dispatch, credentials, folder, abortControllerWrapper.abortController.signal);
+  },
+  moveMessage: (credentials, fromFolder, toFolder, message) => {
+    moveMessage(dispatch, credentials, fromFolder, toFolder, message);
   }
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
   selectFolder: (abortControllerWrapper, folder) =>
     dispatchProps.selectFolder(abortControllerWrapper, folder, stateProps.application.user.credentials,
-      stateProps.messages.cache[folder.folderId])
+      stateProps.messages.cache[folder.folderId]),
+  moveMessage: (fromFolder, toFolder, message) => dispatchProps.moveMessage(stateProps.application.user.credentials,
+    fromFolder, toFolder, message)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(FolderContainer);

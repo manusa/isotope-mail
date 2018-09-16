@@ -7,7 +7,7 @@ package com.marcnuri.isotope.api.message;
 
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.resource.IsotopeResource;
-import com.sun.mail.imap.IMAPMessage;
+import com.sun.mail.imap.IMAPMessage; //NOSONAR
 
 import javax.mail.*;
 import javax.mail.Message.RecipientType;
@@ -33,6 +33,8 @@ public class Message extends IsotopeResource implements Serializable {
     private static final String CET_ZONE_ID = "CET";
 
     private Long uid;
+    private String messageId;
+    private Long modseq;
     private List<String> from;
     private List<Recipient> recipients;
     private String subject;
@@ -50,6 +52,22 @@ public class Message extends IsotopeResource implements Serializable {
 
     public void setUid(Long uid) {
         this.uid = uid;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
+    }
+
+    public Long getModseq() {
+        return modseq;
+    }
+
+    public void setModseq(Long modseq) {
+        this.modseq = modseq;
     }
 
     public List<String> getFrom() {
@@ -139,6 +157,8 @@ public class Message extends IsotopeResource implements Serializable {
         if (!super.equals(o)) return false;
         Message message = (Message) o;
         return Objects.equals(uid, message.uid) &&
+                Objects.equals(messageId, message.messageId) &&
+                Objects.equals(modseq, message.modseq) &&
                 Objects.equals(from, message.from) &&
                 Objects.equals(recipients, message.recipients) &&
                 Objects.equals(subject, message.subject) &&
@@ -154,7 +174,7 @@ public class Message extends IsotopeResource implements Serializable {
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), uid, from, recipients, subject, receivedDate, size, seen, recent, deleted, content, attachments);
+        return Objects.hash(super.hashCode(), uid, messageId, modseq, from, recipients, subject, receivedDate, size, seen, recent, deleted, content, attachments);
     }
 
     /**
@@ -165,9 +185,9 @@ public class Message extends IsotopeResource implements Serializable {
      *
      * To map other fields use a separate method.
      *
-     * @param folder
-     * @param imapMessage
-     * @return
+     * @param folder where the message is located
+     * @param imapMessage original message to map
+     * @return mapped Message with fulfilled envelope fields
      */
     public static <F extends Folder & UIDFolder> Message from(F folder, IMAPMessage imapMessage) {
         final Message ret;
@@ -175,6 +195,7 @@ public class Message extends IsotopeResource implements Serializable {
             ret = new Message();
             try {
                 ret.setUid(folder.getUID(imapMessage));
+                ret.setMessageId(imapMessage.getMessageID());
                 ret.setFrom(processAddress(imapMessage.getFrom()));
                 // Process only recipients received in ENVELOPE (don't use getAllRecipients)
                 ret.setRecipients(Stream.of(

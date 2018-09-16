@@ -25,4 +25,16 @@ export const updateCache = (folder, messages) => ({
   payload: {folder, messages}
 });
 
+/**
+ * Delete messages from state folder's messages cache.
+ *
+ * @param folder from which the messages will be deleted
+ * @param messages {Array} array of messages to delete from the folder's cache
+ * @returns {{type: string, payload: {folder: *, messages: *}}}
+ */
+export const deleteFromCache = (folder, messages) => ({
+  type: ActionTypes.MESSAGES_DELETE_FROM_CACHE,
+  payload: {folder, messages}
+});
+
 export const addMessage = message => ({type: ActionTypes.ADD_MESSAGE, payload: message});
