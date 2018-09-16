@@ -15,7 +15,10 @@ import com.marcnuri.isotope.api.exception.NotFoundException;
 import com.marcnuri.isotope.api.folder.Folder;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
-import com.sun.mail.imap.*; //NOSONAR
+import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPMessage;
+import com.sun.mail.imap.IMAPSSLStore;
+import com.sun.mail.imap.IMAPStore;
 import org.apache.commons.io.IOUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -33,15 +36,13 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.marcnuri.isotope.api.folder.Folder.toBase64Id;
 import static com.marcnuri.isotope.api.folder.FolderResource.addLinks;
+import static com.marcnuri.isotope.api.message.MessageUtils.envelopeFetch;
 import static javax.mail.Folder.READ_ONLY;
 import static javax.mail.Folder.READ_WRITE;
 
@@ -199,6 +200,7 @@ public class ImapService {
             // Maximize IMAP compatibility, perform COPY and DELETE
             final javax.mail.Message[] messagesToMove = Stream.of(fromFolder.getMessagesByUID(
                     uids.stream().mapToLong(Long::longValue).toArray()))
+                    .filter(Objects::nonNull)
                     .filter(m -> !m.isExpunged())
                     .toArray(javax.mail.Message[]::new);
             if (messagesToMove.length > 0) {
@@ -211,17 +213,17 @@ public class ImapService {
 
             // Retrieve new messages in target folder
             toFolder.open(READ_ONLY);
+            // copy operation may not have finished, wait a little
             javax.mail.Message[] newMessages;
             int retries = 5;
             final long sleepTimeMillis = 100L;
-            do { // copy operation may not have finished, wait a little
-                newMessages = toFolder.getMessagesByUID(toFolderNextUID, UIDFolder.LASTUID);
+            while((newMessages = toFolder.getMessagesByUID(toFolderNextUID, UIDFolder.LASTUID)).length == 0
+                    && retries-- > 0) {
                 Thread.sleep(sleepTimeMillis);
-            } while(newMessages.length == 0 && retries > 0);
+            }
             envelopeFetch(toFolder, newMessages);
             final List<Message> ret = Stream.of(newMessages)
                     .map(m -> Message.from(toFolder, (IMAPMessage)m))
-                    .sorted(Comparator.comparingLong(Message::getUid).reversed())
                     .collect(Collectors.toList());
             fromFolder.close(false);
             toFolder.close(false);
@@ -248,7 +250,6 @@ public class ImapService {
             }
         }
     }
-
 
     private IMAPStore getImapStore(Credentials credentials) throws MessagingException {
         if (imapStore == null) {
@@ -281,25 +282,6 @@ public class ImapService {
         return ret;
     }
 
-    /**
-     * Fetches the envelope and basic "lightweight" fields from the provided {@link javax.mail.Message} array.
-     *
-     * @param folder the folder where the messages are located
-     * @param messages array of messages for which to fetch information
-     * @throws MessagingException for other javax.mail failures
-     */
-    private static void envelopeFetch(javax.mail.Folder folder, javax.mail.Message[] messages)
-    throws MessagingException {
-
-        final FetchProfile fp = new FetchProfile();
-        fp.add(FetchProfile.Item.ENVELOPE);
-        fp.add(UIDFolder.FetchProfileItem.UID);
-        fp.add(IMAPFolder.FetchProfileItem.HEADERS);
-        fp.add(FetchProfile.Item.FLAGS);
-        fp.add(FetchProfile.Item.SIZE);
-        folder.fetch(messages, fp);
-    }
-
     private List<Message> getMessages(
             @NonNull IMAPFolder folder, @Nullable Integer start, @Nullable Integer end, boolean fetchModseq)
             throws MessagingException {
@@ -320,7 +302,7 @@ public class ImapService {
         }
         envelopeFetch(folder, messages);
         final Long highestModseq;
-        if (fetchModseq) {
+        if (fetchModseq && messages.length > 0) {
             highestModseq = folder.getHighestModSeq() == -1L ?
                     ((IMAPMessage) messages[messages.length - 1]).getModSeq() : folder.getHighestModSeq();
         } else {
