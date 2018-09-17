@@ -185,15 +185,18 @@ public class Message extends IsotopeResource implements Serializable {
      *
      * To map other fields use a separate method.
      *
+     * @param clazz Class of the new Message instance
      * @param folder where the message is located
      * @param imapMessage original message to map
      * @return mapped Message with fulfilled envelope fields
      */
-    public static <F extends Folder & UIDFolder> Message from(F folder, IMAPMessage imapMessage) {
-        final Message ret;
+    public static <M extends Message, F extends Folder & UIDFolder> M from(
+            Class<M> clazz, F folder, IMAPMessage imapMessage) {
+
+        final M ret;
         if (imapMessage != null) {
-            ret = new Message();
             try {
+                ret = clazz.newInstance();
                 ret.setUid(folder.getUID(imapMessage));
                 ret.setMessageId(imapMessage.getMessageID());
                 ret.setFrom(processAddress(imapMessage.getFrom()));
@@ -210,13 +213,17 @@ public class Message extends IsotopeResource implements Serializable {
                 ret.setSeen(flags.contains(Flags.Flag.SEEN));
                 ret.setRecent(flags.contains(Flags.Flag.RECENT));
                 ret.setDeleted(flags.contains(Flags.Flag.DELETED));
-            } catch (MessagingException e) {
-                throw new IsotopeException("Error parsing IMAP Message");
+            } catch (ReflectiveOperationException | MessagingException e) {
+                throw new IsotopeException("Error parsing IMAP Message", e);
             }
         } else {
             ret = null;
         }
         return ret;
+    }
+
+    public static <F extends Folder & UIDFolder> Message from(F folder, IMAPMessage imapMessage) {
+        return from(Message.class, folder, imapMessage);
     }
 
     private static List<Recipient> processAddress(RecipientType recipient, Address... addresses) {

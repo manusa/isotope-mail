@@ -15,6 +15,7 @@ import com.marcnuri.isotope.api.exception.NotFoundException;
 import com.marcnuri.isotope.api.folder.Folder;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
+import com.marcnuri.isotope.api.message.MessageWithFolder;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPSSLStore;
@@ -188,13 +189,13 @@ public class ImapService {
      * @param uids list of uids to move
      * @return list of new messages in the target folder since the move operation started (may include additional messages)
      */
-    public List<Message> moveMessages(Credentials credentials, URLName fromFolderId, URLName toFolderId, List<Long> uids) {
+    public List<MessageWithFolder> moveMessages(Credentials credentials, URLName fromFolderId, URLName toFolderId, List<Long> uids) {
         try {
             final IMAPFolder fromFolder = (IMAPFolder)getImapStore(credentials).getFolder(fromFolderId);
             fromFolder.open(READ_WRITE);
             final IMAPFolder toFolder = (IMAPFolder)getImapStore(credentials).getFolder(toFolderId);
             toFolder.open(READ_ONLY);
-            long toFolderNextUID = fromFolder.getUIDNext();
+            long toFolderNextUID = toFolder.getUIDNext();
             toFolder.close(false);
 
             // Maximize IMAP compatibility, perform COPY and DELETE
@@ -222,8 +223,8 @@ public class ImapService {
                 Thread.sleep(sleepTimeMillis);
             }
             envelopeFetch(toFolder, newMessages);
-            final List<Message> ret = Stream.of(newMessages)
-                    .map(m -> Message.from(toFolder, (IMAPMessage)m))
+            final List<MessageWithFolder> ret = Stream.of(newMessages)
+                    .map(m -> MessageWithFolder.from(toFolder, (IMAPMessage)m))
                     .collect(Collectors.toList());
             fromFolder.close(false);
             toFolder.close(false);

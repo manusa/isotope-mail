@@ -9,9 +9,11 @@ import {
   setFolderCache,
   updateCache
 } from '../actions/messages';
-import {abortFetch, credentialsHeaders, toJson} from './fetch';
-import {persistMessageCache} from './indexed-db';
 import {refreshMessage} from '../actions/application';
+import {updateFolder} from '../actions/folders';
+import {abortFetch, credentialsHeaders, toJson} from './fetch';
+import {processFolders} from './folder';
+import {persistMessageCache} from './indexed-db';
 import {KEY_HASH, KEY_USER_ID} from './state';
 
 /**
@@ -169,6 +171,7 @@ export function moveMessage(dispatch, credentials, fromFolder, toFolder, message
     .then(newMessages => {
       if (Array.isArray(newMessages)) {
         dispatch(updateCache(toFolder, newMessages));
+        newMessages.forEach(m => dispatch(updateFolder(processFolders([m.folder])[0])));
       }
     })
     .catch(() => {

@@ -9,6 +9,7 @@ import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.imap.ImapService;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
+import com.marcnuri.isotope.api.message.MessageWithFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
@@ -90,14 +91,17 @@ public class FolderResource {
     }
 
     @PutMapping(path = "/{fromFolderId}/messages/{messageId}/folder/{toFolderId}")
-    public ResponseEntity<List<Message>> moveMessage(
+    public ResponseEntity<List<MessageWithFolder>> moveMessage(
             HttpServletRequest request, @PathVariable("fromFolderId") String fromFolderId,
             @PathVariable("messageId") Long messageId, @PathVariable("toFolderId") String toFolderId) {
 
         log.debug("Moving message {} from folder {} to folder {}", messageId, fromFolderId, toFolderId);
-        return ResponseEntity.ok(addLinks(toFolderId, imapServiceFactory.getObject().moveMessages(
+        final List<MessageWithFolder> movedMessages = imapServiceFactory.getObject().moveMessages(
                 credentialsService.fromRequest(request), Folder.toId(fromFolderId), Folder.toId(toFolderId),
-                Arrays.asList(messageId))));
+                Arrays.asList(messageId));
+        movedMessages.forEach(mwf -> addLinks(mwf.getFolder()));
+        addLinks(toFolderId, movedMessages);
+        return ResponseEntity.ok(movedMessages);
     }
 
     private static Folder[] addLinks(Folder... folders) {
@@ -118,17 +122,17 @@ public class FolderResource {
         return folder;
     }
 
-    private static Message[] addLinks(String folderId, Message... messages) {
+    private static <M extends Message> M[] addLinks(String folderId, M... messages) {
         Stream.of(messages).forEach(m -> addLinks(folderId, m));
         return messages;
     }
 
-    private static List<Message> addLinks(String folderId, List<Message> messages) {
+    private static <M extends Message> List<M> addLinks(String folderId, List<M> messages) {
         messages.forEach(m -> addLinks(folderId, m));
         return messages;
     }
 
-    private static Message addLinks(String folderId, Message message) {
+    private static <M extends Message> M addLinks(String folderId, M message) {
         message.add(linkTo(methodOn(FolderResource.class).getMessage(null, folderId, message.getUid()))
                 .withSelfRel().expand());
         message.add(linkTo(methodOn(FolderResource.class).moveMessage(null, folderId, message.getUid(),
