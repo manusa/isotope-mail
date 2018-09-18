@@ -117,7 +117,7 @@ public class ImapService {
         }
     }
 
-    public Message getMessage(Credentials credentials, URLName folderId, Long uid) {
+    public MessageWithFolder getMessage(Credentials credentials, URLName folderId, Long uid) {
         try {
             final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
             if (!folder.isOpen()) {
@@ -129,7 +129,7 @@ public class ImapService {
                 throw new NotFoundException("Message not found");
             }
             imapMessage.setFlag(Flags.Flag.SEEN, true);
-            final Message ret = Message.from(folder, imapMessage);
+            final MessageWithFolder ret = MessageWithFolder.from(folder, imapMessage);
             final Object content = imapMessage.getContent();
             if (content instanceof Multipart) {
                 ret.setContent(extractContent((Multipart) content));
@@ -224,7 +224,7 @@ public class ImapService {
             }
             envelopeFetch(toFolder, newMessages);
             final List<MessageWithFolder> ret = Stream.of(newMessages)
-                    .map(m -> MessageWithFolder.from(toFolder, (IMAPMessage)m))
+                    .map(m -> MessageWithFolder.from(toFolder, true, (IMAPMessage)m))
                     .collect(Collectors.toList());
             fromFolder.close(false);
             toFolder.close(false);

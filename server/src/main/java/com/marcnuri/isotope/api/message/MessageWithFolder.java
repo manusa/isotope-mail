@@ -43,9 +43,14 @@ public class MessageWithFolder extends Message {
         return Objects.hash(super.hashCode(), folder);
     }
 
+
     public static MessageWithFolder from(IMAPFolder folder, IMAPMessage imapMessage) {
+        return from(folder, true, imapMessage);
+    }
+
+    public static MessageWithFolder from(IMAPFolder folder, boolean loadChildrenFolders, IMAPMessage imapMessage) {
         final MessageWithFolder ret = from(MessageWithFolder.class, folder, imapMessage);
-        ret.setFolder(Folder.from(folder, false));
+        ret.setFolder(Folder.from(folder, loadChildrenFolders));
         return ret;
     }
 

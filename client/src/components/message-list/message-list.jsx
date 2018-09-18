@@ -79,11 +79,11 @@ MessageList.defaultProps = {
 
 const mapStateToProps = state => ({
   credentials: state.application.user.credentials,
-  selectedFolder: state.application.selectedFolder,
+  selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || {},
   activeRequests: state.messages.activeRequests,
-  messages: state.application.selectedFolder.folderId
-    && state.messages.cache[state.application.selectedFolder.folderId] ?
-    Array.from(state.messages.cache[state.application.selectedFolder.folderId].values())
+  messages: state.application.selectedFolderId
+    && state.messages.cache[state.application.selectedFolderId] ?
+    Array.from(state.messages.cache[state.application.selectedFolderId].values())
       .sort((a, b) => {
         if (a.receivedDate > b.receivedDate) {
           return -1;

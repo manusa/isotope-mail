@@ -23,7 +23,7 @@ function addressGroups(address) {
 class MessageViewer extends Component {
   render() {
     const t = this.props.t;
-    const folder = this.props.selectedFolder;
+    const folder = this.props.currentFolder;
     const message = this.props.selectedMessage;
     const firstFrom = addressGroups(message.from && message.from.length > 0 ? message.from[0] : '');
     const to = message.recipients.filter(r => r.type === 'To');
@@ -84,7 +84,7 @@ MessageViewer.defaultProps = {
 
 const mapStateToProps = state => ({
   activeRequests: state.application.activeRequests,
-  selectedFolder: state.application.selectedFolder,
+  currentFolder: state.folders.explodedItems[state.application.selectedFolderId] || {},
   selectedMessage: state.application.selectedMessage
 });
 

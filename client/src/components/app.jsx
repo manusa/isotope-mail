@@ -65,7 +65,7 @@ class App extends Component {
 
   startPoll() {
     // Start polling when everything is ready
-    if (this.props.application.selectedFolder.folderId && this.props.folders.items.length > 0
+    if (this.props.application.selectedFolderId && Object.keys(this.props.folders.explodedItems).length > 0
       && !this.pollStarted) {
       this.pollStarted = true;
       this.refreshPoll();
@@ -80,7 +80,8 @@ class App extends Component {
   async refreshPoll() {
     try {
       const folderPromise = this.props.reloadFolders();
-      const messagePromise = this.props.reloadMessageCache(this.props.application.selectedFolder);
+      const selectedFolder = this.props.folders.explodedItems[this.props.application.selectedFolderId] || {};
+      const messagePromise = this.props.reloadMessageCache(selectedFolder);
       await Promise.all([folderPromise, messagePromise]);
     } catch (e) {
       console.log(`Error in refresh poll: ${e}`);

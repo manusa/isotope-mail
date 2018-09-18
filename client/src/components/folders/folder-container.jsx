@@ -27,13 +27,13 @@ class FolderContainer extends Component {
 FolderContainer.propTypes = {
   activeRequests: PropTypes.number.isRequired,
   folderList: PropTypes.array.isRequired,
-  selectFolder: PropTypes.func
+  selectedFolder: PropTypes.object
 };
 
 const mapStateToProps = state => ({
   application: state.application,
   activeRequests: state.folders.activeRequests,
-  selectedFolder: state.application.selectedFolder,
+  selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || {},
   folderList: state.folders.items,
   messages: state.messages
 });

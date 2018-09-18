@@ -84,9 +84,6 @@ export async function recoverState(userId, hash) {
   recoveredState.messages.cache = await _recoverMessageCache(userId, hash);
   //  Process folders
   recoveredState.folders.items = processFolders(recoveredState.folders.items);
-  if (recoveredState.application.selectedFolder) {
-    recoveredState.application.selectedFolder = processFolders([recoveredState.application.selectedFolder])[0];
-  }
   db.close();
   return recoveredState;
 }

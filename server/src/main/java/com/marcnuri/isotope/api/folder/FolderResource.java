@@ -70,7 +70,7 @@ public class FolderResource {
     }
 
     @GetMapping(path = "/{folderId}/messages/{messageId}")
-    public ResponseEntity<Message> getMessage(
+    public ResponseEntity<MessageWithFolder> getMessage(
             HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId) {
 
         log.debug("Loading message {} from folder {}", messageId, folderId);

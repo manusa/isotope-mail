@@ -49,6 +49,19 @@ export function processFolders(initialFolders) {
   return folders;
 }
 
+/**
+ * Builds an object containing all of the folders and their children at the same level
+ */
+export function explodeFolders(originalFolders, explodedFolders = {}) {
+  originalFolders.forEach(f => {
+    explodedFolders[f.folderId] = f;
+    if (f.children && f.children.length > 0) {
+      explodeFolders(f.children, explodedFolders);
+    }
+  });
+  return explodedFolders;
+}
+
 export async function getFolders(dispatch, credentials, loadChildren) {
   abortFetch(abortControllerWrappers.getFoldersAbortController);
   abortControllerWrappers.getFoldersAbortController = new AbortController();

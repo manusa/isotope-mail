@@ -1,10 +1,11 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import {FolderTypes} from '../../services/folder';
 import {selectMessage} from '../../actions/application';
+import {moveMessage} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
-import {FolderTypes} from '../../services/folder';
 
 class TopBar extends Component {
   constructor(props) {
@@ -43,6 +44,17 @@ class TopBar extends Component {
               <span className={mainCss['mdc-top-app-bar__title']}>{title}</span>
             }
           </section>
+          <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-end']}`}>
+            {isMessageViewer ?
+              <button
+                onClick={this.props.deleteMessage}
+                className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
+                delete
+              </button>
+              :
+              null
+            }
+          </section>
         </div>
       </header>
     );
@@ -59,12 +71,30 @@ TopBar.propTypes = {
 
 const mapStateToProps = state => ({
   title: state.application.title,
-  selectedFolder: state.application.selectedFolder,
-  selectedMessage: state.application.selectedMessage
+  selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || null,
+  selectedMessage: state.application.selectedMessage,
+  credentials: state.application.user.credentials,
+  folders: state.folders
 });
 
 const mapDispatchToProps = dispatch => ({
-  selectMessage: message => dispatch(selectMessage(message))
+  selectMessage: message => dispatch(selectMessage(message)),
+  deleteMessage: (credentials, folders, selectedFolder, selectedMessage) => {
+    let trashFolder = Object.values(folders.explodedItems).find(f => f.type === FolderTypes.TRASH);
+    if (!trashFolder) {
+      trashFolder = folders.items.find(f => f.name.toUpperCase() === 'TRASH');
+    }
+    if (selectedMessage && selectedFolder && trashFolder) {
+      moveMessage(dispatch, credentials, selectedFolder, trashFolder, selectedMessage);
+      dispatch(selectMessage(null));
+    }
+  }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(TopBar);
+const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
+  deleteMessage: () =>
+    dispatchProps.deleteMessage(
+      stateProps.credentials, stateProps.folders, stateProps.selectedFolder, stateProps.selectedMessage)
+}));
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(TopBar);

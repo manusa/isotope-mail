@@ -114,6 +114,8 @@ export function readMessage(dispatch, credentials, folder, message) {
       .then(toJson)
       .then(completeMessage => {
         dispatch(refreshMessage(folder, completeMessage));
+        // Update folder with freshest information
+        dispatch(updateFolder(processFolders([completeMessage.folder])[0]));
         // Update folder cache with message marked as read (don't store content in cache)
         const messageWithNoContent = {...completeMessage};
         delete messageWithNoContent.content;

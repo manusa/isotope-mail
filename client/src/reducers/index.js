@@ -7,7 +7,7 @@ export const INITIAL_STATE = {
   application: {
     title: 'Isotope Mail Client',
     user: {},
-    selectedFolder: {},
+    selectedFolderId: {},
     selectedMessage: null,
     pollInterval: 15000,
     errors: {
@@ -17,6 +17,7 @@ export const INITIAL_STATE = {
   },
   folders: {
     items: [],
+    explodedItems: {},
     activeRequests: 0
   },
   messages: {

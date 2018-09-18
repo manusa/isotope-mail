@@ -1,7 +1,7 @@
 import {INITIAL_STATE} from './';
 import {ActionTypes} from '../actions/action-types';
 
-const application = (state = INITIAL_STATE.application, action) => {
+const application = (state = INITIAL_STATE.application, action = {}) => {
   switch (action.type) {
     case ActionTypes.APPLICATION_BE_REQUEST:
       return {...state, activeRequests: state.activeRequests + 1};
@@ -15,11 +15,15 @@ const application = (state = INITIAL_STATE.application, action) => {
         }
       };
     case ActionTypes.APPLICATION_FOLDER_SELECT:
-      return {...state, selectedFolder: {...action.payload}};
+      return {
+        ...state,
+        selectedFolderId: action.payload.folderId,
+        selectedFolder: {...action.payload}
+      };
     case ActionTypes.APPLICATION_MESSAGE_SELECT:
       return {...state, selectedMessage: {...action.payload}};
     case ActionTypes.APPLICATION_MESSAGE_REFRESH:
-      if (state.selectedFolder.folderId === action.payload.folder.folderId
+      if (state.selectedFolderId === action.payload.folder.folderId
         && state.selectedMessage.uid === action.payload.message.uid) {
         return {...state, selectedMessage: {...action.payload.message}};
       }
@@ -36,12 +40,12 @@ const application = (state = INITIAL_STATE.application, action) => {
     }
     case ActionTypes.APPLICATION_ERROR_SET:
       const errorsSetState = {...state};
-      errorsSetState.errors = {...state.erro}
+      errorsSetState.errors = {...state.errors};
       errorsSetState.errors[action.payload.type] = action.payload.value;
       return errorsSetState;
     default:
       return state;
   }
-}
+};
 
 export default application;
