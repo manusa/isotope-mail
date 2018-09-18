@@ -1,5 +1,5 @@
 import {backendRequest, setFolders} from '../actions/folders';
-import {abortFetch, credentialsHeaders, toJson} from './fetch';
+import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 
 export const FolderTypes = Object.freeze({
   INBOX: {serverName: 'INBOX', icon: 'inbox', position: 0},
@@ -8,14 +8,6 @@ export const FolderTypes = Object.freeze({
   TRASH: {attribute: '\\Trash', icon: 'delete', position: 3},
   FOLDER: {icon: 'folder'}
 });
-
-/**
- * Object to store the different AbortController(s) that will be used in the service methods to fetch from the API backend.
- *
- * @type {Object}
- * @private
- */
-const _abortControllerWrappers = {};
 
 /**
  * Processes an initial folder list and adds the corresponding {@link FolderTypes}
@@ -58,9 +50,9 @@ export function processFolders(initialFolders) {
 }
 
 export async function getFolders(dispatch, credentials, loadChildren) {
-  abortFetch(_abortControllerWrappers.getFoldersAbortController);
-  _abortControllerWrappers.getFoldersAbortController = new AbortController();
-  const signal = _abortControllerWrappers.getFoldersAbortController.signal;
+  abortFetch(abortControllerWrappers.getFoldersAbortController);
+  abortControllerWrappers.getFoldersAbortController = new AbortController();
+  const signal = abortControllerWrappers.getFoldersAbortController.signal;
 
   const url = new URL('/api/v1/folders', window.location.origin);
   if (loadChildren) {

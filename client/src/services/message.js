@@ -11,18 +11,10 @@ import {
 } from '../actions/messages';
 import {refreshMessage} from '../actions/application';
 import {updateFolder} from '../actions/folders';
-import {abortFetch, credentialsHeaders, toJson} from './fetch';
+import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 import {processFolders} from './folder';
 import {persistMessageCache} from './indexed-db';
 import {KEY_HASH, KEY_USER_ID} from './state';
-
-/**
- * Object to store the different AbortController(s) that will be used in the service methods to fetch from the API backend.
- *
- * @type {Object}
- * @private
- */
-const _abortControllerWrappers = {};
 
 function _readContent(dispatch, credentials, folder, message, signal, attachment) {
   fetch(attachment._links.download.href, {
@@ -41,13 +33,12 @@ function _readContent(dispatch, credentials, folder, message, signal, attachment
  * @param dispatch
  * @param credentials
  * @param folder
- * @param signal {AbortSignal}
  */
 export async function resetFolderMessagesCache(dispatch, credentials, folder) {
   if (folder && folder._links) {
-    abortFetch(_abortControllerWrappers.resetFolderMessagesCacheAbortController);
-    _abortControllerWrappers.resetFolderMessagesCacheAbortController = new AbortController();
-    const signal = _abortControllerWrappers.resetFolderMessagesCacheAbortController.signal;
+    abortFetch(abortControllerWrappers.resetFolderMessagesCacheAbortController);
+    abortControllerWrappers.resetFolderMessagesCacheAbortController = new AbortController();
+    const signal = abortControllerWrappers.resetFolderMessagesCacheAbortController.signal;
 
     dispatch(backendRequest());
     return fetch(folder._links.messages.href, {
@@ -71,9 +62,9 @@ export async function resetFolderMessagesCache(dispatch, credentials, folder) {
 }
 
 export function updateFolderMessagesCache(dispatch, credentials, folder, start, end) {
-  abortFetch(_abortControllerWrappers.updateFolderMessagesCacheAbortController);
-  _abortControllerWrappers.updateFolderMessagesCacheAbortController = new AbortController();
-  const signal = _abortControllerWrappers.updateFolderMessagesCacheAbortController.signal;
+  abortFetch(abortControllerWrappers.updateFolderMessagesCacheAbortController);
+  abortControllerWrappers.updateFolderMessagesCacheAbortController = new AbortController();
+  const signal = abortControllerWrappers.updateFolderMessagesCacheAbortController.signal;
 
   const url = new URL(folder._links.messages.href);
   if (start >= 0 && end >= 0) {
@@ -106,9 +97,9 @@ export function updateFolderMessagesCache(dispatch, credentials, folder, start, 
 export function readMessage(dispatch, credentials, folder, message) {
   // Abort + signal
   if (message && message._links) {
-    abortFetch(_abortControllerWrappers.readMessageAbortController);
-    _abortControllerWrappers.readMessageAbortController = new AbortController();
-    const signal = _abortControllerWrappers.readMessageAbortController.signal;
+    abortFetch(abortControllerWrappers.readMessageAbortController);
+    abortControllerWrappers.readMessageAbortController = new AbortController();
+    const signal = abortControllerWrappers.readMessageAbortController.signal;
 
     dispatch(aBackendRequest());
     fetch(message._links.self.href, {
@@ -161,8 +152,20 @@ export function downloadAttachment(credentials, attachment) {
 }
 
 export function moveMessage(dispatch, credentials, fromFolder, toFolder, message) {
-  abortFetch(_abortControllerWrappers.resetFolderMessagesCacheAbortController);
+  // Abort any operations that can affect operation result
+  abortFetch(abortControllerWrappers.resetFolderMessagesCacheAbortController);
+  abortFetch(abortControllerWrappers.getFoldersAbortController);
+
+  // Calculate new fromFolder values
+  const fromFolderUpdated = {
+    ...fromFolder,
+    messageCount: fromFolder.messageCount - 1,
+    unreadMessageCount: fromFolder.unreadMessageCount - (message.seen ? 0 : 1),
+    newMessageCount: fromFolder.newMessageCount - (message.recent ? 1 : 0)
+  };
+
   dispatch(deleteFromCache(fromFolder, [message]));
+  dispatch(updateFolder(fromFolderUpdated));
   fetch(message._links.move.href.replace('{toFolderId}', toFolder.folderId), {
     method: 'PUT',
     headers: credentialsHeaders(credentials)
@@ -176,5 +179,6 @@ export function moveMessage(dispatch, credentials, fromFolder, toFolder, message
     })
     .catch(() => {
       dispatch(updateCache(fromFolder, [message]));
+      dispatch(updateFolder(fromFolder));
     });
 }

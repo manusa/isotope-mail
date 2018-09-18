@@ -4,6 +4,14 @@ export const HttpHeaders = {
 };
 
 /**
+ * Object to store the different AbortController(s) that will be used in the service methods to fetch from the API backend.
+ *
+ * @type {Object}
+ * @private
+ */
+export const abortControllerWrappers = {};
+
+/**
  * Converts response Promise to json Promise or throws an error.
  *
  * @param {Response}response
