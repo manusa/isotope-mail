@@ -74,8 +74,11 @@ public class FolderResource {
             HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId) {
 
         log.debug("Loading message {} from folder {}", messageId, folderId);
-        return ResponseEntity.ok(addLinks(folderId, imapServiceFactory.getObject()
-                .getMessage(credentialsService.fromRequest(request), Folder.toId(folderId), messageId)));
+        final MessageWithFolder message = imapServiceFactory.getObject()
+                .getMessage(credentialsService.fromRequest(request), Folder.toId(folderId), messageId);
+        addLinks(message.getFolder());
+        addLinks(folderId, message);
+        return ResponseEntity.ok(message);
     }
 
     @GetMapping(path = "/{folderId}/messages/{messageId}/attachments/{id}")
