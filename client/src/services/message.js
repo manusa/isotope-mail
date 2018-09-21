@@ -24,6 +24,7 @@ function _closeEventSource(dispatch, es) {
     if (!es.DISPATCHED) {
       dispatch(backendRequestCompleted());
       es.DISPATCHED = true;
+      es.resolvePromise();
     }
   }
 }
@@ -67,13 +68,10 @@ export async function resetFolderMessagesCache(dispatch, credentials, folder) {
         dispatch(updateCache(folder, messages));
       }
     };
-    // Server will close the connection when finished -> Error
+    // Return a promise
     const eventSourceCompleted = new Promise(resolve => {
-      es.onerror = () => {
-        allMessages.length = 0;
-        _closeEventSource(dispatch, es);
-        resolve();
-      };
+      // Store resolve function that will be called in _closeEventSource
+      es.resolvePromise = resolve;
     });
     return eventSourceCompleted;
   }
