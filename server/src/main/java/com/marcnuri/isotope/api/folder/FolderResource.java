@@ -27,7 +27,6 @@ import reactor.core.scheduler.Schedulers;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -71,16 +70,13 @@ public class FolderResource implements ApplicationContextAware {
 
     @GetMapping(path = "/{folderId}/messages", produces = TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<List<Message>>> getMessages(
-            @PathVariable("folderId") String folderId,
-            @RequestParam(value = "credentials") String credentials,
-            @RequestParam(value = "salt") String salt,
-            HttpServletResponse response) throws IOException {
+            @PathVariable("folderId") String folderId, HttpServletRequest request, HttpServletResponse response) {
 
         log.debug("Loading list of messages for folder {} ", folderId);
         // Publishing occurs in separate Thread, store request data in this thread (needed by HATEOAS) -> lambda setRequestAttributes
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         return applicationContext.getBean("prototypeImapService", ImapService.class)
-                .getMessagesFlux(credentialsService.decrypt(credentials, salt), Folder.toId(folderId), response)
+                .getMessagesFlux(credentialsService.fromRequest(request), Folder.toId(folderId), response)
                 .map(l -> {
                     RequestContextHolder.setRequestAttributes(requestAttributes);
                     addLinks(folderId, l.data());

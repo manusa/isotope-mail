@@ -51,7 +51,11 @@ export async function resetFolderMessagesCache(dispatch, credentials, folder) {
   _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
   if (folder && folder._links) {
     const allMessages = [];
-    const es = new window.EventSourcePolyfill(`${folder._links.messages.href}?credentials=${credentials.encrypted}&salt=${credentials.salt}`);
+    // Prefer EventSourcePolyfill instead of EventSource to allow sending HTTP headers in all browsers
+    const es = new window.EventSourcePolyfill(folder._links.messages.href,
+      {
+        headers: credentialsHeaders(credentials)
+      });
     _eventSourceWrappers.resetFolderMessagesCache = es;
     dispatch(backendRequest());
     es.onmessage = e => {

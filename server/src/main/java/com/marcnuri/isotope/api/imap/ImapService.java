@@ -184,9 +184,13 @@ public class ImapService {
             } else if (content instanceof MimeMessage
                     && ((MimeMessage) content).getContentType().toLowerCase().contains("html")) {
                 ret.setContent(content.toString());
+            } else if (imapMessage.getContentType().indexOf(MediaType.TEXT_HTML_VALUE) == 0){
+                ret.setContent(content.toString());
             } else {
                 //Preserve formatting
-                ret.setContent(String.format("<pre>%s</pre>", content.toString()));
+                ret.setContent(content.toString()
+                        .replace("\r\n", "<br />" )
+                        .replaceAll("[\\r\\n]", "<br />"));
             }
             folder.close();
             return ret;
