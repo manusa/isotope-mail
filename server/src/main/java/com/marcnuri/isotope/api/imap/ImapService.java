@@ -25,11 +25,14 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
+import reactor.core.publisher.Flux;
 
 import javax.annotation.PreDestroy;
 import javax.mail.*;
@@ -52,6 +55,7 @@ import static javax.mail.Folder.READ_WRITE;
  */
 @Service
 @RequestScope
+@Primary
 public class ImapService {
 
     private static final Logger log = LoggerFactory.getLogger(ImapService.class);
@@ -59,6 +63,7 @@ public class ImapService {
     private static final String IMAPS_PROTOCOL = "imaps";
     private static final String IMAP_CAPABILITY_CONDSTORE = "CONDSTORE";
     private static final String MULTIPART_MIME_TYPE = "multipart/";
+    private static final int DEFAULT_MESSAGES_BATCH_SIZE = 50;
 
     private final IsotopeApiConfiguration isotopeApiConfiguration;
 
@@ -115,6 +120,47 @@ public class ImapService {
             log.error("Error loading messages for folder: " + folderId.toString(), ex);
             throw  new IsotopeException(ex.getMessage());
         }
+    }
+
+    public Flux<ServerSentEvent<List<Message>>> getMessagesFlux(
+            Credentials credentials, URLName folderId, HttpServletResponse response) {
+
+        return Flux.create(s -> {
+            try {
+                final IMAPStore store = getImapStore(credentials);
+                final boolean fetchModseq = store.hasCapability(IMAP_CAPABILITY_CONDSTORE);
+                final IMAPFolder folder = (IMAPFolder)store.getFolder(folderId);
+                // From end to beginning
+                int end = folder.getMessageCount();
+                int start;
+                try {
+                    do {
+                        start = end - DEFAULT_MESSAGES_BATCH_SIZE > 0 ? end - DEFAULT_MESSAGES_BATCH_SIZE : 1;
+                        log.debug("Getting message batch for folder {} [{}-{}]", folder.getName(), start, end);
+                        response.getOutputStream();
+                        final ServerSentEvent<List<Message>> event = ServerSentEvent
+                                .builder(getMessages(folder, start, end, fetchModseq))
+                                .id(String.valueOf(start))
+                                .build();
+                        s.next(event);
+                        end = start - 1;
+                    } while (end > 0 && !s.isCancelled());
+                } catch(IOException ex) {
+                    log.debug("Response stream has already been closed ({})", ex.getMessage());
+                    s.error(ex);
+                }
+                folder.close();
+            } catch (MessagingException ex) {
+                log.error("Error loading messages for folder: " + folderId.toString(), ex);
+                s.error(ex);
+                destroy();
+                s.complete();
+                throw  new IsotopeException(ex.getMessage());
+            }
+            // This bean will be effectively a Prototype, must manually disconnect
+            destroy();
+            s.complete();
+        });
     }
 
     public MessageWithFolder getMessage(Credentials credentials, URLName folderId, Long uid) {
@@ -243,6 +289,7 @@ public class ImapService {
 
     @PreDestroy
     public void destroy() {
+        log.debug("ImapService destroyed");
         if(imapStore != null) {
             try {
                 imapStore.close();
@@ -261,6 +308,7 @@ public class ImapService {
                     credentials.getServerPort(),
                     credentials.getUser(),
                     credentials.getPassword());
+            log.debug("Opened new ImapStore session");
         }
         return imapStore;
     }

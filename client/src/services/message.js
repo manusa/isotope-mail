@@ -16,6 +16,18 @@ import {processFolders} from './folder';
 import {persistMessageCache} from './indexed-db';
 import {KEY_HASH, KEY_USER_ID} from './state';
 
+const _eventSourceWrappers = {};
+
+function _closeEventSource(dispatch, es) {
+  if (es && es.close) {
+    es.close();
+    if (!es.DISPATCHED) {
+      dispatch(backendRequestCompleted());
+      es.DISPATCHED = true;
+    }
+  }
+}
+
 function _readContent(dispatch, credentials, folder, message, signal, attachment) {
   fetch(attachment._links.download.href, {
     method: 'GET',
@@ -35,28 +47,35 @@ function _readContent(dispatch, credentials, folder, message, signal, attachment
  * @param folder
  */
 export async function resetFolderMessagesCache(dispatch, credentials, folder) {
+  _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
   if (folder && folder._links) {
-    abortFetch(abortControllerWrappers.resetFolderMessagesCacheAbortController);
-    abortControllerWrappers.resetFolderMessagesCacheAbortController = new AbortController();
-    const signal = abortControllerWrappers.resetFolderMessagesCacheAbortController.signal;
-
+    const allMessages = [];
+    const es = new window.EventSourcePolyfill(`${folder._links.messages.href}?credentials=${credentials.encrypted}&salt=${credentials.salt}`);
+    _eventSourceWrappers.resetFolderMessagesCache = es;
     dispatch(backendRequest());
-    return fetch(folder._links.messages.href, {
-      method: 'GET',
-      headers: credentialsHeaders(credentials),
-      signal: signal
-    })
-      .then(response => {
-        dispatch(backendRequestCompleted());
-        return response;
-      })
-      .then(toJson)
-      .then(json => {
-        dispatch(setFolderCache(folder, json));
+    es.onmessage = e => {
+      const messages = JSON.parse(e.data);
+      allMessages.push(...messages);
+      if (e.lastEventId === '1') {
+        // This is the last batch
+        dispatch(setFolderCache(folder, allMessages));
+        _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
         // Manually persist newest version of message cache
-        persistMessageCache(sessionStorage.getItem(KEY_USER_ID), sessionStorage.getItem(KEY_HASH), folder, json);
-      })
-      .catch(() => dispatch(backendRequestCompleted()));
+        persistMessageCache(
+          sessionStorage.getItem(KEY_USER_ID), sessionStorage.getItem(KEY_HASH), folder, [...allMessages]);
+      } else {
+        dispatch(updateCache(folder, messages));
+      }
+    };
+    // Server will close the connection when finished -> Error
+    const eventSourceCompleted = new Promise(resolve => {
+      es.onerror = e => {
+        allMessages.length = 0;
+        _closeEventSource(dispatch, es);
+        resolve();
+      };
+    });
+    return eventSourceCompleted;
   }
   return null;
 }

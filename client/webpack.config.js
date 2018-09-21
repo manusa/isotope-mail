@@ -17,6 +17,7 @@ module.exports = {
     'babel-polyfill',
     'whatwg-fetch',
     'abortcontroller-polyfill',
+    SRC_DIR + '/polyfills/eventsource.js',
     SRC_DIR + '/polyfills/IDBIndex.js',
     SRC_DIR + '/index.jsx',
     'react-hot-loader/patch'

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import Spinner from '../spinner/spinner';
 import FolderList from './folder-list';
-import {moveMessage, resetFolderMessagesCache, updateFolderMessagesCache} from '../../services/message';
+import {moveMessage, resetFolderMessagesCache} from '../../services/message';
 import {selectFolder, selectMessage} from '../../actions/application';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
@@ -41,15 +41,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   selectFolder: (folder, credentials, cachedFolderMessagesMap) => {
     dispatch(selectFolder(folder));
-    dispatch(selectMessage(null))
-
-    // Performance: Perform an initial load of the latest (30*) messages in the folder
-    const initialLoadMessageCount = 30;
-    if (cachedFolderMessagesMap instanceof Map === false
-      && folder.messageCount >= initialLoadMessageCount) {
-      updateFolderMessagesCache(
-        dispatch, credentials, folder, folder.messageCount - initialLoadMessageCount, folder.messageCount);
-    }
+    dispatch(selectMessage(null));
     resetFolderMessagesCache(dispatch, credentials, folder);
   },
   moveMessage: (credentials, fromFolder, toFolder, message) => {

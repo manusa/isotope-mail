@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Import;
 
 import java.security.Security;
 
-@SpringBootApplication(exclude = HypermediaAutoConfiguration.class)
+@SpringBootApplication(exclude = {HypermediaAutoConfiguration.class})
 @Import(IsotopeApiConfiguration.class)
 public class IsotopeApiApplication {
 
