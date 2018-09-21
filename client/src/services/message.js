@@ -69,7 +69,7 @@ export async function resetFolderMessagesCache(dispatch, credentials, folder) {
     };
     // Server will close the connection when finished -> Error
     const eventSourceCompleted = new Promise(resolve => {
-      es.onerror = e => {
+      es.onerror = () => {
         allMessages.length = 0;
         _closeEventSource(dispatch, es);
         resolve();
@@ -80,31 +80,31 @@ export async function resetFolderMessagesCache(dispatch, credentials, folder) {
   return null;
 }
 
-export function updateFolderMessagesCache(dispatch, credentials, folder, start, end) {
-  abortFetch(abortControllerWrappers.updateFolderMessagesCacheAbortController);
-  abortControllerWrappers.updateFolderMessagesCacheAbortController = new AbortController();
-  const signal = abortControllerWrappers.updateFolderMessagesCacheAbortController.signal;
-
-  const url = new URL(folder._links.messages.href);
-  if (start >= 0 && end >= 0) {
-    url.search = new URLSearchParams({start, end}).toString();
-  }
-  dispatch(backendRequest());
-  fetch(url, {
-    method: 'GET',
-    headers: credentialsHeaders(credentials),
-    signal: signal
-  })
-    .then(response => {
-      dispatch(backendRequestCompleted());
-      return response;
-    })
-    .then(toJson)
-    .then(json => {
-      dispatch(updateCache(folder, json));
-    })
-    .catch(() => dispatch(backendRequestCompleted()));
-}
+// export function updateFolderMessagesCache(dispatch, credentials, folder, start, end) {
+//   abortFetch(abortControllerWrappers.updateFolderMessagesCacheAbortController);
+//   abortControllerWrappers.updateFolderMessagesCacheAbortController = new AbortController();
+//   const signal = abortControllerWrappers.updateFolderMessagesCacheAbortController.signal;
+//
+//   const url = new URL(folder._links.messages.href);
+//   if (start >= 0 && end >= 0) {
+//     url.search = new URLSearchParams({start, end}).toString();
+//   }
+//   dispatch(backendRequest());
+//   fetch(url, {
+//     method: 'GET',
+//     headers: credentialsHeaders(credentials),
+//     signal: signal
+//   })
+//     .then(response => {
+//       dispatch(backendRequestCompleted());
+//       return response;
+//     })
+//     .then(toJson)
+//     .then(json => {
+//       dispatch(updateCache(folder, json));
+//     })
+//     .catch(() => dispatch(backendRequestCompleted()));
+// }
 
 /**
  *
@@ -174,7 +174,7 @@ export function downloadAttachment(credentials, attachment) {
 
 export function moveMessage(dispatch, credentials, fromFolder, toFolder, message) {
   // Abort any operations that can affect operation result
-  abortFetch(abortControllerWrappers.resetFolderMessagesCacheAbortController);
+  _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
   abortFetch(abortControllerWrappers.getFoldersAbortController);
 
   // Calculate new fromFolder values
