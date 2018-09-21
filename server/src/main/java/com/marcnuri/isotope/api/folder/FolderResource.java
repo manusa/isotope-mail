@@ -87,7 +87,8 @@ public class FolderResource implements ApplicationContextAware {
                     return l;
                 })
                 .subscribeOn(Schedulers.parallel())
-                .publishOn(Schedulers.parallel());
+                .publishOn(Schedulers.single()) // Will allow server to stop sending events in case client disconnects
+                ;
     }
 
     @GetMapping(path = "/{folderId}/messages")
