@@ -63,7 +63,8 @@ public class ImapService {
     private static final String IMAPS_PROTOCOL = "imaps";
     private static final String IMAP_CAPABILITY_CONDSTORE = "CONDSTORE";
     private static final String MULTIPART_MIME_TYPE = "multipart/";
-    private static final int DEFAULT_MESSAGES_BATCH_SIZE = 50;
+    private static final int DEFAULT_INITIAL_MESSAGES_BATCH_SIZE = 20;
+    private static final int DEFAULT_MAX_MESSAGES_BATCH_SIZE = 640;
 
     private final IsotopeApiConfiguration isotopeApiConfiguration;
 
@@ -107,21 +108,6 @@ public class ImapService {
         }
     }
 
-    public List<Message> getMessages(
-            Credentials credentials, URLName folderId, @Nullable Integer start, @Nullable Integer end) {
-
-        try {
-            final IMAPStore store = getImapStore(credentials);
-            final IMAPFolder folder = (IMAPFolder)store.getFolder(folderId);
-            final List<Message> ret = getMessages(folder, start, end, store.hasCapability(IMAP_CAPABILITY_CONDSTORE));
-            folder.close();
-            return ret;
-        } catch (MessagingException ex) {
-            log.error("Error loading messages for folder: " + folderId.toString(), ex);
-            throw  new IsotopeException(ex.getMessage());
-        }
-    }
-
     public Flux<ServerSentEvent<List<Message>>> getMessagesFlux(
             Credentials credentials, URLName folderId, HttpServletResponse response) {
 
@@ -133,9 +119,10 @@ public class ImapService {
                 // From end to beginning
                 int end = folder.getMessageCount();
                 int start;
+                int batchSize = DEFAULT_INITIAL_MESSAGES_BATCH_SIZE;
                 try {
                     do {
-                        start = end - DEFAULT_MESSAGES_BATCH_SIZE > 0 ? end - DEFAULT_MESSAGES_BATCH_SIZE : 1;
+                        start = end - batchSize > 0 ? end - batchSize : 1;
                         log.debug("Getting message batch for folder {} [{}-{}]", folder.getName(), start, end);
                         response.getOutputStream();
                         final ServerSentEvent<List<Message>> event = ServerSentEvent
@@ -144,6 +131,8 @@ public class ImapService {
                                 .build();
                         s.next(event);
                         end = start - 1;
+                        batchSize = (batchSize * 2 ) > DEFAULT_MAX_MESSAGES_BATCH_SIZE ? DEFAULT_MAX_MESSAGES_BATCH_SIZE :
+                                batchSize * 2;
                     } while (end > 0 && !s.isCancelled());
                 } catch(IOException ex) {
                     log.debug("Response stream has already been closed ({})", ex.getMessage());

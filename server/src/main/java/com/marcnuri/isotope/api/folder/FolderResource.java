@@ -87,17 +87,6 @@ public class FolderResource implements ApplicationContextAware {
                 ;
     }
 
-    @GetMapping(path = "/{folderId}/messages")
-    public ResponseEntity<List<Message>> getMessages(
-            HttpServletRequest request,
-            @PathVariable("folderId") String folderId, @RequestParam(value = "start", required = false) Integer start,
-            @RequestParam(value = "end", required = false) Integer end) {
-
-        log.debug("Loading list of messages for folder {} [Range: {}-{}]", folderId, start, end);
-        return ResponseEntity.ok(addLinks(folderId, imapServiceFactory.getObject()
-                .getMessages(credentialsService.fromRequest(request), Folder.toId(folderId), start, end)));
-    }
-
     @GetMapping(path = "/{folderId}/messages/{messageId}")
     public ResponseEntity<MessageWithFolder> getMessage(
             HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId) {
@@ -148,7 +137,7 @@ public class FolderResource implements ApplicationContextAware {
 
     private static Folder addLinks(Folder folder) {
         folder.add(linkTo(methodOn(FolderResource.class)
-                .getMessages(null, folder.getFolderId(), (Integer)null, null))
+                .getMessages( folder.getFolderId(), null, null))
                 .withRel(REL_MESSAGES).expand());
         addLinks(folder.getChildren());
         return folder;
