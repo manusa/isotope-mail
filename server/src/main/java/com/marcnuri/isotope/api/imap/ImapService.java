@@ -280,6 +280,21 @@ public class ImapService {
         }
     }
 
+    public Message setMessageSeen(Credentials credentials, URLName folderId, Long uid, boolean seen) {
+        try {
+            final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
+            folder.open(READ_WRITE);
+            final IMAPMessage message = (IMAPMessage)folder.getMessageByUID(uid);
+            message.setFlag(Flags.Flag.SEEN, seen);
+            final Message ret = MessageWithFolder.from(folder, message);
+            folder.close(false);
+            return ret;
+        } catch (MessagingException ex) {
+            throw new IsotopeException(ex.getMessage(), ex);
+        }
+
+    }
+
     @PreDestroy
     public void destroy() {
         log.debug("ImapService destroyed");

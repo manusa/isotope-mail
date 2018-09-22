@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {FolderTypes} from '../../services/folder';
 import {selectMessage} from '../../actions/application';
-import {moveMessage} from '../../services/message';
+import {moveMessage, setMessageSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
 
@@ -46,11 +46,18 @@ class TopBar extends Component {
           </section>
           <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-end']}`}>
             {isMessageViewer ?
-              <button
-                onClick={this.props.deleteMessage}
-                className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-                delete
-              </button>
+              <Fragment>
+                <button
+                  onClick={this.props.deleteMessage}
+                  className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
+                  delete
+                </button>
+                <button
+                  onClick={this.props.toggleMessageSeen}
+                  className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
+                  email
+                </button>
+              </Fragment>
               :
               null
             }
@@ -88,13 +95,20 @@ const mapDispatchToProps = dispatch => ({
       moveMessage(dispatch, credentials, selectedFolder, trashFolder, selectedMessage);
       dispatch(selectMessage(null));
     }
+  },
+  toggleMessageSeen: (credentials, selectedFolder, selectedMessage) => {
+    setMessageSeen(dispatch, credentials, selectedFolder, selectedMessage, !selectedMessage.seen);
+    dispatch(selectMessage(null));
   }
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
   deleteMessage: () =>
     dispatchProps.deleteMessage(
-      stateProps.credentials, stateProps.folders, stateProps.selectedFolder, stateProps.selectedMessage)
+      stateProps.credentials, stateProps.folders, stateProps.selectedFolder, stateProps.selectedMessage),
+  toggleMessageSeen: () =>
+    dispatchProps.toggleMessageSeen(
+      stateProps.credentials, stateProps.selectedFolder, stateProps.selectedMessage)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(TopBar);

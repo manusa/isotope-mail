@@ -82,32 +82,6 @@ export async function resetFolderMessagesCache(dispatch, credentials, folder) {
   return null;
 }
 
-// export function updateFolderMessagesCache(dispatch, credentials, folder, start, end) {
-//   abortFetch(abortControllerWrappers.updateFolderMessagesCacheAbortController);
-//   abortControllerWrappers.updateFolderMessagesCacheAbortController = new AbortController();
-//   const signal = abortControllerWrappers.updateFolderMessagesCacheAbortController.signal;
-//
-//   const url = new URL(folder._links.messages.href);
-//   if (start >= 0 && end >= 0) {
-//     url.search = new URLSearchParams({start, end}).toString();
-//   }
-//   dispatch(backendRequest());
-//   fetch(url, {
-//     method: 'GET',
-//     headers: credentialsHeaders(credentials),
-//     signal: signal
-//   })
-//     .then(response => {
-//       dispatch(backendRequestCompleted());
-//       return response;
-//     })
-//     .then(toJson)
-//     .then(json => {
-//       dispatch(updateCache(folder, json));
-//     })
-//     .catch(() => dispatch(backendRequestCompleted()));
-// }
-
 /**
  *
  * @param dispatch
@@ -187,6 +161,7 @@ export function moveMessage(dispatch, credentials, fromFolder, toFolder, message
     newMessageCount: fromFolder.newMessageCount - (message.recent ? 1 : 0)
   };
 
+  // Update state with expected response from server
   dispatch(deleteFromCache(fromFolder, [message]));
   dispatch(updateFolder(fromFolderUpdated));
   fetch(message._links.move.href.replace('{toFolderId}', toFolder.folderId), {
@@ -201,7 +176,36 @@ export function moveMessage(dispatch, credentials, fromFolder, toFolder, message
       }
     })
     .catch(() => {
+      // Rollback state from dispatched expected responses
       dispatch(updateCache(fromFolder, [message]));
       dispatch(updateFolder(fromFolder));
+    });
+}
+
+export function setMessageSeen(dispatch, credentials, folder, message, seen) {
+  // Abort any operations that can affect operation result
+  _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
+  abortFetch(abortControllerWrappers.getFoldersAbortController);
+
+  // Update state with expected response from server
+  const expectedUpdatedMessage = {...message, seen: seen};
+  dispatch(updateCache(folder, [expectedUpdatedMessage]));
+  const expectedUpdatedFolder = {...folder, unreadMessageCount: folder.unreadMessageCount + 1};
+  dispatch(updateFolder(expectedUpdatedFolder));
+
+  fetch(message._links.seen.href, {
+    method: 'PUT',
+    headers: credentialsHeaders(credentials, { 'Content-Type': 'application/json'}),
+    body: JSON.stringify(seen)
+  })
+    .then(toJson)
+    .then(updatedMessage => {
+      dispatch(updateCache(folder, [updatedMessage]));
+      dispatch(updateFolder(processFolders([updatedMessage.folder])[0]));
+    })
+    .catch(() => {
+      // Rollback state from dispatched expected responses
+      dispatch(updateCache(folder, [message]));
+      dispatch(updateFolder(folder));
     });
 }

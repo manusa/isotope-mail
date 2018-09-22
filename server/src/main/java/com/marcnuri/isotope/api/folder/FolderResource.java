@@ -47,6 +47,7 @@ public class FolderResource implements ApplicationContextAware {
     private static final String REL_MESSAGES = "messages";
     private static final String REL_DOWNLOAD = "download";
     private static final String REL_MOVE = "move";
+    private static final String REL_SEEN = "seen";
 
     private final CredentialsService credentialsService;
     private final ObjectFactory<ImapService> imapServiceFactory;
@@ -125,6 +126,17 @@ public class FolderResource implements ApplicationContextAware {
         return ResponseEntity.ok(movedMessages);
     }
 
+    @PutMapping(path = "/{folderId}/messages/{messageId}/seen")
+    public ResponseEntity<Message> setMessageSeen(
+            HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId,
+            @RequestBody boolean seen) {
+
+        log.debug("Setting message seen attribute to {} in message {} from folder {}", seen, messageId, folderId);
+        return ResponseEntity.ok(addLinks(folderId,
+                imapServiceFactory.getObject().setMessageSeen(
+                        credentialsService.fromRequest(request), Folder.toId(folderId), messageId, seen)
+        ));
+    }
     private static Folder[] addLinks(Folder... folders) {
         Stream.of(folders).forEach(FolderResource::addLinks);
         return folders;
@@ -158,6 +170,8 @@ public class FolderResource implements ApplicationContextAware {
                 .withSelfRel().expand());
         message.add(linkTo(methodOn(FolderResource.class).moveMessage(null, folderId, message.getUid(),
                 null)).withRel(REL_MOVE));
+        message.add(linkTo(methodOn(FolderResource.class).setMessageSeen(null, folderId, message.getUid(),
+                false)).withRel(REL_SEEN));
         return message;
     }
 
