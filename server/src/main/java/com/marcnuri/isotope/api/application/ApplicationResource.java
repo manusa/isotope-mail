@@ -38,6 +38,7 @@ public class ApplicationResource {
     public ResponseEntity<Credentials> login(
             @Validated(Credentials.Login.class) @RequestBody Credentials credentials) {
 
+        log.info("User logging into application");
         return ResponseEntity.ok(imapService.checkCredentials(credentials));
     }
 
