@@ -1,0 +1,79 @@
+@import '../../styles/partials/variables';
+
+.to {
+  display: flex;
+  flex-flow: row nowrap;
+  min-width: 0;
+
+  .expand,
+  .collapse {
+    cursor: pointer;
+  }
+
+  .entry {
+
+    &::before {
+      content: '; ';
+    }
+
+    &:first-child::before {
+      content: none;
+    }
+
+    .name {
+      color: lighten($base-color, 25%);
+    }
+
+    .email {
+      margin-left: $default-spacing / 2;
+      color: lighten($base-color, 45%);
+      font-style: italic;
+
+      &:empty {
+        margin-left: 0;
+      }
+    }
+  }
+
+  &.collapsed {
+
+    .collapsedList {
+      display: inline-block;
+      flex-grow: 1;
+      min-width: 0;
+      width: 1px;
+      margin-left: $default-spacing / 2;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &.expanded {
+    max-height: 150px;
+    overflow-y: auto;
+    position: relative;
+    display: flex;
+    flex-flow: row nowrap;
+    min-width: 0;
+
+    .recipientGroupContainer {
+      flex: 1;
+
+      .recipientGroup {
+        display: flex;
+        flex-flow: row nowrap;
+        min-width: 0;
+
+        label {
+          min-width: 40px;
+        }
+      }
+    }
+
+    .collapse {
+    }
+  }
+
+}

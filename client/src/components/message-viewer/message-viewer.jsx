@@ -1,33 +1,30 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
 import Spinner from '../spinner/spinner';
+import HeaderTo from './header-to';
+import AttachmentCard from '../attachment/attachment-card';
 import {selectFolder, selectMessage} from '../../actions/application';
 import sanitize from '../../services/sanitize';
 import mainCss from '../../styles/main.scss';
 import styles from './message-viewer.scss';
-import AttachmentCard from '../attachment/attachment-card';
 
-function addressGroups(address) {
+export function addressGroups(address) {
   const ret = {
     name: '',
     email: ''
   };
-  const formattedFrom = address.match(/^\"(.*)\"/);
+  const formattedFrom = address.match(/^"(.*)"/);
   ret.name = formattedFrom !== null ? formattedFrom[1] : address;
-  ret.email = formattedFrom !== null ? address.substring(formattedFrom[0].length).trim().replace(/[\<\>]/g, '') : '';
+  ret.email = formattedFrom !== null ? address.substring(formattedFrom[0].length).trim().replace(/[<>]/g, '') : '';
   return ret;
 }
 
 class MessageViewer extends Component {
   render() {
-    const t = this.props.t;
     const folder = this.props.currentFolder;
     const message = this.props.selectedMessage;
     const firstFrom = addressGroups(message.from && message.from.length > 0 ? message.from[0] : '');
-    const to = message.recipients.filter(r => r.type === 'To');
-    const firstTo = addressGroups(to && to.length > 0 ? to[0].address : '');
     const attachments = message.attachments ? message.attachments.filter(a => !a.contentId) : [];
     return (
       <div className={`${this.props.className} ${styles.messageViewer}`}>
@@ -50,18 +47,15 @@ class MessageViewer extends Component {
               })}
             </div>
           </div>
-          <div className={styles.to}>
-            <label>{t('messageViewer.to')}: </label>
-            <span className={styles.name}>{firstTo.name}</span>
-            <span className={styles.email}>{firstTo.email ? `<${firstTo.email}>` : ''}</span>
-          </div>
+          <HeaderTo className={styles.to} recipients={message.recipients} />
         </div>
         <div className={styles.body}>
           <Spinner visible={this.props.activeRequests > 0}/>
           <div className={styles.attachments}>
             {attachments.map((a, index) => <AttachmentCard key={index} attachment={a} />)}
           </div>
-          <div dangerouslySetInnerHTML={{__html: sanitize.sanitize(message.content)}}></div>
+          <div dangerouslySetInnerHTML={{__html: sanitize.sanitize(message.content)}}>
+          </div>
         </div>
       </div>
     );
@@ -95,4 +89,4 @@ const mapDispatchToProps = dispatch => ({
   }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate()(MessageViewer));
+export default connect(mapStateToProps, mapDispatchToProps)(MessageViewer);

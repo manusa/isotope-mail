@@ -16,6 +16,8 @@
     }
   },
   "messageViewer":{
-    "to": "to"
+    "to": "to",
+    "cc": "cc",
+    "bcc": "bcc"
   }
 }

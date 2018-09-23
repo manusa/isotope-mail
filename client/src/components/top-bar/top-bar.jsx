@@ -55,7 +55,7 @@ class TopBar extends Component {
                 <button
                   onClick={this.props.toggleMessageSeen}
                   className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-                  email
+                  markunread
                 </button>
               </Fragment>
               :
