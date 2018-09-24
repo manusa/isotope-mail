@@ -1,26 +1,28 @@
 branches:
   only:
   - master
-
 language: java
-
 services:
 - docker
-
 before_install:
 - npm install --prefix ./client ./client
-
 script:
-- ./server/gradlew -p ./server/ check assemble || travis_terminate 1
+- "./server/gradlew -p ./server/ check assemble || travis_terminate 1"
 - npm run --prefix ./client build
-
 after_success:
-- docker build -f ./Dockerfile-client -t marcnuri/isotope:client-latest ./ || travis_terminate 1
-- docker build -f ./Dockerfile-server -t marcnuri/isotope:server-latest ./ || travis_terminate 1
-- echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin || travis_terminate 1
+- docker build -f ./Dockerfile-client -t marcnuri/isotope:client-latest ./ || travis_terminate
+  1
+- docker build -f ./Dockerfile-server -t marcnuri/isotope:server-latest ./ || travis_terminate
+  1
+- echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+  || travis_terminate 1
 - docker push marcnuri/isotope:client-latest
 - docker push marcnuri/isotope:server-latest
-
+addons:
+  sonarcloud:
+    organization: "manusa-github"
+    token:
+      secure: "H9j4Ck+zuPrBWyvYBZ8EuYnw2z3IdV0AfQVG870IimGujsrM0g3+J6Ph1MFHDy/ls0kAGW0WbAEYGwqaaMEx4zBOztdlUFNQ/SfqQNOvufAx5XarrpMnbpy35oicMbE3ZjXqYAJ1w9Y8+stxYyYzGbd2RvAzadLBcLRVsimMj+3A5adLwwcnkE594pJRmcqHNwDhIk97wOBZf40ZynB/tWkl8nOuj/v8LTGV/ErXhzv023bMNnKyrmlLlQ78E+MPjP4jOsoyOaqVc8ThbBdqqDIGVS3qaT3+euhGYs0sKJh79kNvqQE1UdNqMAtCbjDfQXQdG+omAsEdwPoMP3BAPwXtioEqK/Z6/tMo6QJZHg5Lh0UaAJHcByc02kIRZ+ATp9F6/o0Hy5E4Mbi9v4bFwSXaXS/GV8QtF0ojmeAB2TKh9CsJrICsRmHpaAMNiwatUd/IidDNaxYQz2wVQSFlNZRlUxRmcuo0yuDzPwDCB8x5No7ppSzD9xB93CkaV7Bn8920NZkq7vG5Gf0bYzMOkKfONKX462SuCp3QBOuEx9FI1Gb4daPOohj8jpQ65q7OYqwpD1itrtbtqjAua4fkGicdJrLAbcXRZTKl7k3j0fHfNqWkTRtEllBVVr38eOFHH4DXYIyuZpb3JTzXf/RQ/TCZdvU/K5medXcevZ8xEkI="
 env:
   global:
   - secure: E1axURzNrnoTj/+8sj0ov1hDGj1kdF0R2ixqc1Y4ue+ZtageCjjqHxyQRk7R+hQ1pCiNJxI7TeQ3qF2ETk/GRA+0h+51wUXx6PURPbF4iMWinwHA6DL5mtrJYsI1Kjcj2gmtAea3tgmDYHzU+6HEYBYjnjZ2IZHQVXp3x6DWxAJ8VnCapOVn72wDWhEhfrYbKaSlOmBzjafR4oElwROmxt3xyDZGT4yvmWcUZc0JgW8tzHlbmk+4+gHXqyAsIWtNYvVzezT9EwGCRTE3xu22LEbAdUCY5WSqGFDtWegOGzdb6LDlTOj7bVzCgwVlNpBbcg349+Ls6/gbd57sXH3s6IT1wgcSxbmRgwOANqfwbUqIPfhwqgeyL+08BYx3TW3Eo/qWWU3TjRiS6qyvVs2ceoW3QUEV7ri+XtR50+XE6JRQR9/EXHV/SZo54jgnKOiuzfe/f9Qcs+FVZdsNTLnQlS8hskv5G8ayEWyWEvoYorGTP528kt35wOgOiaLjvNLTO4s6BKYKgyPY5/gE5P9hPcsZLZfcorTEgzUSb9fnn7zb0bCT7NojJGO70nsstxV2QA5DLrPAdDdGNNYe4UhRwsxCzQSCtnh85kxP9A/wlg9pPKr862WJbBXIO4s3zLrtOKvLIIwqZbkIkuH5j7biB0lYhzKPVND/NaStYyqot+k=
