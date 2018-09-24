@@ -18,6 +18,7 @@ after_success:
   || travis_terminate 1
 - docker push marcnuri/isotope:client-latest
 - docker push marcnuri/isotope:server-latest
+- sonar-scanner
 addons:
   sonarcloud:
     organization: "manusa-github"
