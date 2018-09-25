@@ -20,6 +20,10 @@ $port-field-width: 100px;
   .card {
     padding: $default-spacing;
     width: 60%;
+    @media screen and (max-width: 480px) {
+      width: 100%;
+      height: 100%;
+    }
 
     .title {
       font-size: $font-size-body * 1.8;
