@@ -39,18 +39,18 @@ class Login extends Component {
           </header>
           <form onSubmit={this.login}>
             <div className={styles.server}>
-              <TextField id='serverHost' fieldClass={styles.serverHost}
+              <TextField id='serverHost' fieldClass={`${styles.formField} ${styles.serverHost}`}
                 value={this.state.values.serverHost} onChange={this.onFieldChange}
                 focused={this.isFocused('serverHost')} required={true} autoComplete='on' label={t('login.Host')}/>
-              <TextField key='serverPort' id='serverPort' fieldClass={styles.serverPort}
+              <TextField key='serverPort' id='serverPort' fieldClass={`${styles.formField} ${styles.serverPort}`}
                 type='number' min='0'
                 value={this.state.values.serverPort} onChange={this.onFieldChange}
                 focused={this.isFocused('serverPort')} required={true} autoComplete='on' label={t('login.Port')}/>
             </div>
-            <TextField id='user' fieldClass={styles.fullWidth}
+            <TextField id='user' fieldClass={`${styles.formField} ${styles.fullWidth}`}
               value={this.state.values.user} onChange={this.onFieldChange}
               focused={this.isFocused('user')} required={true} autoComplete='on' label={t('login.User')}/>
-            <TextField id='password' type={'password'} fieldClass={styles.fullWidth}
+            <TextField id='password' type={'password'} fieldClass={`${styles.formField} ${styles.fullWidth}`}
               value={this.state.values.password} onChange={this.onFieldChange}
               focused={this.isFocused('password')} required={true} label={t('login.Password')}/>
             <button type='submit' className={`${styles.loginButton}

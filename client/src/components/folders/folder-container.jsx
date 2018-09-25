@@ -5,6 +5,7 @@ import Spinner from '../spinner/spinner';
 import FolderList from './folder-list';
 import {moveMessage, resetFolderMessagesCache} from '../../services/message';
 import {selectFolder, selectMessage} from '../../actions/application';
+import {clearSelected} from '../../actions/messages';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
 
@@ -42,6 +43,7 @@ const mapDispatchToProps = dispatch => ({
   selectFolder: (folder, credentials, cachedFolderMessagesMap) => {
     dispatch(selectFolder(folder));
     dispatch(selectMessage(null));
+    dispatch(clearSelected());
     resetFolderMessagesCache(dispatch, credentials, folder);
   },
   moveMessage: (credentials, fromFolder, toFolder, message) => {

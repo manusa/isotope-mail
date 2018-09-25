@@ -12,8 +12,6 @@
     height: 100%;
 
     .item {
-      display: flex;
-      flex-flow: row nowrap;
       font-weight: $font-weight-bold;
       font-size: $font-size-body-2;
       padding: 0px;
@@ -30,31 +28,36 @@
         font-style: italic;
       }
 
-      .from {
-        margin-left: $default-spacing / 2;
-        width: 200px;
-        min-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .subject {
-        flex-grow: 1;
-        margin-left: $default-spacing;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .receivedDate {
-        width: 90px;
-        min-width: 90px;
-        text-align: right;
-      }
-      .size {
-        margin-right: $default-spacing / 2;
-        width: 85px;
-        min-width: 85px;
-        text-align: right;
+      .itemDetails {
+        display: flex;
+        flex-flow: row nowrap;
+        width: 100%;
+
+        .from {
+          width: 200px;
+          min-width: 200px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .subject {
+          flex-grow: 1;
+          margin-left: $default-spacing;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .receivedDate {
+          width: 90px;
+          min-width: 90px;
+          text-align: right;
+        }
+        .size {
+          margin-right: $default-spacing / 2;
+          width: 85px;
+          min-width: 85px;
+          text-align: right;
+        }
       }
 
     }
@@ -66,6 +69,7 @@
     z-index: 2;
     height: 25px;
     width: 100%;
+    overflow: hidden;
 
     .listSpinnerCanvas {
       width: 16px;

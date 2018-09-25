@@ -195,7 +195,7 @@ export function setMessageSeen(dispatch, credentials, folder, message, seen) {
 
   fetch(message._links.seen.href, {
     method: 'PUT',
-    headers: credentialsHeaders(credentials, { 'Content-Type': 'application/json'}),
+    headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
     body: JSON.stringify(seen)
   })
     .then(toJson)

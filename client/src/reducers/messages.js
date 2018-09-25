@@ -1,7 +1,7 @@
 import {INITIAL_STATE} from './';
 import {ActionTypes} from '../actions/action-types';
 
-const messages = (state = INITIAL_STATE.messages, action) => {
+const messages = (state = INITIAL_STATE.messages, action = {}) => {
   switch (action.type) {
     case ActionTypes.MESSAGES_BE_REQUEST:
       return {...state, activeRequests: state.activeRequests + 1};
@@ -28,6 +28,21 @@ const messages = (state = INITIAL_STATE.messages, action) => {
         return state;
       }
       action.payload.messages.forEach(m => newUpdateState.cache[action.payload.folder.folderId].delete(m.uid));
+      return newUpdateState;
+    }
+    case ActionTypes.MESSAGES_SET_SELECTED: {
+      const newUpdateState = {...state};
+      newUpdateState.selected = [...state.selected];
+      const indexOfMessage = newUpdateState.selected.indexOf(action.payload.message.uid)
+      if (action.payload.selected && indexOfMessage < 0) {
+        newUpdateState.selected.push(action.payload.message.uid);
+      } else {
+        newUpdateState.selected = newUpdateState.selected.filter(uid => uid !== action.payload.message.uid);
+      }
+      return newUpdateState;
+    }
+    case ActionTypes.MESSAGES_CLEAR_SELECTED: {
+      const newUpdateState = {...state, selected: []};
       return newUpdateState;
     }
     case ActionTypes.ADD_MESSAGE:

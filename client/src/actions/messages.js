@@ -37,4 +37,25 @@ export const deleteFromCache = (folder, messages) => ({
   payload: {folder, messages}
 });
 
+/**
+ * Adds the provided message uid to the selected message list if selected or else removes it from the list
+ *
+ * @param message {Object}
+ * @param selected {boolean}
+ * @returns {{type: string, payload: {message: *, selected: *}}}
+ */
+export const setSelected = (message, selected) => ({
+  type: ActionTypes.MESSAGES_SET_SELECTED,
+  payload: {message, selected}
+});
+
+/**
+ * Clears the list of selected message uids
+ *
+ * @returns {{type: string}}
+ */
+export const clearSelected = () => ({
+  type: ActionTypes.MESSAGES_CLEAR_SELECTED
+});
+
 export const addMessage = message => ({type: ActionTypes.ADD_MESSAGE, payload: message});

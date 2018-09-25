@@ -106,8 +106,8 @@ export async function persistState(dispatch, state) {
     newState.application = {...state.application};
     newState.folders = {...state.folders};
     newState.folders.items = [...state.folders.items];
-    newState.messages = {...state.messages};
-    newState.messages.cache = {};
+    // Don't persist message related states (Own IndexedDB for message cache @see persistMessageCache)
+    newState.messages = {};
     // Object.entries(state.messages.cache).forEach(e => {
     //   newState.messages.cache[e[0]] = Array.from(e[1].values());
     // });
@@ -128,7 +128,7 @@ export async function persistState(dispatch, state) {
         dispatch(setError('diskQuotaExceeded', false));
       }
     } catch (e) {
-      console.log(`${e} ${e.name}`);
+      console.error(`${e} ${e.name}`);
       if (e.name === 'QuotaExceededError' && !state.application.errors.diskQuotaExceeded) {
         dispatch(setError('diskQuotaExceeded', true));
       }

@@ -22,6 +22,7 @@ export const INITIAL_STATE = {
   },
   messages: {
     cache: {},
+    selected: [],
     activeRequests: 0
   }
 };

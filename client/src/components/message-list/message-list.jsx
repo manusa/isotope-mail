@@ -8,6 +8,8 @@ import {selectMessage} from '../../actions/application';
 import {readMessage} from '../../services/message';
 import mainCss from '../../styles/main.scss';
 import styles from './message-list.scss';
+import Checkbox from '../form/checkbox/checkbox';
+import {setSelected} from '../../actions/messages';
 
 function parseFrom(from) {
   const firstFrom = from && from.length > 0 ? from[0] : '';
@@ -50,15 +52,23 @@ class MessageList extends Component {
     const folder = this.props.selectedFolder;
     const message = this.props.messages[index];
     return (
-      <li key={key} style={style} onClick={ () => this.props.selectMessage(message) }
+      <li key={key} style={style}
         draggable={true} onDragStart={event => this.onDragStart(event, folder, message)}
         className={`${mainCss['mdc-list-item']}
                 ${styles.item} ${message.seen ? styles.seen : ''}
                 ${message.deleted ? styles.deleted : ''}`} >
-        <span className={styles.from}>{parseFrom(message.from)}</span>
-        <span className={styles.subject}>{message.subject}</span>
-        <span className={styles.receivedDate}>{prettyDate(message.receivedDate)}</span>
-        <span className={styles.size}>{prettySize(message.size)}</span>
+        <Checkbox id={message.uid}
+          onChange={event => this.props.messageSelected(message, event.target.checked)}
+          checked={this.props.selectedMessages.indexOf(message.uid) > -1}
+        />
+        <span className={styles.itemDetails}
+          onClick={ () => this.props.messageClicked(message) }
+          draggable={true} onDragStart={event => this.onDragStart(event, folder, message)}>
+          <span className={styles.from}>{parseFrom(message.from)}</span>
+          <span className={styles.subject}>{message.subject}</span>
+          <span className={styles.receivedDate}>{prettyDate(message.receivedDate)}</span>
+          <span className={styles.size}>{prettySize(message.size)}</span>
+        </span>
       </li>
     );
   }
@@ -70,11 +80,13 @@ class MessageList extends Component {
 }
 
 MessageList.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
+  selectedMessages: PropTypes.array
 };
 
 MessageList.defaultProps = {
-  className: ''
+  className: '',
+  selectedMessages: []
 };
 
 const mapStateToProps = state => ({
@@ -91,19 +103,21 @@ const mapStateToProps = state => ({
           return 1;
         }
         return 0;
-      }) : []
+      }) : [],
+  selectedMessages: state.messages.selected
 });
 
 const mapDispatchToProps = dispatch => ({
-  selectMessage: (folder, message, credentials) => {
+  messageClicked: (folder, message, credentials) => {
     dispatch(selectMessage(message));
     readMessage(dispatch, credentials, folder, message);
-  }
+  },
+  messageSelected: (message, selected) => dispatch(setSelected(message, selected))
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
-  selectMessage: message =>
-    dispatchProps.selectMessage(stateProps.selectedFolder, message, stateProps.credentials)
+  messageClicked: message =>
+    dispatchProps.messageClicked(stateProps.selectedFolder, message, stateProps.credentials)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(MessageList);

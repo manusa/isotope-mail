@@ -13,9 +13,11 @@ class TextField extends Component {
     this.onBlur = this.onBlur.bind(this);
     this.handleOnChange = this.handleOnChange.bind(this);
   }
+
   render() {
     return (
-      <div className={`${mainCss['mdc-text-field']} ${this.state.focused ? 'mdc-text-field--focused' : ''}
+      <div className={`${mainCss['mdc-text-field']}
+        ${this.state.focused ? mainCss['mdc-text-field--focused'] : ''}
         ${this.props.fieldClass}`}>
         <input type={this.props.type} ref={this.inputRef} id={this.props.id}
           className={`${mainCss['mdc-text-field__input']} ${this.props.inputClass}`}
@@ -26,20 +28,22 @@ class TextField extends Component {
           onChange={this.handleOnChange} />
         <label htmlFor={this.props.id}
           className={`${mainCss['mdc-floating-label']}
-          ${this.state.focused || this.props.value ? 'mdc-floating-label--float-above' : ''}
+          ${this.state.focused || this.props.value ? mainCss['mdc-floating-label--float-above'] : ''}
           ${this.props.labelClass}`}>{this.props.label}</label>
         <div className={`${mainCss['mdc-line-ripple']}
-          ${this.state.focused ? 'mdc-line-ripple--active' : ''}
+          ${this.state.focused ? mainCss['mdc-line-ripple--active'] : ''}
           ${this.props.lineRippleClass}`}></div>
       </div>
     );
   }
+
   componentDidMount() {
     if (this.props.focused) {
       this.inputRef.current.focus();
       this.inputRef.current.selectionStart = this.inputRef.current.selectionEnd = this.inputRef.current.value.length;
     }
   }
+
   onFocus() {
     if (!this.state.focused) {
       this.setState({focused: true});
