@@ -55,7 +55,8 @@ class MessageList extends Component {
       <li key={key} style={style}
         draggable={true} onDragStart={event => this.onDragStart(event, folder, message)}
         className={`${mainCss['mdc-list-item']}
-                ${styles.item} ${message.seen ? styles.seen : ''}
+                ${styles.item}
+                ${message.seen ? styles.seen : ''}
                 ${message.deleted ? styles.deleted : ''}`} >
         <Checkbox id={message.uid}
           onChange={event => this.props.messageSelected(message, event.target.checked)}

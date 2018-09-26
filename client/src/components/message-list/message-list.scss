@@ -12,6 +12,7 @@
     height: 100%;
 
     .item {
+      display: flex;
       font-weight: $font-weight-bold;
       font-size: $font-size-body-2;
       padding: 0px;
@@ -29,9 +30,13 @@
       }
 
       .itemDetails {
+        flex-grow: 1;
+        flex-grow: 1;
+        min-width: 0;
+        width: 1px;
+
         display: flex;
         flex-flow: row nowrap;
-        width: 100%;
 
         .from {
           width: 200px;
