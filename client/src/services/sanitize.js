@@ -20,6 +20,11 @@ sanitize.addHook('afterSanitizeAttributes', node => {
     node.removeAttribute('width');
     node.removeAttribute('height');
   }
+
+  // FIX HR overflow
+  if (node.nodeName === 'HR' && node.width) {
+    node.removeAttribute('width');
+  }
 });
 
 const ISOTOPE_WHITELISTED_URL = '#IsotopeEmbedded';
