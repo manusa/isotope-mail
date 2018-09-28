@@ -18,16 +18,18 @@ function parseFrom(from) {
   return formattedFrom !== null ? formattedFrom[1] : firstFrom;
 }
 
-function dataTransferImage(t, messages) {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = 500;
-  canvas.height = 100;
-  ctx.font = '1rem sans-serif';
-  ctx.fillText(t('messageList.moveEmails', {emailCount: messages.length}), 10, 50);
-  const image = new Image();
-  image.src = canvas.toDataURL();
-  return image;
+function _dragImage(t, messages, x, y) {
+  const imageNode = document.createElement('span');
+  imageNode.draggable = true;
+  imageNode.style.opacity = '1';
+  imageNode.style.position = 'absolute';
+  imageNode.style.top = `${Math.max(0, y)}px`;
+  imageNode.style.left = `${Math.max(0, x)}px`;
+  imageNode.style.pointerEvents = 'none';
+  imageNode.style.padding = '6px';
+  imageNode.style.backgroundColor = 'white';
+  imageNode.innerHTML = t('messageList.moveEmails', {emailCount: messages.length});
+  return imageNode;
 }
 
 class MessageList extends Component {
@@ -69,7 +71,6 @@ class MessageList extends Component {
       <li key={key} style={style}
         draggable={true}
         onDragStart={event => this.onDragStart(event, folder, message)}
-        onDragEnd={event => this.onDragEnd(event)}
         className={`${mainCss['mdc-list-item']}
                 ${styles.item}
                 ${message.seen ? styles.seen : ''}
@@ -100,23 +101,17 @@ class MessageList extends Component {
         return;
       }
       const messages = this.props.messages.filter(m => this.props.selectedMessages.indexOf(m.uid) > -1);
-      const image = dataTransferImage(this.props.t, messages);
-      image.style.position = 'fixed';
-      // Append image to document to force the image to load before drag event starts
-      event.dataTransfer._IMAGE = document.body.appendChild(image);
-      event.dataTransfer.setDragImage(image, 10, 10);
+      if (event.dataTransfer.setDragImage) {
+        const image = _dragImage(this.props.t, messages, event.pageX, event.pageY);
+        const appendedImage = document.body.appendChild(image);
+        setTimeout(() => document.body.removeChild(appendedImage));
+        event.dataTransfer.setDragImage(image, -8, -16);
+      }
       payload.messages = messages;
     } else {
       payload.messages = [message];
     }
     event.dataTransfer.setData('application/json', JSON.stringify(payload));
-  }
-
-  onDragEnd(event) {
-    // Remove temporary image with selected message count
-    if (event.dataTransfer._IMAGE) {
-      document.body.removeChild(event.dataTransfer._IMAGE);
-    }
   }
 }
 
