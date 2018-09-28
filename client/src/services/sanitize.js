@@ -3,7 +3,7 @@ import ReactDOMServer from 'react-dom/server';
 import {renderSpinner} from '../components/spinner/spinner';
 
 sanitize.addHook('afterSanitizeAttributes', node => {
-  // set all elements owning target to target=_blank
+  // set all elements owning target to target=_blank -> Open URLS in new tab
   if ('target' in node) {
     node.setAttribute('target', '_blank');
   }
@@ -12,6 +12,13 @@ sanitize.addHook('afterSanitizeAttributes', node => {
     && (node.hasAttribute('xlink:href')
       || node.hasAttribute('href'))) {
     node.setAttribute('xlink:show', 'new');
+  }
+
+  // FIX Image aspect ratio
+  if (node.nodeName === 'IMG' && node.width) {
+    node.style.width = `${node.width}px`;
+    node.removeAttribute('width');
+    node.removeAttribute('height');
   }
 });
 
