@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {FolderTypes} from '../../services/folder';
 import {selectMessage} from '../../actions/application';
-import {moveMessage, setMessageSeen} from '../../services/message';
+import {moveMessages, setMessageSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
 
@@ -92,7 +92,7 @@ const mapDispatchToProps = dispatch => ({
       trashFolder = folders.items.find(f => f.name.toUpperCase() === 'TRASH');
     }
     if (selectedMessage && selectedFolder && trashFolder) {
-      moveMessage(dispatch, credentials, selectedFolder, trashFolder, selectedMessage);
+      moveMessages(dispatch, credentials, selectedFolder, trashFolder, [selectedMessage]);
       dispatch(selectMessage(null));
     }
   },

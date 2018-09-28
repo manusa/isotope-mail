@@ -15,7 +15,10 @@
       "diskQuotaExceeded": "Disk quota exceeded (IndexedDB)"
     }
   },
-  "messageViewer":{
+  "messageList": {
+    "moveEmails": "Moving {{emailCount}} e-mails"
+  },
+  "messageViewer": {
     "to": "to",
     "cc": "cc",
     "bcc": "bcc"

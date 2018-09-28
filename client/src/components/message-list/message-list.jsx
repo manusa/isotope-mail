@@ -1,20 +1,33 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
 import {AutoSizer, List} from 'react-virtualized';
 import Spinner from '../spinner/spinner';
 import {prettyDate, prettySize} from '../../services/prettify';
 import {selectMessage} from '../../actions/application';
+import {setSelected} from '../../actions/messages';
 import {readMessage} from '../../services/message';
 import mainCss from '../../styles/main.scss';
 import styles from './message-list.scss';
 import Checkbox from '../form/checkbox/checkbox';
-import {setSelected} from '../../actions/messages';
 
 function parseFrom(from) {
   const firstFrom = from && from.length > 0 ? from[0] : '';
   const formattedFrom = firstFrom.match(/^\"(.*)\"/);
   return formattedFrom !== null ? formattedFrom[1] : firstFrom;
+}
+
+function dataTransferImage(t, messages) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 500;
+  canvas.height = 100;
+  ctx.font = '1rem sans-serif';
+  ctx.fillText(t('messageList.moveEmails', {emailCount: messages.length}), 10, 50);
+  const image = new Image();
+  image.src = canvas.toDataURL();
+  return image;
 }
 
 class MessageList extends Component {
@@ -51,16 +64,19 @@ class MessageList extends Component {
   renderItem({index, key, style}) {
     const folder = this.props.selectedFolder;
     const message = this.props.messages[index];
+    const selected = this.props.selectedMessages.indexOf(message.uid) > -1;
     return (
       <li key={key} style={style}
-        draggable={true} onDragStart={event => this.onDragStart(event, folder, message)}
+        draggable={true}
+        onDragStart={event => this.onDragStart(event, folder, message)}
+        onDragEnd={event => this.onDragEnd(event)}
         className={`${mainCss['mdc-list-item']}
                 ${styles.item}
                 ${message.seen ? styles.seen : ''}
                 ${message.deleted ? styles.deleted : ''}`} >
         <Checkbox id={message.uid}
           onChange={event => this.props.messageSelected(message, event.target.checked)}
-          checked={this.props.selectedMessages.indexOf(message.uid) > -1}
+          checked={selected}
         />
         <span className={styles.itemDetails}
           onClick={ () => this.props.messageClicked(message) }
@@ -75,10 +91,35 @@ class MessageList extends Component {
   }
 
   onDragStart(event, fromFolder, message) {
-    const payload = {fromFolder, message};
+    event.stopPropagation();
+    const payload = {fromFolder};
+    if (this.props.selectedMessages.length > 0) {
+      // Prevent dragging single messages when there is a selection and message is not part of the selection
+      if (this.props.selectedMessages.indexOf(message.uid) < 0) {
+        event.preventDefault();
+        return;
+      }
+      const messages = this.props.messages.filter(m => this.props.selectedMessages.indexOf(m.uid) > -1);
+      const image = dataTransferImage(this.props.t, messages);
+      image.style.position = 'fixed';
+      // Append image to document to force the image to load before drag event starts
+      event.dataTransfer._IMAGE = document.body.appendChild(image);
+      event.dataTransfer.setDragImage(image, 10, 10);
+      payload.messages = messages;
+    } else {
+      payload.messages = [message];
+    }
     event.dataTransfer.setData('application/json', JSON.stringify(payload));
   }
+
+  onDragEnd(event) {
+    // Remove temporary image with selected message count
+    if (event.dataTransfer._IMAGE) {
+      document.body.removeChild(event.dataTransfer._IMAGE);
+    }
+  }
 }
+
 
 MessageList.propTypes = {
   className: PropTypes.string,
@@ -121,4 +162,4 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, s
     dispatchProps.messageClicked(stateProps.selectedFolder, message, stateProps.credentials)
 }));
 
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(MessageList);
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(translate()(MessageList));

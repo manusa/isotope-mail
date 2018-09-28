@@ -7,6 +7,7 @@ import {
   backendRequestCompleted,
   deleteFromCache,
   setFolderCache,
+  setSelected,
   updateCache
 } from '../actions/messages';
 import {refreshMessage} from '../actions/application';
@@ -148,25 +149,40 @@ export function downloadAttachment(credentials, attachment) {
   return fetch$;
 }
 
-export function moveMessage(dispatch, credentials, fromFolder, toFolder, message) {
+/**
+ * Moves the provided array of messaged from the original fromFolder to the target toFolder.
+ *
+ * This method is optimistic and will calculate fromFolder message counts before any server response is received.
+ *
+ * @param dispatch {!function}
+ * @param credentials {!Object}
+ * @param fromFolder {!Object}
+ * @param toFolder {!Object}
+ * @param messages {!Array.<Object>}
+ */
+export function moveMessages(dispatch, credentials, fromFolder, toFolder, messages) {
   // Abort any operations that can affect operation result
   _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
   abortFetch(abortControllerWrappers.getFoldersAbortController);
 
-  // Calculate new fromFolder values
   const fromFolderUpdated = {
-    ...fromFolder,
-    messageCount: fromFolder.messageCount - 1,
-    unreadMessageCount: fromFolder.unreadMessageCount - (message.seen ? 0 : 1),
-    newMessageCount: fromFolder.newMessageCount - (message.recent ? 1 : 0)
+    ...fromFolder
   };
+  messages.forEach(m => {
+    dispatch(setSelected(m, false));
+    // Calculate new fromFolder values
+    fromFolderUpdated.messageCount -= 1;
+    fromFolderUpdated.unreadMessageCount -= (m.seen ? 0 : 1);
+    fromFolderUpdated.newMessageCount -= (m.recent ? 1 : 0);
+  });
 
   // Update state with expected response from server
-  dispatch(deleteFromCache(fromFolder, [message]));
+  dispatch(deleteFromCache(fromFolder, messages));
   dispatch(updateFolder(fromFolderUpdated));
-  fetch(message._links.move.href.replace('{toFolderId}', toFolder.folderId), {
+  fetch(messages[0]._links['move.bulk'].href.replace('{toFolderId}', toFolder.folderId), {
     method: 'PUT',
-    headers: credentialsHeaders(credentials)
+    headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
+    body: JSON.stringify(messages.map(m => m.uid))
   })
     .then(toJson)
     .then(newMessages => {
@@ -177,7 +193,7 @@ export function moveMessage(dispatch, credentials, fromFolder, toFolder, message
     })
     .catch(() => {
       // Rollback state from dispatched expected responses
-      dispatch(updateCache(fromFolder, [message]));
+      dispatch(updateCache(fromFolder, messages));
       dispatch(updateFolder(fromFolder));
     });
 }

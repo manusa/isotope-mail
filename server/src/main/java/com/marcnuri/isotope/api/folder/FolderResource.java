@@ -47,6 +47,7 @@ public class FolderResource implements ApplicationContextAware {
     private static final String REL_MESSAGES = "messages";
     private static final String REL_DOWNLOAD = "download";
     private static final String REL_MOVE = "move";
+    private static final String REL_MOVE_BULK = "move.bulk";
     private static final String REL_SEEN = "seen";
 
     private final CredentialsService credentialsService;
@@ -112,6 +113,20 @@ public class FolderResource implements ApplicationContextAware {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping(path = "/{fromFolderId}/messages/folder/{toFolderId}")
+    public ResponseEntity<List<MessageWithFolder>> moveMessages(
+            HttpServletRequest request, @PathVariable("fromFolderId") String fromFolderId,
+            @PathVariable("toFolderId") String toFolderId, @RequestBody List<Long> messageIds) {
+
+        log.debug("Moving {} messages from folder {} to folder {}", messageIds.size(), fromFolderId, toFolderId);
+        final List<MessageWithFolder> movedMessages = imapServiceFactory.getObject().moveMessages(
+                credentialsService.fromRequest(request), Folder.toId(fromFolderId), Folder.toId(toFolderId),
+                messageIds);
+        movedMessages.forEach(mwf -> addLinks(mwf.getFolder()));
+        addLinks(toFolderId, movedMessages);
+        return ResponseEntity.ok(movedMessages);
+    }
+
     @PutMapping(path = "/{fromFolderId}/messages/{messageId}/folder/{toFolderId}")
     public ResponseEntity<List<MessageWithFolder>> moveMessage(
             HttpServletRequest request, @PathVariable("fromFolderId") String fromFolderId,
@@ -170,6 +185,8 @@ public class FolderResource implements ApplicationContextAware {
                 .withSelfRel().expand());
         message.add(linkTo(methodOn(FolderResource.class).moveMessage(null, folderId, message.getUid(),
                 null)).withRel(REL_MOVE));
+        message.add(linkTo(methodOn(FolderResource.class).moveMessages(null, folderId, null,
+                null)).withRel(REL_MOVE_BULK));
         message.add(linkTo(methodOn(FolderResource.class).setMessageSeen(null, folderId, message.getUid(),
                 false)).withRel(REL_SEEN));
         return message;

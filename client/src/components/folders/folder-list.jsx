@@ -20,7 +20,7 @@ class FolderList extends Component {
               <nav className={`${mainCss['mdc-list']} ${styles.childList}`}>
                 <FolderList folderList={folder.children}
                   onClickFolder={this.props.onClickFolder}
-                  onDropMessage={this.props.onDropMessage}
+                  onDropMessages={this.props.onDropMessages}
                   selectedFolder={this.props.selectedFolder} />
               </nav> :
               null
@@ -33,7 +33,7 @@ class FolderList extends Component {
   onDrop(event, toFolder) {
     event.preventDefault();
     const payload = JSON.parse(event.dataTransfer.getData('application/json'));
-    this.props.onDropMessage(payload.fromFolder, toFolder, payload.message);
+    this.props.onDropMessages(payload.fromFolder, toFolder, payload.messages);
   }
 }
 
@@ -42,7 +42,7 @@ FolderList.propTypes = {
   folderList: PropTypes.array.isRequired,
   selectedFolder: PropTypes.object,
   onClickFolder: PropTypes.func,
-  onDropMessage: PropTypes.func
+  onDropMessages: PropTypes.func
 };
 
 

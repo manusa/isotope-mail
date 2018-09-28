@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import Spinner from '../spinner/spinner';
 import FolderList from './folder-list';
-import {moveMessage, resetFolderMessagesCache} from '../../services/message';
+import {moveMessages, resetFolderMessagesCache} from '../../services/message';
 import {selectFolder, selectMessage} from '../../actions/application';
 import {clearSelected} from '../../actions/messages';
 import styles from './folder-container.scss';
@@ -18,7 +18,7 @@ class FolderContainer extends Component {
         <FolderList folderList={this.props.folderList}
           selectedFolder={this.props.selectedFolder}
           onClickFolder={this.props.selectFolder}
-          onDropMessage={this.props.moveMessage}
+          onDropMessages={this.props.moveMessages}
         />
       </nav>
     );
@@ -40,22 +40,21 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  selectFolder: (folder, credentials, cachedFolderMessagesMap) => {
+  selectFolder: (folder, credentials) => {
     dispatch(selectFolder(folder));
     dispatch(selectMessage(null));
     dispatch(clearSelected());
     resetFolderMessagesCache(dispatch, credentials, folder);
   },
-  moveMessage: (credentials, fromFolder, toFolder, message) => {
-    moveMessage(dispatch, credentials, fromFolder, toFolder, message);
+  moveMessages: (credentials, fromFolder, toFolder, messages) => {
+    moveMessages(dispatch, credentials, fromFolder, toFolder, messages);
   }
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
   selectFolder: folder =>
-    dispatchProps.selectFolder(folder, stateProps.application.user.credentials,
-      stateProps.messages.cache[folder.folderId]),
-  moveMessage: (fromFolder, toFolder, message) => dispatchProps.moveMessage(stateProps.application.user.credentials,
+    dispatchProps.selectFolder(folder, stateProps.application.user.credentials),
+  moveMessages: (fromFolder, toFolder, message) => dispatchProps.moveMessages(stateProps.application.user.credentials,
     fromFolder, toFolder, message)
 }));
 

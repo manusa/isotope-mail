@@ -15,7 +15,10 @@
       "diskQuotaExceeded": "Cuota de disco sobrepasada (IndexedDB)"
     }
   },
-  "messageViewer":{
+  "messageList": {
+    "moveEmails": "Moviendo {{emailCount}} e-mails"
+  },
+  "messageViewer": {
     "to": "para",
     "cc": "cc",
     "bcc": "bcc"
