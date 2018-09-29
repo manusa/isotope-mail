@@ -16,8 +16,12 @@ sanitize.addHook('afterSanitizeAttributes', node => {
 
   // FIX Image aspect ratio
   if (node.nodeName === 'IMG' && node.width) {
-    node.style.width = `${node.width}px`;
-    node.removeAttribute('width');
+    node.style.width = '';
+    node.style.height = '';
+    if (node.width) {
+      node.style.width = `${node.width}px`;
+      node.removeAttribute('width');
+    }
     node.removeAttribute('height');
   }
 
