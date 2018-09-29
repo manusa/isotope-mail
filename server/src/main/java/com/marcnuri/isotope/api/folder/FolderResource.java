@@ -84,7 +84,7 @@ public class FolderResource implements ApplicationContextAware {
                     addLinks(folderId, l.data());
                     return l;
                 })
-                .subscribeOn(Schedulers.parallel())
+                .subscribeOn(Schedulers.elastic())
                 .publishOn(Schedulers.immediate()) // Will allow server to stop sending events in case client disconnects
                 ;
     }
