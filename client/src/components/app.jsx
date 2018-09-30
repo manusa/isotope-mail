@@ -5,8 +5,7 @@ import TopBar from './top-bar/top-bar';
 import SideBar from './side-bar/side-bar';
 import MessageList from './message-list/message-list';
 import MessageViewer from './message-viewer/message-viewer';
-import {FolderTypes, getFolders} from '../services/folder';
-import {addFolder} from '../actions/folders';
+import {getFolders} from '../services/folder';
 import {addMessage} from '../actions/messages';
 import mainCss from '../styles/main.scss';
 import styles from './app.scss';
@@ -36,9 +35,6 @@ class App extends Component {
               <div className={styles['fab-container']}>
                 <button className={`${mainCss['mdc-fab']}`} onClick={this.props.addMessage.bind(this)}>
                   <span className={`material-icons ${mainCss['mdc-fab__icon']}`}>edit</span>
-                </button>
-                <button className={`${mainCss['mdc-fab']}`} onClick={this.props.addFolder.bind(this)}>
-                  <span className={`material-icons ${mainCss['mdc-fab__icon']}`}>folder</span>
                 </button>
               </div>
             </Fragment>
@@ -104,7 +100,6 @@ App.propTypes = {
   folders: PropTypes.object.isRequired,
   reloadFolders: PropTypes.func,
   reloadMessageCache: PropTypes.func,
-  addFolder: PropTypes.func.isRequired,
   addMessage: PropTypes.func.isRequired
 };
 
@@ -116,9 +111,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   reloadFolders: credentials => getFolders(dispatch, credentials, true),
   reloadMessageCache: (credentials, folder) => resetFolderMessagesCache(dispatch, credentials, folder),
-  addFolder: () => {
-    dispatch(addFolder({fullURL: 'FU', name: 'New Folder', type: FolderTypes.FOLDER, children: []}));
-  },
   addMessage: () => {
     dispatch(addMessage({subject: 'New Message'}));
   }
