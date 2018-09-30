@@ -7,6 +7,14 @@ import {moveMessages, setMessageSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
 
+function _findTrashFolder(foldersState) {
+  let trashFolder = Object.values(foldersState.explodedItems).find(f => f.type === FolderTypes.TRASH);
+  if (!trashFolder) {
+    trashFolder = foldersState.items.find(f => f.name.toUpperCase() === 'TRASH');
+  }
+  return trashFolder;
+}
+
 class TopBar extends Component {
   constructor(props) {
     super(props);
@@ -45,25 +53,41 @@ class TopBar extends Component {
             }
           </section>
           <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-end']}`}>
-            {isMessageViewer ?
-              <Fragment>
-                <button
-                  onClick={this.props.deleteMessage}
-                  className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-                  delete
-                </button>
-                <button
-                  onClick={this.props.toggleMessageSeen}
-                  className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-                  markunread
-                </button>
-              </Fragment>
-              :
-              null
-            }
+            {isMessageViewer ? this.renderMessageViewerActions() : this.renderMessageListActions()}
           </section>
         </div>
       </header>
+    );
+  }
+
+  renderMessageViewerActions() {
+    return (
+      <Fragment>
+        <button
+          onClick={this.props.deleteMessage}
+          className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
+          delete
+        </button>
+        <button
+          onClick={this.props.toggleMessageSeen}
+          className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
+          markunread
+        </button>
+      </Fragment>
+    );
+  }
+
+  renderMessageListActions() {
+    return (
+      <Fragment>
+        {this.props.selectedMessagesIds.length > 0 ?
+          <button
+            onClick={this.props.deleteMessages}
+            className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
+            delete
+          </button>
+          : null}
+      </Fragment>
     );
   }
 }
@@ -71,6 +95,7 @@ class TopBar extends Component {
 TopBar.propTypes = {
   title: PropTypes.string.isRequired,
   selectedFolder: PropTypes.object,
+  selectedMessagesIds: PropTypes.array,
   selectMessage: PropTypes.func.isRequired,
   sideBarToggle: PropTypes.func.isRequired,
   sideBarCollapsed: PropTypes.bool.isRequired
@@ -79,21 +104,28 @@ TopBar.propTypes = {
 const mapStateToProps = state => ({
   title: state.application.title,
   selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || null,
+  selectedMessagesIds: state.messages.selected,
   selectedMessage: state.application.selectedMessage,
   credentials: state.application.user.credentials,
-  folders: state.folders
+  folders: state.folders,
+  messages: state.application.selectedFolderId && state.messages.cache[state.application.selectedFolderId] ?
+    Array.from(state.messages.cache[state.application.selectedFolderId].values()) : []
 });
 
 const mapDispatchToProps = dispatch => ({
   selectMessage: message => dispatch(selectMessage(message)),
   deleteMessage: (credentials, folders, selectedFolder, selectedMessage) => {
-    let trashFolder = Object.values(folders.explodedItems).find(f => f.type === FolderTypes.TRASH);
-    if (!trashFolder) {
-      trashFolder = folders.items.find(f => f.name.toUpperCase() === 'TRASH');
-    }
+    const trashFolder = _findTrashFolder(folders);
     if (selectedMessage && selectedFolder && trashFolder) {
       moveMessages(dispatch, credentials, selectedFolder, trashFolder, [selectedMessage]);
       dispatch(selectMessage(null));
+    }
+  },
+  deleteMessages: (credentials, folders, selectedFolder, selectedMessagesIds, messages) => {
+    const trashFolder = _findTrashFolder(folders);
+    if (selectedMessagesIds && selectedMessagesIds.length > 0 && selectedFolder && trashFolder) {
+      const selectedMessages = messages.filter(m => selectedMessagesIds.indexOf(m.uid) > -1);
+      moveMessages(dispatch, credentials, selectedFolder, trashFolder, selectedMessages);
     }
   },
   toggleMessageSeen: (credentials, selectedFolder, selectedMessage) => {
@@ -106,6 +138,10 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, s
   deleteMessage: () =>
     dispatchProps.deleteMessage(
       stateProps.credentials, stateProps.folders, stateProps.selectedFolder, stateProps.selectedMessage),
+  deleteMessages: () =>
+    dispatchProps.deleteMessages(
+      stateProps.credentials, stateProps.folders, stateProps.selectedFolder, stateProps.selectedMessagesIds,
+      stateProps.messages),
   toggleMessageSeen: () =>
     dispatchProps.toggleMessageSeen(
       stateProps.credentials, stateProps.selectedFolder, stateProps.selectedMessage)
