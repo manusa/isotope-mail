@@ -280,19 +280,21 @@ public class ImapService {
         }
     }
 
-    public Message setMessageSeen(Credentials credentials, URLName folderId, Long uid, boolean seen) {
+    public List<MessageWithFolder> setMessagesSeen(Credentials credentials, URLName folderId, boolean seen, long... uids) {
         try {
             final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
             folder.open(READ_WRITE);
-            final IMAPMessage message = (IMAPMessage)folder.getMessageByUID(uid);
-            message.setFlag(Flags.Flag.SEEN, seen);
-            final Message ret = MessageWithFolder.from(folder, message);
+            final javax.mail.Message[] messages = folder.getMessagesByUID(uids);
+            final List<MessageWithFolder> ret = new ArrayList<>(messages.length);
+            for (javax.mail.Message message : messages) {
+                message.setFlag(Flags.Flag.SEEN, seen);
+                ret.add(MessageWithFolder.from(folder, (IMAPMessage)message));
+            }
             folder.close(false);
             return ret;
         } catch (MessagingException ex) {
             throw new IsotopeException(ex.getMessage(), ex);
         }
-
     }
 
     @PreDestroy

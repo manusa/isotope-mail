@@ -19,6 +19,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -49,6 +51,7 @@ public class FolderResource implements ApplicationContextAware {
     private static final String REL_MOVE = "move";
     private static final String REL_MOVE_BULK = "move.bulk";
     private static final String REL_SEEN = "seen";
+    private static final String REL_SEEN_BULK = "seen.bulk";
 
     private final CredentialsService credentialsService;
     private final ObjectFactory<ImapService> imapServiceFactory;
@@ -116,7 +119,7 @@ public class FolderResource implements ApplicationContextAware {
     @PutMapping(path = "/{fromFolderId}/messages/folder/{toFolderId}")
     public ResponseEntity<List<MessageWithFolder>> moveMessages(
             HttpServletRequest request, @PathVariable("fromFolderId") String fromFolderId,
-            @PathVariable("toFolderId") String toFolderId, @RequestBody List<Long> messageIds) {
+            @PathVariable("toFolderId") String toFolderId, @NonNull @RequestBody List<Long> messageIds) {
 
         log.debug("Moving {} messages from folder {} to folder {}", messageIds.size(), fromFolderId, toFolderId);
         final List<MessageWithFolder> movedMessages = imapServiceFactory.getObject().moveMessages(
@@ -142,16 +145,30 @@ public class FolderResource implements ApplicationContextAware {
     }
 
     @PutMapping(path = "/{folderId}/messages/{messageId}/seen")
-    public ResponseEntity<Message> setMessageSeen(
-            HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId,
+    public ResponseEntity<MessageWithFolder> setMessageSeen(
+            HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") long messageId,
             @RequestBody boolean seen) {
 
         log.debug("Setting message seen attribute to {} in message {} from folder {}", seen, messageId, folderId);
         return ResponseEntity.ok(addLinks(folderId,
-                imapServiceFactory.getObject().setMessageSeen(
-                        credentialsService.fromRequest(request), Folder.toId(folderId), messageId, seen)
+                imapServiceFactory.getObject().setMessagesSeen(
+                        credentialsService.fromRequest(request), Folder.toId(folderId), seen, messageId).stream()
+                .findFirst().orElse(null)
         ));
     }
+
+    @PutMapping(path = "/{folderId}/messages/seen/{seen}")
+    public ResponseEntity<List<MessageWithFolder>> setMessagesSeen(
+            HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("seen") Boolean seen,
+            @NonNull @RequestBody List<Long> messageIds) {
+
+        log.debug("Setting {} messages in folder {} seen attribute to {}" , messageIds.size(), folderId, seen);
+        return ResponseEntity.ok(addLinks(folderId,
+                imapServiceFactory.getObject().setMessagesSeen(
+                        credentialsService.fromRequest(request), Folder.toId(folderId), seen,
+                        messageIds.stream().mapToLong(Long::longValue).toArray())));
+    }
+
     private static Folder[] addLinks(Folder... folders) {
         Stream.of(folders).forEach(FolderResource::addLinks);
         return folders;
@@ -180,15 +197,19 @@ public class FolderResource implements ApplicationContextAware {
         return messages;
     }
 
-    private static <M extends Message> M addLinks(String folderId, M message) {
-        message.add(linkTo(methodOn(FolderResource.class).getMessage(null, folderId, message.getUid()))
-                .withSelfRel().expand());
-        message.add(linkTo(methodOn(FolderResource.class).moveMessage(null, folderId, message.getUid(),
-                null)).withRel(REL_MOVE));
-        message.add(linkTo(methodOn(FolderResource.class).moveMessages(null, folderId, null,
-                null)).withRel(REL_MOVE_BULK));
-        message.add(linkTo(methodOn(FolderResource.class).setMessageSeen(null, folderId, message.getUid(),
-                false)).withRel(REL_SEEN));
+    private static <M extends Message> M addLinks(String folderId, @Nullable M message) {
+        if (message != null) {
+            message.add(linkTo(methodOn(FolderResource.class).getMessage(null, folderId, message.getUid()))
+                    .withSelfRel().expand());
+            message.add(linkTo(methodOn(FolderResource.class).moveMessage(null, folderId, message.getUid(),
+                    null)).withRel(REL_MOVE));
+            message.add(linkTo(methodOn(FolderResource.class).moveMessages(null, folderId, null,
+                    Collections.emptyList())).withRel(REL_MOVE_BULK));
+            message.add(linkTo(methodOn(FolderResource.class).setMessageSeen(null, folderId, message.getUid(),
+                    false)).withRel(REL_SEEN));
+            message.add(linkTo(methodOn(FolderResource.class).setMessagesSeen(null, folderId, null,
+                    Collections.emptyList())).withRel(REL_SEEN_BULK));
+        }
         return message;
     }
 

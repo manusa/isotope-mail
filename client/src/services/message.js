@@ -188,7 +188,8 @@ export function moveMessages(dispatch, credentials, fromFolder, toFolder, messag
     .then(newMessages => {
       if (Array.isArray(newMessages)) {
         dispatch(updateCache(toFolder, newMessages));
-        newMessages.forEach(m => dispatch(updateFolder(processFolders([m.folder])[0])));
+        // Update folder info with the last message (contains the most recent information)
+        dispatch(updateFolder(processFolders([newMessages[newMessages.length - 1].folder])[0]));
       }
     })
     .catch(() => {
@@ -198,30 +199,40 @@ export function moveMessages(dispatch, credentials, fromFolder, toFolder, messag
     });
 }
 
-export function setMessageSeen(dispatch, credentials, folder, message, seen) {
+export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
   // Abort any operations that can affect operation result
   _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
   abortFetch(abortControllerWrappers.getFoldersAbortController);
 
+  const messagesToUpdate = [];
   // Update state with expected response from server
-  const expectedUpdatedMessage = {...message, seen: seen};
-  dispatch(updateCache(folder, [expectedUpdatedMessage]));
-  const expectedUpdatedFolder = {...folder, unreadMessageCount: folder.unreadMessageCount + 1};
+  const expectedUpdatedFolder = {...folder};
+  messages.forEach(m => {
+    // Calculate new folder values
+    if (m.seen !== seen) {
+      messagesToUpdate.push({...m, seen: seen});
+      expectedUpdatedFolder.unreadMessageCount += seen ? -1 : +1;
+    }
+  });
+  dispatch(updateCache(folder, messagesToUpdate));
   dispatch(updateFolder(expectedUpdatedFolder));
 
-  fetch(message._links.seen.href, {
+  fetch(messages[0]._links['seen.bulk'].href.replace('{seen}', seen.toString()), {
     method: 'PUT',
     headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
-    body: JSON.stringify(seen)
+    body: JSON.stringify(messagesToUpdate.map(m => m.uid))
   })
     .then(toJson)
-    .then(updatedMessage => {
-      dispatch(updateCache(folder, [updatedMessage]));
-      dispatch(updateFolder(processFolders([updatedMessage.folder])[0]));
+    .then(updatedMessages => {
+      if (Array.isArray(updatedMessages) && updatedMessages.length > 0) {
+        dispatch(updateCache(folder, updatedMessages));
+        // Update folder info with the last message (contains the most recent information)
+        dispatch(updateFolder(processFolders([updatedMessages[updatedMessages.length - 1].folder])[0]));
+      }
     })
     .catch(() => {
       // Rollback state from dispatched expected responses
-      dispatch(updateCache(folder, [message]));
+      dispatch(updateCache(folder, messages));
       dispatch(updateFolder(folder));
     });
 }

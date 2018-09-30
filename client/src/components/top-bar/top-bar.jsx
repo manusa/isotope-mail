@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {FolderTypes} from '../../services/folder';
 import {selectMessage} from '../../actions/application';
-import {moveMessages, setMessageSeen} from '../../services/message';
+import {moveMessages, setMessagesSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
 
@@ -79,15 +79,27 @@ class TopBar extends Component {
 
   renderMessageListActions() {
     return (
-      <Fragment>
-        {this.props.selectedMessagesIds.length > 0 ?
+      this.props.selectedMessages.length > 0 ?
+        <Fragment>
           <button
             onClick={this.props.deleteMessages}
             className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
             delete
           </button>
-          : null}
-      </Fragment>
+          {this.props.selectedMessagesAllUnread ?
+            <button
+              onClick={() => this.props.setMessagesSeen(true)}
+              className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
+              drafts
+            </button> :
+            <button
+              onClick={() => this.props.setMessagesSeen(false)}
+              className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
+              markunread
+            </button>
+          }
+        </Fragment>
+        : null
     );
   }
 }
@@ -95,22 +107,33 @@ class TopBar extends Component {
 TopBar.propTypes = {
   title: PropTypes.string.isRequired,
   selectedFolder: PropTypes.object,
-  selectedMessagesIds: PropTypes.array,
+  selectedMessagesIds: PropTypes.array.isRequired,
+  selectedMessages: PropTypes.array.isRequired,
+  selectedMessage: PropTypes.object,
   selectMessage: PropTypes.func.isRequired,
+  selectedMessagesAllUnread: PropTypes.bool.isRequired,
   sideBarToggle: PropTypes.func.isRequired,
   sideBarCollapsed: PropTypes.bool.isRequired
 };
 
-const mapStateToProps = state => ({
-  title: state.application.title,
-  selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || null,
-  selectedMessagesIds: state.messages.selected,
-  selectedMessage: state.application.selectedMessage,
-  credentials: state.application.user.credentials,
-  folders: state.folders,
-  messages: state.application.selectedFolderId && state.messages.cache[state.application.selectedFolderId] ?
-    Array.from(state.messages.cache[state.application.selectedFolderId].values()) : []
-});
+const mapStateToProps = state => {
+  const selectedMessagesIds = state.messages.selected;
+  const messages = state.application.selectedFolderId && state.messages.cache[state.application.selectedFolderId] ?
+    Array.from(state.messages.cache[state.application.selectedFolderId].values()) : [];
+  const selectedMessages = messages.filter(m => selectedMessagesIds.indexOf(m.uid) > -1);
+  const selectedMessagesAllUnread = selectedMessages.filter(m => m.seen === true).length === 0;
+  return ({
+    title: state.application.title,
+    selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || null,
+    selectedMessagesIds: selectedMessagesIds,
+    selectedMessages: selectedMessages,
+    selectedMessage: state.application.selectedMessage,
+    selectedMessagesAllUnread: selectedMessagesAllUnread,
+    credentials: state.application.user.credentials,
+    folders: state.folders,
+    messages: messages
+  });
+};
 
 const mapDispatchToProps = dispatch => ({
   selectMessage: message => dispatch(selectMessage(message)),
@@ -121,16 +144,20 @@ const mapDispatchToProps = dispatch => ({
       dispatch(selectMessage(null));
     }
   },
-  deleteMessages: (credentials, folders, selectedFolder, selectedMessagesIds, messages) => {
+  toggleMessageSeen: (credentials, selectedFolder, selectedMessage) => {
+    setMessagesSeen(dispatch, credentials, selectedFolder, [selectedMessage], !selectedMessage.seen);
+    dispatch(selectMessage(null));
+  },
+  deleteMessages: (credentials, folders, selectedFolder, selectedMessages) => {
     const trashFolder = _findTrashFolder(folders);
-    if (selectedMessagesIds && selectedMessagesIds.length > 0 && selectedFolder && trashFolder) {
-      const selectedMessages = messages.filter(m => selectedMessagesIds.indexOf(m.uid) > -1);
+    if (selectedMessages.length > 0 && selectedFolder && trashFolder) {
       moveMessages(dispatch, credentials, selectedFolder, trashFolder, selectedMessages);
     }
   },
-  toggleMessageSeen: (credentials, selectedFolder, selectedMessage) => {
-    setMessageSeen(dispatch, credentials, selectedFolder, selectedMessage, !selectedMessage.seen);
-    dispatch(selectMessage(null));
+  setMessagesSeen: (credentials, selectedFolder, selectedMessages, seen) => {
+    if (selectedMessages.length > 0 && selectedFolder) {
+      setMessagesSeen(dispatch, credentials, selectedFolder, selectedMessages, seen);
+    }
   }
 });
 
@@ -138,13 +165,15 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, s
   deleteMessage: () =>
     dispatchProps.deleteMessage(
       stateProps.credentials, stateProps.folders, stateProps.selectedFolder, stateProps.selectedMessage),
-  deleteMessages: () =>
-    dispatchProps.deleteMessages(
-      stateProps.credentials, stateProps.folders, stateProps.selectedFolder, stateProps.selectedMessagesIds,
-      stateProps.messages),
   toggleMessageSeen: () =>
     dispatchProps.toggleMessageSeen(
-      stateProps.credentials, stateProps.selectedFolder, stateProps.selectedMessage)
+      stateProps.credentials, stateProps.selectedFolder, stateProps.selectedMessage),
+  deleteMessages: () =>
+    dispatchProps.deleteMessages(
+      stateProps.credentials, stateProps.folders, stateProps.selectedFolder, stateProps.selectedMessages),
+  setMessagesSeen: seen =>
+    dispatchProps.setMessagesSeen(
+      stateProps.credentials, stateProps.selectedFolder, stateProps.selectedMessages, seen)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(TopBar);
