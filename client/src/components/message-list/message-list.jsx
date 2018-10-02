@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
 import {AutoSizer, List} from 'react-virtualized';
+import Checkbox from '../form/checkbox/checkbox';
 import Spinner from '../spinner/spinner';
 import {prettyDate, prettySize} from '../../services/prettify';
 import {selectMessage} from '../../actions/application';
@@ -10,7 +11,6 @@ import {setSelected} from '../../actions/messages';
 import {readMessage} from '../../services/message';
 import mainCss from '../../styles/main.scss';
 import styles from './message-list.scss';
-import Checkbox from '../form/checkbox/checkbox';
 
 function parseFrom(from) {
   const firstFrom = from && from.length > 0 ? from[0] : '';

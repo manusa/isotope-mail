@@ -43,6 +43,11 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
       errorsSetState.errors = {...state.errors};
       errorsSetState.errors[action.payload.type] = action.payload.value;
       return errorsSetState;
+    case ActionTypes.APPLICATION_MESSAGE_EDIT: {
+      const newState = {...state};
+      newState.newMessage = {...action.payload};
+      return newState;
+    }
     default:
       return state;
   }

@@ -45,8 +45,6 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
       const newUpdateState = {...state, selected: []};
       return newUpdateState;
     }
-    case ActionTypes.ADD_MESSAGE:
-      return {...state, items: [...state.items, action.payload]};
     default:
       return state;
   }

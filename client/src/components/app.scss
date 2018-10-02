@@ -15,12 +15,14 @@
       transition: $mdc-slidable-drawer-transition-open;
     }
 
-    .message-grid{
+    .message-grid {
       background-color: #ffffff;
       flex-grow: 1;
+      min-width: 0;
     }
 
-    .message-viewer {
+    .message-viewer,
+    .message-editor {
       background-color: #ffffff;
       flex-grow: 1;
       min-width: 0;

@@ -12,6 +12,22 @@ const DIST_DIR = __dirname + '/dist';
 const ASSETS_DIR = __dirname + '/assets';
 const GLOBAL_STYLES = 'styles/main.scss';
 
+/**
+ * Return true if the CSS resource identified by this path should be component styled
+ * (add hash to class names of resource)
+ *
+ * @param resourcePath path to the css resource
+ * @returns {boolean} true if a hash should be appended to the class names of this resource
+ */
+function isComponentCss(resourcePath) {
+  // All external libraries should have class names untouched
+  if(resourcePath.indexOf('../node_modules/') === 0) {
+    return false;
+  }
+  // Our main.scss file should remain untouched
+  return resourcePath !== GLOBAL_STYLES;
+}
+
 module.exports = {
   entry: [
     'babel-polyfill',
@@ -74,8 +90,7 @@ module.exports = {
                */
               getLocalIdent: (loaderContext, localIdentName, exportName, options) => {
                 const resourcePath = path.relative(SRC_DIR, loaderContext.resourcePath).replace(/\\/g, '/');
-                return resourcePath === GLOBAL_STYLES ?
-                  exportName :
+                return !isComponentCss(resourcePath) ? exportName :
                   getLocalIdent(loaderContext, localIdentName, exportName, options);
               }
             }

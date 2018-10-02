@@ -5,11 +5,12 @@ import TopBar from './top-bar/top-bar';
 import SideBar from './side-bar/side-bar';
 import MessageList from './message-list/message-list';
 import MessageViewer from './message-viewer/message-viewer';
+import MessageEditor from './message-editor/message-editor';
+import {editMessage} from '../actions/application';
 import {getFolders} from '../services/folder';
-import {addMessage} from '../actions/messages';
+import {resetFolderMessagesCache} from '../services/message';
 import mainCss from '../styles/main.scss';
 import styles from './app.scss';
-import {resetFolderMessagesCache} from '../services/message';
 
 class App extends Component {
   constructor(props) {
@@ -29,20 +30,28 @@ class App extends Component {
         <SideBar collapsed={this.state.sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
         <div className={`${mainCss['mdc-top-app-bar--fixed-adjust']} ${styles['content-wrapper']}
             ${this.state.sideBar.collapsed ? '' : styles['with-side-bar']}`}>
-          {!this.props.application.selectedMessage || Object.keys(this.props.application.selectedMessage).length === 0 ?
-            <Fragment>
-              <MessageList className={styles['message-grid']} />
-              <div className={styles['fab-container']}>
-                <button className={`${mainCss['mdc-fab']}`} onClick={this.props.addMessage.bind(this)}>
-                  <span className={`material-icons ${mainCss['mdc-fab__icon']}`}>edit</span>
-                </button>
-              </div>
-            </Fragment>
-            :
-            <MessageViewer className={styles['message-viewer']} />
-          }
+          {this.renderContent()}
         </div>
       </div>
+    );
+  }
+
+  renderContent() {
+    const application = this.props.application;
+    if (application.newMessage && Object.keys(application.newMessage).length > 0) {
+      return <MessageEditor className={styles['message-viewer']} />;
+    } else if (application.selectedMessage && Object.keys(application.selectedMessage).length > 0) {
+      return <MessageViewer className={styles['message-viewer']} />;
+    }
+    return (
+      <Fragment>
+        <MessageList className={styles['message-grid']} />
+        <div className={styles['fab-container']}>
+          <button className={`${mainCss['mdc-fab']}`} onClick={this.props.newMessage.bind(this)}>
+            <span className={`material-icons ${mainCss['mdc-fab__icon']}`}>edit</span>
+          </button>
+        </div>
+      </Fragment>
     );
   }
 
@@ -51,7 +60,7 @@ class App extends Component {
     this.startPoll();
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate() {
     this.startPoll();
   }
 
@@ -100,7 +109,7 @@ App.propTypes = {
   folders: PropTypes.object.isRequired,
   reloadFolders: PropTypes.func,
   reloadMessageCache: PropTypes.func,
-  addMessage: PropTypes.func.isRequired
+  newMessage: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
@@ -111,8 +120,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   reloadFolders: credentials => getFolders(dispatch, credentials, true),
   reloadMessageCache: (credentials, folder) => resetFolderMessagesCache(dispatch, credentials, folder),
-  addMessage: () => {
-    dispatch(addMessage({subject: 'New Message'}));
+  newMessage: () => {
+    dispatch(editMessage({subject: 'New Message'}));
   }
 });
 

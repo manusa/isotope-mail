@@ -18,3 +18,5 @@ export const refreshMessage = (folder, message) =>
 export const replaceMessageEmbeddedImages = (folder, message, attachment, blob) =>
   ({type: ActionTypes.APPLICATION_MESSAGE_REPLACE_IMAGE, payload: {folder, message, attachment, blob}});
 export const setError = (type, value) => ({type: ActionTypes.APPLICATION_ERROR_SET, payload: {type, value}});
+
+export const editMessage = message => ({type: ActionTypes.APPLICATION_MESSAGE_EDIT, payload: message});

@@ -57,5 +57,3 @@ export const setSelected = (message, selected) => ({
 export const clearSelected = () => ({
   type: ActionTypes.MESSAGES_CLEAR_SELECTED
 });
-
-export const addMessage = message => ({type: ActionTypes.ADD_MESSAGE, payload: message});
