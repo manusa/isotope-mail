@@ -69,8 +69,7 @@ module.exports = {
       {
         test: /\.(scss|sass|css)$/,
         exclude: [
-          /node_modules\/(?!@material\/).*/,
-          /node_modules\/(?!@draft-js\/).*/
+          /node_modules\/(?!@material\/).*/
         ],
         loaders: [
           MiniCssExtractPlugin.loader,
