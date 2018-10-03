@@ -27,6 +27,37 @@ function isComponentCss(resourcePath) {
   // Our main.scss file should remain untouched
   return resourcePath !== GLOBAL_STYLES;
 }
+const CSS_LOADER = {
+  loader: 'css-loader',
+  options: {
+    modules: true,
+    sourceMap: devMode,
+    importLoaders: 1,
+    localIdentName: '[local]___[hash:base64:5]',
+    /**
+     * Custom function to replace the CSS class name only if it's not part of
+     * the global application styles
+     *
+     * @param loaderContext
+     * @param localIdentName
+     * @param exportName
+     * @param options
+     * @returns {*}
+     */
+    getLocalIdent: (loaderContext, localIdentName, exportName, options) => {
+      const resourcePath = path.relative(SRC_DIR, loaderContext.resourcePath).replace(/\\/g, '/');
+      return !isComponentCss(resourcePath) ? exportName :
+        getLocalIdent(loaderContext, localIdentName, exportName, options);
+    }
+  }
+};
+
+const SASS_LOADER = {
+  loader: 'sass-loader',
+  options: {
+    includePaths: ['./node_modules']
+  }
+};
 
 module.exports = {
   entry: [
@@ -41,12 +72,17 @@ module.exports = {
   output: {
     path: DIST_DIR,
     publicPath: '/',
-    filename: '[name].bundle.js'
+    filename: '[name].bundle.js',
+    chunkFilename: '[name].bundle.js'
   },
   optimization: {
     splitChunks: {
       cacheGroups: {
-        vendors: { test: /[\\/]node_modules[\\/]/, name: "vendor", chunks: "all" }
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendor",
+          chunks: chunk => chunk.name !== 'draft-js'
+        }
       }
     }
   },
@@ -61,47 +97,27 @@ module.exports = {
             presets: ['@babel/preset-env', '@babel/preset-react'],
             plugins: [
               '@babel/plugin-transform-runtime',
-              '@babel/plugin-proposal-object-rest-spread'
+              '@babel/plugin-proposal-object-rest-spread',
+              '@babel/plugin-syntax-dynamic-import'
             ]
           }
         }
       },
       {
         test: /\.(scss|sass|css)$/,
-        exclude: [
-          /node_modules\/(?!@material\/).*/
-        ],
-        loaders: [
-          MiniCssExtractPlugin.loader,
+        oneOf: [
           {
-            loader: 'css-loader',
-            options: {
-              modules: true,
-              sourceMap: true,
-              importLoaders: 1,
-              localIdentName: '[local]___[hash:base64:5]',
-              /**
-               * Custom function to replace the CSS class name only if it's not part of
-               * the global application styles
-               *
-               * @param loaderContext
-               * @param localIdentName
-               * @param exportName
-               * @param options
-               * @returns {*}
-               */
-              getLocalIdent: (loaderContext, localIdentName, exportName, options) => {
-                const resourcePath = path.relative(SRC_DIR, loaderContext.resourcePath).replace(/\\/g, '/');
-                return !isComponentCss(resourcePath) ? exportName :
-                  getLocalIdent(loaderContext, localIdentName, exportName, options);
-              }
-            }
+            // CSS Style processing for project files
+            exclude: /node_modules/,
+            loaders: [MiniCssExtractPlugin.loader, CSS_LOADER, SASS_LOADER]
           },
           {
-            loader: 'sass-loader',
-            options: {
-              includePaths: ['./node_modules']
-            }
+            // CSS Style processing for external files
+            // Don't Minify node_module dependencies
+            // Using style-loader to embed within js, The main reason is that draft-js css has some syntax errors
+            // and both MiniCssExtractPlugin and extract-loader have trouble parsing the file
+            test: /node_modules/,
+            loaders: ['style-loader', CSS_LOADER]
           }
         ]
       },

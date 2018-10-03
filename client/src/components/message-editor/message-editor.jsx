@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import {Editor, EditorState, RichUtils} from 'draft-js';
 import EditorButton, {Type} from './editor-button';
 import {editMessage} from '../../actions/application';
+import(/* webpackChunkName: "draft-js" */  'draft-js/dist/Draft.css');
 import mainCss from '../../styles/main.scss';
 import styles from './message-editor.scss';
 
