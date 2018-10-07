@@ -12,6 +12,8 @@ const DIST_DIR = __dirname + '/dist';
 const ASSETS_DIR = __dirname + '/assets';
 const GLOBAL_STYLES = 'styles/main.scss';
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Shared Functions
 /**
  * Return true if the CSS resource identified by this path should be component styled
  * (add hash to class names of resource)
@@ -27,6 +29,9 @@ function isComponentCss(resourcePath) {
   // Our main.scss file should remain untouched
   return resourcePath !== GLOBAL_STYLES;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Shared Loaders
 const CSS_LOADER = {
   loader: 'css-loader',
   options: {
@@ -59,6 +64,8 @@ const SASS_LOADER = {
   }
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Module definition
 module.exports = {
   entry: [
     'babel-polyfill',
@@ -75,13 +82,15 @@ module.exports = {
     filename: '[name].bundle.js',
     chunkFilename: '[name].bundle.js'
   },
+  // Split vendor dependencies into specific file (except dynamic imports, chunk name specified at import annotation)
   optimization: {
     splitChunks: {
       cacheGroups: {
         vendors: {
+          priority: -10,
           test: /[\\/]node_modules[\\/]/,
           name: "vendor",
-          chunks: chunk => chunk.name !== 'draft-js'
+          chunks: chunk => chunk.name === 'main' // Unless specified in annotation, import will be named 'main'
         }
       }
     }

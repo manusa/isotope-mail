@@ -1,57 +1,135 @@
 @import '../../styles/partials/variables';
+@import '@material/chips/variables';
+@import '@material/chips/mixins';
 
-$editor-background-color: white;
-$code-block-background: darken($editor-background-color, 8%);
-$block-padding: $default-spacing / 2;
+$header-field-spacing: $default-spacing / 2 !default;
+$header-label-color: lighten($base-color, 25%) !default;
+$header-chip-fill-color: white !default;
+$header-chip-outline-color: transparentize($mdc-theme-primary, 0.75) !default;
+$header-chip-margin: 2px 6px 2px 0;
+$header-chip-height: 21px;
+$editor-background-color: white !default;
+$editor-border-color: lighten($mdc-theme-primary, 50%) !default;
+$editor-h1-margin: 6px 0 16px 0 !default;
+$editor-h1-font-size: 3rem;
+$editor-h2-margin: 6px 0 12px 0 !default;
+$editor-h2-font-size: 2.5rem;
+$editor-h3-margin: 6px 0 8px 0 !default;
+$editor-h3-font-size: 1.5rem;
+$editor-block-padding: 8px !default;
+$editor-code-block-background: darken($editor-background-color, 8%) !default;
 
 .message-editor {
   padding: $default-spacing;
   background-color: $editor-background-color;
 
+  .header {
+
+    input,
+    input:focus {
+      border: 0;
+      outline: 0;
+      color: $base-color;
+      font-family: $base-font-family;
+      font-size: $base-font-size;
+
+      &::placeholder {
+        color: $header-label-color;
+      }
+    }
+
+    .address {
+      display: flex;
+      flex-wrap: wrap;
+      padding: $header-field-spacing 0;
+      border-bottom: 1px solid $editor-border-color;
+
+      .chip {
+        @include mdc-chip-fill-color($header-chip-fill-color);
+        @include mdc-chip-outline(1px, solid, $header-chip-outline-color);
+        @include mdc-chip-height($header-chip-height);
+        margin: $header-chip-margin;
+
+        i {
+          font-size: 15px;
+          height: 15px;
+          width: 15px;
+
+          &:hover {
+            color: darken($mdc-chip-ink-color-default, 30%);
+          }
+        }
+      }
+
+      label {
+        margin-right: $header-field-spacing;
+        color: $header-label-color;
+        line-height: $header-chip-height;
+      }
+
+      input {
+        min-width: 60px;
+        flex: 1;
+      }
+    }
+
+    .subject {
+      input {
+        padding: $header-field-spacing 0;
+        width: 100%;
+      }
+    }
+  }
+
   .editor-wrapper {
-    border: 1px solid $mdc-theme-primary;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+    border: 1px solid $editor-border-color;
     padding: $default-spacing / 2;
     margin-bottom: $default-spacing;
 
     .h1 {
-      margin: $default-spacing * 2 0;
-      font-size: $base-h3-size * 1.25;
+      margin: $editor-h1-margin;
+      font-size: $editor-h1-font-size;
     }
 
     .h2 {
-      margin: $default-spacing 0;
-      font-weight: bold;
-      font-size: $base-h3-size*1.1;
+      margin: $editor-h2-margin;
+      font-size: $editor-h2-font-size;
     }
 
     .h3 {
-      margin: $default-spacing 0;
-      font-size: $base-h3-size;
+      margin: $editor-h3-margin;
+      font-weight: bold;
+      font-size: $editor-h3-font-size;
     }
 
     .blockquote {
-      border-left: 5px solid $code-block-background;
+      border-left: 5px solid $editor-code-block-background;
       font-style: italic;
       margin: 0;
       padding: 0 $default-spacing * 2;
     }
 
     .code-block {
-      background-color: $code-block-background;
+      background-color: $editor-code-block-background;
       margin: 0;
-      padding: 0 $block-padding;
+      padding: 0 $editor-block-padding;
 
       &:first-child {
-        padding-top: $block-padding;
+        padding-top: $editor-block-padding;
       }
 
       &:last-child {
-        padding-bottom: $block-padding;
+        padding-bottom: $editor-block-padding;
       }
     }
 
     .button-container {
-      margin-top: $default-spacing;
+      margin-top: auto;
+      display: flex;
+      flex-direction: row;
 
       .button {
         min-width: auto;

@@ -22,5 +22,10 @@
     "to": "to",
     "cc": "cc",
     "bcc": "bcc"
+  },
+  "messageEditor": {
+    "to": "to",
+    "cc": "cc",
+    "bcc": "bcc"
   }
 }

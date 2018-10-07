@@ -22,5 +22,10 @@
     "to": "para",
     "cc": "cc",
     "bcc": "bcc"
+  },
+  "messageEditor": {
+    "to": "para",
+    "cc": "cc",
+    "bcc": "bcc"
   }
 }
