@@ -14,6 +14,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'jacoco'
 
 group = 'com.marcnuri.isotope'
 version = '0.0.1-SNAPSHOT'
@@ -34,4 +35,15 @@ dependencies {
 	compile('commons-io:commons-io:2.6')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('com.marcnuri:spring-common-test:0.0.2')
+}
+
+test {
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled = true
+		html.enabled = true
+	}
 }
