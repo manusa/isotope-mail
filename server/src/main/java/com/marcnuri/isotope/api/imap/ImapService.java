@@ -16,10 +16,7 @@ import com.marcnuri.isotope.api.folder.Folder;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
 import com.marcnuri.isotope.api.message.MessageWithFolder;
-import com.sun.mail.imap.IMAPFolder;
-import com.sun.mail.imap.IMAPMessage;
-import com.sun.mail.imap.IMAPSSLStore;
-import com.sun.mail.imap.IMAPStore;
+import com.sun.mail.imap.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -397,10 +394,12 @@ public class ImapService {
         }
         for (int it = 0; it < mp.getCount(); it++) {
             final BodyPart bp = mp.getBodyPart(it);
+            // Multipart message with embedded parts
             if (bp.getContentType().toLowerCase().startsWith(MULTIPART_MIME_TYPE)) {
                 extractAttachments(finalMessage, (Multipart) bp.getContent(), attachments);
             }
-            if (bp.getContentType().toLowerCase().startsWith("image/")
+            // Image attachments
+            else if (bp.getContentType().toLowerCase().startsWith("image/")
                     && bp instanceof MimeBodyPart
                     && ((MimeBodyPart) bp).getContentID() != null) {
                 // If image is "not too big" embed as base64 data uri - successive IMAP connections will be more expensive
@@ -411,7 +410,16 @@ public class ImapService {
                             ((MimeBodyPart) bp).getContentID(), bp.getFileName(), bp.getContentType(), bp.getSize()));
                 }
             }
-            if (bp.getDisposition() != null && bp.getDisposition().equalsIgnoreCase(Part.ATTACHMENT)) {
+            // Embedded messages
+            else if (bp.getContentType().toLowerCase().startsWith("message/")) {
+                final Object nestedMessage = bp.getContent();
+                if (nestedMessage instanceof MimeMessage) {
+                    attachments.add(new Attachment(null, ((MimeMessage)nestedMessage).getSubject(),
+                            bp.getContentType(), ((MimeMessage)nestedMessage).getSize()));
+                }
+            }
+            // Regular files
+            else if (bp.getDisposition() != null && bp.getDisposition().equalsIgnoreCase(Part.ATTACHMENT)) {
                 attachments.add(new Attachment(null, bp.getFileName(), bp.getContentType(), bp.getSize()));
             }
         }
@@ -429,9 +437,16 @@ public class ImapService {
         else {
             for (int it = 0; it < mp.getCount(); it++) {
                 final BodyPart bp = mp.getBodyPart(it);
-                if (bp.getDisposition() != null && Part.ATTACHMENT.equalsIgnoreCase(bp.getDisposition())
-                        && id.equals(bp.getFileName())) {
-                    return bp;
+                if (bp.getDisposition() != null && Part.ATTACHMENT.equalsIgnoreCase(bp.getDisposition())) {
+                    // Regular file
+                    if (id.equals(bp.getFileName())) {
+                        return bp;
+                    }
+                    // Embedded message
+                    if(bp.getContentType().toLowerCase().startsWith("message/") && bp.getContent() instanceof MimeMessage
+                            && ((MimeMessage)bp.getContent()).getSubject().equals(id)) {
+                        return bp;
+                    }
                 }
             }
         }

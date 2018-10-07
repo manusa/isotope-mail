@@ -225,9 +225,12 @@ public class FolderResource implements ApplicationContextAware {
 
     private static Attachment addLinks(String folderId, Message message, Attachment attachment) {
         final boolean isContentId = attachment.getContentId() != null && !attachment.getContentId().isEmpty();
-        attachment.add(linkTo(methodOn(FolderResource.class).getAttachment(null, folderId, message.getUid(),
-                isContentId ? attachment.getContentId() : attachment.getFileName(), isContentId, null))
-                .withRel(REL_DOWNLOAD).expand());
+        final String attachmentId = isContentId ? attachment.getContentId() : attachment.getFileName();
+        if (attachmentId != null && !attachmentId.isEmpty()) {
+            attachment.add(linkTo(methodOn(FolderResource.class).getAttachment(null, folderId, message.getUid(),
+                    attachmentId, isContentId, null))
+                    .withRel(REL_DOWNLOAD).expand());
+        }
         return attachment;
     }
 

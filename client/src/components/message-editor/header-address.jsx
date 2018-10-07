@@ -21,7 +21,7 @@ class HeaderAddress extends Component {
                ${mainCss['mdc-chip__icon--trailing']}`}>cancel</i>
           </div>
         ))}
-        <input id={id} ref={this.inputRef} onKeyPress={onKeyPress} onBlur={onBlur} type={'email'} required={true}/>
+        <input id={id} ref={this.inputRef} onKeyPress={onKeyPress} onBlur={onBlur} type={'email'} />
       </div>
     );
   }
