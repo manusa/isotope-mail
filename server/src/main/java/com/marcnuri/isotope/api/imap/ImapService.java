@@ -31,7 +31,10 @@ import com.marcnuri.isotope.api.folder.Folder;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
 import com.marcnuri.isotope.api.message.MessageWithFolder;
-import com.sun.mail.imap.*;
+import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPMessage;
+import com.sun.mail.imap.IMAPSSLStore;
+import com.sun.mail.imap.IMAPStore;
 import org.apache.commons.io.IOUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -44,6 +47,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
+import org.springframework.web.util.HtmlUtils;
 import reactor.core.publisher.Flux;
 
 import javax.annotation.PreDestroy;
@@ -73,10 +77,10 @@ public class ImapService {
     private static final Logger log = LoggerFactory.getLogger(ImapService.class);
 
     private static final String IMAPS_PROTOCOL = "imaps";
-    private static final String IMAP_CAPABILITY_CONDSTORE = "CONDSTORE";
+    static final String IMAP_CAPABILITY_CONDSTORE = "CONDSTORE";
     private static final String MULTIPART_MIME_TYPE = "multipart/";
-    private static final int DEFAULT_INITIAL_MESSAGES_BATCH_SIZE = 20;
-    private static final int DEFAULT_MAX_MESSAGES_BATCH_SIZE = 640;
+    static final int DEFAULT_INITIAL_MESSAGES_BATCH_SIZE = 20;
+    static final int DEFAULT_MAX_MESSAGES_BATCH_SIZE = 640;
 
     private final IsotopeApiConfiguration isotopeApiConfiguration;
 
@@ -123,45 +127,7 @@ public class ImapService {
     public Flux<ServerSentEvent<List<Message>>> getMessagesFlux(
             Credentials credentials, URLName folderId, HttpServletResponse response) {
 
-        return Flux.create(s -> {
-            try {
-                final IMAPStore store = getImapStore(credentials);
-                final boolean fetchModseq = store.hasCapability(IMAP_CAPABILITY_CONDSTORE);
-                final IMAPFolder folder = (IMAPFolder)store.getFolder(folderId);
-                // From end to beginning
-                int end = folder.getMessageCount();
-                int start;
-                int batchSize = DEFAULT_INITIAL_MESSAGES_BATCH_SIZE;
-                try {
-                    do {
-                        start = end - batchSize > 0 ? end - batchSize : 1;
-                        log.debug("Getting message batch for folder {} [{}-{}]", folder.getName(), start, end);
-                        response.getOutputStream();
-                        final ServerSentEvent<List<Message>> event = ServerSentEvent
-                                .builder(getMessages(folder, start, end, fetchModseq))
-                                .id(String.valueOf(start))
-                                .build();
-                        s.next(event);
-                        end = start - 1;
-                        batchSize = (batchSize * 2 ) > DEFAULT_MAX_MESSAGES_BATCH_SIZE ? DEFAULT_MAX_MESSAGES_BATCH_SIZE :
-                                batchSize * 2;
-                    } while (end > 0 && !s.isCancelled());
-                } catch(IOException ex) {
-                    log.debug("Response stream has already been closed ({})", ex.getMessage());
-                    s.error(ex);
-                }
-                folder.close();
-            } catch (MessagingException ex) {
-                log.error("Error loading messages for folder: " + folderId.toString(), ex);
-                s.error(ex);
-                destroy();
-                s.complete();
-                throw  new IsotopeException(ex.getMessage());
-            }
-            // This bean will be effectively a Prototype, must manually disconnect
-            destroy();
-            s.complete();
-        });
+        return Flux.create(new MessageFluxSink(credentials, folderId, response,this));
     }
 
     public MessageWithFolder getMessage(Credentials credentials, URLName folderId, Long uid) {
@@ -321,7 +287,7 @@ public class ImapService {
         }
     }
 
-    private IMAPStore getImapStore(Credentials credentials) throws MessagingException {
+    IMAPStore getImapStore(Credentials credentials) throws MessagingException {
         if (imapStore == null) {
             final Session session = Session.getInstance(initMailProperties(), null);
             imapStore = (IMAPSSLStore) session.getStore(IMAPS_PROTOCOL);
@@ -353,7 +319,7 @@ public class ImapService {
         return ret;
     }
 
-    private List<Message> getMessages(
+    List<Message> getMessages(
             @NonNull IMAPFolder folder, @Nullable Integer start, @Nullable Integer end, boolean fetchModseq)
             throws MessagingException {
 
@@ -493,8 +459,9 @@ public class ImapService {
         String ret = "";
         for (int it = 0; it < mp.getCount(); it++) {
             final BodyPart bp = mp.getBodyPart(it);
-            if (ret == null && bp.getContentType().toLowerCase().startsWith(MediaType.TEXT_PLAIN_VALUE)) {
-                ret = bp.getContent().toString();
+            if ((ret == null || ret.isEmpty())
+                    && bp.getContentType().toLowerCase().startsWith(MediaType.TEXT_PLAIN_VALUE)) {
+                ret = String.format("<pre>%s</pre>", HtmlUtils.htmlEscape(bp.getContent().toString()));
             }
             if (bp.getContentType().toLowerCase().startsWith(MediaType.TEXT_HTML_VALUE)) {
                 ret = (bp.getContent().toString());
