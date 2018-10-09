@@ -52,6 +52,7 @@ import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROT
 @EnableWebFlux
 public class WebConfiguration extends WebSecurityConfigurerAdapter implements WebMvcConfigurer, AsyncConfigurer {
 
+    public static final String IMAP_SERVICE_PROTOTYPE = "prototypeImapService";
     private static final String DEVELOPMENT_PROFILE = "dev";
 
     private Environment environment;
@@ -97,9 +98,9 @@ public class WebConfiguration extends WebSecurityConfigurerAdapter implements We
         return corsConfigurationSource;
     }
 
-    @Bean(name = "prototypeImapService")
+    @Bean(name = IMAP_SERVICE_PROTOTYPE)
     @Scope(SCOPE_PROTOTYPE)
-    @Qualifier("prototypeImapService")
+    @Qualifier(IMAP_SERVICE_PROTOTYPE)
     public ImapService imapService(IsotopeApiConfiguration isotopeApiConfiguration, CredentialsService credentialsService) {
         return new ImapService(isotopeApiConfiguration, credentialsService);
     }

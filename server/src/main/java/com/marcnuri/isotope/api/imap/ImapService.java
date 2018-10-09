@@ -127,7 +127,7 @@ public class ImapService {
     public Flux<ServerSentEvent<List<Message>>> getMessagesFlux(
             Credentials credentials, URLName folderId, HttpServletResponse response) {
 
-        return Flux.create(new MessageFluxSink(credentials, folderId, response,this));
+        return Flux.create(new MessageFluxSinkConsumer(credentials, folderId, response,this));
     }
 
     public MessageWithFolder getMessage(Credentials credentials, URLName folderId, Long uid) {

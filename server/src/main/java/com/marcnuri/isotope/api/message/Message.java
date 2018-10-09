@@ -27,6 +27,7 @@ import com.sun.mail.imap.IMAPMessage; //NOSONAR
 import javax.mail.*;
 import javax.mail.Message.RecipientType;
 import javax.mail.internet.InternetAddress;
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -51,6 +52,7 @@ public class Message extends IsotopeResource implements Serializable {
     private String messageId;
     private Long modseq;
     private List<String> from;
+    @NotEmpty(groups = {SmtpSend.class})
     private List<Recipient> recipients;
     private String subject;
     private ZonedDateTime receivedDate;
@@ -260,4 +262,10 @@ public class Message extends IsotopeResource implements Serializable {
                 })
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Validation Group interface for SMTP send operations
+     */
+    public interface SmtpSend {}
+
 }

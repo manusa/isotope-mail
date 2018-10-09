@@ -27,6 +27,9 @@ import org.springframework.validation.ObjectError;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-17.
@@ -54,4 +57,11 @@ public class InvalidFieldException extends IsotopeException {
                 objectError.getDefaultMessage());
     }
 
+    @Override
+    public String getMessage() {
+        return Stream.concat(
+                Stream.of(super.getMessage(), "The following fields contained Validation errors:"),
+                errors.entrySet().stream().map(e -> String.format("\t - %s: %s", e.getKey(), e.getValue()))
+        ).filter(Objects::nonNull).collect(Collectors.joining("\n"));
+    }
 }

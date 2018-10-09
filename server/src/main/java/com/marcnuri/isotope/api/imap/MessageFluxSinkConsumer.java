@@ -1,5 +1,5 @@
 /*
- * MessageFluxSink.java
+ * MessageFluxSinkConsumer.java
  *
  * Created on 2018-10-09, 7:43
  *
@@ -47,16 +47,16 @@ import static com.marcnuri.isotope.api.imap.ImapService.IMAP_CAPABILITY_CONDSTOR
  *
  * <p>Created by Marc Nuri <marc@marcnuri.com> on 2018-10-09.
  */
-public class MessageFluxSink implements Consumer<FluxSink<ServerSentEvent<List<Message>>>> {
+public class MessageFluxSinkConsumer implements Consumer<FluxSink<ServerSentEvent<List<Message>>>> {
 
-    private static final Logger log = LoggerFactory.getLogger(MessageFluxSink.class);
+    private static final Logger log = LoggerFactory.getLogger(MessageFluxSinkConsumer.class);
 
     private Credentials credentials;
     private URLName folderId;
     private HttpServletResponse response;
     private ImapService imapService;
 
-    MessageFluxSink(Credentials credentials, URLName folderId, HttpServletResponse response, ImapService imapService) {
+    MessageFluxSinkConsumer(Credentials credentials, URLName folderId, HttpServletResponse response, ImapService imapService) {
         this.credentials = credentials;
         this.folderId = folderId;
         this.response = response;
@@ -103,7 +103,7 @@ public class MessageFluxSink implements Consumer<FluxSink<ServerSentEvent<List<M
             do {
                 start = end - batchSize > 0 ? end - batchSize : 1;
                 log.debug("Getting message batch for folder {} [{}-{}]", folder.getName(), start, end);
-                response.getOutputStream();
+                response.getOutputStream(); // Will force an IOException if client disconnected
                 final ServerSentEvent<List<Message>> event = ServerSentEvent
                         .builder(imapService.getMessages(folder, start, end, fetchModseq))
                         .id(String.valueOf(start))

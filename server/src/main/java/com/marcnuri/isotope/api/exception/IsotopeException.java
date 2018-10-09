@@ -33,6 +33,7 @@ import static com.marcnuri.isotope.api.http.HttpHeaders.ISOTOPE_EXCEPTION;
 public class IsotopeException extends RuntimeException {
 
     private static final int MISCELLANEOUS_HTTP_WARN_CODE = 199;
+    private static final int MAX_HEADER_LENGTH = 500;
 
     private final HttpStatus httpStatus;
 
@@ -62,12 +63,16 @@ public class IsotopeException extends RuntimeException {
     }
 
     public final ResponseEntity<String> toFrontEndResponseEntity() {
+        final String message = getMessage();
         final HttpHeaders headers = new HttpHeaders();
         headers.set(ISOTOPE_EXCEPTION, getClass().getName());
         headers.set(HttpHeaders.WARNING, String.format("%s %s \"%s\"",
-                MISCELLANEOUS_HTTP_WARN_CODE, "-", getMessage() == null ? "" : getMessage()));
+                MISCELLANEOUS_HTTP_WARN_CODE, "-",
+                message == null ? "" :
+                        message.substring(0, Math.min(message.length(), MAX_HEADER_LENGTH))
+                                .replaceAll("[\\n\\r]", "")));
         headers.setContentType(MediaType.TEXT_PLAIN);
-        return new ResponseEntity<>(getMessage(), headers, getHttpStatus());
+        return new ResponseEntity<>(message, headers, getHttpStatus());
     }
 
 }

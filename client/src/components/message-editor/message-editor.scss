@@ -8,6 +8,7 @@ $header-chip-fill-color: white !default;
 $header-chip-outline-color: transparentize($mdc-theme-primary, 0.75) !default;
 $header-chip-margin: 2px 6px 2px 0;
 $header-chip-height: 21px;
+$editor-container-padding: 8px !default;
 $editor-background-color: white !default;
 $editor-border-color: lighten($mdc-theme-primary, 50%) !default;
 $editor-h1-margin: 6px 0 16px 0 !default;
@@ -20,6 +21,8 @@ $editor-block-padding: 8px !default;
 $editor-code-block-background: darken($editor-background-color, 8%) !default;
 
 .message-editor {
+  display: flex;
+  flex-direction: column;
   padding: $default-spacing;
   background-color: $editor-background-color;
 
@@ -82,52 +85,60 @@ $editor-code-block-background: darken($editor-background-color, 8%) !default;
   }
 
   .editor-wrapper {
+    flex: 1;
+
     display: flex;
     flex-direction: column;
-    min-height: 200px;
     border: 1px solid $editor-border-color;
-    padding: $default-spacing / 2;
-    margin-bottom: $default-spacing;
 
-    .h1 {
-      margin: $editor-h1-margin;
-      font-size: $editor-h1-font-size;
-    }
+    .editor-container {
+      flex: 1;
+      overflow: auto;
+      height: 1px;
+      min-height: 1px;
+      padding: $editor-container-padding;
+      margin-bottom: $editor-container-padding;
 
-    .h2 {
-      margin: $editor-h2-margin;
-      font-size: $editor-h2-font-size;
-    }
-
-    .h3 {
-      margin: $editor-h3-margin;
-      font-weight: bold;
-      font-size: $editor-h3-font-size;
-    }
-
-    .blockquote {
-      border-left: 5px solid $editor-code-block-background;
-      font-style: italic;
-      margin: 0;
-      padding: 0 $default-spacing * 2;
-    }
-
-    .code-block {
-      background-color: $editor-code-block-background;
-      margin: 0;
-      padding: 0 $editor-block-padding;
-
-      &:first-child {
-        padding-top: $editor-block-padding;
+      .h1 {
+        margin: $editor-h1-margin;
+        font-size: $editor-h1-font-size;
       }
 
-      &:last-child {
-        padding-bottom: $editor-block-padding;
+      .h2 {
+        margin: $editor-h2-margin;
+        font-size: $editor-h2-font-size;
+      }
+
+      .h3 {
+        margin: $editor-h3-margin;
+        font-weight: bold;
+        font-size: $editor-h3-font-size;
+      }
+
+      .blockquote {
+        border-left: 5px solid $editor-code-block-background;
+        font-style: italic;
+        margin: 0;
+        padding: 0 $default-spacing * 2;
+      }
+
+      .code-block {
+        background-color: $editor-code-block-background;
+        margin: 0;
+        padding: 0 $editor-block-padding;
+
+        &:first-child {
+          padding-top: $editor-block-padding;
+        }
+
+        &:last-child {
+          padding-bottom: $editor-block-padding;
+        }
       }
     }
 
     .button-container {
-      margin-top: auto;
+      margin: auto $editor-container-padding $editor-container-padding $editor-container-padding;
       display: flex;
       flex-direction: row;
 
@@ -141,6 +152,23 @@ $editor-code-block-background: darken($editor-background-color, 8%) !default;
         i {
           margin: 0;
         }
+      }
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    .action-button {
+
+      &.send {
+        margin-left: 0;
+      }
+
+      &.cancel {
+        margin-left: auto;
       }
     }
   }

@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.marcnuri.isotope.api.configuration.WebConfiguration.IMAP_SERVICE_PROTOTYPE;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import static org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE;
@@ -95,7 +96,7 @@ public class FolderResource implements ApplicationContextAware {
         log.debug("Loading list of messages for folder {} ", folderId);
         // Publishing occurs in separate Thread, store request data in this thread (needed by HATEOAS) -> lambda setRequestAttributes
         final RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        return applicationContext.getBean("prototypeImapService", ImapService.class)
+        return applicationContext.getBean(IMAP_SERVICE_PROTOTYPE, ImapService.class)
                 .getMessagesFlux(credentialsService.fromRequest(request), Folder.toId(folderId), response)
                 .map(l -> {
                     RequestContextHolder.setRequestAttributes(requestAttributes);

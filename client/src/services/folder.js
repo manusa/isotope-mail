@@ -1,3 +1,4 @@
+import {URLS} from './url';
 import {backendRequest, setFolders} from '../actions/folders';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 
@@ -67,7 +68,7 @@ export async function getFolders(dispatch, credentials, loadChildren) {
   abortControllerWrappers.getFoldersAbortController = new AbortController();
   const signal = abortControllerWrappers.getFoldersAbortController.signal;
 
-  const url = new URL('/api/v1/folders', window.location.origin);
+  const url = new URL(URLS.FOLDERS, window.location.origin);
   if (loadChildren) {
     url.search = new URLSearchParams({loadChildren: true}).toString();
   }

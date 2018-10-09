@@ -82,7 +82,7 @@ public class CredentialsService {
         return encrytpedCredentials;
     }
 
-    public Credentials decrypt(String encrypted, String salt) throws IOException {
+    private Credentials decrypt(String encrypted, String salt) throws IOException {
         if(encrypted == null || encrypted.isEmpty() || salt == null || salt.isEmpty()) {
             throw new AuthenticationException("Missing encrypted credentials");
         }

@@ -104,6 +104,8 @@ export async function persistState(dispatch, state) {
     // Clone state
     const newState = {...state};
     newState.application = {...state.application};
+    // Don't persist edited Message, Must implement special handler to persist editorState
+    newState.application.newMessage = null;
     newState.folders = {...state.folders};
     newState.folders.items = [...state.folders.items];
     // Don't persist message related states (Own IndexedDB for message cache @see persistMessageCache)

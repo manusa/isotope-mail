@@ -6,7 +6,7 @@ import SideBar from './side-bar/side-bar';
 import MessageList from './message-list/message-list';
 import MessageViewer from './message-viewer/message-viewer';
 import MessageEditor from './message-editor/message-editor';
-import {editMessage} from '../actions/application';
+import {editNewMessage} from '../services/application';
 import {getFolders} from '../services/folder';
 import {resetFolderMessagesCache} from '../services/message';
 import mainCss from '../styles/main.scss';
@@ -120,9 +120,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   reloadFolders: credentials => getFolders(dispatch, credentials, true),
   reloadMessageCache: (credentials, folder) => resetFolderMessagesCache(dispatch, credentials, folder),
-  newMessage: () => {
-    dispatch(editMessage({subject: 'New Message'}));
-  }
+  newMessage: () => editNewMessage(dispatch)
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {

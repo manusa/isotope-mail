@@ -20,11 +20,15 @@
  */
 package com.marcnuri.isotope.api.message;
 
+import com.marcnuri.isotope.api.exception.InvalidFieldException;
 import org.springframework.lang.NonNull;
 
+import javax.mail.Address;
 import javax.mail.FetchProfile;
 import javax.mail.MessagingException;
 import javax.mail.UIDFolder;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-09-16.
@@ -53,5 +57,28 @@ public class MessageUtils {
             fp.add(FetchProfile.Item.SIZE);
             folder.fetch(messages, fp);
         }
+    }
+
+    /**
+     * Returns an array of {@link Address} for the provided {@link javax.mail.Message.RecipientType}
+     *
+     * @param message from which to extract Addresses
+     * @param type of recipients to extract
+     * @return Address array containing the recipients of the specified type
+     */
+    public static Address[] getRecipientAddresses(Message message, javax.mail.Message.RecipientType type) {
+        if (message.getRecipients() == null || message.getRecipients().isEmpty()) {
+            return new Address[0];
+        }
+        return message.getRecipients().stream()
+                .filter(r -> type.toString().equals(r.getType()))
+                .map(r -> {
+                    try {
+                        return new InternetAddress(r.getAddress());
+                    } catch(AddressException ex) {
+                        throw new InvalidFieldException("Problem parsing address " + r.getAddress(), ex);
+                    }
+                })
+                .toArray(InternetAddress[]::new);
     }
 }

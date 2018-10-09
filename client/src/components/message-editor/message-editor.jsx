@@ -3,11 +3,11 @@ import {connect} from 'react-redux';
 import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
 import(/* webpackChunkName: "draft-js" */ 'draft-js/dist/Draft.css');
-import {Editor, EditorState, RichUtils} from 'draft-js';
+import {Editor, RichUtils} from 'draft-js';
 import EditorButton, {Type} from './editor-button';
 import HeaderAddress from './header-address';
 import {editMessage} from '../../actions/application';
-import sanitize from '../../services/sanitize';
+import {sendMessage} from '../../services/smtp';
 import mainCss from '../../styles/main.scss';
 import styles from './message-editor.scss';
 
@@ -36,58 +36,62 @@ function _getBlockStyle(block) {
 class MessageEditor extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      to: [],
-      cc: [],
-      bcc: [],
-      editor: EditorState.createEmpty()
-    };
+
     this.editorRef = React.createRef();
     this.handleSubmit = this.submit.bind(this);
+    // Header Address Events
     this.handleOnHeaderKeyPress = this.onHeaderKeyPress.bind(this);
     this.handleOnHeaderBlur = this.onHeaderBlur.bind(this);
     this.handleOnHeaderAddressRemove = this.onHeaderAddressRemove.bind(this);
-    this.handleEditorOnChange = editor => this.setState({editor});
+    // Subject events
+    this.handleOnSubjectChange = this.onSubjectChange.bind(this);
+    // Editor events
+    this.handleEditorOnChange = editor => this.props.editMessage({...this.props.editedMessage, editor});
     this.handleEditorKeyCommand = this.editorKeyCommand.bind(this);
     this.handleToggleBlockType = this.toggleBlockType.bind(this);
     this.handleToggleInlineStyle = this.toggleInlineStyle.bind(this);
   }
 
   render() {
-    const {t, className, cancel} = this.props;
+    const {t, className, close, to, cc, bcc, subject, editor} = this.props;
     return (
       <div className={`${className} ${styles['message-editor']}`}>
         <div className={styles.header}>
-          <HeaderAddress id={'to'} addresses={this.state.to} onKeyPress={this.handleOnHeaderKeyPress}
+          <HeaderAddress id={'to'} addresses={to} onKeyPress={this.handleOnHeaderKeyPress}
             onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
             className={styles.address} chipClassName={styles.chip} label={t('messageEditor.to')} />
-          <HeaderAddress id={'cc'} addresses={this.state.cc} onKeyPress={this.handleOnHeaderKeyPress}
+          <HeaderAddress id={'cc'} addresses={cc} onKeyPress={this.handleOnHeaderKeyPress}
             onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
             className={styles.address} chipClassName={styles.chip} label={t('messageEditor.cc')} />
-          <HeaderAddress id={'bcc'} addresses={this.state.bcc} onKeyPress={this.handleOnHeaderKeyPress}
+          <HeaderAddress id={'bcc'} addresses={bcc} onKeyPress={this.handleOnHeaderKeyPress}
             onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
             className={styles.address} chipClassName={styles.chip} label={t('messageEditor.bcc')} />
           <div className={styles.subject}>
-            <input type={'text'} placeholder={'Subject'} />
+            <input type={'text'} placeholder={'Subject'}
+              value={subject} onChange={this.handleOnSubjectChange} />
           </div>
         </div>
         <div className={styles['editor-wrapper']} onClick={() => this.editorWrapperClick()}>
-          <Editor
-            ref={this.editorRef}
-            editorState={this.state.editor}
-            blockStyleFn={_getBlockStyle}
-            handleKeyCommand={this.handleEditorKeyCommand}
-            onChange={this.handleEditorOnChange} />
+          <div className={styles['editor-container']}>
+            <Editor
+              ref={this.editorRef}
+              editorState={editor}
+              blockStyleFn={_getBlockStyle}
+              handleKeyCommand={this.handleEditorKeyCommand}
+              onChange={this.handleEditorOnChange} />
+          </div>
           {this.renderEditorButtons()}
         </div>
-        <div>
-          <button className={`${mainCss['mdc-button']} ${mainCss['mdc-button--unelevated']}`}
-            onClick={this.handleSubmit}>
+        <div className={styles['action-buttons']}>
+          <button
+            className={`${mainCss['mdc-button']} ${mainCss['mdc-button--unelevated']}
+            ${styles['action-button']} ${styles.send}`}
+            disabled={to.length + cc.length + bcc.length === 0} onClick={this.handleSubmit}>
             Send
           </button>
-          <button className={`${mainCss['mdc-button']} ${mainCss['mdc-button--unelevated']}`}
-            onClick={cancel}>
-            Cancel
+          <button className={`material-icons ${mainCss['mdc-icon-button']} ${styles['action-button']} ${styles.cancel}`}
+            onClick={close}>
+            delete
           </button>
         </div>
       </div>
@@ -110,7 +114,7 @@ class MessageEditor extends Component {
         }
         return (
           <EditorButton key={b.editorStyle}
-            editorState={this.state.editor}
+            editorState={this.props.editor}
             editorStyle={b.editorStyle}
             type={b.type}
             className={styles.button}
@@ -125,19 +129,23 @@ class MessageEditor extends Component {
   }
 
   submit() {
+    const {credentials, to, cc, bcc, subject} = this.props;
     const editorContent = this.editorRef.current.editor.children[0].innerHTML
-      .replace(/data-[^=]*?="[^"]*?"/gm, '');
-    console.log(this.state.to);
-    console.log(this.state.cc);
-    console.log(this.state.bcc);
-    console.log(sanitize.sanitize(editorContent));
+      .replace(/data-[^=]*?="[^"]*?"/gm, '')
+      .replace(new RegExp(styles.h1, 'gm'), 'h1')
+      .replace(new RegExp(styles.h2, 'gm'), 'h2')
+      .replace(new RegExp(styles.h3, 'gm'), 'h3')
+      .replace(new RegExp(styles.blockquote, 'gm'), 'blockquote')
+      .replace(new RegExp(styles['code-block'], 'gm'), 'code-block')
+    sendMessage(credentials, {to, cc, bcc, subject, content: editorContent});
+    this.props.close();
   }
 
   onHeaderAddressRemove(id, index) {
-    const newState = {...this.state};
-    newState[id] = [...newState[id]];
-    newState[id].splice(index, 1);
-    this.setState(newState);
+    const updatedMessage = {...this.props.editedMessage};
+    updatedMessage[id] = [...updatedMessage[id]];
+    updatedMessage[id].splice(index, 1);
+    this.props.editMessage(updatedMessage);
   }
 
   onHeaderKeyPress(event) {
@@ -165,16 +173,24 @@ class MessageEditor extends Component {
     }
   }
 
+  onSubjectChange(event) {
+    const target = event.target;
+    const updatedMessage = {...this.props.editedMessage};
+    this.props.editMessage({...updatedMessage, subject: target.value});
+  }
   /**
    * Adds an address to the list matching the id and value in the provided event target.
    *
    * @param target {object}
    */
   addAddress(target) {
-    const newState = {...this.state};
-    newState[target.id] = [...newState[target.id], target.value.replace(/;/g, '')];
-    this.setState(newState);
-    target.value = '';
+    const value = target.value.replace(/;/g, '');
+    if (value.length > 0) {
+      const updatedMessage = {...this.props.editedMessage};
+      updatedMessage[target.id] = [...updatedMessage[target.id], target.value.replace(/;/g, '')];
+      this.props.editMessage(updatedMessage);
+      target.value = '';
+    }
   }
 
   editorWrapperClick() {
@@ -193,7 +209,7 @@ class MessageEditor extends Component {
   toggleBlockType(blockType) {
     this.handleEditorOnChange(
       RichUtils.toggleBlockType(
-        this.state.editor,
+        this.props.editor,
         blockType
       )
     );
@@ -202,7 +218,7 @@ class MessageEditor extends Component {
   toggleInlineStyle(inlineStyle) {
     this.handleEditorOnChange(
       RichUtils.toggleInlineStyle(
-        this.state.editor,
+        this.props.editor,
         inlineStyle
       )
     );
@@ -218,11 +234,19 @@ MessageEditor.defaultProps = {
   className: ''
 };
 
-const mapStateToProps = () => ({
+const mapStateToProps = state => ({
+  credentials: state.application.user.credentials,
+  editedMessage: state.application.newMessage,
+  to: state.application.newMessage.to,
+  cc: state.application.newMessage.cc,
+  bcc: state.application.newMessage.bcc,
+  subject: state.application.newMessage.subject,
+  editor: state.application.newMessage.editor
 });
 
 const mapDispatchToProps = dispatch => ({
-  cancel: () => dispatch(editMessage(null))
+  close: () => dispatch(editMessage(null)),
+  editMessage: message => dispatch(editMessage(message))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate()(MessageEditor));

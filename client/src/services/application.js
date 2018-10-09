@@ -1,11 +1,19 @@
 import sjcl from 'sjcl';
-import {backendRequest, backendRequestCompleted, selectFolder, setUserCredentials} from '../actions/application';
+import {URLS} from './url';
+import {
+  backendRequest,
+  backendRequestCompleted,
+  editMessage,
+  selectFolder,
+  setUserCredentials
+} from '../actions/application';
 import {toJson} from './fetch';
 import {recoverState} from './indexed-db';
 import {FolderTypes, getFolders} from './folder';
 import {setFolders} from '../actions/folders';
 import {setCache} from '../actions/messages';
 import {resetFolderMessagesCache} from './message';
+import {EditorState} from 'draft-js';
 
 /**
  * @typedef {Object} Credentials
@@ -30,7 +38,7 @@ import {resetFolderMessagesCache} from './message';
  */
 export async function login(dispatch, credentials) {
   dispatch(backendRequest());
-  const url = '/api/v1/application/login';
+  const url = URLS.LOGIN;
   // Will be used as the key in the IndexedDB
   const userId = sjcl.codec.hex.fromBits(
     sjcl.hash.sha256.hash(`${credentials.serverHost}|${credentials.user}`));
@@ -66,4 +74,8 @@ export async function login(dispatch, credentials) {
       }
     }
   }
+}
+
+export function editNewMessage(dispatch) {
+  dispatch(editMessage({to: [], cc: [], bcc: [], subject: '', editor: EditorState.createEmpty()}));
 }
