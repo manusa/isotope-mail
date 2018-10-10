@@ -20,13 +20,14 @@
  */
 package com.marcnuri.isotope.api.smtp;
 
-import com.marcnuri.isotope.api.configuration.AllowAllSSLSocketFactory;
 import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.message.Message;
 import com.marcnuri.isotope.api.message.MessageUtils;
+import com.sun.mail.util.MailSSLSocketFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
@@ -60,8 +61,16 @@ public class SmtpService {
             "pre.code-block {background-color: #ebebeb; margin: 0; padding: 0 8px}" +
             "pre.code-block:first-child {padding-top: 8px}" +
             "pre.code-block:last-child {padding-bottom: 8px}";
+
+    private final MailSSLSocketFactory mailSSLSocketFactory;
+
     private Session session;
     private Transport smtpTransport;
+
+    @Autowired
+    public SmtpService(MailSSLSocketFactory mailSSLSocketFactory) {
+        this.mailSSLSocketFactory = mailSSLSocketFactory;
+    }
 
     public void sendMessage(Credentials credentials, Message message) {
         try {
@@ -107,7 +116,7 @@ public class SmtpService {
 
     private Session getSession() {
         if (session == null) {
-            session = Session.getInstance(initMailProperties(), null);
+            session = Session.getInstance(initMailProperties(mailSSLSocketFactory), null);
         }
         return session;
     }
@@ -125,11 +134,11 @@ public class SmtpService {
         return smtpTransport;
     }
 
-    private static Properties initMailProperties() {
+    private static Properties initMailProperties(MailSSLSocketFactory socketFactory) {
         final Properties ret = new Properties();
         ret.put("mail.smtp.ssl.enable", true);
         ret.put("mail.smtp.starttls.enable", true);
-        ret.put("mail.smtps.socketFactory.class", AllowAllSSLSocketFactory.class.getName());
+        ret.put("mail.smtps.socketFactory.class", socketFactory);
         ret.put("mail.smtps.socketFactory.fallback", false);
         ret.put("mail.smtps.auth", true);
         return ret;

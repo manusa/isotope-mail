@@ -22,6 +22,7 @@ package com.marcnuri.isotope.api.configuration;
 
 import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.imap.ImapService;
+import com.sun.mail.util.MailSSLSocketFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -101,7 +102,10 @@ public class WebConfiguration extends WebSecurityConfigurerAdapter implements We
     @Bean(name = IMAP_SERVICE_PROTOTYPE)
     @Scope(SCOPE_PROTOTYPE)
     @Qualifier(IMAP_SERVICE_PROTOTYPE)
-    public ImapService imapService(IsotopeApiConfiguration isotopeApiConfiguration, CredentialsService credentialsService) {
-        return new ImapService(isotopeApiConfiguration, credentialsService);
+    public ImapService imapService(
+            IsotopeApiConfiguration isotopeApiConfiguration, MailSSLSocketFactory mailSSLSocketFactory,
+            CredentialsService credentialsService) {
+
+        return new ImapService(isotopeApiConfiguration, mailSSLSocketFactory, credentialsService);
     }
 }

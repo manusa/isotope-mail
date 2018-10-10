@@ -20,7 +20,6 @@
  */
 package com.marcnuri.isotope.api.imap;
 
-import com.marcnuri.isotope.api.configuration.AllowAllSSLSocketFactory;
 import com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration;
 import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.credentials.CredentialsService;
@@ -35,6 +34,7 @@ import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPSSLStore;
 import com.sun.mail.imap.IMAPStore;
+import com.sun.mail.util.MailSSLSocketFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -83,14 +83,18 @@ public class ImapService {
     static final int DEFAULT_MAX_MESSAGES_BATCH_SIZE = 640;
 
     private final IsotopeApiConfiguration isotopeApiConfiguration;
-
-    private CredentialsService credentialsService;
+    private final MailSSLSocketFactory mailSSLSocketFactory;
+    private final CredentialsService credentialsService;
 
     private IMAPStore imapStore;
 
     @Autowired
-    public ImapService(IsotopeApiConfiguration isotopeApiConfiguration, CredentialsService credentialsService) {
+    public ImapService(
+            IsotopeApiConfiguration isotopeApiConfiguration, MailSSLSocketFactory mailSSLSocketFactory,
+            CredentialsService credentialsService) {
+
         this.isotopeApiConfiguration = isotopeApiConfiguration;
+        this.mailSSLSocketFactory = mailSSLSocketFactory;
         this.credentialsService = credentialsService;
     }
 
@@ -303,18 +307,10 @@ public class ImapService {
 
     private Properties initMailProperties() {
         final Properties ret = new Properties();
-        ret.put("mail.smtp.ssl.enable", true);
         ret.put("mail.imap.ssl.enable", true);
-        ret.put("mail.smtp.starttls.enable", true);
         ret.put("mail.imap.starttls.enable", true);
-
-        ret.put("mail.smtps.socketFactory.class", AllowAllSSLSocketFactory.class.getName());
-        ret.put("mail.imaps.socketFactory.class", AllowAllSSLSocketFactory.class.getName());
-
-        ret.put("mail.smtps.socketFactory.fallback", false);
+        ret.put("mail.imaps.socketFactory.class", mailSSLSocketFactory);
         ret.put("mail.imaps.socketFactory.fallback", false);
-
-        ret.put("mail.smtps.auth", true);
 
         return ret;
     }
