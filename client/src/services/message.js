@@ -8,7 +8,7 @@ import {
   deleteFromCache,
   setFolderCache,
   setSelected,
-  updateCache
+  updateCache, updateCacheIfExist
 } from '../actions/messages';
 import {refreshMessage} from '../actions/application';
 import {updateFolder} from '../actions/folders';
@@ -225,14 +225,14 @@ export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
     .then(toJson)
     .then(updatedMessages => {
       if (Array.isArray(updatedMessages) && updatedMessages.length > 0) {
-        dispatch(updateCache(folder, updatedMessages));
+        dispatch(updateCacheIfExist(folder, updatedMessages));
         // Update folder info with the last message (contains the most recent information)
         dispatch(updateFolder(processFolders([updatedMessages[updatedMessages.length - 1].folder])[0]));
       }
     })
     .catch(() => {
       // Rollback state from dispatched expected responses
-      dispatch(updateCache(folder, messages));
+      dispatch(updateCacheIfExist(folder, messages));
       dispatch(updateFolder(folder));
     });
 }

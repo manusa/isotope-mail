@@ -22,6 +22,18 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
       action.payload.messages.forEach(m => newUpdateState.cache[action.payload.folder.folderId].set(m.uid, m));
       return newUpdateState;
     }
+    case ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST: {
+      const newUpdateState = {...state};
+      const cache = newUpdateState.cache[action.payload.folder.folderId];
+      if (cache instanceof Map === true) {
+        action.payload.messages.forEach(m => {
+          if (cache.has(m.uid)) {
+            cache.set(m.uid, m);
+          }
+        });
+      }
+      return newUpdateState;
+    }
     case ActionTypes.MESSAGES_DELETE_FROM_CACHE: {
       const newUpdateState = {...state};
       if (newUpdateState.cache[action.payload.folder.folderId] instanceof Map === false) {
@@ -33,7 +45,7 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
     case ActionTypes.MESSAGES_SET_SELECTED: {
       const newUpdateState = {...state};
       newUpdateState.selected = [...state.selected];
-      const indexOfMessage = newUpdateState.selected.indexOf(action.payload.message.uid)
+      const indexOfMessage = newUpdateState.selected.indexOf(action.payload.message.uid);
       if (action.payload.selected && indexOfMessage < 0) {
         newUpdateState.selected.push(action.payload.message.uid);
       } else {

@@ -26,6 +26,18 @@ export const updateCache = (folder, messages) => ({
 });
 
 /**
+ * Updates state folder's messages cache only if the messages already exist in the folder cache.
+ *
+ * @param folder to which the messages will be added
+ * @param messages {Array} array of messages to add to the folder's cache
+ * @returns {{type: string, payload: {folder: *, messages: *}}}
+ */
+export const updateCacheIfExist = (folder, messages) => ({
+  type: ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST,
+  payload: {folder, messages}
+});
+
+/**
  * Delete messages from state folder's messages cache.
  *
  * @param folder from which the messages will be deleted
