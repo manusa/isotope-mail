@@ -1,5 +1,6 @@
 import idb from 'idb';
 import sjcl from 'sjcl';
+import {EditorState, convertFromRaw, convertToRaw} from 'draft-js';
 import {processFolders} from './folder';
 import {setError} from '../actions/application';
 
@@ -55,7 +56,7 @@ async function _recoverMessageCache(userId, hash) {
   const keys = await index.getAllKeys(IDBKeyRange.only(userId));
   for (const key of keys) {
     const encryptedMessageCache = await store.get(key);
-    const messages = JSON.parse(sjcl.decrypt(hash, encryptedMessageCache.messages))
+    const messages = JSON.parse(sjcl.decrypt(hash, encryptedMessageCache.messages));
     ret[sjcl.decrypt(hash, encryptedMessageCache.folderId)] =
       new Map(messages.map(m => [m.uid, m]));
   }
@@ -80,10 +81,15 @@ export async function recoverState(userId, hash) {
   }
   const decryptedState = sjcl.decrypt(hash, encryptedState.value);
   const recoveredState = JSON.parse(decryptedState);
+  // Recover edited newMessage editor content
+  if (recoveredState.application.newMessage && recoveredState.application.newMessage.editor) {
+    recoveredState.application.newMessage.editor = EditorState.createWithContent(
+      convertFromRaw(recoveredState.application.newMessage.editor));
+  }
+  // Process folders
+  recoveredState.folders.items = processFolders(recoveredState.folders.items);
   // Recover message cache from other store
   recoveredState.messages.cache = await _recoverMessageCache(userId, hash);
-  //  Process folders
-  recoveredState.folders.items = processFolders(recoveredState.folders.items);
   db.close();
   return recoveredState;
 }
@@ -104,10 +110,16 @@ export async function persistState(dispatch, state) {
     // Clone state
     const newState = {...state};
     newState.application = {...state.application};
-    // Don't persist edited Message, Must implement special handler to persist editorState
-    newState.application.newMessage = null;
+    // Draft-js can only be persisted if Raw
+    if (newState.application.newMessage
+      && newState.application.newMessage.editor && newState.application.newMessage.editor.getCurrentContent) {
+      newState.application.newMessage = {...newState.application.newMessage,
+        editor: convertToRaw(newState.application.newMessage.editor.getCurrentContent())};
+    }
+
     newState.folders = {...state.folders};
     newState.folders.items = [...state.folders.items];
+
     // Don't persist message related states (Own IndexedDB for message cache @see persistMessageCache)
     newState.messages = {};
     // Object.entries(state.messages.cache).forEach(e => {
@@ -161,7 +173,7 @@ export async function persistMessageCache(userId, hash, folder, messages) {
     userId: userId,
     folderId: sjcl.encrypt(hash, folder.folderId),
     messages: sjcl.encrypt(hash, JSON.stringify(messages))
-  }
+  };
   await store.put(messageCache);
   await tx.complete;
   db.close();
