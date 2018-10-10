@@ -13,7 +13,6 @@ import {
 import {refreshMessage} from '../actions/application';
 import {updateFolder} from '../actions/folders';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
-import {processFolders} from './folder';
 import {persistMessageCache} from './indexed-db';
 import {KEY_HASH, KEY_USER_ID} from './state';
 
@@ -111,7 +110,7 @@ export function readMessage(dispatch, credentials, folder, message) {
       .then(completeMessage => {
         dispatch(refreshMessage(folder, completeMessage));
         // Update folder with freshest information
-        dispatch(updateFolder(processFolders([completeMessage.folder])[0]));
+        dispatch(updateFolder(completeMessage.folder));
         // Update folder cache with message marked as read (don't store content in cache)
         const messageWithNoContent = {...completeMessage};
         delete messageWithNoContent.content;
@@ -189,7 +188,7 @@ export function moveMessages(dispatch, credentials, fromFolder, toFolder, messag
       if (Array.isArray(newMessages)) {
         dispatch(updateCache(toFolder, newMessages));
         // Update folder info with the last message (contains the most recent information)
-        dispatch(updateFolder(processFolders([newMessages[newMessages.length - 1].folder])[0]));
+        dispatch(updateFolder(newMessages[newMessages.length - 1].folder));
       }
     })
     .catch(() => {
@@ -227,7 +226,7 @@ export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
       if (Array.isArray(updatedMessages) && updatedMessages.length > 0) {
         dispatch(updateCacheIfExist(folder, updatedMessages));
         // Update folder info with the last message (contains the most recent information)
-        dispatch(updateFolder(processFolders([updatedMessages[updatedMessages.length - 1].folder])[0]));
+        dispatch(updateFolder(updatedMessages[updatedMessages.length - 1].folder));
       }
     })
     .catch(() => {
