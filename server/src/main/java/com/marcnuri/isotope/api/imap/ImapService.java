@@ -32,7 +32,6 @@ import com.marcnuri.isotope.api.message.Message;
 import com.marcnuri.isotope.api.message.MessageWithFolder;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
-import com.sun.mail.imap.IMAPSSLStore;
 import com.sun.mail.imap.IMAPStore;
 import com.sun.mail.util.MailSSLSocketFactory;
 import org.apache.commons.io.IOUtils;
@@ -76,6 +75,7 @@ public class ImapService {
 
     private static final Logger log = LoggerFactory.getLogger(ImapService.class);
 
+    private static final String IMAP_PROTOCOL = "imap";
     private static final String IMAPS_PROTOCOL = "imaps";
     static final String IMAP_CAPABILITY_CONDSTORE = "CONDSTORE";
     private static final String MULTIPART_MIME_TYPE = "multipart/";
@@ -293,8 +293,8 @@ public class ImapService {
 
     IMAPStore getImapStore(Credentials credentials) throws MessagingException {
         if (imapStore == null) {
-            final Session session = Session.getInstance(initMailProperties(), null);
-            imapStore = (IMAPSSLStore) session.getStore(IMAPS_PROTOCOL);
+            final Session session = Session.getInstance(initMailProperties(credentials), null);
+            imapStore = (IMAPStore) session.getStore(credentials.getImapSsl() ? IMAPS_PROTOCOL : IMAP_PROTOCOL);
             imapStore.connect(
                     credentials.getServerHost(),
                     credentials.getServerPort(),
@@ -305,13 +305,13 @@ public class ImapService {
         return imapStore;
     }
 
-    private Properties initMailProperties() {
+    private Properties initMailProperties(Credentials credentials) {
         final Properties ret = new Properties();
-        ret.put("mail.imap.ssl.enable", true);
+        ret.put("mail.imap.ssl.enable", credentials.getImapSsl());
         ret.put("mail.imap.starttls.enable", true);
+        ret.put("mail.imap.starttls.required", false);
         ret.put("mail.imaps.socketFactory.class", mailSSLSocketFactory);
         ret.put("mail.imaps.socketFactory.fallback", false);
-
         return ret;
     }
 
