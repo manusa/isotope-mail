@@ -293,7 +293,7 @@ public class ImapService {
 
     IMAPStore getImapStore(Credentials credentials) throws MessagingException {
         if (imapStore == null) {
-            final Session session = Session.getInstance(initMailProperties(credentials), null);
+            final Session session = Session.getInstance(initMailProperties(credentials, mailSSLSocketFactory), null);
             imapStore = (IMAPStore) session.getStore(credentials.getImapSsl() ? IMAPS_PROTOCOL : IMAP_PROTOCOL);
             imapStore.connect(
                     credentials.getServerHost(),
@@ -303,16 +303,6 @@ public class ImapService {
             log.debug("Opened new ImapStore session");
         }
         return imapStore;
-    }
-
-    private Properties initMailProperties(Credentials credentials) {
-        final Properties ret = new Properties();
-        ret.put("mail.imap.ssl.enable", credentials.getImapSsl());
-        ret.put("mail.imap.starttls.enable", true);
-        ret.put("mail.imap.starttls.required", false);
-        ret.put("mail.imaps.socketFactory.class", mailSSLSocketFactory);
-        ret.put("mail.imaps.socketFactory.fallback", false);
-        return ret;
     }
 
     List<Message> getMessages(
@@ -401,6 +391,16 @@ public class ImapService {
             }
         }
         return attachments;
+    }
+
+    private static Properties initMailProperties(Credentials credentials, MailSSLSocketFactory mailSSLSocketFactory) {
+        final Properties ret = new Properties();
+        ret.put("mail.imap.ssl.enable", credentials.getImapSsl());
+        ret.put("mail.imap.starttls.enable", true);
+        ret.put("mail.imap.starttls.required", false);
+        ret.put("mail.imaps.socketFactory.class", mailSSLSocketFactory);
+        ret.put("mail.imaps.socketFactory.fallback", false);
+        return ret;
     }
 
     private static BodyPart getBodypart(@NonNull Multipart mp, @NonNull String id, Boolean contentId)

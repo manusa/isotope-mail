@@ -51,6 +51,7 @@ public class SmtpService {
 
     private static final Logger log = LoggerFactory.getLogger(SmtpService.class);
 
+    private static final String SMTP_PROTOCOL = "smtp";
     private static final String SMTPS_PROTOCOL = "smtps";
     private static final String STYLES =
             "body {font-family: 'Roboto', 'Calibri',  sans-serif; font-size: 1rem; color: #333}" +
@@ -74,7 +75,7 @@ public class SmtpService {
 
     public void sendMessage(Credentials credentials, Message message) {
         try {
-            final MimeMessage mimeMessage = new MimeMessage(getSession());
+            final MimeMessage mimeMessage = new MimeMessage(getSession(credentials));
             mimeMessage.setSentDate(new Date());
             if (credentials.getUser() != null && credentials.getUser().contains("@")) {
                 mimeMessage.setFrom(credentials.getUser());
@@ -114,19 +115,20 @@ public class SmtpService {
         }
     }
 
-    private Session getSession() {
+    private Session getSession(Credentials credentials) {
         if (session == null) {
-            session = Session.getInstance(initMailProperties(mailSSLSocketFactory), null);
+            session = Session.getInstance(initMailProperties(credentials, mailSSLSocketFactory), null);
         }
         return session;
     }
 
     private Transport getSmtpTransport(Credentials credentials) throws MessagingException {
         if (smtpTransport == null) {
-            smtpTransport = getSession().getTransport(SMTPS_PROTOCOL);
+            smtpTransport = getSession(credentials).getTransport(credentials.getSmtpSsl() ? SMTPS_PROTOCOL :SMTP_PROTOCOL);
+            final String smtpHost = credentials.getSmtpHost();
             smtpTransport.connect(
-                    credentials.getServerHost(),
-                    465,
+                    smtpHost != null && !smtpHost.isEmpty() ? smtpHost : credentials.getServerHost(),
+                    credentials.getSmtpPort(),
                     credentials.getUser(),
                     credentials.getPassword());
             log.debug("Opened new SMTP transport");
@@ -134,10 +136,11 @@ public class SmtpService {
         return smtpTransport;
     }
 
-    private static Properties initMailProperties(MailSSLSocketFactory socketFactory) {
+    private static Properties initMailProperties(Credentials credentials, MailSSLSocketFactory socketFactory) {
         final Properties ret = new Properties();
-        ret.put("mail.smtp.ssl.enable", true);
+        ret.put("mail.smtp.ssl.enable", credentials.getSmtpSsl());
         ret.put("mail.smtp.starttls.enable", true);
+        ret.put("mail.smtp.starttls.required", false);
         ret.put("mail.smtps.socketFactory.class", socketFactory);
         ret.put("mail.smtps.socketFactory.fallback", false);
         ret.put("mail.smtps.auth", true);
