@@ -15,6 +15,11 @@ import {setCache} from '../actions/messages';
 import {resetFolderMessagesCache} from './message';
 import {EditorState} from 'draft-js';
 
+export const DEFAULT_IMAP_PORT = 993;
+export const DEFAULT_IMAP_SSL = true;
+export const DEFAULT_SMTP_PORT = 465;
+export const DEFAULT_SMTP_SSL = 465;
+
 /**
  * @typedef {Object} Credentials
  * @property {string} serverHost - IMAP host

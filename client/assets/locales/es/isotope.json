@@ -5,6 +5,9 @@
     "Port": "Puerto",
     "User": "Usuario",
     "Password": "Contraseña",
+    "ImapSSL": "IMAP SSL",
+    "SMTP": "SMTP",
+    "SmtpSSL": "SMTP SSL",
     "actions": {
       "Login": "Acceder"
     }

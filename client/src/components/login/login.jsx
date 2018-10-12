@@ -3,7 +3,15 @@ import {connect} from 'react-redux';
 import {Redirect, withRouter} from 'react-router-dom';
 import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
-import {login} from '../../services/application';
+import {
+  DEFAULT_IMAP_PORT,
+  DEFAULT_IMAP_SSL,
+  DEFAULT_SMTP_PORT,
+  DEFAULT_SMTP_SSL,
+  login
+} from '../../services/application';
+import Button from '../buttons/button';
+import Switch from '../form/switch/switch';
 import TextField from '../form/text-field/text-field';
 import Spinner from '../spinner/spinner';
 import mainCss from '../../styles/main.scss';
@@ -15,10 +23,15 @@ class Login extends Component {
     this.state = {
       values: {
         serverHost: '',
-        serverPort: '',
+        serverPort: DEFAULT_IMAP_PORT,
         user: '',
-        password: ''
-      }
+        password: '',
+        imapSsl: DEFAULT_IMAP_SSL,
+        smtpHost: '',
+        smtpPort: DEFAULT_SMTP_PORT,
+        smtpSsl: DEFAULT_SMTP_SSL
+      },
+      advanced: false
     };
     this.onFieldChange = this.onFieldChange.bind(this);
     this.login = this.login.bind(this);
@@ -26,6 +39,8 @@ class Login extends Component {
 
   render() {
     const t = this.props.t;
+    const {serverHost, serverPort, user, password, imapSsl, smtpHost, smtpPort, smtpSsl} = this.state.values;
+    const {advanced} = this.state;
     if (this.props.application.user.credentials) {
       return <Redirect to="/"/>;
     }
@@ -40,24 +55,44 @@ class Login extends Component {
           <form onSubmit={this.login}>
             <div className={styles.server}>
               <TextField id='serverHost' fieldClass={`${styles.formField} ${styles.serverHost}`}
-                value={this.state.values.serverHost} onChange={this.onFieldChange}
+                value={serverHost} onChange={this.onFieldChange}
                 focused={this.isFocused('serverHost')} required={true} autoComplete='on' label={t('login.Host')}/>
               <TextField key='serverPort' id='serverPort' fieldClass={`${styles.formField} ${styles.serverPort}`}
                 type='number' min='0'
-                value={this.state.values.serverPort} onChange={this.onFieldChange}
+                value={serverPort} onChange={this.onFieldChange}
                 focused={this.isFocused('serverPort')} required={true} autoComplete='on' label={t('login.Port')}/>
             </div>
             <TextField id='user' fieldClass={`${styles.formField} ${styles.fullWidth}`}
-              value={this.state.values.user} onChange={this.onFieldChange}
+              value={user} onChange={this.onFieldChange}
               focused={this.isFocused('user')} required={true} autoComplete='on' label={t('login.User')}/>
             <TextField id='password' type={'password'} fieldClass={`${styles.formField} ${styles.fullWidth}`}
-              value={this.state.values.password} onChange={this.onFieldChange}
+              value={password} onChange={this.onFieldChange}
               focused={this.isFocused('password')} required={true} label={t('login.Password')}/>
-            <button type='submit' className={`${styles.loginButton}
-              ${mainCss['mdc-button']} ${mainCss['mdc-button--unelevated']}
-              ${styles.fullWidth}`}>
-              {t('login.actions.Login')}
-            </button>
+            <Button className={styles.advancedButton} label={'Advanced'} icon={advanced ? 'unfold_less' : 'unfold_more'}
+              onClick={e => this.toggleAdvanced(e)}
+            />
+            {advanced ?
+              <div className={styles.advancedContainer}>
+                <Switch id='imapSsl' checked={imapSsl} label={t('login.ImapSSL')}
+                  onToggle={() => this.onToggle('imapSsl')}/>
+                <h3 className={styles.section}>{t('login.SMTP')}</h3>
+                <div className={styles.server}>
+                  <TextField id='smtpHost' fieldClass={`${styles.formField} ${styles.fullWidth} ${styles.serverHost}`}
+                    value={smtpHost} onChange={this.onFieldChange}
+                    focused={this.isFocused('smtpHost')} label={t('login.Host')}/>
+                  <TextField id='smtpPort' fieldClass={`${styles.formField} ${styles.fullWidth} ${styles.serverPort}`}
+                    type='number' min='0' required={true}
+                    value={smtpPort} onChange={this.onFieldChange}
+                    focused={this.isFocused('smtpPort')} label={t('login.Port')}/>
+                </div>
+                <Switch id='smtpSsl' checked={smtpSsl} label={t('login.SmtpSSL')}
+                  onToggle={() => this.onToggle('smtpSsl')}/>
+              </div>
+              : null
+            }
+            <Button type={'submit'}
+              className={`${styles.loginButton} ${mainCss['mdc-button--unelevated']} ${styles.fullWidth}`}
+              label={t('login.actions.Login')} />
           </form>
         </div>
       </div>
@@ -66,6 +101,15 @@ class Login extends Component {
 
   isFocused(componentId) {
     return componentId === this.state.focusedComponentId;
+  }
+
+  onToggle(id) {
+    this.setState(prevState => {
+      const newState = {...prevState};
+      newState.values = {...prevState.values};
+      newState.values[id] = !newState.values[id];
+      return newState;
+    });
   }
 
   onFieldChange(event) {
@@ -77,6 +121,12 @@ class Login extends Component {
       newState.values[target.id] = target.value;
       return newState;
     });
+  }
+
+  toggleAdvanced(event) {
+    event.preventDefault();
+    event.target.blur();
+    this.setState({advanced: !this.state.advanced});
   }
 
   login(event) {
