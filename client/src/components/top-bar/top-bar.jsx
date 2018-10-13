@@ -23,7 +23,7 @@ class TopBar extends Component {
 
   render() {
     const collapsed = this.props.sideBarCollapsed;
-    const isEditing = !this.props.newMessage || Object.keys(this.props.newMessage).length !== 0;
+    const isEditing = this.props.newMessage && Object.keys(this.props.newMessage).length > 0;
     const isMessageViewer = this.props.selectedMessage && Object.keys(this.props.selectedMessage).length > 0;
     let title = this.props.title;
     if (this.props.selectedFolder && this.props.selectedFolder.name

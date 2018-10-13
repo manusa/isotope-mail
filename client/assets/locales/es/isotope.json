@@ -30,5 +30,10 @@
     "to": "para",
     "cc": "cc",
     "bcc": "bcc"
+  },
+  "replyAction": {
+    "From": "De",
+    "Date": "Fecha",
+    "Subject": "Asunto"
   }
 }

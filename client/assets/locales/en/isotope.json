@@ -30,5 +30,10 @@
     "to": "to",
     "cc": "cc",
     "bcc": "bcc"
+  },
+  "replyAction": {
+    "From": "From",
+    "Date": "Date",
+    "Subject": "Subject"
   }
 }

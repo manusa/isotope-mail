@@ -9,6 +9,7 @@ import {
 } from '../actions/application';
 import {toJson} from './fetch';
 import {FolderTypes, getFolders} from './folder';
+import i18n from './i18n';
 import {recoverState} from './indexed-db';
 import {setFolders} from '../actions/folders';
 import {setCache} from '../actions/messages';
@@ -92,8 +93,23 @@ export function replyMessage(dispatch, originalMessage) {
   const cc = recipients.filter(r => r.type === 'Cc').map(recipientMapper);
   const bcc = recipients.filter(r => r.type === 'Bcc').map(recipientMapper);
   const subject = `Re: ${originalMessage.subject}`;
+  const formattedDate = new Date(originalMessage.receivedDate).toLocaleString(navigator.language, {
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'
+  });
 
-  dispatch(editMessage({to, cc, bcc, subject,
-    content: sanitize.sanitize(originalMessage.content)
+  const t = i18n.t.bind(i18n);
+  const content = `
+    <p></p>
+    <hr/>
+    <p>
+      ${t('replyAction.From')}: ${originalMessage.from.join(', ')}<br/>
+      ${t('replyAction.Date')}: ${formattedDate}<br/>
+      ${t('replyAction.Subject')}: ${originalMessage.subject}<br/>
+    </p>
+    <br/>
+    ${sanitize.sanitize(originalMessage.content)}
+  `;
+
+  dispatch(editMessage({to, cc, bcc, subject, content
   }));
 }
