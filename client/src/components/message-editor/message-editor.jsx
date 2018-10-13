@@ -10,6 +10,7 @@ import mainCss from '../../styles/main.scss';
 import styles from './message-editor.scss';
 import MceButton from './mce-button';
 
+const EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED = 100;
 
 function _isStyled(editor, button) {
   return editor && editor.getContent().length > 0 && editor.queryCommandState(button.command);
@@ -36,7 +37,7 @@ function _toggleBlockStyle(editor, button) {
   editor.execCommand('FormatBlock', false, button.blockCommand);
 }
 
-const INLINE_STYLE_BUTTONS = {
+const EDITOR_BUTTONS = {
   bold: {
     command: 'bold', icon: 'format_bold',
     activeFunction: _isStyled, toggleFunction: _toggleStyle},
@@ -154,7 +155,7 @@ class MessageEditor extends Component {
 
   renderEditorButtons() {
     return <div className={`${mainCss['mdc-card']} ${styles['button-container']}`}>
-      {Object.entries(INLINE_STYLE_BUTTONS).map(([k, b]) => (
+      {Object.entries(EDITOR_BUTTONS).map(([k, b]) => (
         <MceButton
           key={k}
           className={styles.button}
@@ -168,7 +169,9 @@ class MessageEditor extends Component {
   }
 
   submit() {
-    const {credentials, to, cc, bcc, subject, content} = this.props;
+    // Get content directly from editor, state content may not contain latest changes
+    const content = this.getEditor().getContent();
+    const {credentials, to, cc, bcc, subject} = this.props;
     sendMessage(credentials, {to, cc, bcc, subject, content});
     this.props.close();
   }
@@ -237,13 +240,16 @@ class MessageEditor extends Component {
   }
 
   editorChange(content) {
-    this.props.editMessage({...this.props.editedMessage, content});
+    // Commit changes every 50 keystrokes
+    if (Math.abs(this.props.editedMessage.content.length - content.length) > EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED) {
+      this.props.editMessage({...this.props.editedMessage, content});
+    }
   }
 
   selectionChange() {
     const editor = this.getEditor();
     const editorState = {};
-    Object.entries(INLINE_STYLE_BUTTONS).forEach(([k, b]) => {
+    Object.entries(EDITOR_BUTTONS).forEach(([k, b]) => {
       editorState[k] = b.activeFunction(editor, b, k);
     });
     // Trigger state change only if values of the selection have changed
