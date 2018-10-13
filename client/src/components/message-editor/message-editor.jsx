@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
-import {Editor as TEditor} from '@tinymce/tinymce-react';
+import {Editor} from '@tinymce/tinymce-react';
 import HeaderAddress from './header-address';
 import {editMessage} from '../../actions/application';
 import {sendMessage} from '../../services/smtp';
@@ -15,8 +15,12 @@ function _isStyled(editor, button) {
   return editor && editor.getContent().length > 0 && editor.queryCommandState(button.command);
 }
 
-function _isBlockStyled(editor, button) {
-  return editor && editor.getContent().length > 0 && editor.queryCommandValue('FormatBlock') === button.blockCommand;
+function _isBlockStyled(editor, button, key) {
+  return editor && editor.getContent().length > 0 && editor.selection.getNode().tagName === key;
+}
+
+function _isBlockStyledFromParent(editor, button, key) {
+  return editor && editor.getContent().length > 0 && editor.selection.getNode().closest(key) !== null;
 }
 
 function _toggleStyle(editor, button) {
@@ -42,23 +46,23 @@ const INLINE_STYLE_BUTTONS = {
   underline: {
     command: 'underline', icon: 'format_underline',
     activeFunction: _isStyled, toggleFunction: _toggleStyle},
-  unorderedList: {
+  UL: {
     command: 'InsertUnorderedList', icon: 'format_list_bulleted',
-    activeFunction: _isStyled, toggleFunction: _toggleStyle},
-  orderedList: {
+    activeFunction: _isBlockStyledFromParent, toggleFunction: _toggleStyle},
+  OL: {
     command: 'InsertOrderedList', icon: 'format_list_numbered',
-    activeFunction: _isStyled, toggleFunction: _toggleStyle},
-  h1: {
+    activeFunction: _isBlockStyledFromParent, toggleFunction: _toggleStyle},
+  H1: {
     blockCommand: 'h1', label: 'H1', activeFunction: _isBlockStyled, toggleFunction: _toggleBlockStyle},
-  h2: {
+  H2: {
     blockCommand: 'h2', label: 'H2', activeFunction: _isBlockStyled, toggleFunction: _toggleBlockStyle},
-  h3: {
+  H3: {
     blockCommand: 'h3', label: 'H3', activeFunction: _isBlockStyled, toggleFunction: _toggleBlockStyle},
   blockquote: {
     blockCommand: 'blockquote', icon: 'format_quote',
-    activeFunction: editor => editor.selection.getNode().closest('blockquote') !== null,
+    activeFunction: _isBlockStyledFromParent,
     toggleFunction: _toggleBlockStyle},
-  pre: {
+  PRE: {
     blockCommand: 'pre', icon: 'space_bar', activeFunction: _isBlockStyled, toggleFunction: _toggleBlockStyle},
   code: {
     blockCommand: 'isotope_code', icon: 'code',
@@ -110,7 +114,7 @@ class MessageEditor extends Component {
         </div>
         <div className={styles['editor-wrapper']} onClick={() => this.editorWrapperClick()}>
           <div className={styles['editor-container']}>
-            <TEditor
+            <Editor
               ref={this.editorRef}
               initialValue={content}
               onEditorChange={this.handleEditorChange}
@@ -240,9 +244,15 @@ class MessageEditor extends Component {
     const editor = this.getEditor();
     const editorState = {};
     Object.entries(INLINE_STYLE_BUTTONS).forEach(([k, b]) => {
-      editorState[k] = b.activeFunction(editor, b);
+      editorState[k] = b.activeFunction(editor, b, k);
     });
-    this.setState({editorState});
+    // Trigger state change only if values of the selection have changed
+    for (const [k, v] of Object.entries(editorState)) {
+      if (v !== this.state.editorState[k]) {
+        this.setState({editorState});
+        break;
+      }
+    }
   }
 }
 

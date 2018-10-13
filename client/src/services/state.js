@@ -25,7 +25,7 @@ export async function loadState() {
   if (userId !== null && hash !== null) {
     const dbState = await recoverState(userId, hash);
     if (dbState && dbState !== null) {
-      state.application = {...dbState.application}
+      state.application = {...dbState.application};
       state.folders.items = [...dbState.folders.items];
       state.folders.explodedItems = explodeFolders(state.folders.items);
       state.messages.cache = {...dbState.messages.cache};
