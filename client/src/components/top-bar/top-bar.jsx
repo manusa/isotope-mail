@@ -23,6 +23,7 @@ class TopBar extends Component {
 
   render() {
     const collapsed = this.props.sideBarCollapsed;
+    const isEditing = !this.props.newMessage || Object.keys(this.props.newMessage).length !== 0;
     const isMessageViewer = this.props.selectedMessage && Object.keys(this.props.selectedMessage).length > 0;
     let title = this.props.title;
     if (this.props.selectedFolder && this.props.selectedFolder.name
@@ -42,7 +43,7 @@ class TopBar extends Component {
               </button> :
               null
             }
-            {isMessageViewer ?
+            {isMessageViewer && !isEditing ?
               <Fragment>
                 <button onClick={() => this.props.selectMessage(null)}
                   className={`material-icons ${mainCss['mdc-top-app-bar__navigation-icon']}`}>
@@ -53,9 +54,11 @@ class TopBar extends Component {
               <span className={mainCss['mdc-top-app-bar__title']}>{title}</span>
             }
           </section>
-          <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-end']}`}>
-            {isMessageViewer ? this.renderMessageViewerActions() : this.renderMessageListActions()}
-          </section>
+          {isEditing ? null :
+            <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-end']}`}>
+              {isMessageViewer ? this.renderMessageViewerActions() : this.renderMessageListActions()}
+            </section>
+          }
         </div>
       </header>
     );
@@ -112,6 +115,7 @@ class TopBar extends Component {
 
 TopBar.propTypes = {
   title: PropTypes.string.isRequired,
+  newMessage: PropTypes.object,
   selectedFolder: PropTypes.object,
   selectedMessagesIds: PropTypes.array.isRequired,
   selectedMessages: PropTypes.array.isRequired,
@@ -130,6 +134,7 @@ const mapStateToProps = state => {
   const selectedMessagesAllUnread = selectedMessages.filter(m => m.seen === true).length === 0;
   return ({
     title: state.application.title,
+    newMessage: state.application.newMessage,
     selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || null,
     selectedMessagesIds: selectedMessagesIds,
     selectedMessages: selectedMessages,

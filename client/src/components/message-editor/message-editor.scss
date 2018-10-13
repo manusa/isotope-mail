@@ -78,6 +78,8 @@ $editor-border-color: lighten($mdc-theme-primary, 50%) !default;
 
   .editor-wrapper {
     flex: 1;
+    height: 1px;
+    min-height: 1px;
 
     display: flex;
     flex-direction: column;

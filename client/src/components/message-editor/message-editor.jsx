@@ -10,7 +10,7 @@ import mainCss from '../../styles/main.scss';
 import styles from './message-editor.scss';
 import MceButton from './mce-button';
 
-const EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED = 100;
+const EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED = 50;
 
 function _isStyled(editor, button) {
   return editor && editor.getContent().length > 0 && editor.queryCommandState(button.command);
@@ -241,7 +241,7 @@ class MessageEditor extends Component {
 
   editorChange(content) {
     // Commit changes every 50 keystrokes
-    if (Math.abs(this.props.editedMessage.content.length - content.length) > EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED) {
+    if (Math.abs(this.props.content.length - content.length) > EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED) {
       this.props.editMessage({...this.props.editedMessage, content});
     }
   }
