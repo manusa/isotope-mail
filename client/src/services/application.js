@@ -8,12 +8,12 @@ import {
   setUserCredentials
 } from '../actions/application';
 import {toJson} from './fetch';
-import {recoverState} from './indexed-db';
 import {FolderTypes, getFolders} from './folder';
+import {recoverState} from './indexed-db';
 import {setFolders} from '../actions/folders';
 import {setCache} from '../actions/messages';
 import {resetFolderMessagesCache} from './message';
-import {EditorState} from 'draft-js';
+import sanitize from './sanitize';
 
 export const DEFAULT_IMAP_PORT = 993;
 export const DEFAULT_IMAP_SSL = true;
@@ -82,5 +82,18 @@ export async function login(dispatch, credentials) {
 }
 
 export function editNewMessage(dispatch) {
-  dispatch(editMessage({to: [], cc: [], bcc: [], subject: '', editor: EditorState.createEmpty()}));
+  dispatch(editMessage({to: [], cc: [], bcc: [], subject: '', content: ''}));
+}
+
+export function replyMessage(dispatch, originalMessage) {
+  const recipients = [...originalMessage.recipients];
+  const recipientMapper = r => r.address;
+  const to = recipients.filter(r => r.type === 'To').map(recipientMapper).concat(originalMessage.from);
+  const cc = recipients.filter(r => r.type === 'Cc').map(recipientMapper);
+  const bcc = recipients.filter(r => r.type === 'Bcc').map(recipientMapper);
+  const subject = `Re: ${originalMessage.subject}`;
+
+  dispatch(editMessage({to, cc, bcc, subject,
+    content: sanitize.sanitize(originalMessage.content)
+  }));
 }

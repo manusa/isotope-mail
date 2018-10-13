@@ -55,13 +55,11 @@ public class SmtpService {
     private static final String SMTPS_PROTOCOL = "smtps";
     private static final String STYLES =
             "body {font-family: 'Roboto', 'Calibri',  sans-serif; font-size: 1rem; color: #333}" +
-            "h1.h1 {margin: 6px 0 16px 0; font-size: 3rem; font-weight: normal}" +
-            "h2.h2 {margin: 6px 0 12px 0; font-size: 2.5rem; font-weight: normal}" +
-            "h3.h3 {margin: 6px 0 8px 0; font-size: 1.5rem; font-weight: bold}" +
-            "blockquote.blockquote {border-left: 5px solid #ebebeb; font-style: italic; margin: 0; padding: 0 32px}" +
-            "pre.code-block {background-color: #ebebeb; margin: 0; padding: 0 8px}" +
-            "pre.code-block:first-child {padding-top: 8px}" +
-            "pre.code-block:last-child {padding-bottom: 8px}";
+            "h1 {margin: 6px 0 16px 0; font-size: 3rem; font-weight: normal}" +
+            "h2 {margin: 6px 0 12px 0; font-size: 2.5rem; font-weight: normal}" +
+            "h3 {margin: 6px 0 8px 0; font-size: 1.5rem; font-weight: bold}" +
+            "blockquote {border-left: 5px solid #ebebeb; font-style: italic; margin: 0; padding: 0 32px}" +
+            "pre.code {background-color: #ebebeb; margin: 0; padding: 8px}";
 
     private final MailSSLSocketFactory mailSSLSocketFactory;
 

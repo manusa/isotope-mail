@@ -1,0 +1,71 @@
+$editor-background-color: white !default;
+$editor-h1-margin: 6px 0 16px 0 !default;
+$editor-h1-font-size: 3rem;
+$editor-h2-margin: 6px 0 12px 0 !default;
+$editor-h2-font-size: 2.5rem;
+$editor-h3-margin: 6px 0 8px 0 !default;
+$editor-h3-font-size: 1.5rem;
+$editor-block-padding: 8px !default;
+$editor-code-block-background: darken($editor-background-color, 8%) !default;
+
+.mce-tinymce{
+  &.mce-panel,
+  .mce-panel {
+    border: 0;
+    box-shadow: none;
+  }
+}
+
+.mce-content-body {
+  &.mce-edit-focus {
+    outline: none;
+  }
+
+  p {
+    margin-top: 6px;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    margin: $editor-h1-margin;
+    font-size: $editor-h1-font-size;
+  }
+
+  h2 {
+    margin: $editor-h2-margin;
+    font-size: $editor-h2-font-size;
+  }
+
+  h3 {
+    margin: $editor-h3-margin;
+    font-weight: bold;
+    font-size: $editor-h3-font-size;
+  }
+
+  blockquote {
+    border-left: 5px solid $editor-code-block-background;
+    font-style: italic;
+    margin: 0;
+    padding: 0 $default-spacing * 2;
+  }
+
+  pre.code {
+    background-color: $editor-code-block-background;
+    margin: 0;
+    padding: $editor-block-padding;
+  }
+
+  code{
+    background-color: $editor-code-block-background;
+    margin: 0;
+    padding: 0 $editor-block-padding;
+
+    &:first-child {
+      padding-top: $editor-block-padding;
+    }
+
+    &:last-child {
+      padding-bottom: $editor-block-padding;
+    }
+  }
+}

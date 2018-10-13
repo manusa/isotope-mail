@@ -2,40 +2,79 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
-import(/* webpackChunkName: "draft-js" */ 'draft-js/dist/Draft.css');
-import {Editor, RichUtils} from 'draft-js';
-import EditorButton, {Type} from './editor-button';
+import {Editor as TEditor} from '@tinymce/tinymce-react';
 import HeaderAddress from './header-address';
 import {editMessage} from '../../actions/application';
 import {sendMessage} from '../../services/smtp';
 import mainCss from '../../styles/main.scss';
 import styles from './message-editor.scss';
+import MceButton from './mce-button';
 
-const EDITOR_BUTTONS = {
-  BOLD: {editorStyle: 'BOLD', type: Type.INLINE, icon: 'format_bold'},
-  ITALIC: {editorStyle: 'ITALIC', type: Type.INLINE, icon: 'format_italic'},
-  UNDERLINE: {editorStyle: 'UNDERLINE', type: Type.INLINE, icon: 'format_underline'},
-  CODE: {editorStyle: 'CODE', type: Type.INLINE, icon: 'space_bar'},
-  'header-one': {editorStyle: 'header-one', type: Type.BLOCK, label: 'H1', className: styles.h1},
-  'header-two': {editorStyle: 'header-two', type: Type.BLOCK, label: 'H2', className: styles.h2},
-  'header-three': {editorStyle: 'header-three', type: Type.BLOCK, label: 'H3', className: styles.h3},
-  blockquote: {editorStyle: 'blockquote', type: Type.BLOCK, icon: 'format_quote', className: styles.blockquote},
-  'unordered-list-item': {editorStyle: 'unordered-list-item', type: Type.BLOCK, icon: 'format_list_bulleted'},
-  'ordered-list-item': {editorStyle: 'ordered-list-item', type: Type.BLOCK, icon: 'format_list_numbered'},
-  'code-block': {editorStyle: 'code-block', type: Type.BLOCK, icon: 'code', className: styles['code-block']}
-};
 
-function _getBlockStyle(block) {
-  const definedBlock = EDITOR_BUTTONS[block.getType()];
-  if (definedBlock) {
-    return definedBlock.className;
-  }
-  return null;
+function _isStyled(editor, button) {
+  return editor && editor.getContent().length > 0 && editor.queryCommandState(button.command);
 }
+
+function _isBlockStyled(editor, button) {
+  return editor && editor.getContent().length > 0 && editor.queryCommandValue('FormatBlock') === button.blockCommand;
+}
+
+function _toggleStyle(editor, button) {
+  editor.execCommand(button.command);
+}
+
+function _toggleBlockStyle(editor, button) {
+  // Remove font-size
+  Array.from(editor.selection.getNode().getElementsByTagName('*')).forEach(e => {
+    e.style['font-size'] = '';
+  });
+  // editor.execCommand('mceToggleFormat', false, button.blockCommand);
+  editor.execCommand('FormatBlock', false, button.blockCommand);
+}
+
+const INLINE_STYLE_BUTTONS = {
+  bold: {
+    command: 'bold', icon: 'format_bold',
+    activeFunction: _isStyled, toggleFunction: _toggleStyle},
+  italic: {
+    command: 'italic', icon: 'format_italic',
+    activeFunction: _isStyled, toggleFunction: _toggleStyle},
+  underline: {
+    command: 'underline', icon: 'format_underline',
+    activeFunction: _isStyled, toggleFunction: _toggleStyle},
+  unorderedList: {
+    command: 'InsertUnorderedList', icon: 'format_list_bulleted',
+    activeFunction: _isStyled, toggleFunction: _toggleStyle},
+  orderedList: {
+    command: 'InsertOrderedList', icon: 'format_list_numbered',
+    activeFunction: _isStyled, toggleFunction: _toggleStyle},
+  h1: {
+    blockCommand: 'h1', label: 'H1', activeFunction: _isBlockStyled, toggleFunction: _toggleBlockStyle},
+  h2: {
+    blockCommand: 'h2', label: 'H2', activeFunction: _isBlockStyled, toggleFunction: _toggleBlockStyle},
+  h3: {
+    blockCommand: 'h3', label: 'H3', activeFunction: _isBlockStyled, toggleFunction: _toggleBlockStyle},
+  blockquote: {
+    blockCommand: 'blockquote', icon: 'format_quote',
+    activeFunction: editor => editor.selection.getNode().closest('blockquote') !== null,
+    toggleFunction: _toggleBlockStyle},
+  pre: {
+    blockCommand: 'pre', icon: 'space_bar', activeFunction: _isBlockStyled, toggleFunction: _toggleBlockStyle},
+  code: {
+    blockCommand: 'isotope_code', icon: 'code',
+    activeFunction: editor => {
+      const node = editor.selection.getNode();
+      return node.tagName === 'PRE' && node.className === 'code';
+    },
+    toggleFunction: _toggleBlockStyle}
+};
 
 class MessageEditor extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      editorState: {}
+    };
 
     this.editorRef = React.createRef();
     this.handleSubmit = this.submit.bind(this);
@@ -46,14 +85,12 @@ class MessageEditor extends Component {
     // Subject events
     this.handleOnSubjectChange = this.onSubjectChange.bind(this);
     // Editor events
-    this.handleEditorOnChange = editor => this.props.editMessage({...this.props.editedMessage, editor});
-    this.handleEditorKeyCommand = this.editorKeyCommand.bind(this);
-    this.handleToggleBlockType = this.toggleBlockType.bind(this);
-    this.handleToggleInlineStyle = this.toggleInlineStyle.bind(this);
+    this.handleEditorChange = this.editorChange.bind(this);
+    this.handleSelectionChange = this.selectionChange.bind(this);
   }
 
   render() {
-    const {t, className, close, to, cc, bcc, subject, editor} = this.props;
+    const {t, className, close, to, cc, bcc, subject, content} = this.props;
     return (
       <div className={`${className} ${styles['message-editor']}`}>
         <div className={styles.header}>
@@ -73,12 +110,25 @@ class MessageEditor extends Component {
         </div>
         <div className={styles['editor-wrapper']} onClick={() => this.editorWrapperClick()}>
           <div className={styles['editor-container']}>
-            <Editor
+            <TEditor
               ref={this.editorRef}
-              editorState={editor}
-              blockStyleFn={_getBlockStyle}
-              handleKeyCommand={this.handleEditorKeyCommand}
-              onChange={this.handleEditorOnChange} />
+              initialValue={content}
+              onEditorChange={this.handleEditorChange}
+              onSelectionChange={this.handleSelectionChange}
+              inline={true}
+              init={{
+                menubar: false,
+                statusbar: false,
+                toolbar: false,
+                plugins: 'autoresize',
+                content_style: 'body {padding:0}', // DOESN'T WORK
+                formats: {
+                  isotope_code: {
+                    block: 'pre', classes: ['code']
+                  }
+                }
+              }}
+            />
           </div>
           {this.renderEditorButtons()}
         </div>
@@ -100,44 +150,22 @@ class MessageEditor extends Component {
 
   renderEditorButtons() {
     return <div className={`${mainCss['mdc-card']} ${styles['button-container']}`}>
-      {Object.values(EDITOR_BUTTONS).map(b => {
-        let toggleFunction;
-        switch (b.type) {
-          case Type.BLOCK:
-            toggleFunction = this.handleToggleBlockType;
-            break;
-          case Type.INLINE:
-            toggleFunction = this.handleToggleInlineStyle;
-            break;
-          default:
-            toggleFunction = null;
-        }
-        return (
-          <EditorButton key={b.editorStyle}
-            editorState={this.props.editor}
-            editorStyle={b.editorStyle}
-            type={b.type}
-            className={styles.button}
-            activeClassName={styles.active}
-            icon={b.icon}
-            label={b.label}
-            onToggle={toggleFunction}
-          />
-        );
-      })}
+      {Object.entries(INLINE_STYLE_BUTTONS).map(([k, b]) => (
+        <MceButton
+          key={k}
+          className={styles.button}
+          activeClassName={styles.active}
+          active={this.state.editorState && this.state.editorState[k] === true}
+          label={b.label}
+          icon={b.icon}
+          onToggle={() => b.toggleFunction(this.getEditor(), b)}
+        />))}
     </div>;
   }
 
   submit() {
-    const {credentials, to, cc, bcc, subject} = this.props;
-    const editorContent = this.editorRef.current.editor.children[0].innerHTML
-      .replace(/data-[^=]*?="[^"]*?"/gm, '')
-      .replace(new RegExp(styles.h1, 'gm'), 'h1')
-      .replace(new RegExp(styles.h2, 'gm'), 'h2')
-      .replace(new RegExp(styles.h3, 'gm'), 'h3')
-      .replace(new RegExp(styles.blockquote, 'gm'), 'blockquote')
-      .replace(new RegExp(styles['code-block'], 'gm'), 'code-block')
-    sendMessage(credentials, {to, cc, bcc, subject, content: editorContent});
+    const {credentials, to, cc, bcc, subject, content} = this.props;
+    sendMessage(credentials, {to, cc, bcc, subject, content});
     this.props.close();
   }
 
@@ -193,35 +221,28 @@ class MessageEditor extends Component {
     }
   }
 
-  editorWrapperClick() {
-    this.editorRef.current.focus();
-  }
-
-  editorKeyCommand(command, editor) {
-    const newState = RichUtils.handleKeyCommand(editor, command);
-    if (newState) {
-      this.handleEditorOnChange(newState);
-      return 'handled';
+  getEditor() {
+    if (this.editorRef.current && this.editorRef.current.editor) {
+      return this.editorRef.current.editor;
     }
-    return 'not-handled';
+    return null;
   }
 
-  toggleBlockType(blockType) {
-    this.handleEditorOnChange(
-      RichUtils.toggleBlockType(
-        this.props.editor,
-        blockType
-      )
-    );
+  editorWrapperClick() {
+    this.getEditor().focus();
   }
 
-  toggleInlineStyle(inlineStyle) {
-    this.handleEditorOnChange(
-      RichUtils.toggleInlineStyle(
-        this.props.editor,
-        inlineStyle
-      )
-    );
+  editorChange(content) {
+    this.props.editMessage({...this.props.editedMessage, content});
+  }
+
+  selectionChange() {
+    const editor = this.getEditor();
+    const editorState = {};
+    Object.entries(INLINE_STYLE_BUTTONS).forEach(([k, b]) => {
+      editorState[k] = b.activeFunction(editor, b);
+    });
+    this.setState({editorState});
   }
 }
 
@@ -241,7 +262,8 @@ const mapStateToProps = state => ({
   cc: state.application.newMessage.cc,
   bcc: state.application.newMessage.bcc,
   subject: state.application.newMessage.subject,
-  editor: state.application.newMessage.editor
+  editor: state.application.newMessage.editor,
+  content: state.application.newMessage.content
 });
 
 const mapDispatchToProps = dispatch => ({

@@ -1,6 +1,5 @@
 import idb from 'idb';
 import sjcl from 'sjcl';
-import {EditorState, convertFromRaw, convertToRaw} from 'draft-js';
 import {processFolders} from './folder';
 import {setError} from '../actions/application';
 
@@ -81,11 +80,6 @@ export async function recoverState(userId, hash) {
   }
   const decryptedState = sjcl.decrypt(hash, encryptedState.value);
   const recoveredState = JSON.parse(decryptedState);
-  // Recover edited newMessage editor content
-  if (recoveredState.application.newMessage && recoveredState.application.newMessage.editor) {
-    recoveredState.application.newMessage.editor = EditorState.createWithContent(
-      convertFromRaw(recoveredState.application.newMessage.editor));
-  }
   // Process folders
   recoveredState.folders.items = processFolders(recoveredState.folders.items);
   // Recover message cache from other store
@@ -110,12 +104,6 @@ export async function persistState(dispatch, state) {
     // Clone state
     const newState = {...state};
     newState.application = {...state.application};
-    // Draft-js can only be persisted if Raw
-    if (newState.application.newMessage
-      && newState.application.newMessage.editor && newState.application.newMessage.editor.getCurrentContent) {
-      newState.application.newMessage = {...newState.application.newMessage,
-        editor: convertToRaw(newState.application.newMessage.editor.getCurrentContent())};
-    }
 
     newState.folders = {...state.folders};
     newState.folders.items = [...state.folders.items];

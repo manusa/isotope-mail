@@ -21,11 +21,11 @@
     }
   ],
   "dependencies": {
+    "@tinymce/tinymce-react": "^2.3.0",
     "abortcontroller-polyfill": "^1.1.9",
     "babel-polyfill": "^6.26.0",
     "compression": "^1.7.2",
     "dompurify": "^1.0.7",
-    "draft-js": "^0.10.5",
     "eventsource": "^1.0.7",
     "i18next": "^11.7.0",
     "i18next-xhr-backend": "^1.5.1",

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {FolderTypes} from '../../services/folder';
 import {selectMessage} from '../../actions/application';
+ºimport {replyMessage} from '../../services/application';
 import {moveMessages, setMessagesSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
@@ -63,6 +64,11 @@ class TopBar extends Component {
   renderMessageViewerActions() {
     return (
       <Fragment>
+        <button
+          onClick={this.props.replyMessage}
+          className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
+          reply
+        </button>
         <button
           onClick={this.props.deleteMessage}
           className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
@@ -137,6 +143,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
   selectMessage: message => dispatch(selectMessage(message)),
+  replyMessage: selectedMessaage => replyMessage(dispatch, selectedMessaage),
   deleteMessage: (credentials, folders, selectedFolder, selectedMessage) => {
     const trashFolder = _findTrashFolder(folders);
     if (selectedMessage && selectedFolder && trashFolder) {
@@ -162,6 +169,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
+  replyMessage: () => dispatchProps.replyMessage(stateProps.selectedMessage),
   deleteMessage: () =>
     dispatchProps.deleteMessage(
       stateProps.credentials, stateProps.folders, stateProps.selectedFolder, stateProps.selectedMessage),
