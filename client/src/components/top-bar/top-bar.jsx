@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {FolderTypes} from '../../services/folder';
 import {selectMessage} from '../../actions/application';
-ºimport {replyMessage} from '../../services/application';
+import {replyMessage} from '../../services/application';
 import {moveMessages, setMessagesSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
