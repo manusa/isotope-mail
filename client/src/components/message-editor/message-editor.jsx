@@ -74,6 +74,21 @@ const EDITOR_BUTTONS = {
     toggleFunction: _toggleBlockStyle}
 };
 
+const EDITOR_CONFIG = {
+  menubar: false,
+  statusbar: false,
+  toolbar: false,
+  plugins: 'autoresize',
+  content_style: 'body {padding:0}', // DOESN'T WORK
+  browser_spellcheck: true,
+  entity_encoding: 'named',
+  formats: {
+    isotope_code: {
+      block: 'pre', classes: ['code']
+    }
+  }
+};
+
 class MessageEditor extends Component {
   constructor(props) {
     super(props);
@@ -91,6 +106,7 @@ class MessageEditor extends Component {
     this.handleOnSubjectChange = this.onSubjectChange.bind(this);
     // Editor events
     this.handleEditorChange = this.editorChange.bind(this);
+    this.handleEditorBlur = this.editorBlur.bind(this);
     this.handleSelectionChange = this.selectionChange.bind(this);
   }
 
@@ -120,19 +136,9 @@ class MessageEditor extends Component {
               initialValue={content}
               onEditorChange={this.handleEditorChange}
               onSelectionChange={this.handleSelectionChange}
+              onBlur={this.handleEditorBlur}
               inline={true}
-              init={{
-                menubar: false,
-                statusbar: false,
-                toolbar: false,
-                plugins: 'autoresize',
-                content_style: 'body {padding:0}', // DOESN'T WORK
-                formats: {
-                  isotope_code: {
-                    block: 'pre', classes: ['code']
-                  }
-                }
-              }}
+              init={EDITOR_CONFIG}
             />
           </div>
           {this.renderEditorButtons()}
@@ -239,11 +245,26 @@ class MessageEditor extends Component {
     this.getEditor().focus();
   }
 
+  /**
+   * Every change in the editor will trigger this method.
+   *
+   * For performance reasons, we'll only persist the editor content every EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED
+   *
+   * @param content
+   */
   editorChange(content) {
     // Commit changes every 50 keystrokes
     if (Math.abs(this.props.content.length - content.length) > EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED) {
       this.props.editMessage({...this.props.editedMessage, content});
     }
+  }
+
+  /**
+   * Persist whatever is in the editor as changes are only persisted every EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED
+   */
+  editorBlur() {
+    const content = this.getEditor().getContent()
+    this.props.editMessage({...this.props.editedMessage, content});
   }
 
   selectionChange() {
