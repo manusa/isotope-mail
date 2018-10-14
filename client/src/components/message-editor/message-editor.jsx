@@ -147,7 +147,7 @@ class MessageEditor extends Component {
               onEditorChange={this.handleEditorChange}
               onSelectionChange={this.handleSelectionChange}
               onBlur={this.handleEditorBlur}
-              onPaste={event => {this.editorPaste(event)}}
+              onPaste={event => this.editorPaste(event)}
               inline={true}
               init={EDITOR_CONFIG}
             />
@@ -281,7 +281,7 @@ class MessageEditor extends Component {
   editorPaste(pasteEvent) {
     if (pasteEvent.clipboardData) {
       const editor = this.getEditor();
-      const items = pasteEvent.clipboardData.items
+      const items = pasteEvent.clipboardData.items;
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         if (item.type.indexOf('image/') === 0) {
