@@ -81,7 +81,8 @@ const EDITOR_CONFIG = {
   plugins: 'autoresize',
   content_style: 'body {padding:0}', // DOESN'T WORK
   browser_spellcheck: true,
-  entity_encoding: 'named',
+  paste_data_images: true,
+  entity_encoding: 'named', // Converts characters to html entities ' ' > &nbsp;
   formats: {
     isotope_code: {
       block: 'pre', classes: ['code']
@@ -137,6 +138,7 @@ class MessageEditor extends Component {
               onEditorChange={this.handleEditorChange}
               onSelectionChange={this.handleSelectionChange}
               onBlur={this.handleEditorBlur}
+              onPaste={event => {this.editorPaste(event)}}
               inline={true}
               init={EDITOR_CONFIG}
             />
@@ -265,6 +267,21 @@ class MessageEditor extends Component {
   editorBlur() {
     const content = this.getEditor().getContent();
     this.props.editMessage({...this.props.editedMessage, content});
+  }
+
+  editorPaste(pasteEvent) {
+    if (pasteEvent.clipboardData) {
+      const editor = this.getEditor();
+      const items = pasteEvent.clipboardData.items
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.type.indexOf('image/') === 0) {
+          event.preventDefault();
+          const objectUrl = URL.createObjectURL(item.getAsFile());
+          editor.execCommand('mceInsertContent', false, `<img alt="" src="${objectUrl}"/>`);
+        }
+      }
+    }
   }
 
   selectionChange() {
