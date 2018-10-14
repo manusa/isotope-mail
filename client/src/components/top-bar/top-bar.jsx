@@ -70,7 +70,7 @@ class TopBar extends Component {
         <button
           onClick={this.props.replyMessage}
           className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-          reply
+          reply_all
         </button>
         <button
           onClick={this.props.deleteMessage}
