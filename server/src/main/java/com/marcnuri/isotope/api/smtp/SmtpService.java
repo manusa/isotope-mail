@@ -36,11 +36,15 @@ import javax.annotation.PreDestroy;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.util.Date;
 import java.util.Properties;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-10-07.
@@ -53,6 +57,7 @@ public class SmtpService {
 
     private static final String SMTP_PROTOCOL = "smtp";
     private static final String SMTPS_PROTOCOL = "smtps";
+    private static final Pattern DATA_URI_IMAGE_PATTERN = Pattern.compile("\"data:(image\\/[^;]*?);base64,([^\\\"]*?)\"");
     private static final String STYLES =
             "body {font-family: 'Roboto', 'Calibri',  sans-serif; font-size: 1rem; color: #333}" +
             "h1 {margin: 6px 0 16px 0; font-size: 3rem; font-weight: normal}" +
@@ -87,13 +92,32 @@ public class SmtpService {
             }
             mimeMessage.setSubject(message.getSubject());
             final MimeMultipart multipart = new MimeMultipart();
+
+            // Extract data-uri images to inline attachments
+            final String originalContent = message.getContent();
+            String finalContent = originalContent;
+            final Matcher matcher = DATA_URI_IMAGE_PATTERN.matcher(originalContent);
+            while(matcher.find()) {
+                final String cid = UUID.randomUUID().toString().replace("-", "");
+                final InternetHeaders headers = new InternetHeaders();
+                headers.addHeader("Content-Type", matcher.group(1));
+                headers.addHeader("Content-Transfer-Encoding", "base64");
+                final MimeBodyPart cidImagePart = new MimeBodyPart(headers, matcher.group(2).getBytes());
+                multipart.addBodyPart(cidImagePart);
+                cidImagePart.setDisposition(MimeBodyPart.INLINE);
+                cidImagePart.setContentID(String.format("<%s>",cid));
+                finalContent = finalContent.replace(matcher.group(), "\"cid:" +cid +"\"");
+            }
+
+            // Create body part
             final MimeBodyPart body = new MimeBodyPart();
             multipart.addBodyPart(body);
             body.setContent(String.format("<html><head><style>%1$s</style></head><body><div id='scoped'>" +
                             "<style type='text/css' scoped>%1$s</style>%2$s</div></body></html>",
-                            STYLES, message.getContent()),
+                            STYLES, finalContent),
                     MediaType.TEXT_HTML_VALUE);
             mimeMessage.setContent(multipart);
+
             mimeMessage.saveChanges();
             getSmtpTransport(credentials).sendMessage(mimeMessage, mimeMessage.getAllRecipients());
         } catch(MessagingException ex) {
