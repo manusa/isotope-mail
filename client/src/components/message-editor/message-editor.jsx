@@ -263,7 +263,7 @@ class MessageEditor extends Component {
    * Persist whatever is in the editor as changes are only persisted every EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED
    */
   editorBlur() {
-    const content = this.getEditor().getContent()
+    const content = this.getEditor().getContent();
     this.props.editMessage({...this.props.editedMessage, content});
   }
 
