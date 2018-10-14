@@ -102,9 +102,9 @@ export function replyMessage(dispatch, originalMessage) {
     <p></p>
     <hr/>
     <p>
-      ${t('replyAction.From')}: ${originalMessage.from.join(', ')}<br/>
-      ${t('replyAction.Date')}: ${formattedDate}<br/>
-      ${t('replyAction.Subject')}: ${originalMessage.subject}<br/>
+      <b>${t('replyAction.From')}:</b> ${originalMessage.from.join(', ')}<br/>
+      <b>${t('replyAction.Date')}:</b> ${formattedDate}<br/>
+      <b>${t('replyAction.Subject')}:</b> ${originalMessage.subject}<br/>
     </p>
     <br/>
     ${sanitize.sanitize(originalMessage.content)}

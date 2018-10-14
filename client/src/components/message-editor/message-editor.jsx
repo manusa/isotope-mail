@@ -13,15 +13,24 @@ import MceButton from './mce-button';
 const EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED = 50;
 
 function _isStyled(editor, button) {
-  return editor && editor.getContent().length > 0 && editor.queryCommandState(button.command);
+  if (!editor || !editor.selection) {
+    return false;
+  }
+  return editor.queryCommandState(button.command);
 }
 
 function _isBlockStyled(editor, button, key) {
-  return editor && editor.getContent().length > 0 && editor.selection.getNode().tagName === key;
+  if (!editor || !editor.selection) {
+    return false;
+  }
+  return editor.selection.getNode().tagName === key;
 }
 
 function _isBlockStyledFromParent(editor, button, key) {
-  return editor && editor.getContent().length > 0 && editor.selection.getNode().closest(key) !== null;
+  if (!editor || !editor.selection) {
+    return false;
+  }
+  return editor.selection.getNode().closest(key) !== null;
 }
 
 function _toggleStyle(editor, button) {
