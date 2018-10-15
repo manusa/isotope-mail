@@ -12,25 +12,19 @@ import MceButton from './mce-button';
 
 const EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED = 50;
 
-function _isStyled(editor, button) {
+function _isStyled({editor, button}) {
   if (!editor || !editor.selection) {
     return false;
   }
   return editor.queryCommandState(button.command);
 }
 
-function _isBlockStyled(editor, button, key) {
-  if (!editor || !editor.selection) {
-    return false;
-  }
-  return editor.selection.getNode().tagName === key;
+function _isBlockStyled({key, node}) {
+  return node.tagName === key;
 }
 
-function _isBlockStyledFromParent(editor, button, key) {
-  if (!editor || !editor.selection) {
-    return false;
-  }
-  return editor.selection.getNode().closest(key) !== null;
+function _isBlockStyledFromParent({key, node}) {
+  return node.closest(key) !== null;
 }
 
 function _toggleStyle(editor, button) {
@@ -76,10 +70,7 @@ const EDITOR_BUTTONS = {
     blockCommand: 'pre', icon: 'space_bar', activeFunction: _isBlockStyled, toggleFunction: _toggleBlockStyle},
   code: {
     blockCommand: 'isotope_code', icon: 'code',
-    activeFunction: editor => {
-      const node = editor.selection.getNode();
-      return node.tagName === 'PRE' && node.className === 'code';
-    },
+    activeFunction: ({node}) => node.tagName === 'PRE' && node.className === 'code',
     toggleFunction: _toggleBlockStyle}
 };
 
@@ -294,10 +285,14 @@ class MessageEditor extends Component {
   }
 
   selectionChange() {
-    const editor = this.getEditor();
     const editorState = {};
-    Object.entries(EDITOR_BUTTONS).forEach(([k, b]) => {
-      editorState[k] = b.activeFunction(editor, b, k);
+    const editor = this.getEditor();
+    if (!editor || !editor.selection) {
+      return;
+    }
+    const node = editor.selection.getNode();
+    Object.entries(EDITOR_BUTTONS).forEach(([k, button]) => {
+      editorState[k] = button.activeFunction({editor, key: k, button, node});
     });
     // Trigger state change only if values of the selection have changed
     for (const [k, v] of Object.entries(editorState)) {
