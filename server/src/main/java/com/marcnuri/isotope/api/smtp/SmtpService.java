@@ -46,6 +46,9 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.marcnuri.isotope.api.message.Message.HEADER_IN_REPLY_TO;
+import static com.marcnuri.isotope.api.message.Message.HEADER_REFERENCES;
+
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-10-07.
  */
@@ -91,6 +94,18 @@ public class SmtpService {
                 mimeMessage.setRecipients(type, MessageUtils.getRecipientAddresses(message, type));
             }
             mimeMessage.setSubject(message.getSubject());
+
+            if (message.getInReplyTo() != null) {
+                for (String s : message.getInReplyTo()) {
+                    mimeMessage.addHeader(HEADER_IN_REPLY_TO, s);
+                }
+            }
+            if (message.getReferences() != null) {
+                for (String s : message.getInReplyTo()) {
+                    mimeMessage.addHeader(HEADER_REFERENCES, s);
+                }
+            }
+
             final MimeMultipart multipart = new MimeMultipart();
 
             // Extract data-uri images to inline attachments

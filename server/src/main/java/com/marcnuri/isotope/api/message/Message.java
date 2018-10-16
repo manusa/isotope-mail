@@ -22,7 +22,7 @@ package com.marcnuri.isotope.api.message;
 
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.resource.IsotopeResource;
-import com.sun.mail.imap.IMAPMessage; //NOSONAR
+import com.sun.mail.imap.IMAPMessage;
 
 import javax.mail.*;
 import javax.mail.Message.RecipientType;
@@ -31,10 +31,7 @@ import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,6 +44,8 @@ public class Message extends IsotopeResource implements Serializable {
     private static final long serialVersionUID = -1068972394742882009L;
 
     private static final String CET_ZONE_ID = "CET";
+    public static final String HEADER_IN_REPLY_TO = "In-Reply-To";
+    public static final String HEADER_REFERENCES = "References";
 
     private Long uid;
     private String messageId;
@@ -62,6 +61,8 @@ public class Message extends IsotopeResource implements Serializable {
     private Boolean deleted;
     private String content;
     private List<Attachment> attachments;
+    private List<String> references;
+    private List<String> inReplyTo;
 
     public Long getUid() {
         return uid;
@@ -167,6 +168,22 @@ public class Message extends IsotopeResource implements Serializable {
         this.attachments = attachments;
     }
 
+    public List<String> getReferences() {
+        return references;
+    }
+
+    public void setReferences(List<String> references) {
+        this.references = references;
+    }
+
+    public List<String> getInReplyTo() {
+        return inReplyTo;
+    }
+
+    public void setInReplyTo(List<String> inReplyTo) {
+        this.inReplyTo = inReplyTo;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -185,13 +202,15 @@ public class Message extends IsotopeResource implements Serializable {
                 Objects.equals(recent, message.recent) &&
                 Objects.equals(deleted, message.deleted) &&
                 Objects.equals(content, message.content) &&
-                Objects.equals(attachments, message.attachments);
+                Objects.equals(attachments, message.attachments) &&
+                Objects.equals(references, message.references) &&
+                Objects.equals(inReplyTo, message.inReplyTo);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), uid, messageId, modseq, from, recipients, subject, receivedDate, size, seen, recent, deleted, content, attachments);
+        return Objects.hash(super.hashCode(), uid, messageId, modseq, from, recipients, subject, receivedDate, size, seen, recent, deleted, content, attachments, references, inReplyTo);
     }
 
     /**
@@ -226,6 +245,10 @@ public class Message extends IsotopeResource implements Serializable {
                 ret.setSubject(imapMessage.getSubject());
                 ret.setReceivedDate(imapMessage.getReceivedDate().toInstant().atZone(ZoneId.of(CET_ZONE_ID)));
                 ret.setSize(imapMessage.getSizeLong());
+                ret.setInReplyTo(Arrays.asList(
+                        Optional.ofNullable(imapMessage.getHeader(HEADER_IN_REPLY_TO)).orElse(new String[0])));
+                ret.setReferences(Arrays.asList(
+                        Optional.ofNullable(imapMessage.getHeader(HEADER_REFERENCES)).orElse(new String[0])));
                 final Flags flags = imapMessage.getFlags();
                 ret.setSeen(flags.contains(Flags.Flag.SEEN));
                 ret.setRecent(flags.contains(Flags.Flag.RECENT));
