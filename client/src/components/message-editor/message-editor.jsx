@@ -273,12 +273,21 @@ class MessageEditor extends Component {
     if (pasteEvent.clipboardData) {
       const editor = this.getEditor();
       const items = pasteEvent.clipboardData.items;
+
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         if (item.type.indexOf('image/') === 0) {
-          event.preventDefault();
-          const objectUrl = URL.createObjectURL(item.getAsFile());
-          editor.execCommand('mceInsertContent', false, `<img alt="" src="${objectUrl}"/>`);
+          pasteEvent.preventDefault();
+          // Although item.getAsFile() is effectively a Blob, in some Linux Desktop environments, mime type of the
+          // File/Blob is lost when creating the object URL. This workaround prevents mime type from being lost
+          // Data is Pasted as File(Blob), it's read with FileReader again, and reconverted to Blob to create ObjectUrl
+          const blobReader = new FileReader();
+          const type = item.type;
+          blobReader.onload = e => {
+            const objectUrl = URL.createObjectURL(new Blob([e.target.result], {type}));
+            editor.execCommand('mceInsertContent', false, `<img alt="" src="${objectUrl}"/>`);
+          };
+          blobReader.readAsArrayBuffer(item.getAsFile());
         }
       }
     }
