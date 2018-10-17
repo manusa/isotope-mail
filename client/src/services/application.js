@@ -89,7 +89,7 @@ export function editNewMessage(dispatch) {
 export function replyMessage(dispatch, originalMessage) {
   const recipients = [...originalMessage.recipients];
   const recipientMapper = r => r.address;
-  const inReplyTo = originalMessage.inReplyTo.concat([originalMessage.messageId]);
+  const inReplyTo = [originalMessage.messageId];
   const references = originalMessage.references.concat([originalMessage.messageId]);
   const to = recipients.filter(r => r.type === 'To').map(recipientMapper).concat(originalMessage.from);
   const cc = recipients.filter(r => r.type === 'Cc').map(recipientMapper);

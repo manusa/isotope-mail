@@ -45,6 +45,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.marcnuri.isotope.api.message.Message.HEADER_IN_REPLY_TO;
 import static com.marcnuri.isotope.api.message.Message.HEADER_REFERENCES;
@@ -96,14 +97,10 @@ public class SmtpService {
             mimeMessage.setSubject(message.getSubject());
 
             if (message.getInReplyTo() != null) {
-                for (String s : message.getInReplyTo()) {
-                    mimeMessage.addHeader(HEADER_IN_REPLY_TO, s);
-                }
+                mimeMessage.setHeader(HEADER_IN_REPLY_TO, String.join(" ", message.getInReplyTo()));
             }
             if (message.getReferences() != null) {
-                for (String s : message.getInReplyTo()) {
-                    mimeMessage.addHeader(HEADER_REFERENCES, s);
-                }
+                mimeMessage.setHeader(HEADER_REFERENCES, String.join(" ", message.getReferences()));
             }
 
             final MimeMultipart multipart = new MimeMultipart();
