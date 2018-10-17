@@ -33,7 +33,8 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
         && state.selectedMessage.uid === action.payload.message.uid) {
         const contentId = action.payload.attachment.contentId.replace(/[<>]/g, '');
         const objectUrl = URL.createObjectURL(action.payload.blob);
-        const parsedMessage = state.selectedMessage.content.replace(`cid:${contentId}`, objectUrl);
+        // Multiple occurrence
+        const parsedMessage = state.selectedMessage.content.replace(new RegExp(`cid:${contentId}`, 'g'), objectUrl);
         return {...state, selectedMessage: {...state.selectedMessage, content: parsedMessage}};
       }
       return state;
