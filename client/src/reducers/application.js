@@ -32,10 +32,12 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
       if (state.selectedFolder.folderId === action.payload.folder.folderId
         && state.selectedMessage.uid === action.payload.message.uid) {
         const contentId = action.payload.attachment.contentId.replace(/[<>]/g, '');
-        const objectUrl = URL.createObjectURL(action.payload.blob);
-        // Multiple occurrence
-        const parsedMessage = state.selectedMessage.content.replace(new RegExp(`cid:${contentId}`, 'g'), objectUrl);
-        return {...state, selectedMessage: {...state.selectedMessage, content: parsedMessage}};
+        if (contentId.length > 0) {
+          const objectUrl = URL.createObjectURL(action.payload.blob);
+          // Multiple occurrence
+          const parsedMessage = state.selectedMessage.content.replace(new RegExp(`cid:${contentId}`, 'g'), objectUrl);
+          return {...state, selectedMessage: {...state.selectedMessage, content: parsedMessage}};
+        }
       }
       return state;
     }

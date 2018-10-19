@@ -111,13 +111,15 @@ public class SmtpService {
             final Matcher matcher = DATA_URI_IMAGE_PATTERN.matcher(originalContent);
             while(matcher.find()) {
                 final String cid = UUID.randomUUID().toString().replace("-", "");
+                final String contentType = matcher.group(1);
                 final InternetHeaders headers = new InternetHeaders();
-                headers.addHeader("Content-Type", matcher.group(1));
+                headers.addHeader("Content-Type", contentType);
                 headers.addHeader("Content-Transfer-Encoding", "base64");
                 final MimeBodyPart cidImagePart = new MimeBodyPart(headers, matcher.group(2).getBytes());
                 multipart.addBodyPart(cidImagePart);
                 cidImagePart.setDisposition(MimeBodyPart.INLINE);
                 cidImagePart.setContentID(String.format("<%s>",cid));
+                cidImagePart.setFileName(String.format("%s.%s", cid, contentType.substring(contentType.indexOf("/") + 1)));
                 finalContent = finalContent.replace(matcher.group(), "\"cid:" +cid +"\"");
             }
 
