@@ -3,7 +3,7 @@ import {ActionTypes} from '../../actions/action-types';
 import {INITIAL_STATE} from '../index';
 
 describe('Folders reducer test suite', () => {
-  test('Folder default state', () => {
+  test('Folders default state', () => {
     const foldersDefaultState = folders();
     expect(foldersDefaultState).toHaveProperty('items', []);
     expect(foldersDefaultState).toHaveProperty('explodedItems', {});
