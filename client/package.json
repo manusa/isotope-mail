@@ -6,7 +6,7 @@
   "scripts": {
     "build": "./node_modules/.bin/webpack -p --mode production",
     "start": "./node_modules/.bin/webpack-dev-server --config ./webpack.config.js --mode development",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "keywords": [],
   "author": {
