@@ -8,6 +8,7 @@ before_install:
 - npm install --prefix ./client ./client
 script:
 - "./server/gradlew -p ./server/ check assemble || travis_terminate 1"
+- npm run --prefix ./client test
 - npm run --prefix ./client build
 after_success:
 - docker build -f ./Dockerfile-client -t marcnuri/isotope:client-latest ./ || travis_terminate

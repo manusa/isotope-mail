@@ -6,7 +6,7 @@
   "scripts": {
     "build": "./node_modules/.bin/webpack -p --mode production",
     "start": "./node_modules/.bin/webpack-dev-server --config ./webpack.config.js --mode development",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [],
   "author": {
@@ -62,7 +62,9 @@
     "@material/switch": "^0.39.3",
     "@material/textfield": "^0.39.3",
     "@material/top-app-bar": "^0.39.3",
+    "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
+    "babel-jest": "^23.6.0",
     "babel-loader": "^8.0.2",
     "copy-webpack-plugin": "^4.5.2",
     "css-loader": "^1.0.0",
@@ -70,10 +72,13 @@
     "eslint-plugin-react": "^7.9.1",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
+    "jest": "^23.6.0",
     "mini-css-extract-plugin": "^0.4.1",
     "node-sass": "^4.9.3",
     "path": "^0.12.7",
     "react-hot-loader": "^4.3.1",
+    "react-test-renderer": "^16.5.2",
+    "regenerator-runtime": "^0.12.1",
     "sass-loader": "^7.0.3",
     "style-loader": "^0.21.0",
     "webpack": "^4.12.0",
