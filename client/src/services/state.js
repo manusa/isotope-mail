@@ -24,7 +24,7 @@ export async function loadState() {
   const hash = sessionStorage.getItem(KEY_HASH);
   if (userId !== null && hash !== null) {
     const dbState = await recoverState(userId, hash);
-    if (dbState && dbState !== null) {
+    if (dbState && dbState.application && dbState.folders && dbState.messages) {
       state.application = {...dbState.application};
       state.folders.items = [...dbState.folders.items];
       state.folders.explodedItems = explodeFolders(state.folders.items);
