@@ -179,6 +179,10 @@
     "template-curly-spacing": [2, "never"]
   },
   "plugins": [
+    "jest",
     "react"
+  ],
+  "extends": [
+    "plugin:jest/recommended"
   ]
 }

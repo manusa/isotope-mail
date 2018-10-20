@@ -17,7 +17,7 @@ function _updateFolder(folderToReplace, folders) {
   });
 }
 
-const folders = (state = INITIAL_STATE.folders, action= {}) => {
+const folders = (state = INITIAL_STATE.folders, action = {}) => {
   switch (action.type) {
     case ActionTypes.FOLDERS_BE_REQUEST:
       return {...state, activeRequests: state.activeRequests + 1};
