@@ -45,7 +45,6 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.marcnuri.isotope.api.message.Message.HEADER_IN_REPLY_TO;
 import static com.marcnuri.isotope.api.message.Message.HEADER_REFERENCES;
@@ -119,7 +118,7 @@ public class SmtpService {
                 multipart.addBodyPart(cidImagePart);
                 cidImagePart.setDisposition(MimeBodyPart.INLINE);
                 cidImagePart.setContentID(String.format("<%s>",cid));
-                cidImagePart.setFileName(String.format("%s.%s", cid, contentType.substring(contentType.indexOf("/") + 1)));
+                cidImagePart.setFileName(String.format("%s.%s", cid, contentType.substring(contentType.indexOf('/') + 1)));
                 finalContent = finalContent.replace(matcher.group(), "\"cid:" +cid +"\"");
             }
 
