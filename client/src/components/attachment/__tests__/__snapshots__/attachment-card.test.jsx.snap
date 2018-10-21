@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AttachmentCard component test suite Snapshot render, should render attachment card for file 1`] = `
+<div
+  className="attachment "
+  isotip="test-attachment.file"
+  isotip-position="bottom"
+  onClick={[Function]}
+>
+  <Spinner
+    canvasClassName="canvas"
+    className="spinner"
+    pathClassName=""
+    visible={false}
+  />
+  <div
+    className="material-icons mdc-list-item__graphic icon"
+  >
+    attach_file
+  </div>
+  <div
+    className="fileInfo"
+  >
+    <div
+      className="fileName"
+    >
+      test-attachment.file
+    </div>
+    <div
+      className="size"
+    >
+      306.03 KiB
+    </div>
+  </div>
+</div>
+`;
