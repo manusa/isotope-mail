@@ -7,7 +7,7 @@ import Spinner from '../spinner/spinner';
 import mainCss from '../../styles/main.scss'; // NOSONAR
 import styles from './attachment-card.scss';
 
-class AttachmentCard extends Component {
+export class AttachmentCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
