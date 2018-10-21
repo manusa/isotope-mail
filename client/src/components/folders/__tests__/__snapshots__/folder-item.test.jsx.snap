@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FolderItem component test suite Snapshot render, should render FolderItem 1`] = `
+<a
+  className="mdc-list-item listItem
+        mdc-list-item--selected"
+  onDragOver={[Function]}
+  onDrop={null}
+>
+  <span
+    className="material-icons mdc-list-item__graphic graphic"
+  >
+    Andy Warhol
+  </span>
+  <span
+    className="mdc-list-item__primary-text primaryText
+          hasNewMessages"
+  >
+    Red Label
+     (13)
+  </span>
+</a>
+`;
