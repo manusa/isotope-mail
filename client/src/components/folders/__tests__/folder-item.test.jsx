@@ -10,4 +10,19 @@ describe('FolderItem component test suite', () => {
       unreadMessageCount={unreadMessageCount} newMessageCount={newMessageCount}/>);
     expect(folderItem).toMatchSnapshot();
   });
+  test('component events, events fired', () => {
+    // Given
+    const onDrop = jest.fn();
+    const onClick = jest.fn();
+    const folderItem = shallow(<FolderItem label={''} selected={false} onDrop={onDrop} onClick={onClick}/>);
+
+    // When
+    folderItem.find('.listItem').simulate('drop');
+    folderItem.find('.listItem').simulate('dragOver', {preventDefault: () => {}});
+    folderItem.find('.listItem').simulate('click');
+
+    // Then
+    expect(onDrop).toHaveBeenCalledTimes(1);
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
 });

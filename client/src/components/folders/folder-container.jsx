@@ -9,7 +9,7 @@ import {clearSelected} from '../../actions/messages';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
 
-class FolderContainer extends Component {
+export class FolderContainer extends Component {
   render() {
     return (
       <nav className={`${mainCss['mdc-list']}`}>

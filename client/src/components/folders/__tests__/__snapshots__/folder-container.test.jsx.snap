@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FolderContainer component test suite Snapshot render, should render FolderContainer 1`] = `
+<nav
+  className="mdc-list"
+>
+  <Spinner
+    canvasClassName="spinnerCanvas"
+    className=""
+    pathClassName=""
+    visible={false}
+  />
+  <FolderList
+    folderList={
+      Array [
+        Object {
+          "folderList": Array [],
+        },
+      ]
+    }
+    onClickFolder={[Function]}
+    onDropMessage={[Function]}
+    selectedFolder={
+      Object {
+        "folderId": "1337-3",
+      }
+    }
+  />
+</nav>
+`;
