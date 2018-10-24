@@ -119,7 +119,7 @@ class MessageEditor extends Component {
     // Get content directly from editor, state content may not contain latest changes
     const content = this.getEditor().getContent();
     const {credentials, to, cc, bcc, subject} = this.props;
-    sendMessage(credentials, {...this.props.editedMessage, to, cc, bcc, subject, content});
+    this.props.sendMessage(credentials, {...this.props.editedMessage, to, cc, bcc, subject, content});
     this.props.close();
   }
 
@@ -274,7 +274,9 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   close: () => dispatch(editMessage(null)),
-  editMessage: message => dispatch(editMessage(message))
+  editMessage: message => dispatch(editMessage(message)),
+  sendMessage: (credentials, {inReplyTo = [], references = [], to, cc, bcc, subject, content}) =>
+    sendMessage(dispatch, credentials, {inReplyTo, references, to, cc, bcc, subject, content})
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate()(MessageEditor));

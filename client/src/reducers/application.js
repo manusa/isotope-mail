@@ -51,6 +51,21 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
       newState.newMessage = {...action.payload};
       return newState;
     }
+    case ActionTypes.APPLICATION_OUTBOX_SEND: {
+      const newState = {...state};
+      newState.outbox = {message: action.payload, progress: 0};
+      return newState;
+    }
+    case ActionTypes.APPLICATION_OUTBOX_UPDATE_PROGRESS: {
+      const newState = {...state};
+      newState.outbox = {...newState.outbox, progress: action.payload};
+      return newState;
+    }
+    case ActionTypes.APPLICATION_OUTBOX_MESSAGE_SENT: {
+      const newState = {...state};
+      newState.outbox = null;
+      return newState;
+    }
     default:
       return state;
   }

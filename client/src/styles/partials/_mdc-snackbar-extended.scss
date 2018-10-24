@@ -1,0 +1,7 @@
+@import '@material/snackbar/mdc-snackbar';
+
+.mdc-snackbar.mdc-snackbar__no_action .mdc-snackbar__text {
+  margin-left: auto;
+  margin-right: auto;
+  padding-right: 0;
+}

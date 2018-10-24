@@ -3,9 +3,10 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import TopBar from './top-bar/top-bar';
 import SideBar from './side-bar/side-bar';
+import MessageEditor from './message-editor/message-editor';
 import MessageList from './message-list/message-list';
 import MessageViewer from './message-viewer/message-viewer';
-import MessageEditor from './message-editor/message-editor';
+import MessageSnackbar from './message-snackbar/message-snackbar';
 import {editNewMessage} from '../services/application';
 import {getFolders} from '../services/folder';
 import {resetFolderMessagesCache} from '../services/message';
@@ -32,12 +33,13 @@ class App extends Component {
             ${this.state.sideBar.collapsed ? '' : styles['with-side-bar']}`}>
           {this.renderContent()}
         </div>
+        <MessageSnackbar/>
       </div>
     );
   }
 
   renderContent() {
-    const application = this.props.application;
+    const {application, outbox} = this.props;
     if (application.newMessage && Object.keys(application.newMessage).length > 0) {
       return <MessageEditor className={styles['message-viewer']} />;
     } else if (application.selectedMessage && Object.keys(application.selectedMessage).length > 0) {
@@ -47,9 +49,11 @@ class App extends Component {
       <Fragment>
         <MessageList className={styles['message-grid']} />
         <div className={styles['fab-container']}>
-          <button className={`${mainCss['mdc-fab']}`} onClick={this.props.newMessage.bind(this)}>
-            <span className={`material-icons ${mainCss['mdc-fab__icon']}`}>edit</span>
-          </button>
+          {outbox === null ?
+            <button className={`${mainCss['mdc-fab']}`} onClick={this.props.newMessage.bind(this)}>
+              <span className={`material-icons ${mainCss['mdc-fab__icon']}`}>edit</span>
+            </button>
+            : null}
         </div>
       </Fragment>
     );
@@ -106,6 +110,7 @@ class App extends Component {
 
 App.propTypes = {
   application: PropTypes.object.isRequired,
+  outbox: PropTypes.object,
   folders: PropTypes.object.isRequired,
   reloadFolders: PropTypes.func,
   reloadMessageCache: PropTypes.func,
@@ -114,6 +119,7 @@ App.propTypes = {
 
 const mapStateToProps = state => ({
   application: state.application,
+  outbox: state.application.outbox,
   folders: state.folders
 });
 

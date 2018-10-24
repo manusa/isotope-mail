@@ -35,5 +35,8 @@
     "From": "De",
     "Date": "Fecha",
     "Subject": "Asunto"
+  },
+  "messageSnackbar": {
+    "sendingMessage" : "Envíando mensaje ({{progress}}%)"
   }
 }

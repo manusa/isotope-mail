@@ -10,6 +10,7 @@ export const INITIAL_STATE = {
     newMessage: null,
     selectedFolderId: {},
     selectedMessage: null,
+    outbox: null,
     pollInterval: 15000,
     errors: {
       diskQuotaExceeded: false

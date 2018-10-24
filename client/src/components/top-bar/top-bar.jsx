@@ -65,20 +65,23 @@ class TopBar extends Component {
   }
 
   renderMessageViewerActions() {
+    const {outbox, deleteMessage, toggleMessageSeen} = this.props;
     return (
       <Fragment>
+        {outbox !== null ?
+          <button
+            onClick={this.props.replyMessage}
+            className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
+            reply_all
+          </button>
+          : null}
         <button
-          onClick={this.props.replyMessage}
-          className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-          reply_all
-        </button>
-        <button
-          onClick={this.props.deleteMessage}
+          onClick={deleteMessage}
           className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
           delete
         </button>
         <button
-          onClick={this.props.toggleMessageSeen}
+          onClick={toggleMessageSeen}
           className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
           markunread
         </button>
@@ -135,6 +138,7 @@ const mapStateToProps = state => {
   return ({
     title: state.application.title,
     newMessage: state.application.newMessage,
+    outbox: state.application.outbox,
     selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || null,
     selectedMessagesIds: selectedMessagesIds,
     selectedMessages: selectedMessages,

@@ -7,7 +7,7 @@
  * @param decimalPlaces {number}
  * @returns {number}
  */
-function round(value, decimalPlaces) {
+export function round(value, decimalPlaces) {
   return Number(`${Math.round(Number(`${value}e${decimalPlaces}`))}e-${decimalPlaces}`);
 }
 
