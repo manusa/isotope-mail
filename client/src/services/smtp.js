@@ -23,8 +23,8 @@ export function sendMessage(dispatch, credentials, {inReplyTo = [], references =
   postMessageRequest.setRequestHeader(HttpHeaders.CONTENT_TYPE, 'application/json');
   const upload = postMessageRequest.upload;
   upload.onprogress = e => dispatch(sendMessageUpdateProgress(round(e.loaded / e.total, 2)));
-  upload.onload = () => dispatch(messageSent());
-  upload.onerror = e => console.error('MESSAGE NOT SENT' + e); // TODO: Add error handling
+  postMessageRequest.onload = () => dispatch(messageSent());
+  postMessageRequest.onerror = e => console.error('MESSAGE NOT SENT' + e); // TODO: Add error handling
   dispatch(sendMessageAction(message));
   postMessageRequest.send(JSON.stringify(message));
 }
