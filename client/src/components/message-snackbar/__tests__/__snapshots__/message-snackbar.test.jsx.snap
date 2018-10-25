@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Snackbar component test suite Snapshot render Renders hidden 1`] = `
+<Snackbar
+  alignStart={true}
+  buttonLabel=""
+  message=""
+  show={false}
+/>
+`;
+
+exports[`Snackbar component test suite Snapshot render Renders with progress 1`] = `
+<Snackbar
+  alignStart={true}
+  buttonLabel=""
+  message="messageSnackbar.sendingMessage 133700"
+  show={true}
+/>
+`;
+
+exports[`Snackbar component test suite Snapshot render Renders with sent status 1`] = `
+<Snackbar
+  alignStart={true}
+  buttonLabel=""
+  message="messageSnackbar.messageSent"
+  show={true}
+/>
+`;

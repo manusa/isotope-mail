@@ -53,12 +53,17 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
     }
     case ActionTypes.APPLICATION_OUTBOX_SEND: {
       const newState = {...state};
-      newState.outbox = {message: action.payload, progress: 0};
+      newState.outbox = {message: action.payload, progress: 0, sent: false};
       return newState;
     }
     case ActionTypes.APPLICATION_OUTBOX_UPDATE_PROGRESS: {
       const newState = {...state};
       newState.outbox = {...newState.outbox, progress: action.payload};
+      return newState;
+    }
+    case ActionTypes.APPLICATION_OUTBOX_SET_SENT: {
+      const newState = {...state};
+      newState.outbox = {...newState.outbox, sent: action.payload};
       return newState;
     }
     case ActionTypes.APPLICATION_OUTBOX_MESSAGE_SENT: {

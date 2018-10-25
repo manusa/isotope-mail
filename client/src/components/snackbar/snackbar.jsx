@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import mainCss from '../../styles/main.scss';
 
@@ -45,4 +44,4 @@ Snackbar.defaultProps = {
   buttonLabel: ''
 };
 
-export default connect()(Snackbar);
+export default Snackbar;

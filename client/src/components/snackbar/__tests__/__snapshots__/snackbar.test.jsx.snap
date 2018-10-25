@@ -1,0 +1,106 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Snackbar component test suite Snapshot render Renders all elements 1`] = `
+<div
+  aria-atomic="true"
+  aria-hidden={false}
+  aria-live="assertive"
+  className="mdc-snackbar
+          
+          mdc-snackbar--align-start
+          mdc-snackbar--active"
+>
+  <div
+    className="mdc-snackbar__text"
+  >
+    in a bottle
+  </div>
+  <div
+    className="mdc-snackbar__action-wrapper"
+  >
+    <button
+      aria-hidden={false}
+      className="mdc-snackbar__action-button"
+      type="button"
+    >
+      White label
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Snackbar component test suite Snapshot render Renders all elements except button 1`] = `
+<div
+  aria-atomic="true"
+  aria-hidden={false}
+  aria-live="assertive"
+  className="mdc-snackbar
+          mdc-snackbar__no_action
+          mdc-snackbar--align-start
+          mdc-snackbar--active"
+>
+  <div
+    className="mdc-snackbar__text"
+  >
+    in a bottle
+  </div>
+</div>
+`;
+
+exports[`Snackbar component test suite Snapshot render Renders all elements, doesn't align start 1`] = `
+<div
+  aria-atomic="true"
+  aria-hidden={false}
+  aria-live="assertive"
+  className="mdc-snackbar
+          
+          
+          mdc-snackbar--active"
+>
+  <div
+    className="mdc-snackbar__text"
+  >
+    in a bottle
+  </div>
+  <div
+    className="mdc-snackbar__action-wrapper"
+  >
+    <button
+      aria-hidden={false}
+      className="mdc-snackbar__action-button"
+      type="button"
+    >
+      White label
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Snackbar component test suite Snapshot render Renders all elements, hidden/not active 1`] = `
+<div
+  aria-atomic="true"
+  aria-hidden={true}
+  aria-live="assertive"
+  className="mdc-snackbar
+          
+          
+          "
+>
+  <div
+    className="mdc-snackbar__text"
+  >
+    in a bottle
+  </div>
+  <div
+    className="mdc-snackbar__action-wrapper"
+  >
+    <button
+      aria-hidden={false}
+      className="mdc-snackbar__action-button"
+      type="button"
+    >
+      White label
+    </button>
+  </div>
+</div>
+`;

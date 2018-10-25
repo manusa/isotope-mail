@@ -2,7 +2,10 @@ import sanitize from './sanitize';
 import {HttpHeaders} from './fetch';
 import {URLS} from './url';
 import {round} from '../services/prettify';
-import {messageSent, sendMessage as sendMessageAction, sendMessageUpdateProgress} from '../actions/application';
+import {messageSent, sendMessage as sendMessageAction, sendMessageUpdateProgress, sendMessageSetSent}
+  from '../actions/application';
+
+const SNACKBAR_DURATION = 4000;
 
 export function sendMessage(dispatch, credentials, {inReplyTo = [], references = [], to, cc, bcc, subject, content}) {
   const message = {
@@ -23,7 +26,10 @@ export function sendMessage(dispatch, credentials, {inReplyTo = [], references =
   postMessageRequest.setRequestHeader(HttpHeaders.CONTENT_TYPE, 'application/json');
   const upload = postMessageRequest.upload;
   upload.onprogress = e => dispatch(sendMessageUpdateProgress(round(e.loaded / e.total, 2)));
-  postMessageRequest.onload = () => dispatch(messageSent());
+  postMessageRequest.onload = () => {
+    dispatch(sendMessageSetSent(true));
+    setTimeout(() => dispatch(messageSent()), SNACKBAR_DURATION);
+  };
   postMessageRequest.onerror = e => console.error('MESSAGE NOT SENT' + e); // TODO: Add error handling
   dispatch(sendMessageAction(message));
   postMessageRequest.send(JSON.stringify(message));

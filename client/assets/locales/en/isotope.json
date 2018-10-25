@@ -37,6 +37,7 @@
     "Subject": "Subject"
   },
   "messageSnackbar": {
-    "sendingMessage" : "Sending message ({{progress}}%)"
+    "sendingMessage" : "Sending message ({{progress}}%)",
+    "messageSent" : "Message sent"
   }
 }

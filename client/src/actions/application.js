@@ -24,4 +24,6 @@ export const editMessage = message => ({type: ActionTypes.APPLICATION_MESSAGE_ED
 export const sendMessage = message => ({type: ActionTypes.APPLICATION_OUTBOX_SEND, payload: message});
 export const sendMessageUpdateProgress = progress =>
   ({type: ActionTypes.APPLICATION_OUTBOX_UPDATE_PROGRESS, payload: progress});
+export const sendMessageSetSent = sent =>
+  ({type: ActionTypes.APPLICATION_OUTBOX_SET_SENT, payload: sent});
 export const messageSent = () => ({type: ActionTypes.APPLICATION_OUTBOX_MESSAGE_SENT});
