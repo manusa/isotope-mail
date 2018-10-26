@@ -2,6 +2,7 @@ import idb from 'idb';
 import sjcl from 'sjcl';
 import {processFolders} from './folder';
 import {setError} from '../actions/application';
+import SjclWorker from 'worker-loader?name=sjcl.worker.[hash].js!./sjcl.worker.js';
 
 const DATABASE_NAME = 'isotope';
 const DATABASE_VERSION = 2;
@@ -77,6 +78,24 @@ async function _recoverApplicationNewMessageContent(userId, hash) {
   const decryptedNewMessage = sjcl.decrypt(hash, encryptedNewMessage.newMessageContent);
   return JSON.parse(decryptedNewMessage);
 }
+
+/**
+ * Deletes applicationNewMessageContent entry from database
+ *
+ * @param hash
+ * @param application
+ * @returns {Promise<void>}
+ * @private
+ */
+export async function _deleteApplicationNewMessageContent(hash, application) {
+  const db = await _openDatabaseSafe();
+  const tx = db.transaction([NEW_MESSAGE_STORE], 'readwrite');
+  const store = tx.objectStore(NEW_MESSAGE_STORE);
+  await store.delete(application.user.id);
+  await tx.complete;
+  db.close();
+}
+
 /**
  * Tries to recover a persisted state for the given userID and uses the hash as the cypher password to decrypt the
  * store value.
@@ -124,9 +143,13 @@ export async function persistState(dispatch, state) {
     const newState = {...state};
     newState.application = {...state.application};
     newState.application.outbox = null;
-    // Don't persist content
     if (newState.application.newMessage) {
+      // Persist everything from application.newMessage except content (persisted independently in message-editor
+      // in a different db store
       newState.application.newMessage = {...newState.application.newMessage, content: ''};
+    } else {
+      // Delete any application.newMessage.content entry in the database
+      await _deleteApplicationNewMessageContent(state.application.user.hash, state.application);
     }
 
     newState.folders = {...state.folders};
@@ -201,14 +224,21 @@ export async function persistApplicationNewMessageContent(hash, application) {
   if (!application.newMessage || !application.newMessage.content || application.newMessage.content.length === 0) {
     return;
   }
-  const db = await _openDatabaseSafe();
-  const tx = db.transaction([NEW_MESSAGE_STORE], 'readwrite');
-  const store = tx.objectStore(NEW_MESSAGE_STORE);
-  const newMessage = {
-    key: application.user.id,
-    newMessageContent: sjcl.encrypt(hash, JSON.stringify(application.newMessage.content))
+  const worker = new SjclWorker();
+  // sjcl.encrypt(hash, JSON.stringify(application.newMessage.content))
+  worker.onmessage = async m => {
+    const newMessage = {
+      key: application.user.id,
+      newMessageContent: m.data
+    };
+    const db = await _openDatabaseSafe();
+    const tx = db.transaction([NEW_MESSAGE_STORE], 'readwrite');
+    const store = tx.objectStore(NEW_MESSAGE_STORE);
+    await store.put(newMessage);
+    await tx.complete;
+    db.close();
+    worker.terminate();
   };
-  await store.put(newMessage);
-  await tx.complete;
-  db.close();
+  worker.postMessage({password: hash, data: JSON.stringify(application.newMessage.content)});
 }
+

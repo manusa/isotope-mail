@@ -199,9 +199,7 @@ class MessageEditor extends Component {
     // Commit changes every 50 keystrokes
     if (Math.abs(this.props.content.length - content.length) > EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED) {
       this.props.editMessage({...this.props.editedMessage, content});
-      // TODO: TEMP
-      setTimeout(() => persistApplicationNewMessageContent(sessionStorage.getItem(KEY_HASH), this.props.application),
-        10);
+      persistApplicationNewMessageContent(sessionStorage.getItem(KEY_HASH), this.props.application);
     }
   }
 
@@ -211,9 +209,7 @@ class MessageEditor extends Component {
   editorBlur() {
     const content = this.getEditor().getContent();
     this.props.editMessage({...this.props.editedMessage, content});
-    // TODO: TEMP
-    setTimeout(() => persistApplicationNewMessageContent(sessionStorage.getItem(KEY_HASH), this.props.application),
-      10);
+    persistApplicationNewMessageContent(sessionStorage.getItem(KEY_HASH), this.props.application);
   }
 
   editorPaste(pasteEvent) {

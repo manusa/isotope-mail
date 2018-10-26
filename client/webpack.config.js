@@ -80,7 +80,8 @@ module.exports = {
     path: DIST_DIR,
     publicPath: '/',
     filename: '[name].bundle.js',
-    chunkFilename: '[name].bundle.js'
+    chunkFilename: '[name].bundle.js',
+    globalObject: `(typeof self !== 'undefined' ? self : this)` // Fix for worker-loader + HotModuleReplacement
   },
   // Split vendor dependencies into specific file (except dynamic imports, chunk name specified at import annotation)
   optimization: {
