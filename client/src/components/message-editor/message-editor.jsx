@@ -8,6 +8,8 @@ import MceButton from './mce-button';
 import {EDITOR_BUTTONS} from './editor-buttons';
 import {editMessage} from '../../actions/application';
 import {sendMessage} from '../../services/smtp';
+import {persistApplicationNewMessageContent} from '../../services/indexed-db';
+import {KEY_HASH} from '../../services/state';
 import mainCss from '../../styles/main.scss';
 import styles from './message-editor.scss';
 
@@ -197,6 +199,9 @@ class MessageEditor extends Component {
     // Commit changes every 50 keystrokes
     if (Math.abs(this.props.content.length - content.length) > EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED) {
       this.props.editMessage({...this.props.editedMessage, content});
+      // TODO: TEMP
+      setTimeout(() => persistApplicationNewMessageContent(sessionStorage.getItem(KEY_HASH), this.props.application),
+        10);
     }
   }
 
@@ -206,6 +211,9 @@ class MessageEditor extends Component {
   editorBlur() {
     const content = this.getEditor().getContent();
     this.props.editMessage({...this.props.editedMessage, content});
+    // TODO: TEMP
+    setTimeout(() => persistApplicationNewMessageContent(sessionStorage.getItem(KEY_HASH), this.props.application),
+      10);
   }
 
   editorPaste(pasteEvent) {
@@ -262,6 +270,7 @@ MessageEditor.defaultProps = {
 };
 
 const mapStateToProps = state => ({
+  application: state.application,
   credentials: state.application.user.credentials,
   editedMessage: state.application.newMessage,
   to: state.application.newMessage.to,

@@ -4,8 +4,9 @@ import {processFolders} from './folder';
 import {setError} from '../actions/application';
 
 const DATABASE_NAME = 'isotope';
-const DATABASE_VERSION = 1;
+const DATABASE_VERSION = 2;
 const STATE_STORE = 'state';
+const NEW_MESSAGE_STORE = 'new_message';
 const MESSAGE_CACHE_STORE = 'message_cache';
 
 /**
@@ -23,6 +24,9 @@ function _openDatabase() {
       if (!upgradeDb.objectStoreNames.contains(MESSAGE_CACHE_STORE)) {
         const messageCacheStore = upgradeDb.createObjectStore(MESSAGE_CACHE_STORE, {keyPath: 'key'});
         messageCacheStore.createIndex('userId', 'userId', {unique: false});
+      }
+      if (!upgradeDb.objectStoreNames.contains(NEW_MESSAGE_STORE)) {
+        upgradeDb.createObjectStore(NEW_MESSAGE_STORE, {keyPath: 'key'});
       }
     });
 }
@@ -62,6 +66,17 @@ async function _recoverMessageCache(userId, hash) {
   return ret;
 }
 
+async function _recoverApplicationNewMessageContent(userId, hash) {
+  const db = await _openDatabaseSafe();
+  const tx = db.transaction([NEW_MESSAGE_STORE], 'readonly');
+  const store = tx.objectStore(NEW_MESSAGE_STORE);
+  const encryptedNewMessage = await store.get(userId);
+  if (!encryptedNewMessage) {
+    return '';
+  }
+  const decryptedNewMessage = sjcl.decrypt(hash, encryptedNewMessage.newMessageContent);
+  return JSON.parse(decryptedNewMessage);
+}
 /**
  * Tries to recover a persisted state for the given userID and uses the hash as the cypher password to decrypt the
  * store value.
@@ -80,6 +95,10 @@ export async function recoverState(userId, hash) {
   }
   const decryptedState = sjcl.decrypt(hash, encryptedState.value);
   const recoveredState = JSON.parse(decryptedState);
+  // Recover new message content
+  if (recoveredState.application.newMessage) {
+    recoveredState.application.newMessage.content = await _recoverApplicationNewMessageContent(userId, hash);
+  }
   // Process folders
   recoveredState.folders.items = processFolders(recoveredState.folders.items);
   // Recover message cache from other store
@@ -104,6 +123,11 @@ export async function persistState(dispatch, state) {
     // Clone state
     const newState = {...state};
     newState.application = {...state.application};
+    newState.application.outbox = null;
+    // Don't persist content
+    if (newState.application.newMessage) {
+      newState.application.newMessage = {...newState.application.newMessage, content: ''};
+    }
 
     newState.folders = {...state.folders};
     newState.folders.items = [...state.folders.items];
@@ -163,6 +187,28 @@ export async function persistMessageCache(userId, hash, folder, messages) {
     messages: sjcl.encrypt(hash, JSON.stringify(messages))
   };
   await store.put(messageCache);
+  await tx.complete;
+  db.close();
+}
+
+/**
+ * Persists application.newMessage.content object in separate database
+ * @param hash
+ * @param application
+ * @returns {Promise<void>}
+ */
+export async function persistApplicationNewMessageContent(hash, application) {
+  if (!application.newMessage || !application.newMessage.content || application.newMessage.content.length === 0) {
+    return;
+  }
+  const db = await _openDatabaseSafe();
+  const tx = db.transaction([NEW_MESSAGE_STORE], 'readwrite');
+  const store = tx.objectStore(NEW_MESSAGE_STORE);
+  const newMessage = {
+    key: application.user.id,
+    newMessageContent: sjcl.encrypt(hash, JSON.stringify(application.newMessage.content))
+  };
+  await store.put(newMessage);
   await tx.complete;
   db.close();
 }

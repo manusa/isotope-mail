@@ -48,7 +48,7 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
       return errorsSetState;
     case ActionTypes.APPLICATION_MESSAGE_EDIT: {
       const newState = {...state};
-      newState.newMessage = {...action.payload};
+      newState.newMessage = action.payload ? {...action.payload} : null;
       return newState;
     }
     case ActionTypes.APPLICATION_OUTBOX_SEND: {
