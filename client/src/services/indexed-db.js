@@ -88,12 +88,14 @@ async function _recoverApplicationNewMessageContent(userId, hash) {
  * @private
  */
 export async function _deleteApplicationNewMessageContent(application) {
-  const db = await _openDatabaseSafe();
-  const tx = db.transaction([NEW_MESSAGE_STORE], 'readwrite');
-  const store = tx.objectStore(NEW_MESSAGE_STORE);
-  await store.delete(application.user.id);
-  await tx.complete;
-  db.close();
+  if (application.user && application.user.id) {
+    const db = await _openDatabaseSafe();
+    const tx = db.transaction([NEW_MESSAGE_STORE], 'readwrite');
+    const store = tx.objectStore(NEW_MESSAGE_STORE);
+    await store.delete(application.user.id);
+    await tx.complete;
+    db.close();
+  }
 }
 
 /**
@@ -220,9 +222,9 @@ export async function persistMessageCache(userId, hash, folder, messages) {
  * @param application
  * @returns {Promise<void>}
  */
-export async function persistApplicationNewMessageContent(application) {
-  if (!application.newMessage || !application.newMessage.content || application.newMessage.content.length === 0) {
-    return;
+export async function persistApplicationNewMessageContent(application, content) {
+  if (!content) {
+    content = '';
   }
   const worker = new SjclWorker();
   worker.onmessage = async m => {
@@ -238,6 +240,6 @@ export async function persistApplicationNewMessageContent(application) {
     db.close();
     worker.terminate();
   };
-  worker.postMessage({password: application.user.hash, data: JSON.stringify(application.newMessage.content)});
+  worker.postMessage({password: application.user.hash, data: JSON.stringify(content)});
 }
 

@@ -52,7 +52,7 @@ class MessageEditor extends Component {
   }
 
   render() {
-    const {t, className, close, to, cc, bcc, subject, content} = this.props;
+    const {t, className, close, application, to, cc, bcc, subject, content} = this.props;
     return (
       <div className={`${className} ${styles['message-editor']}`}>
         <div className={styles.header}>
@@ -93,7 +93,7 @@ class MessageEditor extends Component {
             Send
           </button>
           <button className={`material-icons ${mainCss['mdc-icon-button']} ${styles['action-button']} ${styles.cancel}`}
-            onClick={close}>
+            onClick={() => close(application)}>
             delete
           </button>
         </div>
@@ -121,7 +121,7 @@ class MessageEditor extends Component {
     const content = this.getEditor().getContent();
     const {credentials, to, cc, bcc, subject} = this.props;
     this.props.sendMessage(credentials, {...this.props.editedMessage, to, cc, bcc, subject, content});
-    this.props.close();
+    this.props.close(this.props.application);
   }
 
   onHeaderAddressRemove(id, index) {
@@ -198,7 +198,8 @@ class MessageEditor extends Component {
     // Commit changes every 50 keystrokes
     if (Math.abs(this.props.content.length - content.length) > EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED) {
       this.props.editMessage({...this.props.editedMessage, content});
-      persistApplicationNewMessageContent(this.props.application);
+      // noinspection JSIgnoredPromiseFromCall
+      persistApplicationNewMessageContent(this.props.application, content);
     }
   }
 
@@ -208,7 +209,8 @@ class MessageEditor extends Component {
   editorBlur() {
     const content = this.getEditor().getContent();
     this.props.editMessage({...this.props.editedMessage, content});
-    persistApplicationNewMessageContent(this.props.application);
+    // noinspection JSIgnoredPromiseFromCall
+    persistApplicationNewMessageContent(this.props.application, content);
   }
 
   editorPaste(pasteEvent) {
@@ -277,8 +279,11 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  close: () => {
+  close: application => {
     dispatch(editMessage(null));
+    // Clear content (editorBlur may be half way through -> force a message in the service worker to clear content after)
+    // noinspection JSIgnoredPromiseFromCall
+    persistApplicationNewMessageContent(application, '');
   },
   editMessage: message => {
     dispatch(editMessage(message));
