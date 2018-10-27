@@ -82,7 +82,6 @@ async function _recoverApplicationNewMessageContent(userId, hash) {
 /**
  * Deletes applicationNewMessageContent entry from database
  *
- * @param hash
  * @param application
  * @returns {Promise<void>}
  * @private
@@ -200,26 +199,31 @@ export async function persistState(dispatch, state) {
  * @returns {Promise<void>}
  */
 export async function persistMessageCache(userId, hash, folder, messages) {
-  const db = await _openDatabaseSafe();
-  const tx = db.transaction([MESSAGE_CACHE_STORE], 'readwrite');
-  const store = tx.objectStore(MESSAGE_CACHE_STORE);
-  const messageCache = {
-    // Key will not be used for data retrieval, index will be used instead
-    // Key is only used to overwrite previous versions of the message cache, a has is enough
-    key: sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(`${userId}|${folder.folderId}`)),
-    userId: userId,
-    folderId: sjcl.encrypt(hash, folder.folderId),
-    messages: sjcl.encrypt(hash, JSON.stringify(messages))
+  const worker = new SjclWorker();
+  worker.onmessage = async m => {
+    const messageCache = {
+      // Key will not be used for data retrieval, index will be used instead
+      // Key is only used to overwrite previous versions of the message cache, a has is enough
+      key: sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(`${userId}|${folder.folderId}`)),
+      userId: userId,
+      folderId: sjcl.encrypt(hash, folder.folderId),
+      messages: m.data
+    };
+    const db = await _openDatabaseSafe();
+    const tx = db.transaction([MESSAGE_CACHE_STORE], 'readwrite');
+    const store = tx.objectStore(MESSAGE_CACHE_STORE);
+    await store.put(messageCache);
+    await tx.complete;
+    db.close();
+    worker.terminate();
   };
-  await store.put(messageCache);
-  await tx.complete;
-  db.close();
+  worker.postMessage({password: hash, data: JSON.stringify(messages)});
 }
 
 /**
  * Persists application.newMessage.content object in separate database
- * @param hash
  * @param application
+ * @param content
  * @returns {Promise<void>}
  */
 export async function persistApplicationNewMessageContent(application, content) {
