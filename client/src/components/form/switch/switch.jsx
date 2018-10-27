@@ -11,7 +11,7 @@ class Switch extends Component {
   render() {
     const {id, label, required, checked, onToggle, switchClass, inputClass} = this.props;
     return (
-      <span onClick={onToggle}>
+      <span onClick={e => {e.preventDefault(); onToggle();}}>
         <div className={`${mainCss['mdc-switch']} ${checked ? mainCss['mdc-switch--checked'] : ''} ${switchClass}`}>
           <div className={mainCss['mdc-switch__track']} />
           <div className={mainCss['mdc-switch__thumb-underlay']}>
