@@ -9,7 +9,6 @@ import {EDITOR_BUTTONS} from './editor-buttons';
 import {editMessage} from '../../actions/application';
 import {sendMessage} from '../../services/smtp';
 import {persistApplicationNewMessageContent} from '../../services/indexed-db';
-import {KEY_HASH} from '../../services/state';
 import mainCss from '../../styles/main.scss';
 import styles from './message-editor.scss';
 
@@ -199,7 +198,7 @@ class MessageEditor extends Component {
     // Commit changes every 50 keystrokes
     if (Math.abs(this.props.content.length - content.length) > EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED) {
       this.props.editMessage({...this.props.editedMessage, content});
-      persistApplicationNewMessageContent(sessionStorage.getItem(KEY_HASH), this.props.application);
+      persistApplicationNewMessageContent(this.props.application);
     }
   }
 
@@ -209,7 +208,7 @@ class MessageEditor extends Component {
   editorBlur() {
     const content = this.getEditor().getContent();
     this.props.editMessage({...this.props.editedMessage, content});
-    persistApplicationNewMessageContent(sessionStorage.getItem(KEY_HASH), this.props.application);
+    persistApplicationNewMessageContent(this.props.application);
   }
 
   editorPaste(pasteEvent) {
@@ -278,8 +277,12 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  close: () => dispatch(editMessage(null)),
-  editMessage: message => dispatch(editMessage(message)),
+  close: () => {
+    dispatch(editMessage(null));
+  },
+  editMessage: message => {
+    dispatch(editMessage(message));
+  },
   sendMessage: (credentials, {inReplyTo = [], references = [], to, cc, bcc, subject, content}) =>
     sendMessage(dispatch, credentials, {inReplyTo, references, to, cc, bcc, subject, content})
 });
