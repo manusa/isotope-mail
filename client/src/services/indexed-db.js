@@ -2,7 +2,7 @@ import idb from 'idb';
 import sjcl from 'sjcl';
 import {processFolders} from './folder';
 import {setError} from '../actions/application';
-import SjclWorker from 'worker-loader?name=sjcl.worker.[hash].js!./sjcl.worker.js';
+import SjclWorker from 'worker-loader?name=sjcl.worker.[hash].js&inline!./sjcl.worker.js';
 
 const DATABASE_NAME = 'isotope';
 const DATABASE_VERSION = 2;

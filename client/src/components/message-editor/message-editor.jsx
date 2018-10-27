@@ -77,6 +77,8 @@ class MessageEditor extends Component {
               initialValue={content}
               onEditorChange={this.handleEditorChange}
               onSelectionChange={this.handleSelectionChange}
+              // Force initial content (reply messages) to be persisted in IndexedDB with base64/datauri embedded images
+              onInit={() => this.getEditor().uploadImages().then(() => this.getEditor().fire('Change'))}
               onBlur={this.handleEditorBlur}
               onPaste={event => this.editorPaste(event)}
               inline={true}
