@@ -11,7 +11,7 @@ This webmail client is still in a very early stage, use at your own risk.
 You can see the latest snapshot version in action at: [isotope.marcnuri.com](https://isotope.marcnuri.com)
 
 <p>
-  <img src="https://user-images.githubusercontent.com/488391/47618890-9311ab80-dad8-11e8-9a0f-36062a92b6bc.png" />
+  <img src="isotope-demo-login.gif" />
 </p>
 
 Use the following credentials:
@@ -22,13 +22,7 @@ Use the following credentials:
 You can send e-mails to the demo account (isotope@isotope) by setting the SMTP server advanced settings:
  - Port: 25
  - SMTP SSL: false
- 
-<p>
-  <img src="https://user-images.githubusercontent.com/488391/47618905-d5d38380-dad8-11e8-9f44-acaf78a187ac.png" />
-</p>
-<p>
-  <img src="https://user-images.githubusercontent.com/488391/47618997-b38e3580-dad9-11e8-85ff-50e22fb22c34.png" />
-</p>
+
 
 ## License
 
