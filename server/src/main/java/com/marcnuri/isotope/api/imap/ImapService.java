@@ -396,10 +396,12 @@ public class ImapService {
     private static Properties initMailProperties(Credentials credentials, MailSSLSocketFactory mailSSLSocketFactory) {
         final Properties ret = new Properties();
         ret.put("mail.imap.ssl.enable", credentials.getImapSsl());
+        ret.put("mail.imap.ssl.socketFactory", mailSSLSocketFactory);
         ret.put("mail.imap.starttls.enable", true);
         ret.put("mail.imap.starttls.required", false);
-        ret.put("mail.imaps.socketFactory.class", mailSSLSocketFactory);
+        ret.put("mail.imaps.socketFactory", mailSSLSocketFactory);
         ret.put("mail.imaps.socketFactory.fallback", false);
+        ret.put("mail.imaps.ssl.socketFactory", mailSSLSocketFactory);
         return ret;
     }
 

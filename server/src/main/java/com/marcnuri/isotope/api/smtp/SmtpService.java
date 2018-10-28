@@ -174,9 +174,11 @@ public class SmtpService {
     private static Properties initMailProperties(Credentials credentials, MailSSLSocketFactory socketFactory) {
         final Properties ret = new Properties();
         ret.put("mail.smtp.ssl.enable", credentials.getSmtpSsl());
+        ret.put("mail.smtp.ssl.socketFactory", socketFactory);
         ret.put("mail.smtp.starttls.enable", true);
         ret.put("mail.smtp.starttls.required", false);
-        ret.put("mail.smtps.socketFactory.class", socketFactory);
+        ret.put("mail.smtps.socketFactory", socketFactory);
+        ret.put("mail.smtps.ssl.socketFactory", socketFactory);
         ret.put("mail.smtps.socketFactory.fallback", false);
         ret.put("mail.smtps.auth", true);
         return ret;
