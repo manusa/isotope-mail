@@ -20,16 +20,17 @@ import styles from './login.scss';
 class Login extends Component {
   constructor(props) {
     super(props);
+    const params = new URLSearchParams(this.props.location.search)
     this.state = {
       values: {
-        serverHost: '',
-        serverPort: DEFAULT_IMAP_PORT,
-        user: '',
+        serverHost: params.has('serverHost') ? params.get('serverHost') : '',
+        serverPort: params.has('serverPort') ? params.get('serverPort').replace(/[^0-9]*/g, '') : DEFAULT_IMAP_PORT,
+        user: params.has('user') ? params.get('user') : '',
         password: '',
-        imapSsl: DEFAULT_IMAP_SSL,
-        smtpHost: '',
-        smtpPort: DEFAULT_SMTP_PORT,
-        smtpSsl: DEFAULT_SMTP_SSL
+        imapSsl: params.has('imapSsl') ? params.get('imapSsl') === 'true' : DEFAULT_IMAP_SSL,
+        smtpHost: params.has('smtpHost') ? params.get('smtpHost') : '',
+        smtpPort: params.has('smtpPort') ? params.get('smtpPort').replace(/[^0-9]*/g, '') : DEFAULT_SMTP_PORT,
+        smtpSsl: params.has('smtpSsl') ? params.get('smtpSsl') === 'true' : DEFAULT_SMTP_SSL
       },
       advanced: false
     };

@@ -8,7 +8,7 @@ This webmail client is still in a very early stage, use at your own risk.
 
 ## Demo
 
-You can see the latest snapshot version in action at: [isotope.marcnuri.com](https://isotope.marcnuri.com)
+You can see the latest snapshot version in action at: [isotope.marcnuri.com](https://isotope.marcnuri.com/login?serverHost=isotope&user=isotope&smtpPort=25&smtpSsl=false)
 
 <p>
   <img src="isotope-demo-login.gif" />
