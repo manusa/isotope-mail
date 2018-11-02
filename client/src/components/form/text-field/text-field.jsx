@@ -23,9 +23,13 @@ class TextField extends Component {
           className={`${mainCss['mdc-text-field__input']} ${this.props.inputClass}`}
           required={this.props.required} autoComplete={this.props.autoComplete}
           min={this.props.min}
+          minLength={this.props.minLength}
           value={this.props.value}
           onFocus={this.onFocus} onBlur={this.onBlur}
-          onChange={this.handleOnChange} />
+          onChange={this.handleOnChange}
+          onKeyPress={this.props.onKeyPress}
+          onKeyDown={this.props.onKeyDown}
+        />
         <label htmlFor={this.props.id}
           className={`${mainCss['mdc-floating-label']}
           ${this.state.focused || this.props.value ? mainCss['mdc-floating-label--float-above'] : ''}
@@ -65,7 +69,7 @@ class TextField extends Component {
 
 TextField.propTypes = {
   id: PropTypes.string.isRequired,
-  focused: PropTypes.bool.isRequired,
+  focused: PropTypes.bool,
   fieldClass: PropTypes.string,
   inputClass: PropTypes.string,
   labelClass: PropTypes.string,
@@ -74,15 +78,18 @@ TextField.propTypes = {
   autoComplete: PropTypes.string,
   label: PropTypes.string,
   onChange: PropTypes.func,
+  onKeyPress: PropTypes.func,
+  onKeyDown: PropTypes.func,
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number
   ]),
-  type: PropTypes.string.isRequired,
+  type: PropTypes.string,
   min: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number
-  ])
+  ]),
+  minLength: PropTypes.number
 };
 
 TextField.defaultProps = {
@@ -94,7 +101,10 @@ TextField.defaultProps = {
   required: false,
   autoComplete: 'off',
   type: 'text',
-  min: ''
+  min: '',
+  minLength: null,
+  onKeyPress: null,
+  onKeyDown: null
 };
 
 export default TextField;

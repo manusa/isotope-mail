@@ -16,8 +16,10 @@ exports[`FolderItem component test suite Snapshot render, should render FolderIt
     className="mdc-list-item__primary-text primaryText
           hasNewMessages"
   >
-    Red Label
-     (13)
+    Red Label (13)
   </span>
+  <span
+    className="actions"
+  />
 </a>
 `;

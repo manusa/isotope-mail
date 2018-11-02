@@ -53,6 +53,7 @@
     "@material/card": "^0.39.3",
     "@material/checkbox": "^0.39.3",
     "@material/chips": "^0.39.3",
+    "@material/dialog": "^0.40.1",
     "@material/drawer": "^0.38.0",
     "@material/fab": "^0.39.3",
     "@material/form-field": "^0.39.3",

@@ -24,6 +24,7 @@ import com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration;
 import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.exception.AuthenticationException;
+import com.marcnuri.isotope.api.exception.InvalidFieldException;
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.exception.NotFoundException;
 import com.marcnuri.isotope.api.folder.Folder;
@@ -115,7 +116,7 @@ public class ImapService {
         }
     }
 
-    public List<Folder> getFolders(Credentials credentials, @Nullable  Boolean loadChildren) {
+    public List<Folder> getFolders(Credentials credentials, @Nullable Boolean loadChildren) {
         try {
             final IMAPFolder rootFolder = (IMAPFolder)getImapStore(credentials).getDefaultFolder();
             return Stream.of(rootFolder.list())
@@ -128,6 +129,40 @@ public class ImapService {
         }
     }
 
+    /**
+     * Renames the folder with the provided {@link URLName} to the specified newName.
+     *
+     * <p>The newName must not contain the folder separator character.
+     *
+     * @param credentials for IMAP authentication
+     * @param folderToRenameId Id of the folder to rename
+     * @param newName New name for the provided folder Id
+     * @return Folder with containing metadata from the parent of the renamed folder and all of its children
+     */
+    public Folder renameFolder(Credentials credentials, URLName folderToRenameId, @NonNull String newName) {
+        try {
+            final IMAPFolder folder = getFolder(credentials, folderToRenameId);
+            newName = newName.replaceAll("[.\\[\\]/\\\\&~*]", ""); /// Sanitize name
+            if (newName.isEmpty() || newName.indexOf(folder.getSeparator()) >= 0) {
+                throw new InvalidFieldException("New folder name contains invalid characters");
+            }
+            if (!folder.exists()) {
+                throw new NotFoundException("Folder not found");
+            }
+            final String folderToRenameFullName = folder.getFullName();
+            final String newFolderFullName = String.format("%s%s",
+                    folderToRenameFullName.substring(0, folderToRenameFullName.lastIndexOf(folder.getName())),
+                    newName
+            );
+            final IMAPFolder renamedFolder = (IMAPFolder)getImapStore(credentials).getFolder(newFolderFullName);
+            folder.renameTo(renamedFolder);
+            return Folder.from((IMAPFolder)renamedFolder.getParent(), true);
+        } catch (MessagingException ex) {
+            log.error("Error renaming folder " + folderToRenameId.toString(), ex);
+            throw new IsotopeException(ex.getMessage());
+        }
+    }
+
     public Flux<ServerSentEvent<List<Message>>> getMessagesFlux(
             Credentials credentials, URLName folderId, HttpServletResponse response) {
 
@@ -136,7 +171,7 @@ public class ImapService {
 
     public MessageWithFolder getMessage(Credentials credentials, URLName folderId, Long uid) {
         try {
-            final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
+            final IMAPFolder folder = getFolder(credentials, folderId);
             if (!folder.isOpen()) {
                 folder.open(READ_WRITE);
             }
@@ -175,7 +210,7 @@ public class ImapService {
             HttpServletResponse response, Credentials credentials, URLName folderId, Long messageId,
             String id, Boolean isContentId) {
         try {
-            final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
+            final IMAPFolder folder = getFolder(credentials, folderId);
             if (!folder.isOpen()) {
                 folder.open(READ_ONLY);
             }
@@ -212,9 +247,9 @@ public class ImapService {
      */
     public List<MessageWithFolder> moveMessages(Credentials credentials, URLName fromFolderId, URLName toFolderId, List<Long> uids) {
         try {
-            final IMAPFolder fromFolder = (IMAPFolder)getImapStore(credentials).getFolder(fromFolderId);
+            final IMAPFolder fromFolder = getFolder(credentials, fromFolderId);
             fromFolder.open(READ_WRITE);
-            final IMAPFolder toFolder = (IMAPFolder)getImapStore(credentials).getFolder(toFolderId);
+            final IMAPFolder toFolder = getFolder(credentials, toFolderId);
             toFolder.open(READ_ONLY);
             long toFolderNextUID = toFolder.getUIDNext();
             toFolder.close(false);
@@ -264,7 +299,7 @@ public class ImapService {
 
     public List<MessageWithFolder> setMessagesSeen(Credentials credentials, URLName folderId, boolean seen, long... uids) {
         try {
-            final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
+            final IMAPFolder folder = getFolder(credentials, folderId);
             folder.open(READ_WRITE);
             final javax.mail.Message[] messages = folder.getMessagesByUID(uids);
             final List<MessageWithFolder> ret = new ArrayList<>(messages.length);
@@ -339,6 +374,14 @@ public class ImapService {
                 })
                 .sorted(Comparator.comparingLong(Message::getUid).reversed())
                 .collect(Collectors.toList());
+    }
+
+    private IMAPFolder getFolder(Credentials credentials, URLName folderId) throws MessagingException {
+        final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
+        if (!folder.exists()) {
+            throw new NotFoundException("Folder not found");
+        }
+        return folder;
     }
 
     /**

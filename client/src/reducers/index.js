@@ -9,6 +9,7 @@ export const INITIAL_STATE = {
     user: {},
     newMessage: null,
     selectedFolderId: {},
+    renameFolderId: null,
     selectedMessage: null,
     outbox: null,
     pollInterval: 15000,

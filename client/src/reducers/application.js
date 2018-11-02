@@ -20,6 +20,12 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
         selectedFolderId: action.payload.folderId,
         selectedFolder: {...action.payload}
       };
+    case ActionTypes.APPLICATION_FOLDER_RENAME: {
+      return {
+        ...state,
+        renameFolderId: action.payload ? action.payload.folderId : null
+      };
+    }
     case ActionTypes.APPLICATION_MESSAGE_SELECT:
       return {...state, selectedMessage: {...action.payload}};
     case ActionTypes.APPLICATION_MESSAGE_REFRESH:

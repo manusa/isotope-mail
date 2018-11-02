@@ -1,0 +1,25 @@
+@import '../../styles/partials/variables';
+
+$default-container-width: 550px;
+
+.renameFolderDialog {
+
+  .spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 2;
+  }
+
+  @media screen and (min-width: 600px) {
+    .container {
+      max-width: $default-container-width;
+    }
+    .content {
+      width: $default-container-width;
+    }
+  }
+}

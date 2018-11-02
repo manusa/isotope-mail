@@ -3,6 +3,7 @@
 .listItem {
   height: 36px;
   cursor: pointer;
+  display: flex;
 
   .graphic {
     margin-right: $default-spacing;
@@ -10,9 +11,22 @@
 
   .primaryText {
     margin: 0px;
+    width: 1px;
+    min-width: 1px;
+    flex: 1;
 
     &.hasNewMessages {
       font-weight: $font-weight-bold;
+    }
+  }
+
+  .actions {
+    display: none;
+  }
+
+  &:hover {
+    .actions {
+      display: block;
     }
   }
 }

@@ -39,5 +39,12 @@
   "messageSnackbar": {
     "sendingMessage" : "Envíando mensaje ({{progress}}%)",
     "messageSent" : "Mensaje enviado"
+  },
+  "renameFolderDialog": {
+    "title": "Renombrar carpeta",
+    "message": "Por favor, introduce el nuevo nombre para la carpeta {{folderName}}",
+    "folderNameLabel": "Nuevo nombre de carpeta",
+    "cancel": "Cancelar",
+    "rename": "Renombrar"
   }
 }

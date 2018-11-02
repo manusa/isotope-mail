@@ -6,18 +6,24 @@ import mainCss from '../../styles/main.scss';
 
 class FolderItem extends Component {
   render() {
+    const {selected, graphic, label, newMessageCount, unreadMessageCount, onClick, onDrop, onRename} = this.props;
     return (
       <a className={`${mainCss['mdc-list-item']} ${styles.listItem}
-        ${this.props.selected ? mainCss['mdc-list-item--selected'] : ''}`}
-      onClick={this.props.onClick}
-      onDrop={this.props.onDrop} onDragOver={e => e.preventDefault()}>
+        ${selected ? mainCss['mdc-list-item--selected'] : ''}`}
+      onClick={onClick}
+      onDrop={onDrop} onDragOver={e => e.preventDefault()}>
         <span className={`material-icons ${mainCss['mdc-list-item__graphic']} ${styles.graphic}`}>
-          {this.props.graphic}
+          {graphic}
         </span>
         <span className={`${mainCss['mdc-list-item__primary-text']} ${styles.primaryText}
-          ${this.props.newMessageCount > 0 ? styles.hasNewMessages : ''}`}>
-          {this.props.label}
-          {this.props.unreadMessageCount > 0 ? ` (${this.props.unreadMessageCount})` : ''}
+          ${newMessageCount > 0 ? styles.hasNewMessages : ''}`}>
+          {`${label} ${unreadMessageCount > 0 ? `(${unreadMessageCount})` : ''}`}
+        </span>
+        <span className={styles.actions}>
+          {
+            !onRename ? null :
+              <i className={'material-icons'} onClick={onRename}>edit</i>
+          }
         </span>
       </a>
     );
@@ -30,6 +36,7 @@ FolderItem.propTypes = {
   selected: PropTypes.bool.isRequired,
   onDrop: PropTypes.func,
   onClick: PropTypes.func,
+  onRename: PropTypes.func,
   unreadMessageCount: PropTypes.number,
   newMessageCount: PropTypes.number
 };
@@ -39,7 +46,8 @@ FolderItem.defaultProps = {
   selected: false,
   unreadMessageCount: 0,
   newMessageCount: 0,
-  onDrop: null
+  onDrop: null,
+  onRename: null
 };
 
 export default FolderItem;

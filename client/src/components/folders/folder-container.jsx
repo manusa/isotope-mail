@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import Spinner from '../spinner/spinner';
 import FolderList from './folder-list';
+import FolderRenameDialog from './folder-rename-dialog';
 import {moveMessages, resetFolderMessagesCache} from '../../services/message';
-import {selectFolder, selectMessage} from '../../actions/application';
+import {renameFolder, selectFolder, selectMessage} from '../../actions/application';
 import {clearSelected} from '../../actions/messages';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
@@ -18,8 +19,10 @@ export class FolderContainer extends Component {
         <FolderList folderList={this.props.folderList}
           selectedFolder={this.props.selectedFolder}
           onClickFolder={this.props.selectFolder}
+          onRenameFolder={this.props.renameFolder}
           onDropMessages={this.props.moveMessages}
         />
+        <FolderRenameDialog />
       </nav>
     );
   }
@@ -46,6 +49,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(clearSelected());
     resetFolderMessagesCache(dispatch, credentials, folder);
   },
+  renameFolder: folder => dispatch(renameFolder(folder)),
   moveMessages: (credentials, fromFolder, toFolder, messages) => {
     moveMessages(dispatch, credentials, fromFolder, toFolder, messages);
   }

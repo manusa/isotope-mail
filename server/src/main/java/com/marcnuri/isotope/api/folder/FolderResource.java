@@ -64,6 +64,7 @@ public class FolderResource implements ApplicationContextAware {
 
     private static final String REL_MESSAGES = "messages";
     private static final String REL_DOWNLOAD = "download";
+    private static final String REL_RENAME = "rename";
     private static final String REL_MOVE = "move";
     private static final String REL_MOVE_BULK = "move.bulk";
     private static final String REL_SEEN = "seen";
@@ -87,6 +88,14 @@ public class FolderResource implements ApplicationContextAware {
         log.debug("Loading list of folders [children:{}]", loadChildren);
         return ResponseEntity.ok(addLinks(imapServiceFactory.getObject()
                 .getFolders(credentialsService.fromRequest(request), loadChildren)));
+    }
+
+    @PutMapping(path= "/{folderId}/name", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<Folder> renameFolder(
+            HttpServletRequest request, @PathVariable("folderId") String folderId, @RequestBody String newName) {
+        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().renameFolder(
+                credentialsService.fromRequest(request), Folder.toId(folderId), newName
+        )));
     }
 
     @GetMapping(path = "/{folderId}/messages", produces = TEXT_EVENT_STREAM_VALUE)
@@ -199,6 +208,9 @@ public class FolderResource implements ApplicationContextAware {
         folder.add(linkTo(methodOn(FolderResource.class)
                 .getMessages( folder.getFolderId(), null, null))
                 .withRel(REL_MESSAGES).expand());
+        folder.add(linkTo(methodOn(FolderResource.class)
+                .renameFolder(null, folder.getFolderId(), null))
+                .withRel(REL_RENAME));
         addLinks(folder.getChildren());
         return folder;
     }

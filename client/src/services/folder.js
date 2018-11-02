@@ -1,5 +1,9 @@
 import {URLS} from './url';
-import {backendRequest, setFolders} from '../actions/folders';
+import {
+  backendRequest as applicationBackendRequest,
+  backendRequestCompleted as applicationBackendRequestCompleted,
+  renameFolder as renameFolderAction} from '../actions/application';
+import {backendRequest, setFolders, updateFolder} from '../actions/folders';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 
 export const FolderTypes = Object.freeze({
@@ -79,8 +83,30 @@ export async function getFolders(dispatch, credentials, loadChildren) {
     signal: signal
   });
   const folders = await toJson(response);
-  const processedFolders = processFolders(folders);
-  dispatch(setFolders(processedFolders));
-  return processedFolders;
+  dispatch(setFolders(folders));
+}
+
+export function renameFolder(dispatch, credentials, folderToRename, newName) {
+  abortFetch(abortControllerWrappers.getFoldersAbortController);
+  dispatch(applicationBackendRequest());
+  fetch(folderToRename._links.rename.href, {
+    method: 'PUT',
+    headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
+    body: newName
+  })
+    .then(toJson)
+    .then(renamedFolderParent => {
+      if (renamedFolderParent.fullName.length === 0) {
+        // Root folder (replace current folder tree)
+        dispatch(setFolders(renamedFolderParent.children));
+      } else {
+        dispatch(updateFolder(renamedFolderParent));
+      }
+      dispatch(renameFolderAction(null));
+      dispatch(applicationBackendRequestCompleted());
+    })
+    .catch(error => {
+      dispatch(applicationBackendRequestCompleted());
+    });
 }
 

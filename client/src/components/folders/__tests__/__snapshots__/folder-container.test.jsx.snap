@@ -20,11 +20,13 @@ exports[`FolderContainer component test suite Snapshot render, should render Fol
     }
     onClickFolder={[Function]}
     onDropMessage={[Function]}
+    onRenameFolder={[Function]}
     selectedFolder={
       Object {
         "folderId": "1337-3",
       }
     }
   />
+  <Connect(Translate(FolderRenameDialog)) />
 </nav>
 `;

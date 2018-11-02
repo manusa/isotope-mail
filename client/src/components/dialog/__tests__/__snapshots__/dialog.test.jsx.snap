@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Dialog component test suite Snapshot render, should render dialog 1`] = `
+<Portal
+  containerInfo={
+    <div
+      id="modal-root"
+    />
+  }
+>
+  <div
+    aria-modal="true"
+    className="mdc-dialog first-class mdc-dialog--open"
+    role="alertdialog"
+  >
+    <div
+      className="mdc-dialog__container container-class"
+    >
+      <div
+        className="mdc-dialog__surface"
+      >
+        <h2
+          className="mdc-dialog__title"
+        >
+          Dr. POTUS
+        </h2>
+        <div
+          className="mdc-dialog__content content-class"
+        >
+          <p>
+            Dialog content
+          </p>
+        </div>
+        <footer
+          className="mdc-dialog__actions"
+        >
+          <Button
+            className=" mdc-dialog__button"
+            icon=""
+            key="0"
+            label="Red label"
+            onClick={[Function]}
+            type="button"
+          />
+        </footer>
+      </div>
+    </div>
+    <div
+      className="mdc-dialog__scrim"
+      onClick={[Function]}
+    />
+  </div>
+</Portal>
+`;

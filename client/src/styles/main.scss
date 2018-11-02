@@ -2,6 +2,7 @@
 @import 'partials/mixins';
 @import 'partials/fonts';
 @import 'partials/base';
+@import 'partials/mdc-textfield-extended';
 @import 'partials/mdc-snackbar-extended';
 @import 'partials/mdc-switch-extended';
 @import 'partials/spinner';
@@ -14,9 +15,9 @@
 @import '@material/checkbox/mdc-checkbox';
 @import '@material/chips/mdc-chips';
 @import '@material/drawer/mdc-drawer';
+@import '@material/dialog/mdc-dialog';
 @import '@material/fab/mdc-fab';
 @import '@material/icon-button/mdc-icon-button';
 @import '@material/line-ripple/mdc-line-ripple';
 @import '@material/list/mdc-list';
-@import '@material/textfield/mdc-text-field';
 @import '@material/top-app-bar/mdc-top-app-bar';

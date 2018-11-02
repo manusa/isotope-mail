@@ -39,5 +39,12 @@
   "messageSnackbar": {
     "sendingMessage" : "Sending message ({{progress}}%)",
     "messageSent" : "Message sent"
+  },
+  "renameFolderDialog": {
+    "title": "Rename folder",
+    "message": "Please insert the new name for folder {{folderName}}",
+    "folderNameLabel": "New folder name",
+    "cancel": "Cancel",
+    "rename": "Rename"
   }
 }

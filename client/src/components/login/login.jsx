@@ -20,7 +20,7 @@ import styles from './login.scss';
 class Login extends Component {
   constructor(props) {
     super(props);
-    const params = new URLSearchParams(this.props.location.search)
+    const params = new URLSearchParams(this.props.location.search);
     this.state = {
       values: {
         serverHost: params.has('serverHost') ? params.get('serverHost') : '',
