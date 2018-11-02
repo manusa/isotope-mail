@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Checkbox component test suite Snapshot render, should render switch 1`] = `
+<span
+  onClick={[Function]}
+>
+  <div
+    className="mdc-switch mdc-switch--checked switch-class"
+  >
+    <div
+      className="mdc-switch__track"
+    />
+    <div
+      className="mdc-switch__thumb-underlay"
+    >
+      <div
+        className="mdc-switch__thumb"
+      >
+        <input
+          checked={true}
+          className="mdc-checkbox__native-control input-class"
+          id="Bourne"
+          readOnly={true}
+          required={true}
+          role="switch"
+          type="checkbox"
+        />
+      </div>
+    </div>
+  </div>
+  <label
+    htmlFor="Bourne"
+  >
+    White label
+  </label>
+</span>
+`;
