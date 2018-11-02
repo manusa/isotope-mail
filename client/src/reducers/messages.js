@@ -45,12 +45,16 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
     case ActionTypes.MESSAGES_SET_SELECTED: {
       const newUpdateState = {...state};
       newUpdateState.selected = [...state.selected];
-      const indexOfMessage = newUpdateState.selected.indexOf(action.payload.message.uid);
-      if (action.payload.selected && indexOfMessage < 0) {
-        newUpdateState.selected.push(action.payload.message.uid);
-      } else {
-        newUpdateState.selected = newUpdateState.selected.filter(uid => uid !== action.payload.message.uid);
-      }
+      action.payload.messages.forEach(message => {
+        const indexOfMessage = newUpdateState.selected.indexOf(message.uid);
+        if (action.payload.selected && indexOfMessage < 0) {
+          // Select Message
+          newUpdateState.selected.push(message.uid);
+        } else if (!action.payload.selected) {
+          // Unselect message
+          newUpdateState.selected = newUpdateState.selected.filter(uid => uid !== message.uid);
+        }
+      });
       return newUpdateState;
     }
     case ActionTypes.MESSAGES_CLEAR_SELECTED: {

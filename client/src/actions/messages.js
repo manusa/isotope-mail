@@ -56,9 +56,9 @@ export const deleteFromCache = (folder, messages) => ({
  * @param selected {boolean}
  * @returns {{type: string, payload: {message: *, selected: *}}}
  */
-export const setSelected = (message, selected) => ({
+export const setSelected = (messages, selected) => ({
   type: ActionTypes.MESSAGES_SET_SELECTED,
-  payload: {message, selected}
+  payload: {messages, selected}
 });
 
 /**

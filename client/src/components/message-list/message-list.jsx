@@ -76,7 +76,7 @@ class MessageList extends Component {
                 ${message.seen ? styles.seen : ''}
                 ${message.deleted ? styles.deleted : ''}`} >
         <Checkbox id={message.uid}
-          onChange={event => this.props.messageSelected(message, event.target.checked)}
+          onChange={event => this.selectMessage(event, message)}
           checked={selected}
         />
         <span className={styles.itemDetails}
@@ -112,6 +112,38 @@ class MessageList extends Component {
       payload.messages = [message];
     }
     event.dataTransfer.setData('application/json', JSON.stringify(payload));
+  }
+
+  /**
+   * Select/unselects the message for which the checkbox is changed.
+   *
+   * If the shift key is pressed, and it's a select operation, a range of messages will be selected. The range will be
+   * the one consisting in the last selected message and the current message in any direction.
+   *
+   * @param event
+   * @param message
+   */
+  selectMessage(event, message) {
+    event.stopPropagation();
+    const checked = event.target.checked;
+    if (checked && event.nativeEvent && event.nativeEvent.shiftKey && this.props.selectedMessages.length > 0) {
+      // Range selection
+      const messagesToSelect = [];
+      const lastSelectedMessageUid = this.props.selectedMessages[this.props.selectedMessages.length - 1];
+      let selecting = false;
+      this.props.messages.forEach(m => {
+        if (m.uid === message.uid || m.uid === lastSelectedMessageUid) {
+          selecting = !selecting;
+          messagesToSelect.push(m);
+        } else if (selecting) {
+          messagesToSelect.push(m);
+        }
+      });
+      this.props.messageSelected(messagesToSelect, checked);
+    } else {
+      // Single selection
+      this.props.messageSelected([message], checked);
+    }
   }
 }
 
@@ -149,7 +181,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(selectMessage(message));
     readMessage(dispatch, credentials, folder, message);
   },
-  messageSelected: (message, selected) => dispatch(setSelected(message, selected))
+  messageSelected: (messages, selected, shiftKey) => dispatch(setSelected(messages, selected, shiftKey))
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
