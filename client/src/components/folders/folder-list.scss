@@ -1,6 +1,8 @@
 @import '../../styles/partials/variables';
 
+.itemContainer {
+  padding-left: 15px;
+}
 .childList {
   padding: 0;
-  margin-left: $default-spacing;
 }

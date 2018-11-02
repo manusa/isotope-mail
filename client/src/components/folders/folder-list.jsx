@@ -1,4 +1,4 @@
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import FolderItem from './folder-item';
 import {FolderTypes} from '../../services/folder';
@@ -10,7 +10,7 @@ class FolderList extends Component {
     const {folderList, selectedFolder} = this.props;
     return (
       folderList.map(folder =>
-        <Fragment key={folder.fullURL}>
+        <li key={folder.fullURL} className={`${styles.itemContainer}`}>
           <FolderItem label={folder.name} graphic={folder.type.icon}
             selected={selectedFolder && folder.folderId === selectedFolder.folderId}
             onClick={event => this.onClick(event, folder)}
@@ -28,7 +28,7 @@ class FolderList extends Component {
             </nav> :
             null
           )}
-        </Fragment>
+        </li>
       )
     );
   }
