@@ -22,7 +22,7 @@ describe('Checkbox component test suite', () => {
     switchh.simulate('click', {preventDefault: preventDefault});
 
     // Then
-    expect(preventDefault).toHaveBeenCalledTimes(2);
-    expect(onToggle).toHaveBeenCalledTimes(2);
+    expect(preventDefault).toHaveBeenCalledTimes(1);
+    expect(onToggle).toHaveBeenCalledTimes(1);
   });
 });
