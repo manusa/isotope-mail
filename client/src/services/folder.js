@@ -67,6 +67,14 @@ export function explodeFolders(originalFolders, explodedFolders = {}) {
   return explodedFolders;
 }
 
+/**
+ * Returns the setFolders action with the preprocessed folders in the payload.
+ *
+ * @param dispatch
+ * @param credentials
+ * @param loadChildren
+ * @returns {Promise<*>}
+ */
 export async function getFolders(dispatch, credentials, loadChildren) {
   abortFetch(abortControllerWrappers.getFoldersAbortController);
   abortControllerWrappers.getFoldersAbortController = new AbortController();
@@ -83,7 +91,7 @@ export async function getFolders(dispatch, credentials, loadChildren) {
     signal: signal
   });
   const folders = await toJson(response);
-  dispatch(setFolders(folders));
+  return dispatch(setFolders(folders));
 }
 
 export function renameFolder(dispatch, credentials, folderToRename, newName) {

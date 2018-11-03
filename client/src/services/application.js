@@ -71,9 +71,9 @@ export async function login(dispatch, credentials) {
       dispatch(selectFolder(recoveredState.application.selectedFolder));
     } else {
       // Retrieve first level folders to show something ASAP
-      const folders = await getFolders(dispatch, validatedCredentials, false);
+      const setFoldersDispatchAction = await getFolders(dispatch, validatedCredentials, false);
       // Retrieve and select INBOX folder so that user has something in the screen
-      const inbox = folders.find(f => f.type === FolderTypes.INBOX);
+      const inbox = setFoldersDispatchAction.payload.find(f => f.type === FolderTypes.INBOX);
       if (inbox) {
         dispatch(selectFolder(inbox));
         resetFolderMessagesCache(dispatch, validatedCredentials, inbox, null);
