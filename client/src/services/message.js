@@ -168,7 +168,7 @@ export function moveMessages(dispatch, credentials, fromFolder, toFolder, messag
     ...fromFolder
   };
   messages.forEach(m => {
-    dispatch(setSelected(m, false));
+    dispatch(setSelected([m], false));
     // Calculate new fromFolder values
     fromFolderUpdated.messageCount -= 1;
     fromFolderUpdated.unreadMessageCount -= (m.seen ? 0 : 1);
