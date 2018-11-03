@@ -11,4 +11,15 @@ describe('Checkbox component test suite', () => {
       onChange={onChange} checked={checked} />);
     expect(checkbox).toMatchSnapshot();
   });
+  test('click/change, should trigger onChange function', () => {
+    // Given
+    const onChange = jest.fn();
+    const checkbox = shallow(<Checkbox onChange={onChange}/>);
+
+    // When
+    checkbox.find('.mdc-checkbox input').simulate('change', {target: {checked: true}});
+
+    // Then
+    expect(onChange).toHaveBeenCalledTimes(1);
+  });
 });

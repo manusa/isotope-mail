@@ -12,4 +12,17 @@ describe('Checkbox component test suite', () => {
       onToggle={onToggle} switchClass={switchClass} inputClass={inputClass}/>);
     expect(switchh).toMatchSnapshot();
   });
+  test('click, should trigger onToggle function', () => {
+    // Given
+    const onToggle = jest.fn();
+    const preventDefault = jest.fn();
+    const switchh = shallow(<Switch onToggle={onToggle}/>);
+
+    // When
+    switchh.simulate('click', {preventDefault: preventDefault});
+
+    // Then
+    expect(preventDefault).toHaveBeenCalledTimes(2);
+    expect(onToggle).toHaveBeenCalledTimes(2);
+  });
 });
