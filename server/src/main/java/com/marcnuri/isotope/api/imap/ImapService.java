@@ -122,6 +122,7 @@ public class ImapService {
             return Stream.of(rootFolder.list())
                     .map(IMAPFolder.class::cast)
                     .map(mf -> Folder.from(mf, loadChildren))
+                    .sorted(Comparator.comparing(Folder::getName))
                     .collect(Collectors.toList());
         } catch (MessagingException ex) {
             log.error("Error loading folders", ex);

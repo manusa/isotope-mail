@@ -201,7 +201,9 @@ public class Folder extends IsotopeResource implements Serializable {
                 if (Boolean.TRUE.equals(loadChildren) && !ret.getAttributes().contains(ATTR_HAS_NO_CHILDREN)) {
                     ret.setChildren(Stream.of(mailFolder.list())
                             .map(IMAPFolder.class::cast)
-                            .map(mf -> from(mf, true)).toArray(Folder[]::new));
+                            .map(mf -> from(mf, true))
+                            .sorted(Comparator.comparing(Folder::getName))
+                            .toArray(Folder[]::new));
                 } else {
                     ret.setChildren(EMPTY_FOLDERS);
                 }
