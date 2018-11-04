@@ -14,7 +14,6 @@ import {refreshMessage} from '../actions/application';
 import {updateFolder} from '../actions/folders';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 import {persistMessageCache} from './indexed-db';
-import {KEY_HASH, KEY_USER_ID} from './state';
 
 const _eventSourceWrappers = {};
 
@@ -47,14 +46,14 @@ function _readContent(dispatch, credentials, folder, message, signal, attachment
  * @param credentials
  * @param folder
  */
-export async function resetFolderMessagesCache(dispatch, credentials, folder) {
+export async function resetFolderMessagesCache(dispatch, user, folder) {
   _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
   if (folder && folder._links) {
     const allMessages = [];
     // Prefer EventSourcePolyfill instead of EventSource to allow sending HTTP headers in all browsers
     const es = new window.EventSourcePolyfill(folder._links.messages.href,
       {
-        headers: credentialsHeaders(credentials)
+        headers: credentialsHeaders(user.credentials)
       });
     _eventSourceWrappers.resetFolderMessagesCache = es;
     dispatch(backendRequest());
@@ -67,7 +66,7 @@ export async function resetFolderMessagesCache(dispatch, credentials, folder) {
         _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
         // Manually persist newest version of message cache
         persistMessageCache(
-          sessionStorage.getItem(KEY_USER_ID), sessionStorage.getItem(KEY_HASH), folder, [...allMessages]);
+          user.id, user.hash, folder, [...allMessages]);
       } else {
         dispatch(updateCache(folder, messages));
       }

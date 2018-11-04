@@ -9,11 +9,18 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
       return {...state, activeRequests: state.activeRequests > 0 ? state.activeRequests - 1 : 0};
     case ActionTypes.MESSAGES_SET_CACHE:
       return {...state, cache: action.payload};
-    case ActionTypes.MESSAGES_SET_FOLDER_CACHE:
+    case ActionTypes.MESSAGES_SET_FOLDER_CACHE: {
       const newState = {...state};
       newState.cache[action.payload.folder.folderId] =
         new Map(action.payload.messages.map(m => [m.uid, m]));
       return newState;
+    }
+    case ActionTypes.MESSAGES_RENAME_FOLDER_CACHE: {
+      const newState = {...state};
+      newState.cache[action.payload.newFolderId] = newState.cache[action.payload.oldFolderId];
+      delete newState.cache[action.payload.oldFolderId];
+      return newState;
+    }
     case ActionTypes.MESSAGES_UPDATE_CACHE: {
       const newUpdateState = {...state};
       if (newUpdateState.cache[action.payload.folder.folderId] instanceof Map === false) {

@@ -125,13 +125,13 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   reloadFolders: credentials => getFolders(dispatch, credentials, true),
-  reloadMessageCache: (credentials, folder) => resetFolderMessagesCache(dispatch, credentials, folder),
+  reloadMessageCache: (user, folder) => resetFolderMessagesCache(dispatch, user, folder),
   newMessage: () => editNewMessage(dispatch)
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
   reloadFolders: () => dispatchProps.reloadFolders(stateProps.application.user.credentials),
-  reloadMessageCache: folder => dispatchProps.reloadMessageCache(stateProps.application.user.credentials, folder)
+  reloadMessageCache: folder => dispatchProps.reloadMessageCache(stateProps.application.user, folder)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(App);

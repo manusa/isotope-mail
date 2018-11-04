@@ -88,13 +88,13 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   cancel: () => dispatch(actionRenameFolder(null)),
-  renameFolder: (credentials, folderToRename, newName) =>
-    serviceRenameFolder(dispatch, credentials, folderToRename, newName)
+  renameFolder: (user, folderToRename, newName) =>
+    serviceRenameFolder(dispatch, user, folderToRename, newName)
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
   renameFolder: (folderToRename, newName) =>
-    dispatchProps.renameFolder(stateProps.application.user.credentials, folderToRename, newName)
+    dispatchProps.renameFolder(stateProps.application.user, folderToRename, newName)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(translate()(FolderRenameDialog));

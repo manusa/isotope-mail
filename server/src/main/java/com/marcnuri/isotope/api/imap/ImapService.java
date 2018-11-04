@@ -60,7 +60,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.marcnuri.isotope.api.folder.Folder.toBase64Id;
 import static com.marcnuri.isotope.api.folder.FolderResource.addLinks;
 import static com.marcnuri.isotope.api.message.MessageUtils.envelopeFetch;
 import static javax.mail.Folder.READ_ONLY;
@@ -156,8 +155,16 @@ public class ImapService {
                     newName
             );
             final IMAPFolder renamedFolder = (IMAPFolder)getImapStore(credentials).getFolder(newFolderFullName);
-            folder.renameTo(renamedFolder);
-            return Folder.from((IMAPFolder)renamedFolder.getParent(), true);
+            if (!folder.renameTo(renamedFolder)) {
+                throw new InvalidFieldException("New folder name was not accepted by IMAP server");
+            }
+            final Folder parent = Folder.from((IMAPFolder)renamedFolder.getParent(), true);
+            // Identify renamed folder
+            Stream.of(parent.getChildren())
+                    .filter(f -> f.getFullName().equals(newFolderFullName))
+                    .findAny()
+                    .ifPresent(f -> f.setPreviousFolderId(Folder.toBase64Id((folderToRenameId))));
+            return parent;
         } catch (MessagingException ex) {
             log.error("Error renaming folder " + folderToRenameId.toString(), ex);
             throw new IsotopeException(ex.getMessage());
@@ -186,7 +193,7 @@ public class ImapService {
             final Object content = imapMessage.getContent();
             if (content instanceof Multipart) {
                 ret.setContent(extractContent((Multipart) content));
-                ret.setAttachments(addLinks(toBase64Id(folderId), ret,
+                ret.setAttachments(addLinks(Folder.toBase64Id(folderId), ret,
                         extractAttachments(ret, (Multipart) content, null)));
             } else if (content instanceof MimeMessage
                     && ((MimeMessage) content).getContentType().toLowerCase().contains("html")) {

@@ -20,6 +20,7 @@
  */
 package com.marcnuri.isotope.api.folder;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.resource.IsotopeResource;
 import com.sun.mail.imap.IMAPFolder;
@@ -36,6 +37,7 @@ import static javax.mail.Folder.HOLDS_MESSAGES;
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-08.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Folder extends IsotopeResource implements Serializable {
 
     private static final long serialVersionUID = 8624907999271453862L;
@@ -44,6 +46,8 @@ public class Folder extends IsotopeResource implements Serializable {
     private static final Folder[] EMPTY_FOLDERS = {};
 
     private String folderId;
+    // Used when folder renaming to store previous folderId in order to identificate in FE
+    private String previousFolderId;
     private String name;
     private char separator;
     private Long UIDValidity;
@@ -62,6 +66,14 @@ public class Folder extends IsotopeResource implements Serializable {
 
     public void setFolderId(String folderId) {
         this.folderId = folderId;
+    }
+
+    public String getPreviousFolderId() {
+        return previousFolderId;
+    }
+
+    public void setPreviousFolderId(String previousFolderId) {
+        this.previousFolderId = previousFolderId;
     }
 
     public String getName() {
@@ -164,6 +176,7 @@ public class Folder extends IsotopeResource implements Serializable {
                 unreadMessageCount == folder.unreadMessageCount &&
                 deletedMessageCount == folder.deletedMessageCount &&
                 Objects.equals(folderId, folder.folderId) &&
+                Objects.equals(previousFolderId, folder.previousFolderId) &&
                 Objects.equals(name, folder.name) &&
                 Objects.equals(UIDValidity, folder.UIDValidity) &&
                 Objects.equals(fullName, folder.fullName) &&
@@ -175,7 +188,7 @@ public class Folder extends IsotopeResource implements Serializable {
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(super.hashCode(), folderId, name, separator, UIDValidity, fullName, fullURL, attributes, messageCount, newMessageCount, unreadMessageCount, deletedMessageCount);
+        int result = Objects.hash(super.hashCode(), folderId, previousFolderId, name, separator, UIDValidity, fullName, fullURL, attributes, messageCount, newMessageCount, unreadMessageCount, deletedMessageCount);
         result = 31 * result + Arrays.hashCode(children);
         return result;
     }

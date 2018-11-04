@@ -43,11 +43,11 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  selectFolder: (folder, credentials) => {
+  selectFolder: (folder, user) => {
     dispatch(selectFolder(folder));
     dispatch(selectMessage(null));
     dispatch(clearSelected());
-    resetFolderMessagesCache(dispatch, credentials, folder);
+    resetFolderMessagesCache(dispatch, user, folder);
   },
   renameFolder: folder => dispatch(renameFolder(folder)),
   moveMessages: (credentials, fromFolder, toFolder, messages) => {
@@ -57,7 +57,7 @@ const mapDispatchToProps = dispatch => ({
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
   selectFolder: folder =>
-    dispatchProps.selectFolder(folder, stateProps.application.user.credentials),
+    dispatchProps.selectFolder(folder, stateProps.application.user),
   moveMessages: (fromFolder, toFolder, message) => dispatchProps.moveMessages(stateProps.application.user.credentials,
     fromFolder, toFolder, message)
 }));

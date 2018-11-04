@@ -221,6 +221,29 @@ export async function persistMessageCache(userId, hash, folder, messages) {
 }
 
 /**
+ *
+ * @param userId
+ * @param hash
+ * @param oldFolderId
+ * @param newFolderId
+ * @returns {Promise<void>}
+ */
+export async function renameMessageCache(userId, hash, oldFolderId, newFolderId) {
+  const oldKey = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(`${userId}|${oldFolderId}`));
+  const newKey = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(`${userId}|${newFolderId}`))
+  const db = await _openDatabaseSafe();
+  const tx = db.transaction([MESSAGE_CACHE_STORE], 'readwrite');
+  const store = tx.objectStore(MESSAGE_CACHE_STORE);
+  const oldFolderCache = await store.get(oldKey);
+  oldFolderCache.key = newKey;
+  oldFolderCache.folderId = sjcl.encrypt(hash, newFolderId);
+  await store.put(oldFolderCache);
+  await store.delete(oldKey);
+  await tx.complete;
+  db.close();
+}
+
+/**
  * Persists application.newMessage.content object in separate database
  * @param application
  * @param content

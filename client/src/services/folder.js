@@ -4,6 +4,8 @@ import {
   backendRequestCompleted as applicationBackendRequestCompleted,
   renameFolder as renameFolderAction} from '../actions/application';
 import {backendRequest, setFolders, updateFolder} from '../actions/folders';
+import {renameFolderCache} from '../actions/messages';
+import {renameMessageCache} from './indexed-db';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 
 export const FolderTypes = Object.freeze({
@@ -94,12 +96,12 @@ export async function getFolders(dispatch, credentials, loadChildren) {
   return dispatch(setFolders(folders));
 }
 
-export function renameFolder(dispatch, credentials, folderToRename, newName) {
+export function renameFolder(dispatch, user, folderToRename, newName) {
   abortFetch(abortControllerWrappers.getFoldersAbortController);
   dispatch(applicationBackendRequest());
   fetch(folderToRename._links.rename.href, {
     method: 'PUT',
-    headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
+    headers: credentialsHeaders(user.credentials, {'Content-Type': 'application/json'}),
     body: newName
   })
     .then(toJson)
@@ -110,10 +112,16 @@ export function renameFolder(dispatch, credentials, folderToRename, newName) {
       } else {
         dispatch(updateFolder(renamedFolderParent));
       }
+      renamedFolderParent.children
+        .filter(f => f.previousFolderId)
+        .forEach(f => {
+          dispatch(renameFolderCache(f.previousFolderId, f.folderId));
+          renameMessageCache(user.id, user.hash, f.previousFolderId, f.folderId);
+        });
       dispatch(renameFolderAction(null));
       dispatch(applicationBackendRequestCompleted());
     })
-    .catch(error => {
+    .catch(() => {
       dispatch(applicationBackendRequestCompleted());
     });
 }

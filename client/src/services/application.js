@@ -76,7 +76,12 @@ export async function login(dispatch, credentials) {
       const inbox = setFoldersDispatchAction.payload.find(f => f.type === FolderTypes.INBOX);
       if (inbox) {
         dispatch(selectFolder(inbox));
-        resetFolderMessagesCache(dispatch, validatedCredentials, inbox, null);
+        const user = {
+          id: userId,
+          hash: hash,
+          credentials: validatedCredentials
+        };
+        resetFolderMessagesCache(dispatch, user, inbox, null);
       }
     }
   }

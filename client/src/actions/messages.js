@@ -13,6 +13,11 @@ export const setFolderCache = (folder, messages) => ({
   payload: {folder, messages}
 });
 
+export const renameFolderCache = (oldFolderId, newFolderId) => ({
+  type: ActionTypes.MESSAGES_RENAME_FOLDER_CACHE,
+  payload: {oldFolderId, newFolderId}
+});
+
 /**
  * Updates state folder's messages cache.
  *
