@@ -221,6 +221,10 @@ export async function persistMessageCache(userId, hash, folder, messages) {
 }
 
 /**
+ * Moves entries in the MESSAGE_CACHE_STORE.
+ *
+ * Will create a new entry for the key of the newly named folder and delete the previous entry for the key
+ * of the former folder id (if exists).
  *
  * @param userId
  * @param hash
@@ -235,10 +239,12 @@ export async function renameMessageCache(userId, hash, oldFolderId, newFolderId)
   const tx = db.transaction([MESSAGE_CACHE_STORE], 'readwrite');
   const store = tx.objectStore(MESSAGE_CACHE_STORE);
   const oldFolderCache = await store.get(oldKey);
-  oldFolderCache.key = newKey;
-  oldFolderCache.folderId = sjcl.encrypt(hash, newFolderId);
-  await store.put(oldFolderCache);
-  await store.delete(oldKey);
+  if (oldFolderCache) {
+    oldFolderCache.key = newKey;
+    oldFolderCache.folderId = sjcl.encrypt(hash, newFolderId);
+    await store.put(oldFolderCache);
+    await store.delete(oldKey);
+  }
   await tx.complete;
   db.close();
 }
