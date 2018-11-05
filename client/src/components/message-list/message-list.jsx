@@ -173,20 +173,21 @@ const mapStateToProps = state => ({
         }
         return 0;
       }) : [],
-  selectedMessages: state.messages.selected
+  selectedMessages: state.messages.selected,
+  downloadedMessages: state.application.downloadedMessages
 });
 
 const mapDispatchToProps = dispatch => ({
-  messageClicked: (folder, message, credentials) => {
+  messageClicked: (credentials, downloadedMessages, folder, message) => {
     dispatch(selectMessage(message));
-    readMessage(dispatch, credentials, folder, message);
+    readMessage(dispatch, credentials, downloadedMessages, folder, message);
   },
   messageSelected: (messages, selected, shiftKey) => dispatch(setSelected(messages, selected, shiftKey))
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
-  messageClicked: message =>
-    dispatchProps.messageClicked(stateProps.selectedFolder, message, stateProps.credentials)
+  messageClicked: message => dispatchProps.messageClicked(
+    stateProps.credentials, stateProps.downloadedMessages, stateProps.selectedFolder, message)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(translate()(MessageList));

@@ -143,6 +143,7 @@ export async function persistState(dispatch, state) {
     // Clone state
     const newState = {...state};
     newState.application = {...state.application};
+    newState.application.downloadedMessages = {};
     newState.application.outbox = null;
     if (newState.application.newMessage) {
       // Persist everything from application.newMessage except content (persisted independently in message-editor
@@ -156,7 +157,7 @@ export async function persistState(dispatch, state) {
     newState.folders = {...state.folders};
     newState.folders.items = [...state.folders.items];
 
-    // Don't persist message related states (Own IndexedDB for message cache @see persistMessageCache)
+    // Don't persist message related states (Own IndexedDB entry for message cache @see persistMessageCache)
     newState.messages = {};
     // Object.entries(state.messages.cache).forEach(e => {
     //   newState.messages.cache[e[0]] = Array.from(e[1].values());

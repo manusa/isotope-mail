@@ -82,44 +82,70 @@ export async function resetFolderMessagesCache(dispatch, user, folder) {
 }
 
 /**
+ * Reads the content of a message.
+ *
+ * If the message is cached in the application.downloadedMessages map, the content won't be fetched from the backend.
+ *
+ * If the message is not cached, a backend request will be peformed to read the complete message.
+ *
+ * In both cases, any missing embedded image in tha attachment list will be fetched. For cached messages, unless action
+ * was previously aborted, the embedded images will have already been loaded.
  *
  * @param dispatch
  * @param credentials
+ * @param downloadedMessages
  * @param folder
  * @param message {object}
  */
-export function readMessage(dispatch, credentials, folder, message) {
-  // Abort + signal
-  if (message && message._links) {
-    abortFetch(abortControllerWrappers.readMessageAbortController);
-    abortControllerWrappers.readMessageAbortController = new AbortController();
-    const signal = abortControllerWrappers.readMessageAbortController.signal;
+export function readMessage(dispatch, credentials, downloadedMessages, folder, message) {
+  // Abort + new signal
+  abortFetch(abortControllerWrappers.readMessageAbortController);
+  abortControllerWrappers.readMessageAbortController = new AbortController();
+  const signal = abortControllerWrappers.readMessageAbortController.signal;
 
-    dispatch(aBackendRequest());
-    fetch(message._links.self.href, {
-      method: 'GET',
-      headers: credentialsHeaders(credentials),
-      signal: signal
-    })
-      .then(response => {
-        dispatch(aBackendRequestCompleted());
-        return response;
+  if (message && message._links) {
+    const downloadedMessage = downloadedMessages[message.messageId];
+    let $message;
+    if (downloadedMessage) {
+      // Read message from application.downloadedMessages cache
+      $message = Promise.resolve(downloadedMessage);
+    } else {
+      // Read message from BE
+      dispatch(aBackendRequest());
+      $message = fetch(message._links.self.href, {
+        method: 'GET',
+        headers: credentialsHeaders(credentials),
+        signal: signal
       })
-      .then(toJson)
+        .then(response => {
+          dispatch(aBackendRequestCompleted());
+          return response;
+        })
+        .then(toJson)
+        .then(completeMessage => {
+          // Update folder with freshest information
+          dispatch(updateFolder(completeMessage.folder));
+          // Update folder cache with message marked as read (don't store content in cache)
+          const messageWithNoContent = {...completeMessage};
+          delete messageWithNoContent.content;
+          dispatch(updateCache(folder, [messageWithNoContent]));
+          return Promise.resolve(completeMessage);
+        })
+        .catch(() => dispatch(aBackendRequestCompleted()));
+    }
+    $message
       .then(completeMessage => {
         dispatch(refreshMessage(folder, completeMessage));
-        // Update folder with freshest information
-        dispatch(updateFolder(completeMessage.folder));
-        // Update folder cache with message marked as read (don't store content in cache)
-        const messageWithNoContent = {...completeMessage};
-        delete messageWithNoContent.content;
-        dispatch(updateCache(folder, [messageWithNoContent]));
-        // Read message's embedded images
+        // Read message's embedded images if used in message content
         completeMessage.attachments
           .filter(a => a.contentId && a.contentId.length > 0)
           .filter(a => a.contentType.toLowerCase().indexOf('image/') === 0)
+          .filter(a => {
+            const contentId = a.contentId.replace(/[<>]/g, '');
+            return completeMessage.content.indexOf(`cid:${contentId}`) >= 0;
+          })
           .forEach(a => _readContent(dispatch, credentials, folder, message, signal, a));
-      }).catch(() => dispatch(aBackendRequestCompleted()));
+      });
   }
 }
 

@@ -11,6 +11,7 @@ export const INITIAL_STATE = {
     selectedFolderId: {},
     renameFolderId: null,
     selectedMessage: null,
+    downloadedMessages: {},
     outbox: null,
     pollInterval: 15000,
     errors: {

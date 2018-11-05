@@ -28,24 +28,38 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
     }
     case ActionTypes.APPLICATION_MESSAGE_SELECT:
       return {...state, selectedMessage: {...action.payload}};
-    case ActionTypes.APPLICATION_MESSAGE_REFRESH:
+    case ActionTypes.APPLICATION_MESSAGE_REFRESH: {
+      const newState = {...state};
+      const message = action.payload.message;
+      // Store in application.downloadedMessages
+      newState.downloadedMessages[message.messageId] = message;
+      // Update selected message if is currently selected
       if (state.selectedFolderId === action.payload.folder.folderId
-        && state.selectedMessage.uid === action.payload.message.uid) {
-        return {...state, selectedMessage: {...action.payload.message}};
+        && state.selectedMessage.uid === message.uid) {
+        newState.selectedMessage = {...message};
       }
-      return state;
+      return newState;
+    }
     case ActionTypes.APPLICATION_MESSAGE_REPLACE_IMAGE: {
-      if (state.selectedFolder.folderId === action.payload.folder.folderId
-        && state.selectedMessage.uid === action.payload.message.uid) {
-        const contentId = action.payload.attachment.contentId.replace(/[<>]/g, '');
-        if (contentId.length > 0) {
-          const objectUrl = URL.createObjectURL(action.payload.blob);
-          // Multiple occurrence
-          const parsedMessage = state.selectedMessage.content.replace(new RegExp(`cid:${contentId}`, 'g'), objectUrl);
-          return {...state, selectedMessage: {...state.selectedMessage, content: parsedMessage}};
+      const newState = {...state};
+      const folder = action.payload.folder;
+      const message = action.payload.message;
+      const attachment = action.payload.attachment;
+      const contentId = attachment.contentId.replace(/[<>]/g, '');
+      const regex = new RegExp(`cid:${contentId}`, 'g'); // Multiple occurrence -> ReplaceAll
+      if (contentId.length > 0) {
+        const objectUrl = URL.createObjectURL(action.payload.blob);
+        // Store in application.downloadedMessages
+        newState.downloadedMessages[message.messageId].content =
+          newState.downloadedMessages[message.messageId].content.replace(regex, objectUrl);
+        // Update selected message if applicable
+        if (newState.selectedFolder.folderId === folder.folderId
+          && newState.selectedMessage.uid === message.uid) {
+          const parsedMessage = newState.selectedMessage.content.replace(regex, objectUrl);
+          newState.selectedMessage = {...newState.selectedMessage, content: parsedMessage};
         }
       }
-      return state;
+      return newState;
     }
     case ActionTypes.APPLICATION_ERROR_SET:
       const errorsSetState = {...state};

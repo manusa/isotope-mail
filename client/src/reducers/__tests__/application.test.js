@@ -11,6 +11,7 @@ describe('Application reducer test suite', () => {
     expect(applicationDefaultState).toHaveProperty('selectedFolderId', {});
     expect(applicationDefaultState).toHaveProperty('renameFolderId', null);
     expect(applicationDefaultState).toHaveProperty('selectedMessage', null);
+    expect(applicationDefaultState).toHaveProperty('downloadedMessages', {});
     expect(applicationDefaultState).toHaveProperty('outbox', null);
     expect(applicationDefaultState).toHaveProperty('pollInterval');
     expect(applicationDefaultState).toHaveProperty('errors.diskQuotaExceeded', false);
