@@ -103,44 +103,54 @@ export function readMessage(dispatch, credentials, downloadedMessages, folder, m
   abortControllerWrappers.readMessageAbortController = new AbortController();
   const signal = abortControllerWrappers.readMessageAbortController.signal;
 
+  const fetchMessage = () => {
+    dispatch(aBackendRequest());
+    return fetch(message._links.self.href, {
+      method: 'GET',
+      headers: credentialsHeaders(credentials),
+      signal: signal
+    })
+      .then(response => {
+        dispatch(aBackendRequestCompleted());
+        return response;
+      })
+      .then(toJson)
+      .catch(() => dispatch(aBackendRequestCompleted()));
+  };
+
   if (message && message._links) {
     const downloadedMessage = downloadedMessages[message.messageId];
     let $message;
     if (downloadedMessage) {
       // Read message from application.downloadedMessages cache
-      // Update target message (keep content), message may have been moved/read/...
-      const updatedMessage = {...message, folder: {...folder}};
+      // //////////////////////////////////////////////////////
+      // Update cached/downloaded message (keep content), message may have been moved/read/...
+      let updatedMessage = {...message, folder: {...folder}, seen: true};
       Object.entries(updatedMessage)
         .filter(entry => entry[1] === null // Remove empty arrays/strings...
           || entry[1].length === 0) // Remove null attributes
         .forEach(([key]) => delete updatedMessage[key]);
-      $message = Promise.resolve(Object.assign({...downloadedMessage}, updatedMessage));
+      updatedMessage = Object.assign({...downloadedMessage}, updatedMessage);
+      // Show optimistic version of updated downloadedMessage
+      dispatch(refreshMessage(folder, updatedMessage));
+      // Read message from BE to update links (attachments) and other mutable properties
+      $message = fetchMessage()
+        .then(completeMessage => (
+          Promise.resolve({...completeMessage, content: updatedMessage.content})
+        ));
     } else {
       // Read message from BE
-      dispatch(aBackendRequest());
-      $message = fetch(message._links.self.href, {
-        method: 'GET',
-        headers: credentialsHeaders(credentials),
-        signal: signal
-      })
-        .then(response => {
-          dispatch(aBackendRequestCompleted());
-          return response;
-        })
-        .then(toJson)
-        .then(completeMessage => {
-          // Update folder with freshest information
-          dispatch(updateFolder(completeMessage.folder));
-          // Update folder cache with message marked as read (don't store content in cache)
-          const messageWithNoContent = {...completeMessage};
-          delete messageWithNoContent.content;
-          dispatch(updateCache(folder, [messageWithNoContent]));
-          return Promise.resolve(completeMessage);
-        })
-        .catch(() => dispatch(aBackendRequestCompleted()));
+      $message = fetchMessage();
     }
     $message
       .then(completeMessage => {
+        // Update folder with freshest BE information
+        dispatch(updateFolder(completeMessage.folder));
+        // Update folder cache with message marked as read (don't store content in cache)
+        const messageWithNoContent = {...completeMessage};
+        delete messageWithNoContent.content;
+        dispatch(updateCache(folder, [messageWithNoContent]));
+        // Refresh message view
         dispatch(refreshMessage(folder, completeMessage));
         // Read message's embedded images if used in message content
         completeMessage.attachments

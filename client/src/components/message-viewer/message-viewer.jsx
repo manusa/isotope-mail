@@ -50,7 +50,7 @@ class MessageViewer extends Component {
           <HeaderTo className={styles.to} recipients={message.recipients} />
         </div>
         <div className={styles.body}>
-          <Spinner visible={this.props.activeRequests > 0}/>
+          <Spinner visible={this.props.activeRequests > 0 && !message.content}/>
           <div className={styles.attachments}>
             {attachments.map((a, index) => <AttachmentCard key={index} attachment={a} />)}
           </div>
