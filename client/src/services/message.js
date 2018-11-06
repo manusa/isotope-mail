@@ -108,7 +108,13 @@ export function readMessage(dispatch, credentials, downloadedMessages, folder, m
     let $message;
     if (downloadedMessage) {
       // Read message from application.downloadedMessages cache
-      $message = Promise.resolve(downloadedMessage);
+      // Update target message (keep content), message may have been moved/read/...
+      const updatedMessage = {...message, folder: {...folder}};
+      Object.entries(updatedMessage)
+        .filter(entry => entry[1] === null // Remove empty arrays/strings...
+          || entry[1].length === 0) // Remove null attributes
+        .forEach(([key]) => delete updatedMessage[key]);
+      $message = Promise.resolve(Object.assign({...downloadedMessage}, updatedMessage));
     } else {
       // Read message from BE
       dispatch(aBackendRequest());
