@@ -29,7 +29,12 @@
   "messageEditor": {
     "to": "to",
     "cc": "cc",
-    "bcc": "bcc"
+    "bcc": "bcc",
+    "insertLinkDialog": {
+      "title": "Insert Link",
+      "cancel": "Cancel",
+      "ok": "Ok"
+    }
   },
   "replyAction": {
     "From": "From",

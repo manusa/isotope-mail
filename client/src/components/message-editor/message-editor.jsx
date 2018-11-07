@@ -3,41 +3,32 @@ import {connect} from 'react-redux';
 import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
 import {Editor} from '@tinymce/tinymce-react';
+import EDITOR_BUTTONS from './editor-buttons';
+import EDITOR_CONFIG from './editor-config';
 import HeaderAddress from './header-address';
 import MceButton from './mce-button';
-import {EDITOR_BUTTONS} from './editor-buttons';
+import InsertLinkDialog from './insert-link-dialog';
 import {editMessage} from '../../actions/application';
 import {sendMessage} from '../../services/smtp';
 import {persistApplicationNewMessageContent} from '../../services/indexed-db';
-import mainCss from '../../styles/main.scss';
 import styles from './message-editor.scss';
+import mainCss from '../../styles/main.scss';
 
 const EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED = 50;
-
-const EDITOR_CONFIG = {
-  menubar: false,
-  statusbar: false,
-  toolbar: false,
-  plugins: 'autoresize lists',
-  content_style: 'body {padding:0}', // DOESN'T WORK
-  browser_spellcheck: true,
-  paste_data_images: true,
-  entity_encoding: 'named', // Converts characters to html entities ' ' > &nbsp;
-  formats: {
-    isotope_code: {
-      block: 'pre', classes: ['code']
-    }
-  }
-};
 
 class MessageEditor extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      linkDialogVisible: false,
+      linkDialogUrl: '',
+      // Stores state of current selection in the dialog (is title, underlined... H1, H2, ..., italic, underline)
+      // Used in editor buttons to activate/deactivate them
       editorState: {}
     };
 
     this.editorRef = React.createRef();
+    this.handleSetState = patchedState => this.setState(patchedState);
     this.handleSubmit = this.submit.bind(this);
     // Header Address Events
     this.handleOnHeaderKeyPress = this.onHeaderKeyPress.bind(this);
@@ -49,6 +40,7 @@ class MessageEditor extends Component {
     this.handleEditorChange = this.editorChange.bind(this);
     this.handleEditorBlur = this.editorBlur.bind(this);
     this.handleSelectionChange = this.selectionChange.bind(this);
+    this.handleEditorInsertLink = this.editorInsertLink.bind(this);
   }
 
   render() {
@@ -99,6 +91,12 @@ class MessageEditor extends Component {
             delete
           </button>
         </div>
+        <InsertLinkDialog
+          visible={this.state.linkDialogVisible}
+          closeDialog={() => this.setState({linkDialogVisible: false, linkDialogInitialUrl: ''})}
+          onChange={e => this.setState({linkDialogUrl: e.target.value})}
+          url={this.state.linkDialogUrl} insertLink={this.handleEditorInsertLink}
+        />
       </div>
     );
   }
@@ -113,7 +111,7 @@ class MessageEditor extends Component {
           active={this.state.editorState && this.state.editorState[k] === true}
           label={b.label}
           icon={b.icon}
-          onToggle={() => b.toggleFunction(this.getEditor(), b)}
+          onToggle={() => b.toggleFunction(this.getEditor(), b, this.handleSetState)}
         />))}
     </div>;
   }
@@ -220,6 +218,11 @@ class MessageEditor extends Component {
       const editor = this.getEditor();
       const items = pasteEvent.clipboardData.items;
 
+      const insertBlob = (type, e) => {
+        const objectUrl = URL.createObjectURL(new Blob([e.target.result], {type}));
+        editor.execCommand('mceInsertContent', false, `<img alt="" src="${objectUrl}"/>`);
+      };
+
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
         if (item.type.indexOf('image/') === 0) {
@@ -229,14 +232,32 @@ class MessageEditor extends Component {
           // Data is Pasted as File(Blob), it's read with FileReader again, and reconverted to Blob to create ObjectUrl
           const blobReader = new FileReader();
           const type = item.type;
-          blobReader.onload = e => {
-            const objectUrl = URL.createObjectURL(new Blob([e.target.result], {type}));
-            editor.execCommand('mceInsertContent', false, `<img alt="" src="${objectUrl}"/>`);
-          };
+
+          blobReader.onload = insertBlob.bind(null, [type]);
           blobReader.readAsArrayBuffer(item.getAsFile());
         }
       }
     }
+  }
+
+  editorInsertLink() {
+    let href = this.state.linkDialogUrl;
+    if (href.indexOf('://') < 0 && href.indexOf('mailto:') < 0) {
+      href = `http://${href}`;
+    }
+    const editor = this.getEditor();
+    const selection = editor.selection;
+    if (!selection
+      || (selection.getContent().length === 0
+        && selection.getNode().tagName !== 'A'
+        && selection.getNode().parentNode.tagName !== 'A')) {
+      // Insert new Link
+      editor.execCommand('mceInsertContent', false, `<a href="${href}">${href}</a>`);
+    } else {
+      // Edit existing link in current node or create link with current selection
+      editor.execCommand('mceInsertLink', false, href);
+    }
+    this.setState({linkDialogVisible: false});
   }
 
   selectionChange() {

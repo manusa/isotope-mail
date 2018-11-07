@@ -1,3 +1,6 @@
+function _alwaysFalse() {
+  return false;
+}
 
 function _isStyled({editor, button}) {
   if (!editor || !editor.selection) {
@@ -14,6 +17,10 @@ function _isBlockStyledFromParent({key, node}) {
   return node.closest(key) !== null;
 }
 
+function _isBlockLink({node}) {
+  return _isBlockStyled({key: 'A', node}) || node.parentElement.tagName === 'A';
+}
+
 function _toggleStyle(editor, button) {
   editor.execCommand(button.command);
 }
@@ -27,7 +34,18 @@ function _toggleBlockStyle(editor, button) {
   editor.execCommand('FormatBlock', false, button.blockCommand);
 }
 
-export const EDITOR_BUTTONS = {
+function _editLink(editor, button, parentSetState) {
+  let linkDialogUrl = '';
+  const node = editor.selection.getNode();
+  if (node.tagName === 'A') {
+    linkDialogUrl = node.getAttribute('href');
+  } else if (node.parentNode && node.parentNode.tagName === 'A') { // Images / <spans> for styles / ...
+    linkDialogUrl = node.parentNode.getAttribute('href');
+  }
+  parentSetState({linkDialogVisible: true, linkDialogUrl});
+}
+
+const editorButtons = {
   bold: {
     command: 'bold', icon: 'format_bold',
     activeFunction: _isStyled, toggleFunction: _toggleStyle},
@@ -45,13 +63,13 @@ export const EDITOR_BUTTONS = {
     activeFunction: _isBlockStyledFromParent, toggleFunction: _toggleStyle},
   outdent: {
     command: 'Outdent', icon: 'format_indent_decrease',
-    activeFunction: () => false, toggleFunction: _toggleStyle},
+    activeFunction: _alwaysFalse, toggleFunction: _toggleStyle},
   indent: {
     command: 'Indent', icon: 'format_indent_increase',
-    activeFunction: () => false, toggleFunction: _toggleStyle},
+    activeFunction: _alwaysFalse, toggleFunction: _toggleStyle},
   clear_format: {
     command: 'RemoveFormat', icon: 'format_clear',
-    activeFunction: () => false, toggleFunction: _toggleStyle},
+    activeFunction: _alwaysFalse, toggleFunction: _toggleStyle},
   H1: {
     blockCommand: 'h1', label: 'H1', activeFunction: _isBlockStyled, toggleFunction: _toggleBlockStyle},
   H2: {
@@ -67,7 +85,15 @@ export const EDITOR_BUTTONS = {
   code: {
     blockCommand: 'isotope_code', icon: 'code',
     activeFunction: ({node}) => node.tagName === 'PRE' && node.className === 'code',
-    toggleFunction: _toggleBlockStyle}
+    toggleFunction: _toggleBlockStyle},
+  link: {
+    icon: 'link',
+    activeFunction: _isBlockLink,
+    toggleFunction: _editLink},
+  unlink: {
+    command: 'unlink', icon: 'link_off',
+    activeFunction: _alwaysFalse,
+    toggleFunction: _toggleStyle}
 };
 
-export default EDITOR_BUTTONS;
+export default editorButtons;
