@@ -10,7 +10,7 @@ class FolderList extends Component {
     const {folderList, selectedFolder} = this.props;
     return (
       folderList.map(folder =>
-        <li key={folder.fullURL} className={`${styles.itemContainer}`}>
+        <div key={folder.fullURL} className={`${styles.itemContainer}`}>
           <FolderItem label={folder.name} graphic={folder.type.icon}
             selected={selectedFolder && folder.folderId === selectedFolder.folderId}
             onClick={event => this.onClick(event, folder)}
@@ -28,7 +28,7 @@ class FolderList extends Component {
             </nav> :
             null
           )}
-        </li>
+        </div>
       )
     );
   }
