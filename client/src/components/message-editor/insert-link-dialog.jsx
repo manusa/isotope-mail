@@ -5,7 +5,7 @@ import TextField from '../form/text-field/text-field';
 import {translate} from 'react-i18next';
 import mainCss from '../../styles/main.scss';
 
-class InsertLinkDialog extends Component {
+export class InsertLinkDialog extends Component {
   constructor(props) {
     super(props);
     this.handleTextfieldKeyDown = this.textfieldKeyDown.bind(this);

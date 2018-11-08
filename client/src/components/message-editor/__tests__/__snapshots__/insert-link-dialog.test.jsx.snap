@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InsertLinkDialog component test suite Snapshot render, should render InsertLinkDialog 1`] = `
+<Dialog
+  actions={
+    Array [
+      Object {
+        "action": [Function],
+        "label": "messageEditor.insertLinkDialog.cancel",
+      },
+      Object {
+        "action": [Function],
+        "label": "messageEditor.insertLinkDialog.ok",
+      },
+    ]
+  }
+  className=""
+  containerClassName=""
+  contentClassName=""
+  scrimClick={[Function]}
+  title="messageEditor.insertLinkDialog.title"
+  visible={true}
+>
+  <form>
+    <TextField
+      autoComplete="off"
+      fieldClass="mdc-text-field--fullwidth"
+      focused={true}
+      id="link"
+      inputClass=""
+      labelClass=""
+      lineRippleClass=""
+      min=""
+      minLength={null}
+      onChange={[Function]}
+      onKeyDown={[Function]}
+      onKeyPress={null}
+      required={false}
+      type="text"
+      value="http://blog.marcnuri.com"
+    />
+  </form>
+</Dialog>
+`;

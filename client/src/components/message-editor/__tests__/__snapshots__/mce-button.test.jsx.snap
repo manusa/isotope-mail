@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MceButton component test suite Snapshot render with no icon and inactive, should render MceButton 1`] = `
+<button
+  className="mdc-button Worker Class "
+  onMouseDown={[Function]}
+/>
+`;
+
+exports[`MceButton component test suite Snapshot render, should render MceButton 1`] = `
+<button
+  className="mdc-button Worker Class It's a free world"
+  onMouseDown={[Function]}
+>
+  <i
+    aria-hidden="true"
+    className="material-icons mdc-button__icon"
+  >
+    Roy Lichtenstein
+  </i>
+</button>
+`;
