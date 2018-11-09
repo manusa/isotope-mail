@@ -146,9 +146,10 @@ module.exports = {
       filename: devMode ? '[name].css' : '[name].[hash].css',
       chunkFilename: devMode ? '[id].css' : '[id].[hash].css',
     }),
-    new CopyWebpackPlugin([{
-      from: ASSETS_DIR, fromArgs: {cache: false}, to: `assets`, force: true
-    }], {
+    new CopyWebpackPlugin([
+      {from: ASSETS_DIR, fromArgs: {cache: false}, to: `assets`, force: true},
+      {from: `${SRC_DIR}/favicon.ico`, to: '', force: true}
+    ], {
       copyUnmodified: true
     })
   ],
