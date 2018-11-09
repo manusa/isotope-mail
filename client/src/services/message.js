@@ -149,7 +149,7 @@ export function readMessage(dispatch, credentials, downloadedMessages, folder, m
         // Update folder cache with message marked as read (don't store content in cache)
         const messageWithNoContent = {...completeMessage};
         delete messageWithNoContent.content;
-        dispatch(updateCache(folder, [messageWithNoContent]));
+        dispatch(updateCacheIfExist(folder, [messageWithNoContent]));
         // Refresh message view
         dispatch(refreshMessage(folder, completeMessage));
         // Read message's embedded images if used in message content
@@ -263,12 +263,9 @@ export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
     body: JSON.stringify(messagesToUpdate.map(m => m.uid))
   })
     .then(toJson)
-    .then(updatedMessages => {
-      if (Array.isArray(updatedMessages) && updatedMessages.length > 0) {
-        dispatch(updateCacheIfExist(folder, updatedMessages));
-        // Update folder info with the last message (contains the most recent information)
-        dispatch(updateFolder(updatedMessages[updatedMessages.length - 1].folder));
-      }
+    .then(() => {
+      // Message and folder information was inferred previously, don't dispatch any actions as this information
+      // can be updated
     })
     .catch(() => {
       // Rollback state from dispatched expected responses
