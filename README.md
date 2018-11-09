@@ -7,6 +7,25 @@ Microservice based webmail client.
 
 This webmail client is still in a very early stage, use at your own risk.
 
+## TL;DR
+
+If you just want to check out the current status of the project you can deploy the application
+using the example traefik docker-compose.
+
+Just run the following commands:
+
+```
+git clone https://github.com/manusa/isotope-mail.git
+cd isotope-mail/docker/traefik
+docker-compose pull && docker-compose up --force-recreate
+```
+
+Point your browser to [localhost](http://localhost) and login using the credentials of your mailserver.
+
+<p>
+  <img src="doc/tldr-isotope-deploy.gif" />
+</p>
+
 ## Demo
 
 You can see the latest snapshot version in action at: [isotope.marcnuri.com](https://isotope.marcnuri.com/login?serverHost=isotope&user=isotope&smtpPort=25&smtpSsl=false)
