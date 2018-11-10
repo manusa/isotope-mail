@@ -13,10 +13,39 @@ $editor-background-color: white !default;
 $editor-border-color: lighten($mdc-theme-primary, 50%) !default;
 
 .message-editor {
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: $default-spacing;
   background-color: $editor-background-color;
+
+  .dropZone {
+    pointer-events: none;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.05);
+
+    .dropZoneMessage {
+      pointer-events: none;
+      position: absolute;
+      left: $default-spacing;
+      top: $default-spacing;
+      bottom: $default-spacing;
+      right: $default-spacing;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border: 4px dashed lighten($base-color, 50%);
+      border-radius: $default-spacing;
+      color: lighten($base-color, 40%);
+      font-size: 2.125 * $font-size-body;
+      text-align: center;
+    }
+  }
 
   .header {
 
@@ -87,11 +116,50 @@ $editor-border-color: lighten($mdc-theme-primary, 50%) !default;
 
     .editor-container {
       flex: 1;
+
+      display: flex;
+      flex-direction: column;
       overflow: auto;
       height: 1px;
       min-height: 1px;
       padding: $editor-container-padding;
       margin-bottom: $editor-container-padding;
+
+      .attachments {
+        margin-top: auto;
+
+        .attachment {
+          position: relative;
+          margin: 0 0 9px;
+          padding: 4px;
+          border: 1px solid transparent;
+          background-color: #f5f5f5;
+          font-size: $font-size-body-2;
+
+          display: flex;
+          align-items: center;
+
+          .fileName {
+            font-weight: $font-weight-bold;
+          }
+
+          .size {
+            margin-left: 4px;
+            font-size: $font-size-body-2 * 0.8;
+          }
+
+          .delete {
+            margin-left: auto;
+            min-width: auto;
+            height: 18px;
+            padding-right: 0px;
+
+            > i {
+              padding: 0px;
+            }
+          }
+        }
+      }
     }
 
     .button-container {

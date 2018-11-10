@@ -7,7 +7,8 @@ import {messageSent, sendMessage as sendMessageAction, sendMessageUpdateProgress
 
 const SNACKBAR_DURATION = 4000;
 
-export function sendMessage(dispatch, credentials, {inReplyTo = [], references = [], to, cc, bcc, subject, content}) {
+export function sendMessage(
+  dispatch, credentials, {inReplyTo = [], references = [], to, cc, bcc, attachments = [], subject, content}) {
   const message = {
     recipients: [
       ...to.map(address => ({type: 'To', address: address})),
@@ -16,8 +17,9 @@ export function sendMessage(dispatch, credentials, {inReplyTo = [], references =
     ],
     inReplyTo,
     references,
+    attachments,
     subject: subject,
-    content: sanitize.sanitize(content)
+    content: sanitize.sanitize(content),
   };
   const postMessageRequest = new XMLHttpRequest();
   postMessageRequest.open('POST', URLS.SMTP);

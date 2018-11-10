@@ -22,6 +22,7 @@ package com.marcnuri.isotope.api.smtp;
 
 import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.exception.IsotopeException;
+import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
 import com.marcnuri.isotope.api.message.MessageUtils;
 import com.sun.mail.util.MailSSLSocketFactory;
@@ -32,6 +33,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 
+import javax.activation.DataHandler;
 import javax.annotation.PreDestroy;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -40,6 +42,7 @@ import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 import java.util.Date;
 import java.util.Properties;
 import java.util.UUID;
@@ -120,6 +123,18 @@ public class SmtpService {
                 cidImagePart.setContentID(String.format("<%s>",cid));
                 cidImagePart.setFileName(String.format("%s.%s", cid, contentType.substring(contentType.indexOf('/') + 1)));
                 finalContent = finalContent.replace(matcher.group(), "\"cid:" +cid +"\"");
+            }
+
+            // Include attachments
+            if (message.getAttachments() != null && !message.getAttachments().isEmpty()) {
+                for (Attachment attachment : message.getAttachments()) {
+                    final MimeBodyPart mimeAttachment = new MimeBodyPart();
+                    multipart.addBodyPart(mimeAttachment);
+                    mimeAttachment.setDisposition(MimeBodyPart.ATTACHMENT);
+                    mimeAttachment.setDataHandler(new DataHandler(
+                            new ByteArrayDataSource(attachment.getContent(), attachment.getContentType())));
+                    mimeAttachment.setFileName(attachment.getFileName());
+                }
             }
 
             // Create body part

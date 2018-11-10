@@ -30,6 +30,8 @@
     "to": "para",
     "cc": "cc",
     "bcc": "bcc",
+    "subject": "Asunto",
+    "dropZoneMessage": "Deposita aquí ficheros",
     "insertLinkDialog": {
       "title": "Insertar Enlace",
       "cancel": "Cancelar",

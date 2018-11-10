@@ -148,7 +148,7 @@ export async function persistState(dispatch, state) {
     if (newState.application.newMessage) {
       // Persist everything from application.newMessage except content (persisted independently in message-editor
       // in a different db store
-      newState.application.newMessage = {...newState.application.newMessage, content: ''};
+      newState.application.newMessage = {...newState.application.newMessage, attachments: [], content: ''};
     } else {
       // Delete any application.newMessage.content entry in the database
       await _deleteApplicationNewMessageContent(state.application);

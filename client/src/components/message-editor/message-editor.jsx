@@ -13,6 +13,8 @@ import {sendMessage} from '../../services/smtp';
 import {persistApplicationNewMessageContent} from '../../services/indexed-db';
 import styles from './message-editor.scss';
 import mainCss from '../../styles/main.scss';
+import {prettySize} from '../../services/prettify';
+import Button from '../buttons/button';
 
 const EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED = 50;
 
@@ -22,6 +24,7 @@ class MessageEditor extends Component {
     this.state = {
       linkDialogVisible: false,
       linkDialogUrl: '',
+      dropZoneActive: false,
       // Stores state of current selection in the dialog (is title, underlined... H1, H2, ..., italic, underline)
       // Used in editor buttons to activate/deactivate them
       editorState: {}
@@ -30,6 +33,10 @@ class MessageEditor extends Component {
     this.editorRef = React.createRef();
     this.handleSetState = patchedState => this.setState(patchedState);
     this.handleSubmit = this.submit.bind(this);
+    // Global events
+    this.handleOnDrop = this.onDrop.bind(this);
+    this.handleOnDragOver = this.onDragOver.bind(this);
+    this.handleOnDragLeave = this.onDragLeave.bind(this);
     // Header Address Events
     this.handleOnHeaderKeyPress = this.onHeaderKeyPress.bind(this);
     this.handleOnHeaderBlur = this.onHeaderBlur.bind(this);
@@ -44,9 +51,16 @@ class MessageEditor extends Component {
   }
 
   render() {
-    const {t, className, close, application, to, cc, bcc, subject, content} = this.props;
+    const {t, className, close, application, to, cc, bcc, attachments, subject, content} = this.props;
     return (
-      <div className={`${className} ${styles['message-editor']}`}>
+      <div
+        className={`${className} ${styles['message-editor']}`}
+        onDrop={this.handleOnDrop} onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave}>
+        {this.state.dropZoneActive ?
+          <div className={styles.dropZone}>
+            <div className={styles.dropZoneMessage}>{t('messageEditor.dropZoneMessage')}</div>
+          </div>
+          : null}
         <div className={styles.header}>
           <HeaderAddress id={'to'} addresses={to} onKeyPress={this.handleOnHeaderKeyPress}
             onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
@@ -58,7 +72,7 @@ class MessageEditor extends Component {
             onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
             className={styles.address} chipClassName={styles.chip} label={t('messageEditor.bcc')} />
           <div className={styles.subject}>
-            <input type={'text'} placeholder={'Subject'}
+            <input type={'text'} placeholder={t('messageEditor.subject')}
               value={subject} onChange={this.handleOnSubjectChange} />
           </div>
         </div>
@@ -76,6 +90,15 @@ class MessageEditor extends Component {
               inline={true}
               init={EDITOR_CONFIG}
             />
+            <div className={styles.attachments}>
+              {attachments.map((a, index) =>
+                <div key={index} className={styles.attachment}>
+                  <span className={styles.fileName}>{a.fileName}</span>
+                  <span className={styles.size}>({prettySize(a.size)})</span>
+                  <Button className={styles.delete} icon={'delete'} onClick={() => this.removeAttachment(a)}/>
+                </div>
+              )}
+            </div>
           </div>
           {this.renderEditorButtons()}
         </div>
@@ -161,6 +184,7 @@ class MessageEditor extends Component {
     const updatedMessage = {...this.props.editedMessage};
     this.props.editMessage({...updatedMessage, subject: target.value});
   }
+
   /**
    * Adds an address to the list matching the id and value in the provided event target.
    *
@@ -173,6 +197,50 @@ class MessageEditor extends Component {
       updatedMessage[target.id] = [...updatedMessage[target.id], target.value.replace(/;/g, '')];
       this.props.editMessage(updatedMessage);
       target.value = '';
+    }
+  }
+
+  onDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.setState({dropZoneActive: false});
+    const addAttachment = (file, dataUrl) => {
+      const newAttachment = {
+        fileName: file.name,
+        size: file.size,
+        contentType: file.type,
+        content: dataUrl.currentTarget.result.replace(/^data:[^;]*;base64,/, '')
+      };
+      const updatedMessage = {...this.props.editedMessage};
+      updatedMessage.attachments = updatedMessage.attachments ?
+        [...updatedMessage.attachments, newAttachment] : [newAttachment];
+      this.props.editMessage(updatedMessage);
+    };
+    Array.from(event.dataTransfer.files).forEach(file => {
+      const fileReader = new FileReader();
+      fileReader.onload = addAttachment.bind(this, file);
+      fileReader.readAsDataURL(file);
+    });
+    return true;
+  }
+
+  onDragOver(event) {
+    event.preventDefault();
+    if (event.dataTransfer.types && Array.from(event.dataTransfer.types).indexOf('Files') >= 0) {
+      this.setState({dropZoneActive: true});
+    }
+  }
+
+  onDragLeave(event) {
+    event.preventDefault();
+    this.setState({dropZoneActive: false});
+  }
+
+  removeAttachment(attachment) {
+    const updatedMessage = {...this.props.editedMessage};
+    if (updatedMessage.attachments && updatedMessage.attachments.length) {
+      updatedMessage.attachments = updatedMessage.attachments.filter(a => a !== attachment);
+      this.props.editMessage(updatedMessage);
     }
   }
 
@@ -296,6 +364,7 @@ const mapStateToProps = state => ({
   to: state.application.newMessage.to,
   cc: state.application.newMessage.cc,
   bcc: state.application.newMessage.bcc,
+  attachments: state.application.newMessage.attachments,
   subject: state.application.newMessage.subject,
   editor: state.application.newMessage.editor,
   content: state.application.newMessage.content
@@ -311,8 +380,8 @@ const mapDispatchToProps = dispatch => ({
   editMessage: message => {
     dispatch(editMessage(message));
   },
-  sendMessage: (credentials, {inReplyTo = [], references = [], to, cc, bcc, subject, content}) =>
-    sendMessage(dispatch, credentials, {inReplyTo, references, to, cc, bcc, subject, content})
+  sendMessage: (credentials, {inReplyTo, references, to, cc, bcc, attachments, subject, content}) =>
+    sendMessage(dispatch, credentials, {inReplyTo, references, to, cc, bcc, attachments, subject, content})
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(translate()(MessageEditor));

@@ -20,6 +20,7 @@
  */
 package com.marcnuri.isotope.api.message;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.marcnuri.isotope.api.resource.IsotopeResource;
 
 import java.io.Serializable;
@@ -28,6 +29,7 @@ import java.util.Objects;
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-09-11.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Attachment extends IsotopeResource implements Serializable {
 
     private static final long serialVersionUID = 4001902363078332347L;
@@ -36,6 +38,7 @@ public class Attachment extends IsotopeResource implements Serializable {
     private String fileName;
     private String contentType;
     private Integer size;
+    private byte[] content;
 
     public Attachment(String contentId, String fileName, String contentType, Integer size) {
         this.contentId = contentId;
@@ -74,6 +77,14 @@ public class Attachment extends IsotopeResource implements Serializable {
 
     public void setSize(Integer size) {
         this.size = size;
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public void setContent(byte[] content) {
+        this.content = content;
     }
 
     @Override
