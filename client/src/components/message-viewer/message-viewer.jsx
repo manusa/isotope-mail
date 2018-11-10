@@ -37,7 +37,7 @@ class MessageViewer extends Component {
           </h1>
           <div className={styles.fromDate}>
             <div className={styles.from}>
-              <span className={styles.name}>{firstFrom.name}</span>
+              <span className={styles.fromName}>{firstFrom.name}</span>
               <span className={styles.email}>{firstFrom.email}</span>
             </div>
             <div className={styles.date}>

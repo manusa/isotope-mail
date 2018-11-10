@@ -58,7 +58,10 @@ class MessageEditor extends Component {
         onDrop={this.handleOnDrop} onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave}>
         {this.state.dropZoneActive ?
           <div className={styles.dropZone}>
-            <div className={styles.dropZoneMessage}>{t('messageEditor.dropZoneMessage')}</div>
+            <div className={styles.dropZoneMessage}>
+              <i className={'material-icons'}>attach_file</i>
+              {t('messageEditor.dropZoneMessage')}
+            </div>
           </div>
           : null}
         <div className={styles.header}>
@@ -94,7 +97,7 @@ class MessageEditor extends Component {
               {attachments.map((a, index) =>
                 <div key={index} className={styles.attachment}>
                   <span className={styles.fileName}>{a.fileName}</span>
-                  <span className={styles.size}>({prettySize(a.size)})</span>
+                  <span className={styles.size}>({prettySize(a.size, 0)})</span>
                   <Button className={styles.delete} icon={'delete'} onClick={() => this.removeAttachment(a)}/>
                 </div>
               )}
@@ -107,7 +110,7 @@ class MessageEditor extends Component {
             className={`${mainCss['mdc-button']} ${mainCss['mdc-button--unelevated']}
             ${styles['action-button']} ${styles.send}`}
             disabled={to.length + cc.length + bcc.length === 0} onClick={this.handleSubmit}>
-            Send
+            {t('messageEditor.send')}
           </button>
           <button className={`material-icons ${mainCss['mdc-icon-button']} ${styles['action-button']} ${styles.cancel}`}
             onClick={() => close(application)}>

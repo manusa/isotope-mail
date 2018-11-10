@@ -36,13 +36,13 @@ export function prettyDate(date) {
  * @param size {number}
  * @returns {string}
  */
-export function prettySize(size) {
+export function prettySize(size, decimalPlaces = 2) {
   const divisor = 1024;
   if (size < Math.pow(divisor, 2)) {
-    return `${round(size / divisor, 2)} KiB`;
+    return `${round(size / divisor, decimalPlaces)} KiB`;
   } else if (size < Math.pow(divisor, 3)) {
-    return `${round(size / Math.pow(divisor, 2), 2)} MiB`;
+    return `${round(size / Math.pow(divisor, 2), decimalPlaces)} MiB`;
   }
-  return `${round(size / Math.pow(divisor, 3), 2)} GiB`;
+  return `${round(size / Math.pow(divisor, 3), decimalPlaces)} GiB`;
 }
 

@@ -22,6 +22,7 @@ $editor-border-color: lighten($mdc-theme-primary, 50%) !default;
   .dropZone {
     pointer-events: none;
     position: absolute;
+    z-index: 2;
     top: 0px;
     left: 0px;
     height: 100%;
@@ -44,6 +45,10 @@ $editor-border-color: lighten($mdc-theme-primary, 50%) !default;
       color: lighten($base-color, 40%);
       font-size: 2.125 * $font-size-body;
       text-align: center;
+
+      i {
+        font-size: 3 * $font-size-body;
+      }
     }
   }
 
