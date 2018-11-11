@@ -3,7 +3,7 @@ import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
 import mainCss from '../../styles/main.scss';
 
-class HeaderAddress extends Component {
+export class HeaderAddress extends Component {
   constructor(props) {
     super(props);
     this.inputRef = React.createRef();

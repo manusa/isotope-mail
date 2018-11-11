@@ -11,13 +11,13 @@ class MceButton extends Component {
   }
 
   render() {
-    const {className, activeClassName, active, icon, label} = this.props;
+    const {className, activeClassName, iconClassName, active, icon, label} = this.props;
     return (
       <button className={`mdc-button ${className} ${active ? activeClassName : ''}`}
         onMouseDown={this.handleOnToggle}
       >
         {icon ?
-          <i className="material-icons mdc-button__icon" aria-hidden="true">{icon}</i> : null
+          <i className={`material-icons mdc-button__icon ${iconClassName}`} aria-hidden="true">{icon}</i> : null
         }
         {label}
       </button>
@@ -28,6 +28,7 @@ class MceButton extends Component {
 MceButton.propTypes = {
   className: PropTypes.string,
   activeClassName: PropTypes.string,
+  iconClassName: PropTypes.string,
   active: PropTypes.bool.isRequired,
   icon: PropTypes.string,
   label: PropTypes.string,
@@ -37,6 +38,7 @@ MceButton.propTypes = {
 MceButton.defaultProps = {
   className: '',
   activeClassName: '',
+  iconClassName: '',
   icon: null,
   label: '',
   onToggle: () => {}

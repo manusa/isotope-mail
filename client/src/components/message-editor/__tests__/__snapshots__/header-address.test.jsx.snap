@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HeaderAddress component test suite Snapshot render, should render HeaderAddress 1`] = `
+<div
+  className="Business"
+  onClick={[Function]}
+>
+  <label>
+    BlackLabel12yrs
+    :
+  </label>
+  <div
+    className="FirstClassChips mdc-chip"
+    key="0"
+  >
+    <div
+      className="mdc-chip__text"
+    >
+      name@email.com
+    </div>
+    <i
+      className="material-icons mdc-chip__icon
+               mdc-chip__icon--trailing"
+      onClick={[Function]}
+    >
+      cancel
+    </i>
+  </div>
+  <div
+    className="FirstClassChips mdc-chip"
+    key="1"
+  >
+    <div
+      className="mdc-chip__text"
+    >
+      other@e-mail.mail
+    </div>
+    <i
+      className="material-icons mdc-chip__icon
+               mdc-chip__icon--trailing"
+      onClick={[Function]}
+    >
+      cancel
+    </i>
+  </div>
+  <input
+    id="I'mDown"
+    onBlur={[Function]}
+    onKeyPress={[Function]}
+    type="email"
+  />
+</div>
+`;

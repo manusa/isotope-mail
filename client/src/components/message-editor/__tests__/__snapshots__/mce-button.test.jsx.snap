@@ -2,19 +2,19 @@
 
 exports[`MceButton component test suite Snapshot render with no icon and inactive, should render MceButton 1`] = `
 <button
-  className="mdc-button Worker Class "
+  className="mdc-button Worker-Class "
   onMouseDown={[Function]}
 />
 `;
 
 exports[`MceButton component test suite Snapshot render, should render MceButton 1`] = `
 <button
-  className="mdc-button Worker Class It's a free world"
+  className="mdc-button WorkerClass It's-a-free-world"
   onMouseDown={[Function]}
 >
   <i
     aria-hidden="true"
-    className="material-icons mdc-button__icon"
+    className="material-icons mdc-button__icon Upper-class"
   >
     Roy Lichtenstein
   </i>

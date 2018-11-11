@@ -30,6 +30,7 @@ class MessageEditor extends Component {
       editorState: {}
     };
 
+    this.headerFormRef = React.createRef();
     this.editorRef = React.createRef();
     this.handleSetState = patchedState => this.setState(patchedState);
     this.handleSubmit = this.submit.bind(this);
@@ -65,19 +66,21 @@ class MessageEditor extends Component {
           </div>
           : null}
         <div className={styles.header}>
-          <HeaderAddress id={'to'} addresses={to} onKeyPress={this.handleOnHeaderKeyPress}
-            onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
-            className={styles.address} chipClassName={styles.chip} label={t('messageEditor.to')} />
-          <HeaderAddress id={'cc'} addresses={cc} onKeyPress={this.handleOnHeaderKeyPress}
-            onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
-            className={styles.address} chipClassName={styles.chip} label={t('messageEditor.cc')} />
-          <HeaderAddress id={'bcc'} addresses={bcc} onKeyPress={this.handleOnHeaderKeyPress}
-            onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
-            className={styles.address} chipClassName={styles.chip} label={t('messageEditor.bcc')} />
-          <div className={styles.subject}>
-            <input type={'text'} placeholder={t('messageEditor.subject')}
-              value={subject} onChange={this.handleOnSubjectChange} />
-          </div>
+          <form ref={this.headerFormRef}>
+            <HeaderAddress id={'to'} addresses={to} onKeyPress={this.handleOnHeaderKeyPress}
+              onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
+              className={styles.address} chipClassName={styles.chip} label={t('messageEditor.to')} />
+            <HeaderAddress id={'cc'} addresses={cc} onKeyPress={this.handleOnHeaderKeyPress}
+              onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
+              className={styles.address} chipClassName={styles.chip} label={t('messageEditor.cc')} />
+            <HeaderAddress id={'bcc'} addresses={bcc} onKeyPress={this.handleOnHeaderKeyPress}
+              onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
+              className={styles.address} chipClassName={styles.chip} label={t('messageEditor.bcc')} />
+            <div className={styles.subject}>
+              <input type={'text'} placeholder={t('messageEditor.subject')}
+                value={subject} onChange={this.handleOnSubjectChange} />
+            </div>
+          </form>
         </div>
         <div className={styles['editor-wrapper']} onClick={() => this.editorWrapperClick()}>
           <div className={styles['editor-container']}>
@@ -134,6 +137,7 @@ class MessageEditor extends Component {
           key={k}
           className={styles.button}
           activeClassName={styles.active}
+          iconClassName={styles.buttonIcon}
           active={this.state.editorState && this.state.editorState[k] === true}
           label={b.label}
           icon={b.icon}
@@ -143,11 +147,13 @@ class MessageEditor extends Component {
   }
 
   submit() {
-    // Get content directly from editor, state content may not contain latest changes
-    const content = this.getEditor().getContent();
-    const {credentials, to, cc, bcc, subject} = this.props;
-    this.props.sendMessage(credentials, {...this.props.editedMessage, to, cc, bcc, subject, content});
-    this.props.close(this.props.application);
+    if (this.headerFormRef.current.reportValidity()) {
+      // Get content directly from editor, state content may not contain latest changes
+      const content = this.getEditor().getContent();
+      const {credentials, to, cc, bcc, subject} = this.props;
+      this.props.sendMessage(credentials, {...this.props.editedMessage, to, cc, bcc, subject, content});
+      this.props.close(this.props.application);
+    }
   }
 
   onHeaderAddressRemove(id, index) {
