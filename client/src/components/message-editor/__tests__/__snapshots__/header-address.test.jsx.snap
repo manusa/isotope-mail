@@ -4,6 +4,8 @@ exports[`HeaderAddress component test suite Snapshot render, should render Heade
 <div
   className="Business"
   onClick={[Function]}
+  onDragOver={[Function]}
+  onDrop={[Function]}
 >
   <label>
     BlackLabel12yrs
@@ -11,7 +13,9 @@ exports[`HeaderAddress component test suite Snapshot render, should render Heade
   </label>
   <div
     className="FirstClassChips mdc-chip"
+    draggable={true}
     key="0"
+    onDragStart={[Function]}
   >
     <div
       className="mdc-chip__text"
@@ -28,7 +32,9 @@ exports[`HeaderAddress component test suite Snapshot render, should render Heade
   </div>
   <div
     className="FirstClassChips mdc-chip"
+    draggable={true}
     key="1"
+    onDragStart={[Function]}
   >
     <div
       className="mdc-chip__text"

@@ -39,9 +39,9 @@ class MessageEditor extends Component {
     this.handleOnDragOver = this.onDragOver.bind(this);
     this.handleOnDragLeave = this.onDragLeave.bind(this);
     // Header Address Events
-    this.handleOnHeaderKeyPress = this.onHeaderKeyPress.bind(this);
-    this.handleOnHeaderBlur = this.onHeaderBlur.bind(this);
-    this.handleOnHeaderAddressRemove = this.onHeaderAddressRemove.bind(this);
+    this.handleAddAddress = this.addAddress.bind(this);
+    this.handleRemoveAddress = this.removeAddress.bind(this);
+    this.handleMoveAddress = this.moveAddress.bind(this);
     // Subject events
     this.handleOnSubjectChange = this.onSubjectChange.bind(this);
     // Editor events
@@ -67,14 +67,17 @@ class MessageEditor extends Component {
           : null}
         <div className={styles.header}>
           <form ref={this.headerFormRef}>
-            <HeaderAddress id={'to'} addresses={to} onKeyPress={this.handleOnHeaderKeyPress}
-              onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
+            <HeaderAddress id={'to'} addresses={to} onAddressAdd={this.handleAddAddress}
+              onAddressRemove={this.handleRemoveAddress}
+              onAddressMove={this.handleMoveAddress}
               className={styles.address} chipClassName={styles.chip} label={t('messageEditor.to')} />
-            <HeaderAddress id={'cc'} addresses={cc} onKeyPress={this.handleOnHeaderKeyPress}
-              onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
+            <HeaderAddress id={'cc'} addresses={cc} onAddressAdd={this.handleAddAddress}
+              onAddressRemove={this.handleRemoveAddress}
+              onAddressMove={this.handleMoveAddress}
               className={styles.address} chipClassName={styles.chip} label={t('messageEditor.cc')} />
-            <HeaderAddress id={'bcc'} addresses={bcc} onKeyPress={this.handleOnHeaderKeyPress}
-              onBlur={this.handleOnHeaderBlur} onAddressRemove={this.handleOnHeaderAddressRemove}
+            <HeaderAddress id={'bcc'} addresses={bcc} onAddressAdd={this.handleAddAddress}
+              onAddressRemove={this.handleRemoveAddress}
+              onAddressMove={this.handleMoveAddress}
               className={styles.address} chipClassName={styles.chip} label={t('messageEditor.bcc')} />
             <div className={styles.subject}>
               <input type={'text'} placeholder={t('messageEditor.subject')}
@@ -155,58 +158,54 @@ class MessageEditor extends Component {
       this.props.close(this.props.application);
     }
   }
+  /**
+   * Adds an address to the list matching the id.
+   *
+   * @param id
+   * @param address
+   */
+  addAddress(id, address) {
+    if (address.length > 0) {
+      const updatedMessage = {...this.props.editedMessage};
+      updatedMessage[id] = [...updatedMessage[id], address];
+      this.props.editMessage(updatedMessage);
+    }
+  }
 
-  onHeaderAddressRemove(id, index) {
+  /**
+   * Removes the address from the under the field matching the id.
+   *
+   * @param id
+   * @param address
+   */
+  removeAddress(id, address) {
     const updatedMessage = {...this.props.editedMessage};
     updatedMessage[id] = [...updatedMessage[id]];
-    updatedMessage[id].splice(index, 1);
+    updatedMessage[id].splice(updatedMessage[id].indexOf(address), 1);
     this.props.editMessage(updatedMessage);
   }
 
-  onHeaderKeyPress(event) {
-    const target = event.target;
-    if (event.key === 'Enter' || event.key === ';') {
-      if (target.validity.valid) {
-        this.addAddress(target);
-        target.focus();
-        event.preventDefault();
-      } else {
-        target.reportValidity();
-      }
-    }
-  }
-
-  onHeaderBlur(event) {
-    const target = event.target;
-    if (target.value.length > 0) {
-      if (target.validity.valid) {
-        this.addAddress(target);
-      } else {
-        event.preventDefault();
-        setTimeout(() => target.reportValidity());
-      }
-    }
+  /**
+   * Moves an address from the address list under the field matching the fromId to the address field
+   * matching the toId.
+   *
+   * @param fromId
+   * @param toId
+   * @param address
+   */
+  moveAddress(fromId, toId, address) {
+    const updatedMessage = {...this.props.editedMessage};
+    // Remove
+    updatedMessage[fromId].splice(updatedMessage[fromId].indexOf(address), 1);
+    // Add
+    updatedMessage[toId] = [...updatedMessage[toId], address];
+    this.props.editMessage(updatedMessage);
   }
 
   onSubjectChange(event) {
     const target = event.target;
     const updatedMessage = {...this.props.editedMessage};
     this.props.editMessage({...updatedMessage, subject: target.value});
-  }
-
-  /**
-   * Adds an address to the list matching the id and value in the provided event target.
-   *
-   * @param target {object}
-   */
-  addAddress(target) {
-    const value = target.value.replace(/;/g, '');
-    if (value.length > 0) {
-      const updatedMessage = {...this.props.editedMessage};
-      updatedMessage[target.id] = [...updatedMessage[target.id], target.value.replace(/;/g, '')];
-      this.props.editMessage(updatedMessage);
-      target.value = '';
-    }
   }
 
   onDrop(event) {
