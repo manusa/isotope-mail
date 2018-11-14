@@ -43,6 +43,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Properties;
 import java.util.UUID;
@@ -96,7 +97,7 @@ public class SmtpService {
             }) {
                 mimeMessage.setRecipients(type, MessageUtils.getRecipientAddresses(message, type));
             }
-            mimeMessage.setSubject(message.getSubject());
+            mimeMessage.setSubject(message.getSubject(), StandardCharsets.UTF_8.name());
 
             if (message.getInReplyTo() != null) {
                 mimeMessage.setHeader(HEADER_IN_REPLY_TO, String.join(" ", message.getInReplyTo()));
@@ -140,10 +141,10 @@ public class SmtpService {
             // Create body part
             final MimeBodyPart body = new MimeBodyPart();
             multipart.addBodyPart(body);
-            body.setContent(String.format("<html><head><style>%1$s</style></head><body><div id='scoped'>" +
-                            "<style type='text/css' scoped>%1$s</style>%2$s</div></body></html>",
-                            STYLES, finalContent),
-                    MediaType.TEXT_HTML_VALUE);
+            body.setContent(new String(String.format("<html><head><style>%1$s</style></head><body><div id='scoped'>"
+                            + "<style type='text/css' scoped>%1$s</style>%2$s</div></body></html>",
+                            STYLES, finalContent).getBytes(), StandardCharsets.UTF_8),
+                    String.format("%s; charset=\"%s\"", MediaType.TEXT_HTML_VALUE, StandardCharsets.UTF_8.name()));
             mimeMessage.setContent(multipart);
 
             mimeMessage.saveChanges();
