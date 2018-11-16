@@ -132,8 +132,10 @@ public class SmtpService {
                     final MimeBodyPart mimeAttachment = new MimeBodyPart();
                     multipart.addBodyPart(mimeAttachment);
                     mimeAttachment.setDisposition(MimeBodyPart.ATTACHMENT);
+                    final String mimeType = attachment.getContentType() != null && !attachment.getContentType().isEmpty() ?
+                            attachment.getContentType() : MediaType.APPLICATION_OCTET_STREAM_VALUE;
                     mimeAttachment.setDataHandler(new DataHandler(
-                            new ByteArrayDataSource(attachment.getContent(), attachment.getContentType())));
+                            new ByteArrayDataSource(attachment.getContent(), mimeType)));
                     mimeAttachment.setFileName(attachment.getFileName());
                 }
             }
