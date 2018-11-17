@@ -177,7 +177,7 @@ public class SmtpService {
 
     private Transport getSmtpTransport(Credentials credentials) throws MessagingException {
         if (smtpTransport == null) {
-            smtpTransport = getSession(credentials).getTransport(credentials.getSmtpSsl() ? SMTPS_PROTOCOL :SMTP_PROTOCOL);
+            smtpTransport = getSession(credentials).getTransport(credentials.getSmtpSsl() ? SMTPS_PROTOCOL : SMTP_PROTOCOL);
             final String smtpHost = credentials.getSmtpHost();
             smtpTransport.connect(
                     smtpHost != null && !smtpHost.isEmpty() ? smtpHost : credentials.getServerHost(),

@@ -35,6 +35,8 @@ dependencies {
 	compile('commons-io:commons-io:2.6')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('com.marcnuri:spring-common-test:0.0.2')
+	testCompile('org.powermock:powermock-module-junit4:2.0.0-RC.3')
+	testCompile('org.powermock:powermock-api-mockito2:2.0.0-RC.3')
 }
 
 test {
