@@ -129,14 +129,7 @@ public class SmtpService {
             // Include attachments
             if (message.getAttachments() != null && !message.getAttachments().isEmpty()) {
                 for (Attachment attachment : message.getAttachments()) {
-                    final MimeBodyPart mimeAttachment = new MimeBodyPart();
-                    multipart.addBodyPart(mimeAttachment);
-                    mimeAttachment.setDisposition(MimeBodyPart.ATTACHMENT);
-                    final String mimeType = attachment.getContentType() != null && !attachment.getContentType().isEmpty() ?
-                            attachment.getContentType() : MediaType.APPLICATION_OCTET_STREAM_VALUE;
-                    mimeAttachment.setDataHandler(new DataHandler(
-                            new ByteArrayDataSource(attachment.getContent(), mimeType)));
-                    mimeAttachment.setFileName(attachment.getFileName());
+                    multipart.addBodyPart(toBodyPart(attachment));
                 }
             }
 
@@ -155,6 +148,7 @@ public class SmtpService {
             throw new IsotopeException("Problem sending message", ex);
         }
     }
+
 
     @PreDestroy
     public void destroy() {
@@ -200,5 +194,16 @@ public class SmtpService {
         ret.put("mail.smtps.socketFactory.fallback", false);
         ret.put("mail.smtps.auth", true);
         return ret;
+    }
+
+    private static MimeBodyPart toBodyPart(Attachment attachment) throws MessagingException {
+        final MimeBodyPart mimeAttachment = new MimeBodyPart();
+        mimeAttachment.setDisposition(MimeBodyPart.ATTACHMENT);
+        final String mimeType = attachment.getContentType() != null && !attachment.getContentType().isEmpty() ?
+                attachment.getContentType() : MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        mimeAttachment.setDataHandler(new DataHandler(
+                new ByteArrayDataSource(attachment.getContent(), mimeType)));
+        mimeAttachment.setFileName(attachment.getFileName());
+        return mimeAttachment;
     }
 }
