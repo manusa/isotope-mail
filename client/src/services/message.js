@@ -98,6 +98,10 @@ export async function resetFolderMessagesCache(dispatch, user, folder) {
  * @param message {object}
  */
 export function readMessage(dispatch, credentials, downloadedMessages, folder, message) {
+  // Abort any operations that can affect operation result data consistency
+  _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
+  abortFetch(abortControllerWrappers.getFoldersAbortController);
+
   // Abort + new signal
   abortFetch(abortControllerWrappers.readMessageAbortController);
   abortControllerWrappers.readMessageAbortController = new AbortController();
