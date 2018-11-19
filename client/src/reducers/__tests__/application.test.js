@@ -15,6 +15,7 @@ describe('Application reducer test suite', () => {
     expect(applicationDefaultState).toHaveProperty('outbox', null);
     expect(applicationDefaultState).toHaveProperty('pollInterval');
     expect(applicationDefaultState).toHaveProperty('errors.diskQuotaExceeded', false);
+    expect(applicationDefaultState).toHaveProperty('errors.authentication', null);
     expect(applicationDefaultState).toHaveProperty('activeRequests', 0);
   });
   test('Application BE Request', () => {

@@ -60,6 +60,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration.DEFAULT_CONNECTION_TIMEOUT;
+import static com.marcnuri.isotope.api.exception.AuthenticationException.Type.IMAP;
 import static com.marcnuri.isotope.api.folder.FolderResource.addLinks;
 import static com.marcnuri.isotope.api.message.MessageUtils.envelopeFetch;
 import static javax.mail.Folder.READ_ONLY;
@@ -111,7 +113,7 @@ public class ImapService {
             getImapStore(credentials).getDefaultFolder();
             return credentialsService.encrypt(credentials);
         } catch (MessagingException | IOException e) {
-            throw new AuthenticationException("Error while logging in", e);
+            throw new AuthenticationException(IMAP);
         }
     }
 
@@ -447,6 +449,8 @@ public class ImapService {
     private static Properties initMailProperties(Credentials credentials, MailSSLSocketFactory mailSSLSocketFactory) {
         final Properties ret = new Properties();
         ret.put("mail.imap.ssl.enable", credentials.getImapSsl());
+        ret.put("mail.imap.connectiontimeout", DEFAULT_CONNECTION_TIMEOUT);
+        ret.put("mail.imap.connectionpooltimeout", DEFAULT_CONNECTION_TIMEOUT);
         ret.put("mail.imap.ssl.socketFactory", mailSSLSocketFactory);
         ret.put("mail.imap.starttls.enable", true);
         ret.put("mail.imap.starttls.required", false);

@@ -10,6 +10,11 @@
     "SmtpSSL": "SMTP SSL",
     "actions": {
       "Login": "Acceder"
+    },
+    "errors": {
+      "BLACKLISTED": "Servidor no autorizado",
+      "IMAP": "Credenciales IMAP inválidas",
+      "SMTP": "Credenciales SMTP inválidas"
     }
   },
   "sideBar": {

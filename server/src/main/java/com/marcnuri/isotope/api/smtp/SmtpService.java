@@ -21,6 +21,7 @@
 package com.marcnuri.isotope.api.smtp;
 
 import com.marcnuri.isotope.api.credentials.Credentials;
+import com.marcnuri.isotope.api.exception.AuthenticationException;
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
@@ -50,6 +51,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration.DEFAULT_CONNECTION_TIMEOUT;
+import static com.marcnuri.isotope.api.exception.AuthenticationException.Type.SMTP;
 import static com.marcnuri.isotope.api.message.Message.HEADER_IN_REPLY_TO;
 import static com.marcnuri.isotope.api.message.Message.HEADER_REFERENCES;
 
@@ -81,6 +84,19 @@ public class SmtpService {
     @Autowired
     public SmtpService(MailSSLSocketFactory mailSSLSocketFactory) {
         this.mailSSLSocketFactory = mailSSLSocketFactory;
+    }
+    /**
+     * Checks if specified {@link Credentials} are valid
+     *
+     * @param credentials to validate
+     * @throws AuthenticationException if credentials are not valid
+     */
+    public void checkCredentials(Credentials credentials) {
+        try {
+            getSmtpTransport(credentials);
+        } catch (MessagingException e) {
+            throw new AuthenticationException(SMTP);
+        }
     }
 
     public void sendMessage(Credentials credentials, Message message) {
@@ -186,9 +202,11 @@ public class SmtpService {
     private static Properties initMailProperties(Credentials credentials, MailSSLSocketFactory socketFactory) {
         final Properties ret = new Properties();
         ret.put("mail.smtp.ssl.enable", credentials.getSmtpSsl());
+        ret.put("mail.smtp.connectiontimeout", DEFAULT_CONNECTION_TIMEOUT);
         ret.put("mail.smtp.ssl.socketFactory", socketFactory);
         ret.put("mail.smtp.starttls.enable", true);
         ret.put("mail.smtp.starttls.required", false);
+        ret.put("mail.smtps.connectiontimeout", DEFAULT_CONNECTION_TIMEOUT);
         ret.put("mail.smtps.socketFactory", socketFactory);
         ret.put("mail.smtps.ssl.socketFactory", socketFactory);
         ret.put("mail.smtps.socketFactory.fallback", false);

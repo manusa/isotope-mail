@@ -35,6 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Set;
 
+import static com.marcnuri.isotope.api.exception.AuthenticationException.Type.BLACKLISTED;
+
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-15.
  */
@@ -53,7 +55,7 @@ public class CredentialsService {
     public void checkHost(Credentials credentials) {
         final Set<String> trustedHosts = isotopeApiConfiguration.getTrustedHosts();
         if (!trustedHosts.isEmpty() && !trustedHosts.contains(credentials.getServerHost())){
-            throw new AuthenticationException("Host is not allowed");
+            throw new AuthenticationException(BLACKLISTED);
         }
     }
 

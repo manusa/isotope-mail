@@ -5,6 +5,7 @@ import {
   backendRequestCompleted,
   editMessage,
   selectFolder,
+  setError,
   setUserCredentials
 } from '../actions/application';
 import {toJson} from './fetch';
@@ -20,6 +21,8 @@ export const DEFAULT_IMAP_PORT = 993;
 export const DEFAULT_IMAP_SSL = true;
 export const DEFAULT_SMTP_PORT = 465;
 export const DEFAULT_SMTP_SSL = true;
+
+const LOGIN_SNACKBAR_DURATION = 4000;
 
 /**
  * @typedef {Object} Credentials
@@ -44,6 +47,7 @@ export const DEFAULT_SMTP_SSL = true;
  */
 export async function login(dispatch, credentials) {
   dispatch(backendRequest());
+  dispatch(setError('authentication', null));
   const url = URLS.LOGIN;
   // Will be used as the key in the IndexedDB
   const userId = sjcl.codec.hex.fromBits(
@@ -84,6 +88,10 @@ export async function login(dispatch, credentials) {
         resetFolderMessagesCache(dispatch, user, inbox, null);
       }
     }
+  } else {
+    const error = await response.text();
+    dispatch(setError('authentication', error));
+    setTimeout(() => dispatch(setError('authentication', null)), LOGIN_SNACKBAR_DURATION);
   }
 }
 

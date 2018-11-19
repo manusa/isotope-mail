@@ -10,6 +10,11 @@
     "SmtpSSL": "SMTP SSL",
     "actions": {
       "Login": "Login"
+    },
+    "errors": {
+      "BLACKLISTED": "Host is not whitelisted",
+      "IMAP": "Invalid IMAP credentials",
+      "SMTP": "Invalid SMTP credentials"
     }
   },
   "sideBar": {

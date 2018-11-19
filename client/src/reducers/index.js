@@ -15,7 +15,8 @@ export const INITIAL_STATE = {
     outbox: null,
     pollInterval: 15000,
     errors: {
-      diskQuotaExceeded: false
+      diskQuotaExceeded: false,
+      authentication: null
     },
     activeRequests: 0
   },

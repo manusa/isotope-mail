@@ -11,6 +11,7 @@ import {
   login
 } from '../../services/application';
 import Button from '../buttons/button';
+import LoginSnackbar from './login-snackbar';
 import Switch from '../form/switch/switch';
 import TextField from '../form/text-field/text-field';
 import Spinner from '../spinner/spinner';
@@ -96,6 +97,7 @@ class Login extends Component {
               label={t('login.actions.Login')} />
           </form>
         </div>
+        <LoginSnackbar />
       </div>
     );
   }

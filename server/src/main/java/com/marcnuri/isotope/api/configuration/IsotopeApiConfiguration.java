@@ -42,6 +42,7 @@ import java.util.stream.Stream;
 @Import({WebConfiguration.class})
 public class IsotopeApiConfiguration {
 
+    public static final int DEFAULT_CONNECTION_TIMEOUT = 5000;
     @SuppressWarnings("squid:S2068")
     private static final String ENCRYPTION_PASSWORD = "ENCRYPTION_PASSWORD";
     @SuppressWarnings("squid:S2068")

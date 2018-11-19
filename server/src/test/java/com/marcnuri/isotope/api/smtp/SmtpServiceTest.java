@@ -21,6 +21,7 @@
 package com.marcnuri.isotope.api.smtp;
 
 import com.marcnuri.isotope.api.credentials.Credentials;
+import com.marcnuri.isotope.api.exception.AuthenticationException;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
 import com.sun.mail.util.MailSSLSocketFactory;
@@ -48,9 +49,10 @@ import java.util.Properties;
 
 import static com.marcnuri.isotope.api.smtp.SmtpServiceTest.HeaderMatcher.headerMatches;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -96,6 +98,41 @@ public class SmtpServiceTest {
 
         // Then
         // No exception is thrown
+    }
+
+    @Test
+    public void checkCredentials_validCredentials_shouldNotFail() {
+        // Given
+        final Credentials credentials = new Credentials();
+        credentials.setUser("valid");
+        credentials.setServerHost("email.com");
+        credentials.setSmtpSsl(true);
+        credentials.setSmtpPort(1);
+
+        // When
+        smtpService.checkCredentials(credentials);
+
+        // Then
+        // No exception is thrown
+    }
+
+    @Test(expected = AuthenticationException.class)
+    public void checkCredentials_invalidCredentials_shouldThrowException() throws Exception {
+        // Given
+        final Credentials credentials = new Credentials();
+        credentials.setUser("invalid");
+        credentials.setServerHost("email.com");
+        credentials.setSmtpSsl(true);
+        credentials.setSmtpPort(1);
+        doThrow(new MessagingException()).when(mockedTransport).connect(
+                Mockito.eq(credentials.getServerHost()), Mockito.eq(credentials.getSmtpPort()),
+                Mockito.eq(credentials.getUser()), Mockito.eq(credentials.getPassword()));
+
+        // When
+        smtpService.checkCredentials(credentials);
+
+        // Then
+        fail();
     }
 
     @Test

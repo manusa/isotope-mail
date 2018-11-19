@@ -27,6 +27,14 @@ import org.springframework.http.HttpStatus;
  */
 public class AuthenticationException extends IsotopeException {
 
+    public enum Type {
+        BLACKLISTED, IMAP, SMTP
+    }
+
+    public AuthenticationException(Type type) {
+        this(type.name());
+    }
+
     public AuthenticationException(String message) {
         this(message, null);
     }

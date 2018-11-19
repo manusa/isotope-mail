@@ -22,6 +22,7 @@ package com.marcnuri.isotope.api.application;
 
 import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.imap.ImapService;
+import com.marcnuri.isotope.api.smtp.SmtpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +44,12 @@ public class ApplicationResource {
     private static final Logger log = LoggerFactory.getLogger(ApplicationResource.class);
 
     private final ImapService imapService;
+    private final SmtpService smtpService;
 
     @Autowired
-    public ApplicationResource(ImapService imapService) {
+    public ApplicationResource(ImapService imapService, SmtpService smtpService) {
         this.imapService = imapService;
+        this.smtpService = smtpService;
     }
 
     @PostMapping(path = "/login", produces = MediaTypes.HAL_JSON_VALUE)
@@ -54,7 +57,9 @@ public class ApplicationResource {
             @Validated(Credentials.Login.class) @RequestBody Credentials credentials) {
 
         log.info("User logging into application");
-        return ResponseEntity.ok(imapService.checkCredentials(credentials));
+        final Credentials encryptedCredentials = imapService.checkCredentials(credentials);
+        smtpService.checkCredentials(credentials);
+        return ResponseEntity.ok(encryptedCredentials);
     }
 
 }
