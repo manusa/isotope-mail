@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Snackbar component test suite Snapshot render Renders hidden 1`] = `
+exports[`MessageSnackbar component test suite Snapshot render Renders hidden 1`] = `
 <Snackbar
   alignStart={true}
   buttonLabel=""
@@ -9,7 +9,7 @@ exports[`Snackbar component test suite Snapshot render Renders hidden 1`] = `
 />
 `;
 
-exports[`Snackbar component test suite Snapshot render Renders with progress 1`] = `
+exports[`MessageSnackbar component test suite Snapshot render Renders with progress 1`] = `
 <Snackbar
   alignStart={true}
   buttonLabel=""
@@ -18,7 +18,7 @@ exports[`Snackbar component test suite Snapshot render Renders with progress 1`]
 />
 `;
 
-exports[`Snackbar component test suite Snapshot render Renders with sent status 1`] = `
+exports[`MessageSnackbar component test suite Snapshot render Renders with sent status 1`] = `
 <Snackbar
   alignStart={true}
   buttonLabel=""

@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LoginSnackbar component test suite Snapshot render Renders hidden 1`] = `
+<Snackbar
+  alignStart={false}
+  buttonLabel=""
+  message=""
+  show={false}
+/>
+`;
+
+exports[`LoginSnackbar component test suite Snapshot render Renders with error 1`] = `
+<Snackbar
+  alignStart={false}
+  buttonLabel=""
+  message="login.errors.BLACKLISTED"
+  show={true}
+/>
+`;

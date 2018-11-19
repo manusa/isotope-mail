@@ -2,7 +2,7 @@ import React from 'react';
 import {shallow} from 'enzyme/build/index';
 import {MessageSnackbar} from '../message-snackbar';
 
-describe('Snackbar component test suite', () => {
+describe('MessageSnackbar component test suite', () => {
   describe('Snapshot render', () => {
     test('Renders hidden', () => {
       // Given
