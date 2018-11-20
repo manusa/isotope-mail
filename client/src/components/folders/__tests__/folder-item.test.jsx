@@ -17,8 +17,9 @@ describe('FolderItem component test suite', () => {
     const folderItem = shallow(<FolderItem label={''} selected={false} onDrop={onDrop} onClick={onClick}/>);
 
     // When
-    folderItem.find('.listItem').simulate('drop');
-    folderItem.find('.listItem').simulate('dragOver', {preventDefault: () => {}});
+    folderItem.find('.listItem').simulate('drop', {preventDefault: () => {}});
+    folderItem.find('.listItem').simulate('dragOver', {
+      preventDefault: () => {}, dataTransfer: {types: ['application/hal+json', 'text/plain', 'application/json']}});
     folderItem.find('.listItem').simulate('click');
 
     // Then

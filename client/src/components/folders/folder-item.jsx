@@ -5,13 +5,25 @@ import styles from './folder-item.scss';
 import mainCss from '../../styles/main.scss';
 
 class FolderItem extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      dragOver: false
+    };
+    this.handleOnDragOver = this.onDragOver.bind(this);
+    this.handleOnDragLeave = this.onDragLeave.bind(this);
+    this.handleOnDrop = this.onDrop.bind(this);
+  }
+
   render() {
-    const {selected, graphic, label, newMessageCount, unreadMessageCount, onClick, onDrop, onRename} = this.props;
+    const {selected, graphic, label, newMessageCount, unreadMessageCount, onClick, onRename} = this.props;
+    const {dragOver} = this.state;
     return (
       <a className={`${mainCss['mdc-list-item']} ${styles.listItem}
-        ${selected ? mainCss['mdc-list-item--selected'] : ''}`}
+        ${selected ? mainCss['mdc-list-item--selected'] : ''}
+        ${dragOver ? mainCss['mdc-list-item--activated'] : ''}`}
       onClick={onClick}
-      onDrop={onDrop} onDragOver={e => e.preventDefault()}>
+      onDrop={this.handleOnDrop} onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave}>
         <span className={`material-icons ${mainCss['mdc-list-item__graphic']} ${styles.graphic}`}>
           {graphic}
         </span>
@@ -27,6 +39,23 @@ class FolderItem extends Component {
         </span>
       </a>
     );
+  }
+
+  onDrop(event) {
+    event.preventDefault();
+    this.setState({dragOver: false});
+    this.props.onDrop(event);
+  }
+  onDragOver(event) {
+    event.preventDefault();
+    if (event.dataTransfer.types && Array.from(event.dataTransfer.types).includes('application/json')) {
+      this.setState({dragOver: true});
+    }
+  }
+
+  onDragLeave(event) {
+    event.preventDefault();
+    this.setState({dragOver: false});
   }
 }
 

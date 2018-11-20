@@ -234,7 +234,7 @@ class MessageEditor extends Component {
 
   onDragOver(event) {
     event.preventDefault();
-    if (event.dataTransfer.types && Array.from(event.dataTransfer.types).indexOf('Files') >= 0) {
+    if (event.dataTransfer.types && Array.from(event.dataTransfer.types).includes('Files')) {
       this.setState({dropZoneActive: true});
     }
   }

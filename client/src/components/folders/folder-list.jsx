@@ -40,8 +40,10 @@ class FolderList extends Component {
 
   onDrop(event, toFolder) {
     event.preventDefault();
-    const payload = JSON.parse(event.dataTransfer.getData('application/json'));
-    this.props.onDropMessages(payload.fromFolder, toFolder, payload.messages);
+    if (event.dataTransfer.types && Array.from(event.dataTransfer.types).includes('application/json')) {
+      const payload = JSON.parse(event.dataTransfer.getData('application/json'));
+      this.props.onDropMessages(payload.fromFolder, toFolder, payload.messages);
+    }
   }
 
   onRename(event, folder) {
