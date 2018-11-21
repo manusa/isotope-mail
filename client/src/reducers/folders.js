@@ -1,6 +1,6 @@
 import {INITIAL_STATE} from './';
 import {ActionTypes} from '../actions/action-types';
-import {explodeFolders} from '../services/folder';
+import {explodeFolders, FolderTypes} from '../services/folder';
 
 function _updateFolder(folderToReplace, folders) {
   if (!folders || !folders.length > 0) {
@@ -11,6 +11,11 @@ function _updateFolder(folderToReplace, folders) {
       f.children = _updateFolder(folderToReplace, f.children);
     }
     if (f.folderId === folderToReplace.folderId) {
+      // Keep trash attribute (may have been arbitrarily set from API server)
+      if (f.type === FolderTypes.TRASH && folderToReplace.type !== FolderTypes.TRASH) {
+        folderToReplace.attributes.push(FolderTypes.TRASH.attribute);
+        folderToReplace.type = FolderTypes.TRASH;
+      }
       return {...folderToReplace};
     }
     return {...f};

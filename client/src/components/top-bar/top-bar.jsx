@@ -8,13 +8,8 @@ import {moveMessages, setMessagesSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
 
-function _findTrashFolder(foldersState) {
-  let trashFolder = Object.values(foldersState.explodedItems).find(f => f.type === FolderTypes.TRASH);
-  if (!trashFolder) {
-    trashFolder = foldersState.items.find(f => f.name.toUpperCase() === 'TRASH');
-  }
-  return trashFolder;
-}
+const _findTrashFolder = foldersState =>
+  Object.values(foldersState.explodedItems).find(f => f.type === FolderTypes.TRASH);
 
 class TopBar extends Component {
   constructor(props) {

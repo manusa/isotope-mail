@@ -42,7 +42,9 @@ public class Folder extends IsotopeResource implements Serializable {
 
     private static final long serialVersionUID = 8624907999271453862L;
 
+    public static final String ATTR_TRASH = "\\Trash";
     private static final String ATTR_HAS_NO_CHILDREN = "\\HasNoChildren";
+    public static final String TRASH_FOLDER_NAME = "Trash";
     private static final Folder[] EMPTY_FOLDERS = {};
 
     private String folderId;

@@ -63,6 +63,7 @@ import java.util.stream.Stream;
 import static com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration.DEFAULT_CONNECTION_TIMEOUT;
 import static com.marcnuri.isotope.api.exception.AuthenticationException.Type.IMAP;
 import static com.marcnuri.isotope.api.folder.FolderResource.addLinks;
+import static com.marcnuri.isotope.api.folder.FolderUtils.addSystemFolders;
 import static com.marcnuri.isotope.api.message.MessageUtils.envelopeFetch;
 import static javax.mail.Folder.READ_ONLY;
 import static javax.mail.Folder.READ_WRITE;
@@ -120,11 +121,12 @@ public class ImapService {
     public List<Folder> getFolders(Credentials credentials, @Nullable Boolean loadChildren) {
         try {
             final IMAPFolder rootFolder = (IMAPFolder)getImapStore(credentials).getDefaultFolder();
-            return Stream.of(rootFolder.list())
+            final List<Folder> folders = Stream.of(rootFolder.list())
                     .map(IMAPFolder.class::cast)
                     .map(mf -> Folder.from(mf, loadChildren))
                     .sorted(Comparator.comparing(Folder::getName))
                     .collect(Collectors.toList());
+            return addSystemFolders(rootFolder, folders);
         } catch (MessagingException ex) {
             log.error("Error loading folders", ex);
             throw  new IsotopeException(ex.getMessage());
