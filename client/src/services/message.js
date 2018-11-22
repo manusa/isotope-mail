@@ -1,6 +1,6 @@
 import {
   backendRequest as aBackendRequest,
-  backendRequestCompleted as aBackendRequestCompleted, replaceMessageEmbeddedImages
+  backendRequestCompleted as aBackendRequestCompleted, cacheDownloadedMessages, replaceMessageEmbeddedImages
 } from '../actions/application';
 import {
   backendRequest,
@@ -79,6 +79,20 @@ export async function resetFolderMessagesCache(dispatch, user, folder) {
     return eventSourceCompleted;
   }
   return null;
+}
+
+export function preloadMessages(dispatch, credentials, folder, messageUids) {
+  if (messageUids.length === 0) {
+    return;
+  }
+  const url = new URL(folder._links.messages.href);
+  messageUids.forEach(messageUid => url.searchParams.append('id', messageUid));
+  fetch(url, {
+    method: 'GET',
+    headers: credentialsHeaders(credentials)
+  })
+    .then(toJson)
+    .then(messages => dispatch(cacheDownloadedMessages(messages)));
 }
 
 /**

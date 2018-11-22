@@ -35,8 +35,6 @@ import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPStore;
 import com.sun.mail.util.MailSSLSocketFactory;
-import org.apache.commons.io.IOUtils;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,16 +45,26 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
-import org.springframework.web.util.HtmlUtils;
 import reactor.core.publisher.Flux;
 
 import javax.annotation.PreDestroy;
-import javax.mail.*;
+import javax.mail.BodyPart;
+import javax.mail.Flags;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Part;
+import javax.mail.Session;
+import javax.mail.UIDFolder;
+import javax.mail.URLName;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,6 +73,9 @@ import static com.marcnuri.isotope.api.exception.AuthenticationException.Type.IM
 import static com.marcnuri.isotope.api.folder.FolderResource.addLinks;
 import static com.marcnuri.isotope.api.folder.FolderUtils.addSystemFolders;
 import static com.marcnuri.isotope.api.message.MessageUtils.envelopeFetch;
+import static com.marcnuri.isotope.api.message.MessageUtils.extractBodypart;
+import static com.marcnuri.isotope.api.message.MessageUtils.extractContent;
+import static com.marcnuri.isotope.api.message.MessageUtils.replaceEmbeddedImage;
 import static javax.mail.Folder.READ_ONLY;
 import static javax.mail.Folder.READ_WRITE;
 
@@ -81,7 +92,7 @@ public class ImapService {
     private static final String IMAP_PROTOCOL = "imap";
     private static final String IMAPS_PROTOCOL = "imaps";
     static final String IMAP_CAPABILITY_CONDSTORE = "CONDSTORE";
-    private static final String MULTIPART_MIME_TYPE = "multipart/";
+    public static final String MULTIPART_MIME_TYPE = "multipart/";
     static final int DEFAULT_INITIAL_MESSAGES_BATCH_SIZE = 20;
     static final int DEFAULT_MAX_MESSAGES_BATCH_SIZE = 640;
 
@@ -194,26 +205,37 @@ public class ImapService {
             }
             imapMessage.setFlag(Flags.Flag.SEEN, true);
             final MessageWithFolder ret = MessageWithFolder.from(folder, imapMessage);
-            final Object content = imapMessage.getContent();
-            if (content instanceof Multipart) {
-                ret.setContent(extractContent((Multipart) content));
-                ret.setAttachments(addLinks(Folder.toBase64Id(folderId), ret,
-                        extractAttachments(ret, (Multipart) content, null)));
-            } else if (content instanceof MimeMessage
-                    && ((MimeMessage) content).getContentType().toLowerCase().contains("html")) {
-                ret.setContent(content.toString());
-            } else if (imapMessage.getContentType().indexOf(MediaType.TEXT_HTML_VALUE) == 0){
-                ret.setContent(content.toString());
-            } else {
-                //Preserve formatting
-                ret.setContent(content.toString()
-                        .replace("\r\n", "<br />" )
-                        .replaceAll("[\\r\\n]", "<br />"));
-            }
+            readContentIntoMessage(folderId, imapMessage, ret);
             folder.close();
             return ret;
         } catch (MessagingException | IOException ex) {
             log.error("Error loading messages for folder: " + folderId.toString(), ex);
+            throw  new IsotopeException(ex.getMessage());
+        }
+    }
+
+    public List<Message> preloadMessages(
+            @NonNull Credentials credentials, @NonNull URLName folderId, @NonNull List<Long> uids) {
+
+        try {
+            final IMAPFolder folder = getFolder(credentials, folderId);
+            if (!folder.isOpen()) {
+                folder.open(READ_ONLY);
+            }
+            final List<Message> ret = new ArrayList<>(uids.size());
+            for(Long uid : uids) {
+                final IMAPMessage imapMessage = (IMAPMessage)folder.getMessageByUID(uid);
+                if (imapMessage == null) {
+                    folder.close();
+                    throw new NotFoundException("Message not found");
+                }
+                final Message message = Message.from(folder, imapMessage);
+                ret.add(message);
+                readContentIntoMessage(folderId, imapMessage, message);
+            }
+            folder.close();
+            return ret;
+        } catch (MessagingException | IOException ex) {
             throw  new IsotopeException(ex.getMessage());
         }
     }
@@ -229,7 +251,7 @@ public class ImapService {
             final IMAPMessage imapMessage = (IMAPMessage)folder.getMessageByUID(messageId);
             final Object content = imapMessage.getContent();
             if (content instanceof Multipart) {
-                final BodyPart bp = getBodypart((Multipart)content, id, isContentId);
+                final BodyPart bp = extractBodypart((Multipart)content, id, isContentId);
                 if (bp != null) {
                     response.setContentType(bp.getContentType());
                     bp.getDataHandler().writeTo(response.getOutputStream());
@@ -448,7 +470,28 @@ public class ImapService {
         return attachments;
     }
 
-    private static Properties initMailProperties(Credentials credentials, MailSSLSocketFactory mailSSLSocketFactory) {
+    private void readContentIntoMessage(URLName folderId, @NonNull IMAPMessage imapMessage, @NonNull Message message)
+            throws MessagingException, IOException {
+
+        final Object content = imapMessage.getContent();
+        if (content instanceof Multipart) {
+            message.setContent(extractContent((Multipart) content));
+            message.setAttachments(addLinks(Folder.toBase64Id(folderId), message,
+                    extractAttachments(message, (Multipart) content, null)));
+        } else if (content instanceof MimeMessage
+                && ((MimeMessage) content).getContentType().toLowerCase().contains("html")) {
+            message.setContent(content.toString());
+        } else if (imapMessage.getContentType().indexOf(MediaType.TEXT_HTML_VALUE) == 0){
+            message.setContent(content.toString());
+        } else {
+            //Preserve formatting
+            message.setContent(content.toString()
+                    .replace("\r\n", "<br />" )
+                    .replaceAll("[\\r\\n]", "<br />"));
+        }
+    }
+
+    private static Properties initMailProperties(@NonNull Credentials credentials, MailSSLSocketFactory mailSSLSocketFactory) {
         final Properties ret = new Properties();
         ret.put("mail.imap.ssl.enable", credentials.getImapSsl());
         ret.put("mail.imap.connectiontimeout", DEFAULT_CONNECTION_TIMEOUT);
@@ -462,102 +505,8 @@ public class ImapService {
         return ret;
     }
 
-    private static BodyPart getBodypart(@NonNull Multipart mp, @NonNull String id, Boolean contentId)
-            throws MessagingException, IOException {
 
-        // Embedded contentId
-        if (Boolean.TRUE.equals(contentId)) {
-            return getEmbeddedBodypart(mp, id);
-        }
-        // Attachment
-        else {
-            for (int it = 0; it < mp.getCount(); it++) {
-                final BodyPart bp = mp.getBodyPart(it);
-                if (bp.getDisposition() != null && Part.ATTACHMENT.equalsIgnoreCase(bp.getDisposition())) {
-                    // Regular file
-                    if (id.equals(bp.getFileName())) {
-                        return bp;
-                    }
-                    // Embedded message
-                    if(bp.getContentType().toLowerCase().startsWith("message/") && bp.getContent() instanceof MimeMessage
-                            && ((MimeMessage)bp.getContent()).getSubject().equals(id)) {
-                        return bp;
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
-    private static BodyPart getEmbeddedBodypart(@NonNull Multipart mp, @NonNull String contentId)
-            throws MessagingException, IOException {
 
-        for (int it = 0; it < mp.getCount(); it++) {
-            final BodyPart bp = mp.getBodyPart(it);
-            if (bp.getContentType().toLowerCase().startsWith(MULTIPART_MIME_TYPE)) {
-                final BodyPart nestedBodyPart = getEmbeddedBodypart((Multipart) bp.getContent(), contentId);
-                if (nestedBodyPart != null){
-                    return nestedBodyPart;
-                }
-            }
-            if (bp.getContentType().toLowerCase().startsWith("image/") && bp instanceof MimeBodyPart
-                    && contentId.equals(((MimeBodyPart) bp).getContentID())) {
-                return bp;
-            }
-        }
-        return null;
-    }
-
-    private static String extractContent(@NonNull Multipart mp)
-            throws MessagingException, IOException {
-
-        String ret = "";
-        for (int it = 0; it < mp.getCount(); it++) {
-            final BodyPart bp = mp.getBodyPart(it);
-            if ((ret == null || ret.isEmpty())
-                    && bp.getContentType().toLowerCase().startsWith(MediaType.TEXT_PLAIN_VALUE)) {
-                ret = String.format("<pre>%s</pre>", HtmlUtils.htmlEscape(bp.getContent().toString()));
-            }
-            if (bp.getContentType().toLowerCase().startsWith(MediaType.TEXT_HTML_VALUE)) {
-                ret = (bp.getContent().toString());
-            }
-            if (bp.getContentType().toLowerCase().startsWith(MULTIPART_MIME_TYPE)) {
-                ret = extractContent((Multipart) bp.getContent());
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Replaces content image cid urls (<code>&lt;img src='cid:1234' /&gt;</code>) by Base64 data urls for every occurrence
-     * of the provided {@link MimeBodyPart}.
-     *
-     * If no occurrences are found, same content is returned.
-     *
-     * @param content e-mail message content to replace cid urls
-     * @param imageBodyPart body part of the replaceable cid url
-     * @return a string with the original content with replaced image cid urls
-     * @throws MessagingException for javax.mail failures
-     * @throws IOException for IO failures
-     */
-    private static String replaceEmbeddedImage(String content, MimeBodyPart imageBodyPart)
-            throws MessagingException, IOException {
-
-        final String cid = imageBodyPart.getContentID().replaceAll("[<>]", "");
-        if (content != null && content.contains(cid)) {
-            String contentType = imageBodyPart.getContentType();
-            if (contentType.contains(";")) {
-                contentType = contentType.substring(0, contentType.indexOf(';'));
-            }
-            final String base64 = Base64.encodeBase64String(IOUtils.toByteArray(imageBodyPart.getInputStream()))
-                    .replace("\r", "").replace("\n", "");
-            return content.replace("cid:" + cid,
-                    String.format("data:%s;%s,%s",
-                            contentType,
-                            imageBodyPart.getEncoding(),
-                            base64));
-        }
-        return content;
-    }
 
 }

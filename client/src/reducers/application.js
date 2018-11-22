@@ -40,6 +40,15 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
       }
       return newState;
     }
+    case ActionTypes.APPLICATION_MESSAGE_CACHE_AS_DOWNLOADED: {
+      const newState = {...state};
+      const messages = action.payload.messages;
+      // Store in application.downloadedMessages
+      messages.forEach(message => {
+        newState.downloadedMessages[message.messageId] = message;
+      });
+      return newState;
+    }
     case ActionTypes.APPLICATION_MESSAGE_REPLACE_IMAGE: {
       const newState = {...state};
       const folder = action.payload.folder;

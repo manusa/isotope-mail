@@ -20,16 +20,21 @@
  */
 package com.marcnuri.isotope.api.message;
 
+import com.marcnuri.isotope.api.exception.InvalidFieldException;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import javax.mail.Address;
 import javax.mail.Folder;
 import javax.mail.Message;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.marcnuri.isotope.api.message.MessageUtils.envelopeFetch;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.hamcrest.Matchers.arrayWithSize;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-09-16.
@@ -60,5 +65,57 @@ public class MessageUtilsTest {
 
         // Then
         verify(mockFolder, never()).fetch(Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    public void getRecipientAddresses_validMessageNoRecipients_shouldReturnAddresses() {
+        // Given
+        final com.marcnuri.isotope.api.message.Message message =
+                Mockito.mock(com.marcnuri.isotope.api.message.Message.class);
+        doReturn(null).when(message).getRecipients();
+
+        // When
+        final Address[] result = MessageUtils.getRecipientAddresses(message, Message.RecipientType.TO);
+
+        // Then
+        int expectedSize = 0;
+        assertThat(result, arrayWithSize(expectedSize));
+    }
+
+    @Test
+    public void getRecipientAddresses_validMessage_shouldReturnAddresses() {
+        // Given
+        final com.marcnuri.isotope.api.message.Message message =
+                Mockito.mock(com.marcnuri.isotope.api.message.Message.class);
+        final List<Recipient> recipients = Arrays.asList(
+                new Recipient("To", "valid@toemail.com"),
+                new Recipient("Cc", "valid@ccemail.com")
+        );
+        doReturn(recipients).when(message).getRecipients();
+
+        // When
+        final Address[] result = MessageUtils.getRecipientAddresses(message, Message.RecipientType.TO);
+
+        // Then
+        int expectedSize = 1;
+        assertThat(result, arrayWithSize(expectedSize));
+    }
+
+    @Test(expected = InvalidFieldException.class)
+    public void getRecipientAddresses_invalidMessage_shouldThrowException() {
+        // Given
+        final com.marcnuri.isotope.api.message.Message message =
+                Mockito.mock(com.marcnuri.isotope.api.message.Message.class);
+        final List<Recipient> recipients = Arrays.asList(
+                new Recipient("To", "invalid@email@address_"),
+                new Recipient("Cc", "valid@ccemail.com")
+        );
+        doReturn(recipients).when(message).getRecipients();
+
+        // When
+        final Address[] result = MessageUtils.getRecipientAddresses(message, Message.RecipientType.TO);
+
+        // Then
+        fail();
     }
 }

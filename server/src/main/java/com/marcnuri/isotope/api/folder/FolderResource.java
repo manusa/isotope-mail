@@ -117,6 +117,17 @@ public class FolderResource implements ApplicationContextAware {
                 ;
     }
 
+    @GetMapping(path = "/{folderId}/messages")
+    public ResponseEntity<List<Message>> preloadMessages(
+            HttpServletRequest request, @PathVariable("folderId") String folderId, @RequestParam("id") List<Long> messageIds) {
+
+        log.debug("Preloading {} messages for folder {} ", messageIds.size(), folderId);
+        final List<Message> ret = imapServiceFactory.getObject()
+                .preloadMessages(credentialsService.fromRequest(request), Folder.toId(folderId), messageIds);
+        addLinks(folderId, ret);
+        return ResponseEntity.ok(ret);
+    }
+
     @GetMapping(path = "/{folderId}/messages/{messageId}")
     public ResponseEntity<MessageWithFolder> getMessage(
             HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId) {
