@@ -74,6 +74,7 @@
     height: 25px;
     width: 100%;
     overflow: hidden;
+    pointer-events: none;
 
     .listSpinnerCanvas {
       width: 16px;
