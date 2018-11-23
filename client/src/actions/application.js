@@ -16,8 +16,8 @@ export const selectMessage = message => ({type: ActionTypes.APPLICATION_MESSAGE_
  */
 export const refreshMessage = (folder, message) =>
   ({type: ActionTypes.APPLICATION_MESSAGE_REFRESH, payload: {folder, message}});
-export const cacheDownloadedMessages = messages =>
-  ({type: ActionTypes.APPLICATION_MESSAGE_CACHE_AS_DOWNLOADED, payload: {messages}});
+export const preDownloadMessages = messages =>
+  ({type: ActionTypes.APPLICATION_MESSAGE_PRE_DOWNLOAD, payload: {messages}});
 export const replaceMessageEmbeddedImages = (folder, message, attachment, blob) =>
   ({type: ActionTypes.APPLICATION_MESSAGE_REPLACE_IMAGE, payload: {folder, message, attachment, blob}});
 export const setError = (type, value) => ({type: ActionTypes.APPLICATION_ERROR_SET, payload: {type, value}});

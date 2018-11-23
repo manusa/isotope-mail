@@ -225,13 +225,11 @@ public class ImapService {
             final List<Message> ret = new ArrayList<>(uids.size());
             for(Long uid : uids) {
                 final IMAPMessage imapMessage = (IMAPMessage)folder.getMessageByUID(uid);
-                if (imapMessage == null) {
-                    folder.close();
-                    throw new NotFoundException("Message not found");
+                if (imapMessage != null) {
+                    final Message message = Message.from(folder, imapMessage);
+                    ret.add(message);
+                    readContentIntoMessage(folderId, imapMessage, message);
                 }
-                final Message message = Message.from(folder, imapMessage);
-                ret.add(message);
-                readContentIntoMessage(folderId, imapMessage, message);
             }
             folder.close();
             return ret;

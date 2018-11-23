@@ -40,7 +40,7 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
       }
       return newState;
     }
-    case ActionTypes.APPLICATION_MESSAGE_CACHE_AS_DOWNLOADED: {
+    case ActionTypes.APPLICATION_MESSAGE_PRE_DOWNLOAD: {
       const newState = {...state};
       const messages = action.payload.messages;
       // Store in application.downloadedMessages

@@ -1,6 +1,8 @@
 import {
   backendRequest as aBackendRequest,
-  backendRequestCompleted as aBackendRequestCompleted, cacheDownloadedMessages, replaceMessageEmbeddedImages
+  backendRequestCompleted as aBackendRequestCompleted,
+  preDownloadMessages,
+  replaceMessageEmbeddedImages
 } from '../actions/application';
 import {
   backendRequest,
@@ -92,7 +94,7 @@ export function preloadMessages(dispatch, credentials, folder, messageUids) {
     headers: credentialsHeaders(credentials)
   })
     .then(toJson)
-    .then(messages => dispatch(cacheDownloadedMessages(messages)));
+    .then(messages => dispatch(preDownloadMessages(messages)));
 }
 
 /**

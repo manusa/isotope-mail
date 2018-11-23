@@ -8,7 +8,7 @@ import Spinner from '../spinner/spinner';
 import {prettyDate, prettySize} from '../../services/prettify';
 import {selectMessage} from '../../actions/application';
 import {setSelected} from '../../actions/messages';
-import {readMessage} from '../../services/message';
+import {preloadMessages, readMessage} from '../../services/message';
 import mainCss from '../../styles/main.scss';
 import styles from './message-list.scss';
 
@@ -61,6 +61,14 @@ class MessageList extends Component {
         }
       </div>
     );
+  }
+
+  componentDidMount() {
+    this.preloadMessages({messages: []});
+  }
+
+  componentDidUpdate(previousProps) {
+    this.preloadMessages(previousProps);
   }
 
   renderItem({index, key, style}) {
@@ -145,8 +153,23 @@ class MessageList extends Component {
       this.props.messageSelected([message], checked);
     }
   }
-}
 
+  /**
+   * Preloads latest received messages whenever <b>new</b> messages are loaded in the list
+   */
+  preloadMessages(previousProps) {
+    const messagesToPreload = 15;
+    const previousIds = previousProps.messages.slice(0, messagesToPreload).map(m => m.messageId);
+    const currentIds = this.props.messages.slice(0, messagesToPreload).map(m => m.messageId);
+    if (currentIds.some(id => !previousIds.includes(id))) {
+      const latestMessagesUids = this.props.messages
+        .slice(0, messagesToPreload)
+        .filter(m => !Object.keys(this.props.downloadedMessages).includes(m.messageId))
+        .map(m => m.uid);
+      this.props.preloadMessages(this.props.selectedFolder, latestMessagesUids);
+    }
+  }
+}
 
 MessageList.propTypes = {
   className: PropTypes.string,
@@ -182,12 +205,14 @@ const mapDispatchToProps = dispatch => ({
     dispatch(selectMessage(message));
     readMessage(dispatch, credentials, downloadedMessages, folder, message);
   },
-  messageSelected: (messages, selected, shiftKey) => dispatch(setSelected(messages, selected, shiftKey))
+  messageSelected: (messages, selected, shiftKey) => dispatch(setSelected(messages, selected, shiftKey)),
+  preloadMessages: (credentials, folder, messageUids) => preloadMessages(dispatch, credentials, folder, messageUids)
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
   messageClicked: message => dispatchProps.messageClicked(
-    stateProps.credentials, stateProps.downloadedMessages, stateProps.selectedFolder, message)
+    stateProps.credentials, stateProps.downloadedMessages, stateProps.selectedFolder, message),
+  preloadMessages: (folder, messageUids) => dispatchProps.preloadMessages(stateProps.credentials, folder, messageUids)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(translate()(MessageList));

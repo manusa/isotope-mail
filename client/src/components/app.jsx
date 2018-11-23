@@ -9,7 +9,7 @@ import MessageViewer from './message-viewer/message-viewer';
 import MessageSnackbar from './message-snackbar/message-snackbar';
 import {editNewMessage} from '../services/application';
 import {getFolders} from '../services/folder';
-import {preloadMessages, resetFolderMessagesCache} from '../services/message';
+import {resetFolderMessagesCache} from '../services/message';
 import mainCss from '../styles/main.scss';
 import styles from './app.scss';
 
@@ -88,20 +88,10 @@ class App extends Component {
    */
   async refreshPoll() {
     try {
-      const messagesToPreload = 15;
       const folderPromise = this.props.reloadFolders();
       const selectedFolder = this.props.folders.explodedItems[this.props.application.selectedFolderId] || {};
       const messagePromise = this.props.reloadMessageCache(selectedFolder);
       await Promise.all([folderPromise, messagePromise]);
-      // Preload latest received messages if applicable
-      const activeMessageList = this.props.messages.cache[this.props.application.selectedFolderId];
-      if (activeMessageList) {
-        const latestMessagesUids = Array.from(activeMessageList.values())
-          .slice(0, messagesToPreload)
-          .filter(m => !Object.keys(this.props.application.downloadedMessages).includes(m.messageId))
-          .map(m => m.uid);
-        this.props.preloadMessages(selectedFolder, latestMessagesUids);
-      }
     } catch (e) {
       console.log(`Error in refresh poll: ${e}`);
     }
@@ -137,15 +127,12 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   reloadFolders: credentials => getFolders(dispatch, credentials, true),
   reloadMessageCache: (user, folder) => resetFolderMessagesCache(dispatch, user, folder),
-  newMessage: () => editNewMessage(dispatch),
-  preloadMessages: (credentials, folder, messageUids) => preloadMessages(dispatch, credentials, folder, messageUids)
+  newMessage: () => editNewMessage(dispatch)
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
   reloadFolders: () => dispatchProps.reloadFolders(stateProps.application.user.credentials),
-  reloadMessageCache: folder => dispatchProps.reloadMessageCache(stateProps.application.user, folder),
-  preloadMessages: (folder, messageUids) =>
-    dispatchProps.preloadMessages(stateProps.application.user.credentials, folder, messageUids)
+  reloadMessageCache: folder => dispatchProps.reloadMessageCache(stateProps.application.user, folder)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(App);
