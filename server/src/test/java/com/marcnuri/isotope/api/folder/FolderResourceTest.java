@@ -23,6 +23,7 @@ package com.marcnuri.isotope.api.folder;
 import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.imap.ImapService;
+import com.marcnuri.isotope.api.message.Message;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +40,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 
+import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.endsWith;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -93,7 +95,34 @@ public class FolderResourceTest {
         result.andExpect(jsonPath("$").isArray());
         result.andExpect(jsonPath("[0].folderId").value(folderId));
         result.andExpect(jsonPath("[0]._links").exists());
+        result.andExpect(jsonPath("[0]._links", aMapWithSize(2)));
         result.andExpect(jsonPath("[0]._links.messages.href", endsWith("/v1/folders/1337/messages")));
+    }
+
+    @Test
+    public void preloadMessages_validFolderAndValidIds_shouldReturnOk() throws Exception {
+        // Given
+        final Long messageUid = 1337L;
+        final Message message = new Message();
+        message.setUid(messageUid);
+        message.setSubject("Message in a bottle");
+        doReturn(Collections.singletonList(message))
+                .when(imapService).preloadMessages(Mockito.any(), Mockito.any(), Mockito.anyList());
+
+        // When
+        final ResultActions result = mockMvc.perform(
+                get("/v1/folders/1337/messages?id=1337")
+                        .accept(MediaTypes.HAL_JSON_VALUE));
+
+        // Then
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$").isArray());
+        result.andExpect(jsonPath("[0].uid").value(messageUid));
+        result.andExpect(jsonPath("[0].subject").value("Message in a bottle"));
+        result.andExpect(jsonPath("[0]._links").exists());
+        result.andExpect(jsonPath("[0]._links", aMapWithSize(5)));
+
+
     }
 
 }
