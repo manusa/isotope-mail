@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import mainCss from '../../styles/main.scss';
 
@@ -12,17 +12,10 @@ export function renderSpinner(className = '', canvasClassName = '', pathClassNam
   </div>);
 }
 
-class Spinner extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return this.props.visible ? (
-      renderSpinner(this.props.className, this.props.canvasClassName, this.props.pathClassName)
-    ) : (null);
-  }
-}
+const Spinner = ({visible, className, canvasClassName, pathClassName}) =>
+  (visible &&
+    renderSpinner(className, canvasClassName, pathClassName)
+  );
 
 Spinner.propTypes = {
   visible: PropTypes.bool,

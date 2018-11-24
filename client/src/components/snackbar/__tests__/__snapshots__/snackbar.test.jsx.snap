@@ -6,9 +6,9 @@ exports[`Snackbar component test suite Snapshot render Renders all elements 1`] 
   aria-hidden={false}
   aria-live="assertive"
   className="mdc-snackbar
-          
-          mdc-snackbar--align-start
-          mdc-snackbar--active"
+      
+      mdc-snackbar--align-start
+      mdc-snackbar--active"
 >
   <div
     className="mdc-snackbar__text"
@@ -35,9 +35,9 @@ exports[`Snackbar component test suite Snapshot render Renders all elements exce
   aria-hidden={false}
   aria-live="assertive"
   className="mdc-snackbar
-          mdc-snackbar__no_action
-          mdc-snackbar--align-start
-          mdc-snackbar--active"
+      mdc-snackbar__no_action
+      mdc-snackbar--align-start
+      mdc-snackbar--active"
 >
   <div
     className="mdc-snackbar__text"
@@ -53,9 +53,9 @@ exports[`Snackbar component test suite Snapshot render Renders all elements, doe
   aria-hidden={false}
   aria-live="assertive"
   className="mdc-snackbar
-          
-          
-          mdc-snackbar--active"
+      
+      
+      mdc-snackbar--active"
 >
   <div
     className="mdc-snackbar__text"
@@ -82,9 +82,9 @@ exports[`Snackbar component test suite Snapshot render Renders all elements, hid
   aria-hidden={true}
   aria-live="assertive"
   className="mdc-snackbar
-          
-          
-          "
+      
+      
+      "
 >
   <div
     className="mdc-snackbar__text"

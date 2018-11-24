@@ -4,7 +4,7 @@ import Button from '../button';
 
 describe('Button component test suite', () => {
   test('Snapshot render, should render button', () => {
-    const {className, type, label, icon} = {className: 'first-class', type: 'NotMyType', label: 'Black Label',
+    const {className, type, label, icon} = {className: 'first-class', type: 'button', label: 'Black Label',
       icon: 'Andy Warhol'};
     const button = shallow(<Button className={className} type={type} label={label} icon={icon}/>);
     expect(button).toMatchSnapshot();

@@ -4,7 +4,7 @@ exports[`Button component test suite Snapshot render, should render button 1`] =
 <button
   className="mdc-button first-class"
   onClick={[Function]}
-  type="NotMyType"
+  type="button"
 >
   <i
     className="material-icons mdc-button__icon"
