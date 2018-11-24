@@ -68,7 +68,7 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
         newState.downloadedMessages[message.messageId].content =
           newState.downloadedMessages[message.messageId].content.replace(regex, objectUrl);
         // Update selected message if applicable
-        if (newState.selectedFolder.folderId === folder.folderId
+        if (newState.selectedFolderId === folder.folderId
           && newState.selectedMessage.uid === message.uid) {
           const parsedMessage = newState.selectedMessage.content.replace(regex, objectUrl);
           newState.selectedMessage = {...newState.selectedMessage, content: parsedMessage};
