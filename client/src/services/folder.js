@@ -2,9 +2,9 @@ import {URLS} from './url';
 import {
   backendRequest as applicationBackendRequest,
   backendRequestCompleted as applicationBackendRequestCompleted,
-  renameFolder as renameFolderAction} from '../actions/application';
+  renameFolder as renameFolderAction, renameFolderOk
+} from '../actions/application';
 import {backendRequest, setFolders, updateFolder} from '../actions/folders';
-import {renameFolderCache} from '../actions/messages';
 import {renameMessageCache} from './indexed-db';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 
@@ -115,7 +115,7 @@ export function renameFolder(dispatch, user, folderToRename, newName) {
       renamedFolderParent.children
         .filter(f => f.previousFolderId)
         .forEach(f => {
-          dispatch(renameFolderCache(f.previousFolderId, f.folderId));
+          dispatch(renameFolderOk(f.previousFolderId, f.folderId));
           renameMessageCache(user.id, user.hash, f.previousFolderId, f.folderId);
         });
       dispatch(renameFolderAction(null));

@@ -6,6 +6,10 @@ export const setUserCredentials = (userId, hash, credentials) =>
   ({type: ActionTypes.APPLICATION_USER_CREDENTIALS_SET, payload: {userId, hash, credentials}});
 export const selectFolder = folder => ({type: ActionTypes.APPLICATION_FOLDER_SELECT, payload: folder});
 export const renameFolder = folder => ({type: ActionTypes.APPLICATION_FOLDER_RENAME, payload: folder});
+export const renameFolderOk = (oldFolderId, newFolderId) => ({
+  type: ActionTypes.APPLICATION_FOLDER_RENAME_OK,
+  payload: {oldFolderId, newFolderId}
+});
 export const selectMessage = message => ({type: ActionTypes.APPLICATION_MESSAGE_SELECT, payload: message});
 /**
  * Refreshes the current selectedMessage if it's still the same (same selectedFolder and same selectedMessage)
