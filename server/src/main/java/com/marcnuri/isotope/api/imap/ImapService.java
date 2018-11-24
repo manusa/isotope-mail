@@ -223,13 +223,15 @@ public class ImapService {
                 folder.open(READ_ONLY);
             }
             final List<Message> ret = new ArrayList<>(uids.size());
-            for(Long uid : uids) {
-                final IMAPMessage imapMessage = (IMAPMessage)folder.getMessageByUID(uid);
-                if (imapMessage != null) {
-                    final Message message = Message.from(folder, imapMessage);
-                    ret.add(message);
-                    readContentIntoMessage(folderId, imapMessage, message);
-                }
+            final List<IMAPMessage> messages = Stream.of(
+                    folder.getMessagesByUID(uids.stream().mapToLong(Long::longValue).toArray()))
+                    .filter(Objects::nonNull)
+                    .map(IMAPMessage.class::cast)
+                    .collect(Collectors.toList());
+            for(IMAPMessage imapMessage : messages) {
+                final Message message = Message.from(folder, imapMessage);
+                ret.add(message);
+                readContentIntoMessage(folderId, imapMessage, message);
             }
             folder.close();
             return ret;
