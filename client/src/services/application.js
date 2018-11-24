@@ -72,7 +72,7 @@ export async function login(dispatch, credentials) {
     if (recoveredState !== null) {
       await dispatch(setCache(recoveredState.messages.cache));
       await dispatch(setFolders(recoveredState.folders.items));
-      dispatch(selectFolder(recoveredState.application.selectedFolder));
+      dispatch(selectFolder({folderId: recoveredState.application.selectedFolderId}));
     } else {
       // Retrieve first level folders to show something ASAP
       const setFoldersDispatchAction = await getFolders(dispatch, validatedCredentials, false);
