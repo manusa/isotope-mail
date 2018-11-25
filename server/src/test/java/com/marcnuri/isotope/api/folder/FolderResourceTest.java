@@ -43,6 +43,7 @@ import java.util.Collections;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.endsWith;
 import static org.mockito.Mockito.doReturn;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -121,8 +122,28 @@ public class FolderResourceTest {
         result.andExpect(jsonPath("[0].subject").value("Message in a bottle"));
         result.andExpect(jsonPath("[0]._links").exists());
         result.andExpect(jsonPath("[0]._links", aMapWithSize(5)));
+    }
 
+    @Test
+    public void deleteMessages_validFolderAndValidIds_shouldReturnOk() throws Exception {
+        // Given
+        final String folderId = "1337";
+        final Folder folder = new Folder();
+        folder.setChildren(new Folder[0]);
+        folder.setFolderId(folderId);
+        doReturn(folder)
+                .when(imapService).deleteMessages(Mockito.any(), Mockito.any(), Mockito.anyList());
 
+        // When
+        final ResultActions result = mockMvc.perform(
+                delete("/v1/folders/1337/messages?id=1337")
+                        .accept(MediaTypes.HAL_JSON_VALUE));
+
+        // Then
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.folderId").value(folderId));
+        result.andExpect(jsonPath("$._links").exists());
+        result.andExpect(jsonPath("$._links", aMapWithSize(2)));
     }
 
 }

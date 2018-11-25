@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {FolderTypes} from '../../services/folder';
 import {selectMessage} from '../../actions/application';
 import {replyMessage} from '../../services/application';
-import {moveMessages, setMessagesSeen} from '../../services/message';
+import {deleteMessages, moveMessages, setMessagesSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
 
@@ -151,7 +151,11 @@ const mapDispatchToProps = dispatch => ({
   deleteMessage: (credentials, folders, selectedFolder, selectedMessage) => {
     const trashFolder = _findTrashFolder(folders);
     if (selectedMessage && selectedFolder && trashFolder) {
-      moveMessages(dispatch, credentials, selectedFolder, trashFolder, [selectedMessage]);
+      if (selectedFolder === trashFolder) {
+        deleteMessages(dispatch, credentials, selectedFolder, [selectedMessage]);
+      } else {
+        moveMessages(dispatch, credentials, selectedFolder, trashFolder, [selectedMessage]);
+      }
       dispatch(selectMessage(null));
     }
   },
@@ -162,7 +166,11 @@ const mapDispatchToProps = dispatch => ({
   deleteMessages: (credentials, folders, selectedFolder, selectedMessages) => {
     const trashFolder = _findTrashFolder(folders);
     if (selectedMessages.length > 0 && selectedFolder && trashFolder) {
-      moveMessages(dispatch, credentials, selectedFolder, trashFolder, selectedMessages);
+      if (selectedFolder === trashFolder) {
+        deleteMessages(dispatch, credentials, selectedFolder, selectedMessages);
+      } else {
+        moveMessages(dispatch, credentials, selectedFolder, trashFolder, selectedMessages);
+      }
     }
   },
   setMessagesSeen: (credentials, selectedFolder, selectedMessages, seen) => {

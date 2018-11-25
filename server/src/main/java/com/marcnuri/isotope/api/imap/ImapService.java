@@ -348,6 +348,25 @@ public class ImapService {
         }
     }
 
+    public Folder deleteMessages(@NonNull Credentials credentials, @NonNull URLName folderId, @NonNull List<Long> uids) {
+        try {
+            final IMAPFolder folder = getFolder(credentials, folderId);
+            folder.open(READ_WRITE);
+            final IMAPMessage[] messages = Stream.of(
+                    folder.getMessagesByUID(uids.stream().mapToLong(Long::longValue).toArray()))
+                    .filter(Objects::nonNull)
+                    .map(IMAPMessage.class::cast)
+                    .toArray(IMAPMessage[]::new);
+            for(IMAPMessage message : messages) {
+                message.setFlag(Flags.Flag.DELETED, true);
+            }
+            folder.expunge(messages);
+            return Folder.from(folder, true);
+        } catch (MessagingException ex) {
+            throw new IsotopeException(ex.getMessage(), ex);
+        }
+    }
+
     @PreDestroy
     public void destroy() {
         log.debug("ImapService destroyed");

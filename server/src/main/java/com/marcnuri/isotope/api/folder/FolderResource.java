@@ -128,6 +128,17 @@ public class FolderResource implements ApplicationContextAware {
         return ResponseEntity.ok(ret);
     }
 
+    @DeleteMapping(path = "/{folderId}/messages")
+    public ResponseEntity<Folder> deleteMessages(
+            HttpServletRequest request, @PathVariable("folderId") String folderId, @RequestParam("id") List<Long> messageIds) {
+
+        log.debug("Deleting {} messages for folder {} ", messageIds.size(), folderId);
+        final Folder folder = imapServiceFactory.getObject()
+                .deleteMessages(credentialsService.fromRequest(request), Folder.toId(folderId), messageIds);
+        addLinks(folder);
+        return ResponseEntity.ok(folder);
+    }
+
     @GetMapping(path = "/{folderId}/messages/{messageId}")
     public ResponseEntity<MessageWithFolder> getMessage(
             HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId) {

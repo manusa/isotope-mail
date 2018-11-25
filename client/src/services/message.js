@@ -293,3 +293,34 @@ export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
       dispatch(updateFolder(folder));
     });
 }
+
+export function deleteMessages(dispatch, credentials, folder, messages) {
+  if (messages.length === 0) {
+    return;
+  }
+  // Abort any operations that can affect operation result
+  _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
+  abortFetch(abortControllerWrappers.getFoldersAbortController);
+
+  const url = new URL(folder._links.messages.href);
+  const messagesToDelete = [];
+  messages.forEach(message => {
+    url.searchParams.append('id', message.uid);
+    messagesToDelete.push({...message, deleted: true});
+  });
+  dispatch(deleteFromCache(folder, messagesToDelete));
+  dispatch(setSelected(messagesToDelete, false));
+  fetch(url, {
+    method: 'DELETE',
+    headers: credentialsHeaders(credentials)
+  })
+    .then(toJson)
+    .then(updatedFolder => {
+      dispatch(updateFolder(updatedFolder));
+    })
+    .catch(() => {
+      // Rollback state from dispatched expected responses
+      dispatch(updateCacheIfExist(folder, messages));
+      dispatch(updateFolder(folder));
+    });
+}
