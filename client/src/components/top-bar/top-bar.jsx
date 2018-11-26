@@ -1,6 +1,7 @@
 import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import ConfirmDeleteFromTrashDialog from './confirm-delete-from-trash-dialog';
 import {FolderTypes} from '../../services/folder';
 import {selectMessage} from '../../actions/application';
 import {replyMessage} from '../../services/application';
@@ -14,6 +15,10 @@ const _findTrashFolder = foldersState =>
 class TopBar extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      deletingFromTrash: false,
+      deletingFromTrashConfirm: () => {}
+    };
   }
 
   render() {
@@ -55,23 +60,27 @@ class TopBar extends Component {
             </section>
           }
         </div>
+        <ConfirmDeleteFromTrashDialog
+          visible={this.state.deletingFromTrash}
+          deleteAction={this.state.deletingFromTrashConfirm}
+          cancelAction={() => this.setState({deletingFromTrash: false})}
+        />
       </header>
     );
   }
 
   renderMessageViewerActions() {
-    const {outbox, deleteMessage, toggleMessageSeen} = this.props;
+    const {outbox, toggleMessageSeen} = this.props;
     return (
       <Fragment>
-        {outbox === null ?
+        {outbox &&
           <button
             onClick={this.props.replyMessage}
             className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
             reply_all
-          </button>
-          : null}
+          </button>}
         <button
-          onClick={deleteMessage}
+          onClick={() => this.onDelete(this.props.deleteMessage)}
           className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
           delete
         </button>
@@ -86,10 +95,10 @@ class TopBar extends Component {
 
   renderMessageListActions() {
     return (
-      this.props.selectedMessages.length > 0 ?
+      this.props.selectedMessages.length > 0 &&
         <Fragment>
           <button
-            onClick={this.props.deleteMessages}
+            onClick={() => this.onDelete(this.props.deleteMessages)}
             className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
             delete
           </button>
@@ -106,8 +115,21 @@ class TopBar extends Component {
             </button>
           }
         </Fragment>
-        : null
     );
+  }
+
+  onDelete(action) {
+    if (this.props.selectedFolder.type === FolderTypes.TRASH) {
+      this.setState({
+        deletingFromTrash: true,
+        deletingFromTrashConfirm: () => {
+          action();
+          this.setState({deletingFromTrash: false});
+        }
+      });
+    } else {
+      action();
+    }
   }
 }
 

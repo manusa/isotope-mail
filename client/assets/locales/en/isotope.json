@@ -23,6 +23,14 @@
       "diskQuotaExceeded": "Disk quota exceeded (IndexedDB)"
     }
   },
+  "topBar": {
+    "deleteFromTrashDialog": {
+      "title": "Confirm deletion",
+      "message": "This will permanently delete messages from Trash. Are you sure you want to continue?",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    }
+  },
   "messageList": {
     "moveEmails": "Moving {{emailCount}} e-mails"
   },

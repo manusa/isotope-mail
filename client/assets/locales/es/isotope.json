@@ -23,6 +23,14 @@
       "diskQuotaExceeded": "Cuota de disco sobrepasada (IndexedDB)"
     }
   },
+  "topBar": {
+    "deleteFromTrashDialog": {
+      "title": "Confirmar borrado",
+      "message": "Esta acción eliminará permenentemente los mensajes de la basura. ¿Seguro que quieres continuar?",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    }
+  },
   "messageList": {
     "moveEmails": "Moviendo {{emailCount}} e-mails"
   },
