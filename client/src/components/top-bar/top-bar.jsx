@@ -73,7 +73,7 @@ class TopBar extends Component {
     const {outbox, toggleMessageSeen} = this.props;
     return (
       <Fragment>
-        {outbox &&
+        {outbox === null &&
           <button
             onClick={this.props.replyMessage}
             className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
