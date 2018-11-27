@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ConfirmDeleteFromTrashDialog component test suite Snapshot render, should render ConfirmDeleteFromTrashDialog 1`] = `
+<Dialog
+  actions={
+    Array [
+      Object {
+        "action": [Function],
+        "label": "topBar.deleteFromTrashDialog.cancel",
+      },
+      Object {
+        "action": [Function],
+        "label": "topBar.deleteFromTrashDialog.delete",
+      },
+    ]
+  }
+  className=""
+  containerClassName=""
+  contentClassName=""
+  scrimClick={[Function]}
+  title="topBar.deleteFromTrashDialog.title"
+  visible={true}
+>
+  <p>
+    topBar.deleteFromTrashDialog.message
+  </p>
+</Dialog>
+`;
