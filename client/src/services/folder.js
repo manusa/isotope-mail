@@ -7,6 +7,7 @@ import {
 import {backendRequest, setFolders, updateFolder} from '../actions/folders';
 import {renameMessageCache} from './indexed-db';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
+import {notify} from './notification';
 
 export const FolderTypes = Object.freeze({
   INBOX: {serverName: 'INBOX', icon: 'inbox', position: 0},
@@ -93,7 +94,12 @@ export async function getFolders(dispatch, credentials, loadChildren) {
     signal: signal
   });
   const folders = await toJson(response);
-  return dispatch(setFolders(folders));
+  const foldersAction = setFolders(folders);
+  const inbox = Object.values(foldersAction.payload).find(f => f.type === FolderTypes.INBOX);
+  if (inbox && inbox.newMessageCount > 0) {
+    notify(`New messages received ${inbox.newMessageCount}`, {tag: 'isotope.new-mail', renotify: false});
+  }
+  return dispatch(foldersAction);
 }
 
 export function renameFolder(dispatch, user, folderToRename, newName) {
