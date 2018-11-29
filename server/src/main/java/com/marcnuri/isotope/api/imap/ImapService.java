@@ -137,7 +137,16 @@ public class ImapService {
                     .map(mf -> Folder.from(mf, loadChildren))
                     .sorted(Comparator.comparing(Folder::getName))
                     .collect(Collectors.toList());
-            return addSystemFolders(rootFolder, folders);
+            addSystemFolders(rootFolder, folders);
+            // Clear \Recent flags by opening and closing the INBOX
+            if (folders.stream().anyMatch(
+                    f -> f.getName().equalsIgnoreCase("INBOX") && f.getNewMessageCount() > 0)) {
+                final IMAPFolder inbox = (IMAPFolder)rootFolder.getFolder("INBOX");
+                inbox.open(READ_WRITE);
+                inbox.getNewMessageCount();
+                inbox.close();
+            }
+            return folders;
         } catch (MessagingException ex) {
             log.error("Error loading folders", ex);
             throw  new IsotopeException(ex.getMessage());

@@ -67,5 +67,8 @@
     "folderNameLabel": "New folder name",
     "cancel": "Cancel",
     "rename": "Rename"
+  },
+  "notifications": {
+    "newMail": "New messages received"
   }
 }

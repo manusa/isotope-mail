@@ -67,5 +67,8 @@
     "folderNameLabel": "Nuevo nombre de carpeta",
     "cancel": "Cancelar",
     "rename": "Renombrar"
+  },
+  "notifications": {
+    "newMail": "New messages received"
   }
 }

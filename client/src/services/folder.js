@@ -8,6 +8,7 @@ import {backendRequest, setFolders, updateFolder} from '../actions/folders';
 import {renameMessageCache} from './indexed-db';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 import {notify} from './notification';
+import i18n from './i18n';
 
 export const FolderTypes = Object.freeze({
   INBOX: {serverName: 'INBOX', icon: 'inbox', position: 0},
@@ -97,7 +98,8 @@ export async function getFolders(dispatch, credentials, loadChildren) {
   const foldersAction = setFolders(folders);
   const inbox = Object.values(foldersAction.payload).find(f => f.type === FolderTypes.INBOX);
   if (inbox && inbox.newMessageCount > 0) {
-    notify(`New messages received ${inbox.newMessageCount}`, {tag: 'isotope.new-mail', renotify: false});
+    const t = i18n.t.bind(i18n);
+    notify(t('notifications.newMail'), {tag: 'isotope.new-mail', renotify: true});
   }
   return dispatch(foldersAction);
 }
