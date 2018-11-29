@@ -12,7 +12,9 @@ function requestPermission() {
 export function notify(message, options) {
   return requestPermission().then(permission => {
     if (permission === GRANTED_PERMISSION) {
-      return new Notification(message, {...options, icon: 'assets/images/notification-icon.png'});
+      const notification = new Notification(message, {...options, icon: 'assets/images/notification-icon.png'});
+      notification.onclick = () => window.focus();
+      return notification;
     }
     return null;
   });
