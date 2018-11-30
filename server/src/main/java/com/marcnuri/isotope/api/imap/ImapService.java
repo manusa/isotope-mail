@@ -58,6 +58,7 @@ import javax.mail.UIDFolder;
 import javax.mail.URLName;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -492,7 +493,8 @@ public class ImapService {
             }
             // Regular files
             else if (bp.getDisposition() != null && bp.getDisposition().equalsIgnoreCase(Part.ATTACHMENT)) {
-                attachments.add(new Attachment(null, bp.getFileName(), bp.getContentType(), bp.getSize()));
+                attachments.add(new Attachment(
+                        null, MimeUtility.decodeText(bp.getFileName()), bp.getContentType(), bp.getSize()));
             }
         }
         return attachments;
