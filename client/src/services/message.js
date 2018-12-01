@@ -16,6 +16,7 @@ import {refreshMessage} from '../actions/application';
 import {updateFolder} from '../actions/folders';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 import {persistMessageCache} from './indexed-db';
+import {notifyNewMail} from './notification';
 
 const _eventSourceWrappers = {};
 
@@ -94,7 +95,12 @@ export function preloadMessages(dispatch, credentials, folder, messageUids) {
     headers: credentialsHeaders(credentials)
   })
     .then(toJson)
-    .then(messages => dispatch(preDownloadMessages(messages)));
+    .then(messages => {
+      if (messages.some(m => m.recent === true)) {
+        notifyNewMail();
+      }
+      dispatch(preDownloadMessages(messages));
+    });
 }
 
 /**

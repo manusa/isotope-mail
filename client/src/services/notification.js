@@ -1,3 +1,5 @@
+import i18n from './i18n';
+
 const GRANTED_PERMISSION = 'granted';
 const DENIED_PERMISSION = 'denied';
 
@@ -18,4 +20,9 @@ export function notify(message, options) {
     }
     return null;
   });
+}
+
+export function notifyNewMail() {
+  const t = i18n.t.bind(i18n);
+  return notify(t('notifications.newMail'), {tag: 'isotope.new-mail', renotify: true});
 }

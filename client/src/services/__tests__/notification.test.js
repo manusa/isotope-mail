@@ -1,4 +1,4 @@
-import {notify} from '../notification';
+import {notify, notifyNewMail} from '../notification';
 
 describe('Notification service test suite', () => {
   test('notify, requests permission but not granted, should do nothing', done => {
@@ -41,6 +41,24 @@ describe('Notification service test suite', () => {
 
     // When
     notify('I\'m a loser baby').then(result => {
+      expect(global.Notification).toHaveBeenCalledTimes(1);
+      expect(result).not.toEqual(null);
+      done();
+    });
+
+    // Then
+    expect(global.Notification.requestPermission).toHaveBeenCalledTimes(1);
+  });
+  test('notifyNewMail, requests permission and granted, should notify', done => {
+    // Given
+    global.Notification = jest.fn(message => {
+      expect(message).toEqual('notifications.newMail');
+    });
+    global.Notification.permission = 'default';
+    global.Notification.requestPermission = jest.fn(() => Promise.resolve('granted'));
+
+    // When
+    notifyNewMail().then(result => {
       expect(global.Notification).toHaveBeenCalledTimes(1);
       expect(result).not.toEqual(null);
       done();
