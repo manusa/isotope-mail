@@ -1,28 +1,30 @@
 @import '../../styles/partials/variables';
 
 .side-bar {
+  display: flex;
+  position: fixed;
   min-height: 100vh;
   border-right: none;
+  width: 0px;
+  transition: width $drawerAnimationSpeed;
+
   &.open {
     width: $drawerWidth;
   }
-  .drawer {
-    position: fixed;
 
-    .top-container {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      cursor: default;
-      color: $mdc-theme-secondary;
+  .top-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: default;
+    color: $mdc-theme-secondary;
 
-      .toggle {
-        margin-left: auto;
-      }
+    .toggle {
+      margin-left: auto;
     }
+  }
 
-    .drawer-content {
-      overflow-y: auto;
-    }
+  .drawer-content {
+    overflow-y: auto;
   }
 }

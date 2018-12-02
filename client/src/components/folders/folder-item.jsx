@@ -16,10 +16,10 @@ class FolderItem extends Component {
   }
 
   render() {
-    const {selected, graphic, label, newMessageCount, unreadMessageCount, onClick, onRename} = this.props;
+    const {className, selected, graphic, label, newMessageCount, unreadMessageCount, onClick, onRename} = this.props;
     const {dragOver} = this.state;
     return (
-      <a className={`${mainCss['mdc-list-item']} ${styles.listItem}
+      <a className={`${className} ${mainCss['mdc-list-item']} ${styles.listItem}
         ${selected ? mainCss['mdc-list-item--selected'] : ''}
         ${dragOver ? mainCss['mdc-list-item--activated'] : ''}`}
       onClick={onClick}
@@ -60,6 +60,7 @@ class FolderItem extends Component {
 }
 
 FolderItem.propTypes = {
+  className: PropTypes.string,
   graphic: PropTypes.string,
   label: PropTypes.string.isRequired,
   selected: PropTypes.bool.isRequired,
@@ -71,6 +72,7 @@ FolderItem.propTypes = {
 };
 
 FolderItem.defaultProps = {
+  className: '',
   graphic: FolderTypes.FOLDER.icon,
   selected: false,
   unreadMessageCount: 0,

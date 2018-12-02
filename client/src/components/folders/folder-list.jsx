@@ -12,6 +12,7 @@ class FolderList extends Component {
       folderList.map(folder =>
         <div key={folder.fullURL} className={`${styles.itemContainer}`}>
           <FolderItem label={folder.name} graphic={folder.type.icon}
+            className={styles.item}
             selected={selectedFolder && folder.folderId === selectedFolder.folderId}
             onClick={event => this.onClick(event, folder)}
             onDrop={event => this.onDrop(event, folder)}

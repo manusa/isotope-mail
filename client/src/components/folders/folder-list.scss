@@ -2,6 +2,18 @@
 
 .itemContainer {
   padding-left: 15px;
+
+  .item {
+    margin-left: -100%;
+    padding-left: 100%;
+    margin-right: 0px;
+    height: 36px;
+    border-radius: 0;
+
+    &:nth-child(1) {
+      margin-top: 0px;
+    }
+  }
 }
 .childList {
   padding: 0;

@@ -2,7 +2,7 @@
 
 exports[`FolderItem component test suite Snapshot render, should render FolderItem 1`] = `
 <a
-  className="mdc-list-item listItem
+  className="the-one-percent mdc-list-item listItem
         mdc-list-item--selected
         "
   onDragLeave={[Function]}
