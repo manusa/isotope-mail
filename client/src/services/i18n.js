@@ -11,7 +11,7 @@ i18n
     ns: ['isotope'],
     defaultNS: 'isotope',
     backend: {
-      loadPath: '/assets/locales/{{lng}}/{{ns}}.json'
+      loadPath: 'assets/locales/{{lng}}/{{ns}}.json'
     },
     interpolation: {
       escapeValue: false
