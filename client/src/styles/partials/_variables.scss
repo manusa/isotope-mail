@@ -7,6 +7,19 @@ $mdc-theme-on-secondary: #fcffff;
 
 // Layout
 $default-spacing: 16px;
+$z-index: (
+        'exosphere': 1000,
+        'thermosphere': 500,
+        'mesosphere': 300,
+        'stratosphere': 100,
+        'ozone-layer' : 20,
+        'troposhere': 10,
+        'crust': 0,
+        'upper-mantle': -10,
+        'lower-mantle': -20,
+        'outer-core': -100,
+        'inner-core': -300,
+);
 
 // Drawer
 $drawerWidth: 240px;
