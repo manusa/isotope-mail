@@ -4,7 +4,7 @@
 .topBar {
   margin-left: 0px;
   width: 100%;
-  transition: margin $drawerAnimationSpeed;
+  transition: margin $drawerAnimationSpeed, width $drawerAnimationSpeed;
 
   &.with-custom-styles{
     @include mdc-top-app-bar-fill-color($mdc-theme-secondary);
