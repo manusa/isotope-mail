@@ -45,6 +45,7 @@ import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -150,11 +151,7 @@ public class SmtpService {
             // Include attachments
             if (message.getAttachments() != null && !message.getAttachments().isEmpty()) {
                 for (Attachment attachment : message.getAttachments()) {
-                    try {
-                        multipart.addBodyPart(toBodyPart(request, attachment));
-                    } catch (IOException e) {
-                        log.debug("Unable to attach file {}", attachment.getFileName(), e);
-                    }
+                    multipart.addBodyPart(toBodyPart(request, attachment));
                 }
             }
 
@@ -169,7 +166,7 @@ public class SmtpService {
 
             mimeMessage.saveChanges();
             getSmtpTransport(credentials).sendMessage(mimeMessage, mimeMessage.getAllRecipients());
-        } catch(MessagingException ex) {
+        } catch(MessagingException | IOException ex) {
             throw new IsotopeException("Problem sending message", ex);
         }
     }
@@ -238,7 +235,7 @@ public class SmtpService {
                     mimeType, request);
         }
         mimeAttachment.setDataHandler(new DataHandler(dataSource));
-        mimeAttachment.setFileName(attachment.getFileName());
+        mimeAttachment.setFileName(MimeUtility.encodeText(attachment.getFileName()));
         return mimeAttachment;
     }
 }

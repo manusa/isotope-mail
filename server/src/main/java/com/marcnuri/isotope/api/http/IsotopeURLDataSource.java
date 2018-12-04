@@ -127,7 +127,7 @@ public class IsotopeURLDataSource implements DataSource, EncodingAware {
     }
 
     /**
-     * Always retursn base64
+     * Always returns base64
      *
      * This DataSource is intended to retrieve Isotope attachments, mostly binary code
      *

@@ -131,6 +131,7 @@ export function replyMessage(dispatch, originalMessage) {
 }
 
 export function forwardMessage(dispatch, originalMessage) {
+  const t = i18n.t.bind(i18n);
   const attachments = [...originalMessage.attachments];
   const subject = `${originalMessage.subject.toLowerCase().indexOf('fwd:') === 0 ? '' : 'Fwd: '}${originalMessage.subject}`;
   const formattedDate = new Date(originalMessage.receivedDate).toLocaleString(navigator.language, {
@@ -142,7 +143,6 @@ export function forwardMessage(dispatch, originalMessage) {
   const cc = recipients.filter(r => r.type === 'Cc').map(recipientMapper);
   const optionalCc = cc.length > 0 ? `<b>${t('forwardAction.Cc')}:</b> ${cc.join(', ')}<br/>` : '';
 
-  const t = i18n.t.bind(i18n);
   const content = `
     <p></p>
     <hr/>
