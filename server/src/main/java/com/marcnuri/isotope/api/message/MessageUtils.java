@@ -33,6 +33,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
 import java.io.IOException;
 
 import static com.marcnuri.isotope.api.imap.ImapService.MULTIPART_MIME_TYPE;
@@ -214,7 +215,7 @@ public class MessageUtils {
             final BodyPart bp = multipart.getBodyPart(it);
             if (bp.getDisposition() != null && Part.ATTACHMENT.equalsIgnoreCase(bp.getDisposition())) {
                 // Regular file
-                if (id.equals(bp.getFileName())) {
+                if (id.equals(MimeUtility.decodeText(bp.getFileName()))) {
                     return bp;
                 }
                 // Embedded message
