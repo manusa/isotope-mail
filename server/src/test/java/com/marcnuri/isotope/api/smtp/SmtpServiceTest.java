@@ -22,6 +22,7 @@ package com.marcnuri.isotope.api.smtp;
 
 import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.exception.AuthenticationException;
+import com.marcnuri.isotope.api.http.IsotopeURLDataSource;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
 import com.sun.mail.util.MailSSLSocketFactory;
@@ -36,6 +37,7 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.hateoas.Link;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.mail.MessagingException;
@@ -49,11 +51,16 @@ import java.util.Collections;
 import java.util.Properties;
 
 import static com.marcnuri.isotope.api.smtp.SmtpServiceTest.HeaderMatcher.headerMatches;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.array;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -204,7 +211,9 @@ public class SmtpServiceTest {
         attachment1.setContent("1337".getBytes());
         final Attachment attachment2 = new Attachment(null, "strange.file", null, 1337);
         attachment2.setContent(new byte[0]);
-        message.setAttachments(Arrays.asList(attachment1, attachment2));
+        final Attachment attachmentUrl = new Attachment(null, "forwarded.attachment", null, 1337);
+        attachmentUrl.add(new Link("http://localhost/attachment.ext", "download"));
+        message.setAttachments(Arrays.asList(attachment1, attachment2, attachmentUrl));
 
         final ArgumentCaptor<MimeMessage> mimeMessage = ArgumentCaptor.forClass(MimeMessage.class);
 
@@ -220,6 +229,10 @@ public class SmtpServiceTest {
                 headerMatches("Content-type", startsWith("text/plain")));
         assertThat(((MimeMultipart)content).getBodyPart(1),
                 headerMatches("Content-type", startsWith("application/octet-stream")));
+        assertThat(((MimeMultipart)content).getBodyPart(2),
+                headerMatches("Content-type", startsWith("application/octet-stream")));
+        assertThat(((MimeMultipart)content).getBodyPart(2).getDataHandler().getDataSource(),
+                instanceOf(IsotopeURLDataSource.class));
     }
 
     protected static final class HeaderMatcher extends FeatureMatcher<MimeBodyPart, String> {
