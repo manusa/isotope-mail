@@ -163,8 +163,8 @@ public class SmtpService {
             multipart.addBodyPart(body);
             body.setContent(new String(String.format("<html><head><style>%1$s</style></head><body><div id='scoped'>"
                             + "<style type='text/css' scoped>%1$s</style>%2$s</div></body></html>",
-                            STYLES, finalContent).getBytes(), StandardCharsets.UTF_8),
-                    String.format("%s; charset=\"%s\"", MediaType.TEXT_HTML_VALUE, StandardCharsets.UTF_8.name()));
+                            STYLES, finalContent).getBytes(), StandardCharsets.ISO_8859_1),
+                    String.format("%s; charset=\"%s\"", MediaType.TEXT_HTML_VALUE, StandardCharsets.ISO_8859_1.name()));
             mimeMessage.setContent(multipart);
 
             mimeMessage.saveChanges();
