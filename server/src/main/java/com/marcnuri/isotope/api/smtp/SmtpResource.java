@@ -58,7 +58,7 @@ public class SmtpResource {
             HttpServletRequest request, @Validated({Message.SmtpSend.class}) @RequestBody Message message) {
 
         log.debug("Sending SMTP message");
-        smtpServiceFactory.getObject().sendMessage(credentialsService.fromRequest(request), message);
+        smtpServiceFactory.getObject().sendMessage(request, credentialsService.fromRequest(request), message);
         return ResponseEntity.noContent().build();
     }
 

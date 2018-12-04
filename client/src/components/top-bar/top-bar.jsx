@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import ConfirmDeleteFromTrashDialog from './confirm-delete-from-trash-dialog';
 import {FolderTypes} from '../../services/folder';
 import {selectMessage} from '../../actions/application';
-import {replyMessage} from '../../services/application';
+import {forwardMessage, replyMessage} from '../../services/application';
 import {deleteMessages, moveMessages, setMessagesSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
@@ -79,6 +79,12 @@ class TopBar extends Component {
             className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
             reply_all
           </button>}
+        {outbox === null &&
+        <button
+          onClick={this.props.forwardMessage}
+          className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
+          forward
+        </button>}
         <button
           onClick={() => this.onDelete(this.props.deleteMessage)}
           className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
@@ -170,6 +176,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   selectMessage: message => dispatch(selectMessage(message)),
   replyMessage: selectedMessaage => replyMessage(dispatch, selectedMessaage),
+  forwardMessage: selectedMessaage => forwardMessage(dispatch, selectedMessaage),
   deleteMessage: (credentials, folders, selectedFolder, selectedMessage) => {
     const trashFolder = _findTrashFolder(folders);
     if (selectedMessage && selectedFolder && trashFolder) {
@@ -204,6 +211,7 @@ const mapDispatchToProps = dispatch => ({
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
   replyMessage: () => dispatchProps.replyMessage(stateProps.selectedMessage),
+  forwardMessage: () => dispatchProps.forwardMessage(stateProps.selectedMessage),
   deleteMessage: () =>
     dispatchProps.deleteMessage(
       stateProps.credentials, stateProps.folders, stateProps.selectedFolder, stateProps.selectedMessage),

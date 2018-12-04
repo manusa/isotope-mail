@@ -23,6 +23,7 @@ package com.marcnuri.isotope.api.smtp;
 import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.exception.AuthenticationException;
 import com.marcnuri.isotope.api.exception.IsotopeException;
+import com.marcnuri.isotope.api.http.IsotopeURLDataSource;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
 import com.marcnuri.isotope.api.message.MessageUtils;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.annotation.PreDestroy;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -44,6 +46,8 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Properties;
@@ -53,6 +57,7 @@ import java.util.regex.Pattern;
 
 import static com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration.DEFAULT_CONNECTION_TIMEOUT;
 import static com.marcnuri.isotope.api.exception.AuthenticationException.Type.SMTP;
+import static com.marcnuri.isotope.api.folder.FolderResource.REL_DOWNLOAD;
 import static com.marcnuri.isotope.api.message.Message.HEADER_IN_REPLY_TO;
 import static com.marcnuri.isotope.api.message.Message.HEADER_REFERENCES;
 
@@ -99,7 +104,7 @@ public class SmtpService {
         }
     }
 
-    public void sendMessage(Credentials credentials, Message message) {
+    public void sendMessage(HttpServletRequest request, Credentials credentials, Message message) {
         try {
             final MimeMessage mimeMessage = new MimeMessage(getSession(credentials));
             mimeMessage.setSentDate(new Date());
@@ -145,7 +150,11 @@ public class SmtpService {
             // Include attachments
             if (message.getAttachments() != null && !message.getAttachments().isEmpty()) {
                 for (Attachment attachment : message.getAttachments()) {
-                    multipart.addBodyPart(toBodyPart(attachment));
+                    try {
+                        multipart.addBodyPart(toBodyPart(request, attachment));
+                    } catch (IOException e) {
+                        log.debug("Unable to attach file {}", attachment.getFileName(), e);
+                    }
                 }
             }
 
@@ -214,13 +223,21 @@ public class SmtpService {
         return ret;
     }
 
-    private static MimeBodyPart toBodyPart(Attachment attachment) throws MessagingException {
+    private static MimeBodyPart toBodyPart(HttpServletRequest request, Attachment attachment)
+            throws MessagingException, IOException {
+
         final MimeBodyPart mimeAttachment = new MimeBodyPart();
         mimeAttachment.setDisposition(MimeBodyPart.ATTACHMENT);
         final String mimeType = attachment.getContentType() != null && !attachment.getContentType().isEmpty() ?
                 attachment.getContentType() : MediaType.APPLICATION_OCTET_STREAM_VALUE;
-        mimeAttachment.setDataHandler(new DataHandler(
-                new ByteArrayDataSource(attachment.getContent(), mimeType)));
+        final DataSource dataSource;
+        if (attachment.getContent() != null) {
+            dataSource = new ByteArrayDataSource(attachment.getContent(), mimeType);
+        } else {
+            dataSource = new IsotopeURLDataSource(attachment.getLink(REL_DOWNLOAD).getTemplate().expand().toURL(),
+                    mimeType, request);
+        }
+        mimeAttachment.setDataHandler(new DataHandler(dataSource));
         mimeAttachment.setFileName(attachment.getFileName());
         return mimeAttachment;
     }

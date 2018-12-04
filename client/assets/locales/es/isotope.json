@@ -52,6 +52,13 @@
       "ok": "Ok"
     }
   },
+  "forwardAction": {
+    "From": "De",
+    "To": "Para",
+    "Cc": "Cc",
+    "Date": "Fecha",
+    "Subject": "Asunto"
+  },
   "replyAction": {
     "From": "De",
     "Date": "Fecha",

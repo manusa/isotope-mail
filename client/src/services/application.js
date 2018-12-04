@@ -129,3 +129,32 @@ export function replyMessage(dispatch, originalMessage) {
   dispatch(editMessage({inReplyTo, references, to, cc, bcc, attachments, subject, content
   }));
 }
+
+export function forwardMessage(dispatch, originalMessage) {
+  const attachments = [...originalMessage.attachments];
+  const subject = `${originalMessage.subject.toLowerCase().indexOf('fwd:') === 0 ? '' : 'Fwd: '}${originalMessage.subject}`;
+  const formattedDate = new Date(originalMessage.receivedDate).toLocaleString(navigator.language, {
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'
+  });
+  const recipients = [...originalMessage.recipients];
+  const recipientMapper = r => r.address;
+  const to = recipients.filter(r => r.type === 'To').map(recipientMapper).concat(originalMessage.from);
+  const cc = recipients.filter(r => r.type === 'Cc').map(recipientMapper);
+  const optionalCc = cc.length > 0 ? `<b>${t('forwardAction.Cc')}:</b> ${cc.join(', ')}<br/>` : '';
+
+  const t = i18n.t.bind(i18n);
+  const content = `
+    <p></p>
+    <hr/>
+    <p>
+      <b>${t('forwardAction.From')}:</b> ${originalMessage.from.join(', ')}<br/>
+      <b>${t('forwardAction.To')}:</b> ${to.join(', ')}<br/>
+      ${optionalCc}
+      <b>${t('forwardAction.Date')}:</b> ${formattedDate}<br/>
+      <b>${t('forwardAction.Subject')}:</b> ${originalMessage.subject}<br/>
+    </p>
+    <br/>
+    ${sanitize.sanitize(originalMessage.content)}
+  `;
+  dispatch(editMessage({to: [], cc: [], bcc: [], attachments, subject, content}));
+}

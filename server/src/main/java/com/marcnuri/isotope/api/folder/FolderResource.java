@@ -63,7 +63,7 @@ public class FolderResource implements ApplicationContextAware {
     private static final Logger log = LoggerFactory.getLogger(FolderResource.class);
 
     private static final String REL_MESSAGES = "messages";
-    private static final String REL_DOWNLOAD = "download";
+    public static final String REL_DOWNLOAD = "download";
     private static final String REL_RENAME = "rename";
     private static final String REL_MOVE = "move";
     private static final String REL_MOVE_BULK = "move.bulk";
