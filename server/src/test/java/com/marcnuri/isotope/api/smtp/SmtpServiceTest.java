@@ -36,6 +36,7 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -153,7 +154,7 @@ public class SmtpServiceTest {
         final ArgumentCaptor<MimeMessage> mimeMessage = ArgumentCaptor.forClass(MimeMessage.class);
 
         // When
-        smtpService.sendMessage(credentials, message);
+        smtpService.sendMessage(new MockHttpServletRequest(), credentials, message);
 
         // Then
         verify(mockedTransport, times(1)).sendMessage(mimeMessage.capture(), Mockito.any());
@@ -178,7 +179,7 @@ public class SmtpServiceTest {
         final ArgumentCaptor<MimeMessage> mimeMessage = ArgumentCaptor.forClass(MimeMessage.class);
 
         // When
-        smtpService.sendMessage(credentials, message);
+        smtpService.sendMessage(new MockHttpServletRequest(), credentials, message);
 
         // Then
         verify(mockedTransport, times(1)).sendMessage(mimeMessage.capture(), Mockito.any());
@@ -208,7 +209,7 @@ public class SmtpServiceTest {
         final ArgumentCaptor<MimeMessage> mimeMessage = ArgumentCaptor.forClass(MimeMessage.class);
 
         // When
-        smtpService.sendMessage(credentials, message);
+        smtpService.sendMessage(new MockHttpServletRequest(), credentials, message);
 
         // Then
         verify(mockedTransport, times(1)).sendMessage(mimeMessage.capture(), Mockito.any());
