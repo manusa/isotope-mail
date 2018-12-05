@@ -1,0 +1,154 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TopBar component test suite Snapshot render TopBar with new message and no selected message and no selected folder, should render in edit mode without buttons 1`] = `
+<header
+  className="topBar with-custom-styles
+      with-side-bar
+      mdc-top-app-bar mdc-top-app-bar--fixed"
+>
+  <div
+    className="mdc-top-app-bar__row"
+  >
+    <section
+      className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
+    >
+      <span
+        className="mdc-top-app-bar__title"
+      >
+        Isotope Mail Client - TITLE
+      </span>
+    </section>
+  </div>
+  <Translate(ConfirmDeleteFromTrashDialog)
+    cancelAction={[Function]}
+    deleteAction={[Function]}
+    visible={false}
+  />
+</header>
+`;
+
+exports[`TopBar component test suite Snapshot render TopBar with selected folder (and messageIds) and no new message and no selected message, should render in list mode with delete and mark read buttons 1`] = `
+<header
+  className="topBar with-custom-styles
+      with-side-bar
+      mdc-top-app-bar mdc-top-app-bar--fixed"
+>
+  <div
+    className="mdc-top-app-bar__row"
+  >
+    <section
+      className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
+    >
+      <span
+        className="mdc-top-app-bar__title"
+      >
+        SelectedFolder - Isotope Mail Client - TITLE
+      </span>
+    </section>
+    <section
+      className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
+    >
+      <button
+        className="material-icons mdc-top-app-bar__action-item"
+        onClick={[Function]}
+      >
+        delete
+      </button>
+      <button
+        className="material-icons mdc-top-app-bar__action-item"
+        onClick={[Function]}
+      >
+        markunread
+      </button>
+    </section>
+  </div>
+  <Translate(ConfirmDeleteFromTrashDialog)
+    cancelAction={[Function]}
+    deleteAction={[Function]}
+    visible={false}
+  />
+</header>
+`;
+
+exports[`TopBar component test suite Snapshot render TopBar with selected folder and no new message and no selected message, should render in list mode 1`] = `
+<header
+  className="topBar with-custom-styles
+      with-side-bar
+      mdc-top-app-bar mdc-top-app-bar--fixed"
+>
+  <div
+    className="mdc-top-app-bar__row"
+  >
+    <section
+      className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
+    >
+      <span
+        className="mdc-top-app-bar__title"
+      >
+        SelectedFolder - Isotope Mail Client - TITLE
+      </span>
+    </section>
+    <section
+      className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
+    />
+  </div>
+  <Translate(ConfirmDeleteFromTrashDialog)
+    cancelAction={[Function]}
+    deleteAction={[Function]}
+    visible={false}
+  />
+</header>
+`;
+
+exports[`TopBar component test suite Snapshot render TopBar with selected message and no new message and no selected folder, should render in view mode with buttons 1`] = `
+<header
+  className="topBar with-custom-styles
+      with-side-bar
+      mdc-top-app-bar mdc-top-app-bar--fixed"
+>
+  <div
+    className="mdc-top-app-bar__row"
+  >
+    <section
+      className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
+    >
+      <button
+        className="material-icons mdc-top-app-bar__navigation-icon"
+        onClick={[Function]}
+      >
+        arrow_back
+      </button>
+    </section>
+    <section
+      className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
+    >
+      <button
+        className="material-icons mdc-top-app-bar__action-item"
+      >
+        reply_all
+      </button>
+      <button
+        className="material-icons mdc-top-app-bar__action-item"
+      >
+        forward
+      </button>
+      <button
+        className="material-icons mdc-top-app-bar__action-item"
+        onClick={[Function]}
+      >
+        delete
+      </button>
+      <button
+        className="material-icons mdc-top-app-bar__action-item"
+      >
+        markunread
+      </button>
+    </section>
+  </div>
+  <Translate(ConfirmDeleteFromTrashDialog)
+    cancelAction={[Function]}
+    deleteAction={[Function]}
+    visible={false}
+  />
+</header>
+`;

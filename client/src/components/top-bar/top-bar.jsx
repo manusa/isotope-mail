@@ -12,7 +12,7 @@ import mainCss from '../../styles/main.scss';
 const _findTrashFolder = foldersState =>
   Object.values(foldersState.explodedItems).find(f => f.type === FolderTypes.TRASH);
 
-class TopBar extends Component {
+export class TopBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -140,14 +140,14 @@ class TopBar extends Component {
 }
 
 TopBar.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   newMessage: PropTypes.object,
   selectedFolder: PropTypes.object,
-  selectedMessagesIds: PropTypes.array.isRequired,
-  selectedMessages: PropTypes.array.isRequired,
+  selectedMessagesIds: PropTypes.array,
+  selectedMessages: PropTypes.array,
   selectedMessage: PropTypes.object,
-  selectMessage: PropTypes.func.isRequired,
-  selectedMessagesAllUnread: PropTypes.bool.isRequired,
+  selectMessage: PropTypes.func,
+  selectedMessagesAllUnread: PropTypes.bool,
   sideBarToggle: PropTypes.func.isRequired,
   sideBarCollapsed: PropTypes.bool.isRequired
 };
