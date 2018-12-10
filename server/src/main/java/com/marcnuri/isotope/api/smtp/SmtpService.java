@@ -49,7 +49,7 @@ import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.Properties;
 import java.util.UUID;
@@ -107,6 +107,7 @@ public class SmtpService {
 
     public void sendMessage(HttpServletRequest request, Credentials credentials, Message message) {
         try {
+            final Charset currentCharset = Charset.defaultCharset();
             final MimeMessage mimeMessage = new MimeMessage(getSession(credentials));
             mimeMessage.setSentDate(new Date());
             if (credentials.getUser() != null && credentials.getUser().contains("@")) {
@@ -119,7 +120,7 @@ public class SmtpService {
             }) {
                 mimeMessage.setRecipients(type, MessageUtils.getRecipientAddresses(message, type));
             }
-            mimeMessage.setSubject(message.getSubject(), StandardCharsets.UTF_8.name());
+            mimeMessage.setSubject(message.getSubject(), currentCharset.name());
 
             if (message.getInReplyTo() != null) {
                 mimeMessage.setHeader(HEADER_IN_REPLY_TO, String.join(" ", message.getInReplyTo()));
@@ -160,8 +161,8 @@ public class SmtpService {
             multipart.addBodyPart(body);
             body.setContent(new String(String.format("<html><head><style>%1$s</style></head><body><div id='scoped'>"
                             + "<style type='text/css' scoped>%1$s</style>%2$s</div></body></html>",
-                            STYLES, finalContent).getBytes(), StandardCharsets.ISO_8859_1),
-                    String.format("%s; charset=\"%s\"", MediaType.TEXT_HTML_VALUE, StandardCharsets.ISO_8859_1.name()));
+                            STYLES, finalContent).getBytes(), currentCharset),
+                    String.format("%s; charset=\"%s\"", MediaType.TEXT_HTML_VALUE, currentCharset.name()));
             mimeMessage.setContent(multipart);
 
             mimeMessage.saveChanges();
