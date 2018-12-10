@@ -139,7 +139,7 @@ export function forwardMessage(dispatch, originalMessage) {
   });
   const recipients = [...originalMessage.recipients];
   const recipientMapper = r => r.address;
-  const to = recipients.filter(r => r.type === 'To').map(recipientMapper).concat(originalMessage.from);
+  const to = recipients.filter(r => r.type === 'To').map(recipientMapper);
   const cc = recipients.filter(r => r.type === 'Cc').map(recipientMapper);
   const optionalCc = cc.length > 0 ? `<b>${t('forwardAction.Cc')}:</b> ${cc.join(', ')}<br/>` : '';
 
