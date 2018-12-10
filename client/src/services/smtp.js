@@ -25,7 +25,7 @@ export function sendMessage(
   postMessageRequest.open('POST', URLS.SMTP);
   postMessageRequest.setRequestHeader(HttpHeaders.ISOTOPE_CREDENTIALS, credentials.encrypted);
   postMessageRequest.setRequestHeader(HttpHeaders.ISOTOPE_SALT, credentials.salt);
-  postMessageRequest.setRequestHeader(HttpHeaders.CONTENT_TYPE, 'application/json');
+  postMessageRequest.setRequestHeader(HttpHeaders.CONTENT_TYPE, `application/json; charset=${document.characterSet}`);
   const upload = postMessageRequest.upload;
   upload.onprogress = e => dispatch(sendMessageUpdateProgress(round(e.loaded / e.total, 2)));
   postMessageRequest.onload = () => {
