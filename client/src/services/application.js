@@ -99,6 +99,14 @@ export function editNewMessage(dispatch) {
   dispatch(editMessage({to: [], cc: [], bcc: [], attachments: [], subject: '', content: ''}));
 }
 
+export function editMessageAsNew(dispatch, message) {
+  const recipientMapper = r => r.address;
+  const to = message.recipients.filter(r => r.type === 'To').map(recipientMapper);
+  const cc = message.recipients.filter(r => r.type === 'Cc').map(recipientMapper);
+  const bcc = message.recipients.filter(r => r.type === 'Bcc').map(recipientMapper);
+  dispatch(editMessage({...message, to, cc, bcc}));
+}
+
 export function replyMessage(dispatch, originalMessage) {
   const recipients = [...originalMessage.recipients];
   const recipientMapper = r => r.address;

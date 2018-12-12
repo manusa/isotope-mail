@@ -28,9 +28,11 @@ export const setError = (type, value) => ({type: ActionTypes.APPLICATION_ERROR_S
 
 export const editMessage = message => ({type: ActionTypes.APPLICATION_MESSAGE_EDIT, payload: message});
 
-export const sendMessage = message => ({type: ActionTypes.APPLICATION_OUTBOX_SEND, payload: message});
-export const sendMessageUpdateProgress = progress =>
+export const outboxSendMessage = message => ({type: ActionTypes.APPLICATION_OUTBOX_SEND, payload: message});
+export const outboxUpdateProgress = progress =>
   ({type: ActionTypes.APPLICATION_OUTBOX_UPDATE_PROGRESS, payload: progress});
-export const sendMessageSetSent = sent =>
+export const outboxSetSent = sent =>
   ({type: ActionTypes.APPLICATION_OUTBOX_SET_SENT, payload: sent});
-export const messageSent = () => ({type: ActionTypes.APPLICATION_OUTBOX_MESSAGE_SENT});
+export const outboxSetError = error =>
+  ({type: ActionTypes.APPLICATION_OUTBOX_SET_ERROR, payload: error});
+export const outboxMessageProcessed = () => ({type: ActionTypes.APPLICATION_OUTBOX_MESSAGE_PROCESSED});

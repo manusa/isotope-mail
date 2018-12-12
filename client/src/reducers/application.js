@@ -101,7 +101,12 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
       newState.outbox = {...newState.outbox, sent: action.payload};
       return newState;
     }
-    case ActionTypes.APPLICATION_OUTBOX_MESSAGE_SENT: {
+    case ActionTypes.APPLICATION_OUTBOX_SET_ERROR: {
+      const newState = {...state};
+      newState.outbox = {...newState.outbox, error: action.payload};
+      return newState;
+    }
+    case ActionTypes.APPLICATION_OUTBOX_MESSAGE_PROCESSED: {
       const newState = {...state};
       newState.outbox = null;
       return newState;
