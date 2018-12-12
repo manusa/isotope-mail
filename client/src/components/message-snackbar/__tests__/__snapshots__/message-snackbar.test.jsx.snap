@@ -3,6 +3,7 @@
 exports[`MessageSnackbar component test suite Snapshot render Renders hidden 1`] = `
 <Snackbar
   alignStart={true}
+  buttonAction={[Function]}
   buttonLabel=""
   message=""
   show={false}
@@ -12,6 +13,7 @@ exports[`MessageSnackbar component test suite Snapshot render Renders hidden 1`]
 exports[`MessageSnackbar component test suite Snapshot render Renders with progress 1`] = `
 <Snackbar
   alignStart={true}
+  buttonAction={[Function]}
   buttonLabel=""
   message="messageSnackbar.sendingMessage 133700"
   show={true}
@@ -21,6 +23,7 @@ exports[`MessageSnackbar component test suite Snapshot render Renders with progr
 exports[`MessageSnackbar component test suite Snapshot render Renders with sent status 1`] = `
 <Snackbar
   alignStart={true}
+  buttonAction={[Function]}
   buttonLabel=""
   message="messageSnackbar.messageSent"
   show={true}

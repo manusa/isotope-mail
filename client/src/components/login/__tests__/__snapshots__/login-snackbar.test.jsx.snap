@@ -3,6 +3,7 @@
 exports[`LoginSnackbar component test suite Snapshot render Renders hidden 1`] = `
 <Snackbar
   alignStart={false}
+  buttonAction={[Function]}
   buttonLabel=""
   message=""
   show={false}
@@ -12,6 +13,7 @@ exports[`LoginSnackbar component test suite Snapshot render Renders hidden 1`] =
 exports[`LoginSnackbar component test suite Snapshot render Renders with error 1`] = `
 <Snackbar
   alignStart={false}
+  buttonAction={[Function]}
   buttonLabel=""
   message="login.errors.BLACKLISTED"
   show={true}

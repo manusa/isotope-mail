@@ -19,8 +19,8 @@ exports[`Snackbar component test suite Snapshot render Renders all elements 1`] 
     className="mdc-snackbar__action-wrapper"
   >
     <button
-      aria-hidden={false}
       className="mdc-snackbar__action-button"
+      onClick={[Function]}
       type="button"
     >
       White label
@@ -66,8 +66,8 @@ exports[`Snackbar component test suite Snapshot render Renders all elements, doe
     className="mdc-snackbar__action-wrapper"
   >
     <button
-      aria-hidden={false}
       className="mdc-snackbar__action-button"
+      onClick={[Function]}
       type="button"
     >
       White label
@@ -95,8 +95,8 @@ exports[`Snackbar component test suite Snapshot render Renders all elements, hid
     className="mdc-snackbar__action-wrapper"
   >
     <button
-      aria-hidden={false}
       className="mdc-snackbar__action-button"
+      onClick={[Function]}
       type="button"
     >
       White label
