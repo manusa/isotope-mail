@@ -10,6 +10,16 @@ exports[`MessageSnackbar component test suite Snapshot render Renders hidden 1`]
 />
 `;
 
+exports[`MessageSnackbar component test suite Snapshot render Renders with error 1`] = `
+<Snackbar
+  alignStart={true}
+  buttonAction={[Function]}
+  buttonLabel="messageSnackbar.retry"
+  message="messageSnackbar.messageError"
+  show={true}
+/>
+`;
+
 exports[`MessageSnackbar component test suite Snapshot render Renders with progress 1`] = `
 <Snackbar
   alignStart={true}

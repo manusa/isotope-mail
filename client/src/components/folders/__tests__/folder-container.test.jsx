@@ -1,5 +1,5 @@
 import React from 'react';
-import {shallow} from 'enzyme/build/index';
+import {shallow} from 'enzyme';
 import {MOCK_STORE} from '../../../__testutils__/store';
 import * as messageService from '../../../services/message';
 import * as applicationActions from '../../../actions/application';
