@@ -1,9 +1,39 @@
 import * as messageService from '../message';
+import * as fodlerActions from '../../actions/folders';
 import * as messageActions from '../../actions/messages';
 import * as fetch from '../fetch';
 import {ActionTypes} from '../../actions/action-types';
 
 describe('Message service test suite', () => {
+  describe('setMessagesSeen', () => {
+    test('setMessagesSeen with valid message array, should dispatch results and fetch (update BE)', () => {
+      // Given
+      global.fetch = jest.fn((url, options) => {
+        expect(url.toLocaleString()).toMatch('http://test.url/folder1337?seen=true');
+        expect(options.body).toMatch('[1,1337]');
+        return Promise.resolve({ok: true, url, options, json: () => Promise.resolve({})});
+      });
+      fetch.abortFetch = jest.fn();
+      messageActions.updateCache = jest.fn();
+      fodlerActions.updateFolder = jest.fn();
+      const dispatch = jest.fn();
+      const credentials = {};
+      const folder = {};
+      const messages = [
+        {uid: 1, _links: {'seen.bulk': {href: 'http://test.url/folder1337?seen={seen}'}}},
+        {uid: 1337}
+      ];
+
+      // When
+      messageService.setMessagesSeen(dispatch, credentials, folder, messages, true);
+
+      // Then
+      expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
+      expect(messageActions.updateCache).toHaveBeenCalledTimes(1);
+      expect(fodlerActions.updateFolder).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
   describe('deleteMessages', () => {
     test('deleteMessages with valid message array, should fetch and dispatch results', done => {
       // Given
