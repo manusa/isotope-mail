@@ -5,13 +5,32 @@ import * as fetch from '../fetch';
 import {ActionTypes} from '../../actions/action-types';
 
 describe('Message service test suite', () => {
+  // Backup mocked implementations
+  beforeEach(() => {
+    global.fetchBu = global.fetch;
+    messageActions.deleteFromCacheBu = messageActions.deleteFromCache;
+    messageActions.setSelectedBu = messageActions.setSelected;
+    messageActions.updateCacheBu = messageActions.updateCache;
+    fodlerActions.updateFolderBu = fodlerActions.updateFolder;
+  });
+  // Restore mocked implementations
+  afterEach(() => {
+    global.fetch = global.fetchBu;
+    messageActions.deleteFromCache = messageActions.deleteFromCacheBu;
+    messageActions.setSelected = messageActions.setSelectedBu;
+    messageActions.updateCache = messageActions.updateCacheBu;
+    fodlerActions.updateFolder = fodlerActions.updateFolderBu;
+  });
   describe('setMessagesSeen', () => {
-    test('setMessagesSeen with valid message array, should dispatch results and fetch (update BE)', () => {
+    test('setMessagesSeen with valid message array, should dispatch results and fetch (update BE)', done => {
       // Given
       global.fetch = jest.fn((url, options) => {
         expect(url.toLocaleString()).toMatch('http://test.url/folder1337?seen=true');
         expect(options.body).toMatch('[1,1337]');
-        return Promise.resolve({ok: true, url, options, json: () => Promise.resolve({})});
+        return Promise.resolve({ok: true, url, options, json: () => {
+          done();
+          return Promise.resolve({});
+        }});
       });
       fetch.abortFetch = jest.fn();
       messageActions.updateCache = jest.fn();
