@@ -5,6 +5,7 @@
     "Port": "Puerto",
     "User": "Usuario",
     "Password": "Contraseña",
+    "Advanced": "Avanzado",
     "ImapSSL": "IMAP SSL",
     "SMTP": "SMTP",
     "SmtpSSL": "SMTP SSL",

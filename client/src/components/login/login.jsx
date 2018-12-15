@@ -70,7 +70,8 @@ class Login extends Component {
             <TextField id='password' type={'password'} fieldClass={`${styles.formField} ${styles.fullWidth}`}
               value={password} onChange={this.onFieldChange}
               focused={this.isFocused('password')} required={true} label={t('login.Password')}/>
-            <Button className={styles.advancedButton} label={'Advanced'} icon={advanced ? 'unfold_less' : 'unfold_more'}
+            <Button className={styles.advancedButton} label={t('login.Advanced')}
+              icon={advanced ? 'unfold_less' : 'unfold_more'}
               onClick={e => this.toggleAdvanced(e)}
             />
             {advanced ?
@@ -139,7 +140,6 @@ class Login extends Component {
 }
 
 Login.propTypes = {
-  application: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({
