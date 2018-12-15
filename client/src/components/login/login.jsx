@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Redirect, withRouter} from 'react-router-dom';
 import {translate} from 'react-i18next';
-import PropTypes from 'prop-types';
 import {
   DEFAULT_IMAP_PORT,
   DEFAULT_IMAP_SSL,
@@ -18,7 +17,7 @@ import Spinner from '../spinner/spinner';
 import mainCss from '../../styles/main.scss';
 import styles from './login.scss';
 
-class Login extends Component {
+export class Login extends Component {
   constructor(props) {
     super(props);
     const params = new URLSearchParams(this.props.location.search);

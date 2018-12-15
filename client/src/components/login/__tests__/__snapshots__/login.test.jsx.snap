@@ -1,0 +1,133 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LoginSnackbar component test suite Snapshot render User logged in, should render Redirect 1`] = `
+<Redirect
+  push={false}
+  to="/"
+/>
+`;
+
+exports[`LoginSnackbar component test suite Snapshot render User not logged in, should render Login 1`] = `
+<div
+  className="login"
+>
+  <Spinner
+    canvasClassName=""
+    className="spinner"
+    pathClassName=""
+    visible={false}
+  />
+  <div
+    className="mdc-card card"
+  >
+    <header>
+      <h1
+        className="title"
+      >
+        Isotope Mail Client
+      </h1>
+      <h2
+        className="subtitle"
+      >
+        login.Login
+      </h2>
+    </header>
+    <form
+      onSubmit={[Function]}
+    >
+      <div
+        className="server"
+      >
+        <TextField
+          autoComplete="on"
+          fieldClass="formField serverHost"
+          focused={false}
+          id="serverHost"
+          inputClass=""
+          label="login.Host"
+          labelClass=""
+          lineRippleClass=""
+          min=""
+          minLength={null}
+          onChange={[Function]}
+          onKeyDown={null}
+          onKeyPress={null}
+          required={true}
+          type="text"
+          value=""
+        />
+        <TextField
+          autoComplete="on"
+          fieldClass="formField serverPort"
+          focused={false}
+          id="serverPort"
+          inputClass=""
+          key="serverPort"
+          label="login.Port"
+          labelClass=""
+          lineRippleClass=""
+          min="0"
+          minLength={null}
+          onChange={[Function]}
+          onKeyDown={null}
+          onKeyPress={null}
+          required={true}
+          type="number"
+          value={993}
+        />
+      </div>
+      <TextField
+        autoComplete="on"
+        fieldClass="formField fullWidth"
+        focused={false}
+        id="user"
+        inputClass=""
+        label="login.User"
+        labelClass=""
+        lineRippleClass=""
+        min=""
+        minLength={null}
+        onChange={[Function]}
+        onKeyDown={null}
+        onKeyPress={null}
+        required={true}
+        type="text"
+        value=""
+      />
+      <TextField
+        autoComplete="off"
+        fieldClass="formField fullWidth"
+        focused={false}
+        id="password"
+        inputClass=""
+        label="login.Password"
+        labelClass=""
+        lineRippleClass=""
+        min=""
+        minLength={null}
+        onChange={[Function]}
+        onKeyDown={null}
+        onKeyPress={null}
+        required={true}
+        type="password"
+        value=""
+      />
+      <Button
+        className="advancedButton"
+        icon="unfold_more"
+        label="login.Advanced"
+        onClick={[Function]}
+        type="button"
+      />
+      <Button
+        className="loginButton mdc-button--unelevated fullWidth"
+        icon=""
+        label="login.actions.Login"
+        onClick={[Function]}
+        type="submit"
+      />
+    </form>
+  </div>
+  <Connect(Translate(LoginSnackbar)) />
+</div>
+`;
