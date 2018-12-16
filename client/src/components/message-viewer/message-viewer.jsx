@@ -20,7 +20,7 @@ export function addressGroups(address) {
   return ret;
 }
 
-class MessageViewer extends Component {
+export class MessageViewer extends Component {
   render() {
     const folder = this.props.currentFolder;
     const message = this.props.selectedMessage;
