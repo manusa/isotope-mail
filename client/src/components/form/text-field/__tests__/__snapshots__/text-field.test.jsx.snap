@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TextField component test suite Snapshot render Snapshot render, should render text-field 1`] = `
+<div
+  className="mdc-text-field
+        
+        "
+>
+  <input
+    autoComplete="off"
+    className="mdc-text-field__input "
+    id="Bourne"
+    min={1337}
+    minLength={null}
+    onBlur={[Function]}
+    onChange={[Function]}
+    onFocus={[Function]}
+    onKeyDown={null}
+    onKeyPress={null}
+    required={false}
+    type="text"
+  />
+  <label
+    className="mdc-floating-label
+          
+          "
+    htmlFor="Bourne"
+  >
+    Red label
+  </label>
+  <div
+    className="mdc-line-ripple
+          
+          "
+  />
+</div>
+`;
