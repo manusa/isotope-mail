@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MessageViewer component test suite Snapshot render Should render MessageViewer 1`] = `
+<div
+  className=" messageViewer"
+>
+  <div
+    className="header"
+  >
+    <h1
+      className="subject"
+    >
+      News from 1337
+      <div
+        className="folder mdc-chip"
+        onClick={[Function]}
+      >
+        <div
+          className="mdc-chip__text"
+        >
+          Folder 1337
+        </div>
+      </div>
+    </h1>
+    <div
+      className="fromDate"
+    >
+      <div
+        className="from"
+      >
+        <span
+          className="fromName"
+        >
+          "
+        </span>
+        <span
+          className="email"
+        />
+      </div>
+      <div
+        className="date"
+      >
+        06/23/1912, 12:13:37 AM
+      </div>
+    </div>
+    <Translate(HeaderTo)
+      className="to"
+    />
+  </div>
+  <div
+    className="body"
+  >
+    <Spinner
+      canvasClassName=""
+      className=""
+      pathClassName=""
+      visible={false}
+    />
+    <div
+      className="attachments"
+    >
+      <Connect(AttachmentCard)
+        attachment={
+          Object {
+            "fileName": "ELIZA.test",
+            "size": 1337,
+          }
+        }
+        key="0"
+      />
+    </div>
+    <div
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": "<p>Please tell me what's been bothering you.</p>",
+        }
+      }
+    />
+  </div>
+</div>
+`;
