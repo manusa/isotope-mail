@@ -159,6 +159,8 @@ export function readMessage(dispatch, credentials, downloadedMessages, folder, m
       updatedMessage = Object.assign({...downloadedMessage}, updatedMessage);
       // Show optimistic version of updated downloadedMessage
       dispatch(refreshMessage(folder, updatedMessage));
+      // Update folder message cache to set message as seen ASAP
+      dispatch(updateCacheIfExist(folder, [updatedMessage]));
       // Read message from BE to update links (attachments) and other mutable properties
       $message = fetchMessage()
         .then(completeMessage => (
