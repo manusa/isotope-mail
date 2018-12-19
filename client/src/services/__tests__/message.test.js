@@ -1,6 +1,4 @@
 import * as messageService from '../message';
-import * as fodlerActions from '../../actions/folders';
-import * as messageActions from '../../actions/messages';
 import * as fetch from '../fetch';
 import {ActionTypes} from '../../actions/action-types';
 
@@ -8,18 +6,10 @@ describe('Message service test suite', () => {
   // Backup mocked implementations
   beforeEach(() => {
     global.fetchBu = global.fetch;
-    messageActions.deleteFromCacheBu = messageActions.deleteFromCache;
-    messageActions.setSelectedBu = messageActions.setSelected;
-    messageActions.updateCacheBu = messageActions.updateCache;
-    fodlerActions.updateFolderBu = fodlerActions.updateFolder;
   });
   // Restore mocked implementations
   afterEach(() => {
     global.fetch = global.fetchBu;
-    messageActions.deleteFromCache = messageActions.deleteFromCacheBu;
-    messageActions.setSelected = messageActions.setSelectedBu;
-    messageActions.updateCache = messageActions.updateCacheBu;
-    fodlerActions.updateFolder = fodlerActions.updateFolderBu;
   });
   describe('setMessagesSeen', () => {
     test('setMessagesSeen with valid message array, should dispatch results and fetch (update BE)', done => {
@@ -33,9 +23,17 @@ describe('Message service test suite', () => {
         }});
       });
       fetch.abortFetch = jest.fn();
-      messageActions.updateCache = jest.fn();
-      fodlerActions.updateFolder = jest.fn();
-      const dispatch = jest.fn();
+      let dispatchCount = 0;
+      const dispatch = jest.fn(action => {
+        switch (action.type) {
+          case ActionTypes.MESSAGES_UPDATE_CACHE:
+          case ActionTypes.FOLDERS_UPDATE: {
+            dispatchCount++;
+            break;
+          }
+          default:
+        }
+      });
       const credentials = {};
       const folder = {};
       const messages = [
@@ -48,8 +46,7 @@ describe('Message service test suite', () => {
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
-      expect(messageActions.updateCache).toHaveBeenCalledTimes(1);
-      expect(fodlerActions.updateFolder).toHaveBeenCalledTimes(1);
+      expect(dispatchCount).toEqual(2);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
@@ -61,15 +58,22 @@ describe('Message service test suite', () => {
         return Promise.resolve({ok: true, url, options, json: () => Promise.resolve({fromServer: true})});
       });
       fetch.abortFetch = jest.fn();
-      messageActions.deleteFromCache = jest.fn();
-      messageActions.setSelected = jest.fn();
-      const dispatch = jest.fn()
-        .mockImplementation(action => {
-          if (action && action.type === ActionTypes.FOLDERS_UPDATE) {
+      let dispatchCount = 0;
+      const dispatch = jest.fn(action => {
+        switch (action.type) {
+          case ActionTypes.MESSAGES_DELETE_FROM_CACHE:
+          case ActionTypes.MESSAGES_SET_SELECTED: {
+            dispatchCount++;
+            break;
+          }
+          case ActionTypes.FOLDERS_UPDATE: {
             expect(action.payload.fromServer).toEqual(true);
             done();
+            break;
           }
-        });
+          default:
+        }
+      });
       const credentials = {};
       const folder = {_links: {messages: {href: 'http://test.url'}}};
       const messages = [{uid: 1}, {uid: 1337}];
@@ -79,8 +83,7 @@ describe('Message service test suite', () => {
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
-      expect(messageActions.deleteFromCache).toHaveBeenCalledTimes(1);
-      expect(messageActions.setSelected).toHaveBeenCalledTimes(1);
+      expect(dispatchCount).toEqual(2);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
     test('deleteMessages with valid message array, fetch has error, should dispatch previous folder/messages', done => {
@@ -90,13 +93,12 @@ describe('Message service test suite', () => {
         return Promise.resolve({ok: true});
       });
       fetch.abortFetch = jest.fn();
-      const dispatch = jest.fn()
-        .mockImplementation(action => {
-          if (action && action.type === ActionTypes.FOLDERS_UPDATE) {
-            expect(action.payload.originalFolder).toEqual(true);
-            done();
-          }
-        });
+      const dispatch = jest.fn(action => {
+        if (action && action.type === ActionTypes.FOLDERS_UPDATE) {
+          expect(action.payload.originalFolder).toEqual(true);
+          done();
+        }
+      });
       const credentials = {};
       const folder = {_links: {messages: {href: 'http://test.url.witherror'}}, originalFolder: true};
       const messages = [{uid: 1}, {uid: 1337}];
