@@ -4,11 +4,11 @@ import {
   backendRequest,
   backendRequestCompleted,
   editMessage,
-  selectFolder,
+  selectFolder, selectMessage,
   setError,
   setUserCredentials
 } from '../actions/application';
-import {toJson} from './fetch';
+import {abortControllerWrappers, abortFetch, toJson} from './fetch';
 import {FolderTypes, getFolders} from './folder';
 import i18n from './i18n';
 import {recoverState} from './indexed-db';
@@ -165,4 +165,16 @@ export function forwardMessage(dispatch, originalMessage) {
     ${sanitize.sanitize(originalMessage.content)}
   `;
   dispatch(editMessage({to: [], cc: [], bcc: [], attachments, subject, content}));
+}
+
+/**
+ * Aborts any active request to read a message from the BE.
+ *
+ * Clears the selected message in the application.
+ *
+ * @param dispatch, store's dispatch function
+ */
+export function clearSelectedMessage(dispatch) {
+  abortFetch(abortControllerWrappers.readMessageAbortController);
+  dispatch(selectMessage(null));
 }

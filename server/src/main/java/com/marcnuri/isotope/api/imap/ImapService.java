@@ -206,14 +206,13 @@ public class ImapService {
         try {
             final IMAPFolder folder = getFolder(credentials, folderId);
             if (!folder.isOpen()) {
-                folder.open(READ_WRITE);
+                folder.open(READ_ONLY);
             }
             final IMAPMessage imapMessage = (IMAPMessage)folder.getMessageByUID(uid);
             if (imapMessage == null) {
                 folder.close();
                 throw new NotFoundException("Message not found");
             }
-            imapMessage.setFlag(Flags.Flag.SEEN, true);
             final MessageWithFolder ret = MessageWithFolder.from(folder, imapMessage);
             readContentIntoMessage(folderId, imapMessage, ret);
             folder.close();

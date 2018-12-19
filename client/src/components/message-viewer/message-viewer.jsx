@@ -4,10 +4,11 @@ import PropTypes from 'prop-types';
 import Spinner from '../spinner/spinner';
 import HeaderTo from './header-to';
 import AttachmentCard from '../attachment/attachment-card';
-import {selectFolder, selectMessage} from '../../actions/application';
+import {selectFolder} from '../../actions/application';
 import sanitize from '../../services/sanitize';
 import mainCss from '../../styles/main.scss';
 import styles from './message-viewer.scss';
+import {clearSelectedMessage} from '../../services/application';
 
 export function addressGroups(address) {
   const ret = {
@@ -84,7 +85,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   showFolder: folder => {
-    dispatch(selectMessage(null));
+    clearSelectedMessage(dispatch);
     dispatch(selectFolder(folder));
   }
 });

@@ -44,6 +44,48 @@ function _readContent(dispatch, credentials, folder, message, signal, attachment
 }
 
 /**
+ * Returns a function that will perform a BE request to read a message.
+ *
+ * @param dispatch
+ * @param credentials
+ * @param message
+ * @returns {function(): Promise<Response>}
+ * @private
+ */
+function _readMessageRequest(dispatch, credentials, message) {
+  // Abort + new signal
+  abortFetch(abortControllerWrappers.readMessageAbortController);
+  abortControllerWrappers.readMessageAbortController = new AbortController();
+  const signal = abortControllerWrappers.readMessageAbortController.signal;
+
+  return () => {
+    dispatch(aBackendRequest());
+    return fetch(message._links.self.href, {
+      method: 'GET',
+      headers: credentialsHeaders(credentials),
+      signal: signal
+    })
+      .then(response => {
+        dispatch(aBackendRequestCompleted());
+        return response;
+      })
+      .then(toJson)
+      .catch(() => {
+        dispatch(aBackendRequestCompleted());
+        throw Error();
+      });
+  };
+}
+
+function _messageSeenRequest(credentials, message) {
+  return fetch(message._links.seen.href, {
+    method: 'PUT',
+    headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
+    body: JSON.stringify(true)
+  });
+}
+
+/**
  *
  * @param dispatch
  * @param credentials
@@ -106,12 +148,16 @@ export function preloadMessages(dispatch, credentials, folder, messageUids) {
 /**
  * Reads the content of a message.
  *
- * If the message is cached in the application.downloadedMessages map, the content won't be fetched from the backend.
+ * If the message is cached in the application.downloadedMessages map, the content is loaded from the cache
+ * and will be completed with a BE request to fetch the missing parts (attachments...).
  *
- * If the message is not cached, a backend request will be peformed to read the complete message.
+ * If the message is not cached, a backend request will be performed to read the complete message.
  *
  * In both cases, any missing embedded image in tha attachment list will be fetched. For cached messages, unless action
  * was previously aborted, the embedded images will have already been loaded.
+ *
+ * BE read message request won't set the message as seen. If the BE request completes successfully, and additional
+ * request to the server will be sent to confirm this and set the message as seen.
  *
  * @param dispatch
  * @param credentials
@@ -129,20 +175,7 @@ export function readMessage(dispatch, credentials, downloadedMessages, folder, m
   abortControllerWrappers.readMessageAbortController = new AbortController();
   const signal = abortControllerWrappers.readMessageAbortController.signal;
 
-  const fetchMessage = () => {
-    dispatch(aBackendRequest());
-    return fetch(message._links.self.href, {
-      method: 'GET',
-      headers: credentialsHeaders(credentials),
-      signal: signal
-    })
-      .then(response => {
-        dispatch(aBackendRequestCompleted());
-        return response;
-      })
-      .then(toJson)
-      .catch(() => dispatch(aBackendRequestCompleted()));
-  };
+  const fetchMessage = _readMessageRequest(dispatch, credentials, message);
 
   if (message && message._links) {
     const downloadedMessage = downloadedMessages[message.messageId];
@@ -161,18 +194,34 @@ export function readMessage(dispatch, credentials, downloadedMessages, folder, m
       dispatch(refreshMessage(folder, updatedMessage));
       // Update folder message cache to set message as seen ASAP
       dispatch(updateCacheIfExist(folder, [updatedMessage]));
+      // Update folder seen counter if applicable
+      if (!message.seen) {
+        dispatch(updateFolder({...folder, unreadMessageCount: folder.unreadMessageCount - 1}));
+        // Send request to BE to mark message as read
+        _messageSeenRequest(credentials, message);
+      }
       // Read message from BE to update links (attachments) and other mutable properties
       $message = fetchMessage()
         .then(completeMessage => (
           Promise.resolve({...completeMessage, content: updatedMessage.content})
         ));
     } else {
-      // Read message from BE
-      $message = fetchMessage();
+      // Read message from BE (Set message seen only if request is successfull)
+      $message = fetchMessage()
+        // Message successfully loaded, send signal to BE to mark as read if applicable and change folder information
+        .then(completeMessage => {
+          if (!completeMessage.seen) {
+            _messageSeenRequest(credentials, completeMessage);
+            completeMessage.folder.unreadMessageCount--;
+          }
+          return Promise.resolve(completeMessage);
+        });
     }
     $message
       .then(completeMessage => {
-        // Update folder with freshest BE information
+        // Optimistically set message as seen
+        completeMessage.seen = true;
+        // Update folder with freshest BE information (and optimistic unreadMessageCount)
         dispatch(updateFolder(completeMessage.folder));
         // Update folder cache with message marked as read (don't store content in cache)
         const messageWithNoContent = {...completeMessage};
@@ -189,7 +238,7 @@ export function readMessage(dispatch, credentials, downloadedMessages, folder, m
             return completeMessage.content.indexOf(`cid:${contentId}`) >= 0;
           })
           .forEach(a => _readContent(dispatch, credentials, folder, message, signal, a));
-      });
+      }).catch(() => {});
   }
 }
 

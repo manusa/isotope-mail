@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import ConfirmDeleteFromTrashDialog from './confirm-delete-from-trash-dialog';
 import {FolderTypes} from '../../services/folder';
-import {selectMessage} from '../../actions/application';
-import {forwardMessage, replyMessage} from '../../services/application';
+import {forwardMessage, replyMessage, clearSelectedMessage} from '../../services/application';
 import {deleteMessages, moveMessages, setMessagesSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
@@ -45,7 +44,7 @@ export class TopBar extends Component {
             }
             {isMessageViewer && !isEditing ?
               <Fragment>
-                <button onClick={() => this.props.selectMessage(null)}
+                <button onClick={this.props.clearSelectedMessage}
                   className={`material-icons ${mainCss['mdc-top-app-bar__navigation-icon']}`}>
                   arrow_back
                 </button>
@@ -146,8 +145,8 @@ TopBar.propTypes = {
   selectedMessagesIds: PropTypes.array,
   selectedMessages: PropTypes.array,
   selectedMessage: PropTypes.object,
-  selectMessage: PropTypes.func,
   selectedMessagesAllUnread: PropTypes.bool,
+  clearSelectedMessage: PropTypes.func,
   sideBarToggle: PropTypes.func.isRequired,
   sideBarCollapsed: PropTypes.bool.isRequired
 };
@@ -174,7 +173,7 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  selectMessage: message => dispatch(selectMessage(message)),
+  clearSelectedMessage: () => clearSelectedMessage(dispatch),
   replyMessage: selectedMessaage => replyMessage(dispatch, selectedMessaage),
   forwardMessage: selectedMessaage => forwardMessage(dispatch, selectedMessaage),
   deleteMessage: (credentials, folders, selectedFolder, selectedMessage) => {
@@ -185,12 +184,12 @@ const mapDispatchToProps = dispatch => ({
       } else {
         moveMessages(dispatch, credentials, selectedFolder, trashFolder, [selectedMessage]);
       }
-      dispatch(selectMessage(null));
+      clearSelectedMessage(dispatch);
     }
   },
   toggleMessageSeen: (credentials, selectedFolder, selectedMessage) => {
     setMessagesSeen(dispatch, credentials, selectedFolder, [selectedMessage], !selectedMessage.seen);
-    dispatch(selectMessage(null));
+    clearSelectedMessage(dispatch);
   },
   deleteMessages: (credentials, folders, selectedFolder, selectedMessages) => {
     const trashFolder = _findTrashFolder(folders);

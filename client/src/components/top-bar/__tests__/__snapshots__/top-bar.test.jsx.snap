@@ -114,7 +114,6 @@ exports[`TopBar component test suite Snapshot render TopBar with selected messag
     >
       <button
         className="material-icons mdc-top-app-bar__navigation-icon"
-        onClick={[Function]}
       >
         arrow_back
       </button>

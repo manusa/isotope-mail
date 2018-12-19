@@ -5,10 +5,11 @@ import Spinner from '../spinner/spinner';
 import FolderList from './folder-list';
 import FolderRenameDialog from './folder-rename-dialog';
 import {moveMessages, resetFolderMessagesCache} from '../../services/message';
-import {renameFolder, selectFolder, selectMessage} from '../../actions/application';
+import {renameFolder, selectFolder} from '../../actions/application';
 import {clearSelected} from '../../actions/messages';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
+import {clearSelectedMessage} from '../../services/application';
 
 export class FolderContainer extends Component {
   render() {
@@ -45,7 +46,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   selectFolder: (folder, user) => {
     dispatch(selectFolder(folder));
-    dispatch(selectMessage(null));
+    clearSelectedMessage(dispatch);
     dispatch(clearSelected());
     resetFolderMessagesCache(dispatch, user, folder);
   },
