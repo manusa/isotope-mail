@@ -24,6 +24,7 @@ describe('MessageRead service test suite', () => {
           expect(message.fromBackend).toEqual(true);
           expect(message.folder.unreadMessageCount).toEqual(1337);
           expect(message.seen).toEqual(true);
+        } else if (action.type === ActionTypes.APPLICATION_MESSAGE_REPLACE_IMAGE) {
           done();
         }
       });
@@ -36,14 +37,21 @@ describe('MessageRead service test suite', () => {
         messageId: '1337@1337-server.com',
         folder,
         seen: false,
+        content: '<img src="cid:attachment1.png" />',
+        attachments: [
+          {contentId: '<attachment1.png>', contentType: 'image/png',
+            _links: {download: {href: 'http://test.com/folderId/messageId/attachments/1'}}}
+        ],
         _links: {
           self: {href: 'http://test.com/folderId/messageId'},
           seen: {href: 'http://test.com/folderId/messageId/seen'}
         }
       };
-      global.fetch = jest.fn((url, options) => {
-        return Promise.resolve({ok: true, url, options, json: () => ({...message, fromBackend: true})});
-      });
+      global.fetch = jest.fn((url, options) =>
+        Promise.resolve({ok: true, url, options,
+          json: () => ({...message, fromBackend: true}),
+          blob: () => Promise.resolve({})})
+      );
 
       // When
       messageReadService.readMessage(dispatch, credentials, downloadedMessages, folder, message);

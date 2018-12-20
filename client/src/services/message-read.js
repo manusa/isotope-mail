@@ -21,7 +21,7 @@ import {closeResetFolderMessagesCacheEventSource} from './message';
  * @param attachment
  * @private
  */
-function _readContent(dispatch, credentials, folder, message, signal, attachment) {
+function _readEmbeddedContent(dispatch, credentials, folder, message, signal, attachment) {
   fetch(attachment._links.download.href, {
     method: 'GET',
     headers: credentialsHeaders(credentials),
@@ -170,7 +170,7 @@ export function readMessage(dispatch, credentials, downloadedMessages, folder, m
             const contentId = a.contentId.replace(/[<>]/g, '');
             return completeMessage.content.indexOf(`cid:${contentId}`) >= 0;
           })
-          .forEach(a => _readContent(dispatch, credentials, folder, message, signal, a));
+          .forEach(a => _readEmbeddedContent(dispatch, credentials, folder, message, signal, a));
       }).catch(() => {});
   }
 }
