@@ -193,15 +193,12 @@ export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
     headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
     body: JSON.stringify(messagesToUpdate.map(m => m.uid))
   })
-    .then(toJson)
-    .then(() => {
-      // Message and folder information was inferred previously, don't dispatch any actions as this information
-      // can be updated
-    })
-    .catch(() => {
-      // Rollback state from dispatched expected responses
-      dispatch(updateCacheIfExist(folder, messages));
-      dispatch(updateFolder(folder));
+    .then(response => {
+      if (!response.ok) {
+        // Rollback state from dispatched expected responses
+        dispatch(updateCacheIfExist(folder, messages));
+        dispatch(updateFolder(folder));
+      }
     });
 }
 

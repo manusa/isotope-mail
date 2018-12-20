@@ -197,14 +197,9 @@ public class FolderResource implements ApplicationContextAware {
             @RequestBody boolean seen) {
 
         log.debug("Setting message seen attribute to {} in message {} from folder {}", seen, messageId, folderId);
-        final MessageWithFolder ret = imapServiceFactory.getObject().setMessagesSeen(
-                credentialsService.fromRequest(request), Folder.toId(folderId), seen, messageId).stream()
-                .findFirst().orElse(null);
-        if (ret != null) {
-            addLinks(ret.getFolder());
-            addLinks(folderId, ret);
-        }
-        return ResponseEntity.ok(ret);
+        imapServiceFactory.getObject().setMessagesSeen(
+                credentialsService.fromRequest(request), Folder.toId(folderId), seen, messageId);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping(path = "/{folderId}/messages/seen/{seen}")
@@ -213,12 +208,10 @@ public class FolderResource implements ApplicationContextAware {
             @NonNull @RequestBody List<Long> messageIds) {
 
         log.debug("Setting {} messages in folder {} seen attribute to {}" , messageIds.size(), folderId, seen);
-        final List<MessageWithFolder> ret = imapServiceFactory.getObject().setMessagesSeen(
+        imapServiceFactory.getObject().setMessagesSeen(
                 credentialsService.fromRequest(request), Folder.toId(folderId), seen,
-                messageIds.stream().mapToLong(Long::longValue).toArray());
-        ret.forEach(mwf -> addLinks(mwf.getFolder()));
-        addLinks(folderId, ret);
-        return ResponseEntity.ok(ret);
+                messageIds.stream().mapToLong(Long::longValue).toArray());;
+        return ResponseEntity.noContent().build();
     }
 
     private static Folder[] addLinks(Folder... folders) {

@@ -17,10 +17,8 @@ describe('Message service test suite', () => {
       global.fetch = jest.fn((url, options) => {
         expect(url.toLocaleString()).toMatch('http://test.url/folder1337?seen=true');
         expect(options.body).toMatch('[1,1337]');
-        return Promise.resolve({ok: true, url, options, json: () => {
-          done();
-          return Promise.resolve({});
-        }});
+        done();
+        return Promise.resolve({});
       });
       fetch.abortFetch = jest.fn();
       let dispatchCount = 0;
