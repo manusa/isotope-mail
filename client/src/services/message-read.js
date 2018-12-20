@@ -108,6 +108,7 @@ export function readMessage(dispatch, credentials, downloadedMessages, folder, m
   abortFetch(abortControllerWrappers.getFoldersAbortController);
 
   const fetchMessage = _readMessageRequest(dispatch, credentials, message);
+  const signal = abortControllerWrappers.readMessageAbortController.signal;
 
   if (message && message._links) {
     const downloadedMessage = downloadedMessages[message.messageId];
