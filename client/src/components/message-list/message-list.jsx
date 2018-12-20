@@ -8,7 +8,8 @@ import Spinner from '../spinner/spinner';
 import {prettyDate, prettySize} from '../../services/prettify';
 import {selectMessage} from '../../actions/application';
 import {setSelected} from '../../actions/messages';
-import {preloadMessages, readMessage} from '../../services/message';
+import {preloadMessages} from '../../services/message';
+import {readMessage} from '../../services/message-read';
 import mainCss from '../../styles/main.scss';
 import styles from './message-list.scss';
 
