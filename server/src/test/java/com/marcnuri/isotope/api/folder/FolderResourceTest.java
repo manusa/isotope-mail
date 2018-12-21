@@ -32,6 +32,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -42,9 +43,11 @@ import java.util.Collections;
 
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.endsWith;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -146,4 +149,37 @@ public class FolderResourceTest {
         result.andExpect(jsonPath("$._links", aMapWithSize(2)));
     }
 
+    @Test
+    public void setMessageSeen_validFolderAndMessage_shouldReturnNoContent() throws Exception {
+        // Given
+        doNothing().when(imapService)
+                .setMessagesSeen(Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(long[].class));
+
+        // When
+        final ResultActions result = mockMvc.perform(
+                put("/v1/folders/1337/messages/1337/seen")
+                        .content("\"true\"")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaTypes.HAL_JSON_VALUE));
+
+        // Then
+        result.andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void setMessagesSeen_validFolderAndMessages_shouldReturnNoContent() throws Exception {
+        // Given
+        doNothing().when(imapService)
+                .setMessagesSeen(Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(long[].class));
+
+        // When
+        final ResultActions result = mockMvc.perform(
+                put("/v1/folders/1337/messages/seen/true")
+                        .content("[1337]")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaTypes.HAL_JSON_VALUE));
+
+        // Then
+        result.andExpect(status().isNoContent());
+    }
 }
