@@ -192,7 +192,7 @@ public class FolderResource implements ApplicationContextAware {
     }
 
     @PutMapping(path = "/{folderId}/messages/{messageId}/seen")
-    public ResponseEntity<MessageWithFolder> setMessageSeen(
+    public ResponseEntity<Void> setMessageSeen(
             HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") long messageId,
             @RequestBody boolean seen) {
 
@@ -203,14 +203,14 @@ public class FolderResource implements ApplicationContextAware {
     }
 
     @PutMapping(path = "/{folderId}/messages/seen/{seen}")
-    public ResponseEntity<List<MessageWithFolder>> setMessagesSeen(
+    public ResponseEntity<Void> setMessagesSeen(
             HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("seen") Boolean seen,
             @NonNull @RequestBody List<Long> messageIds) {
 
         log.debug("Setting {} messages in folder {} seen attribute to {}" , messageIds.size(), folderId, seen);
         imapServiceFactory.getObject().setMessagesSeen(
                 credentialsService.fromRequest(request), Folder.toId(folderId), seen,
-                messageIds.stream().mapToLong(Long::longValue).toArray());;
+                messageIds.stream().mapToLong(Long::longValue).toArray());
         return ResponseEntity.noContent().build();
     }
 

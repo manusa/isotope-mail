@@ -24,7 +24,7 @@ describe('Message service test suite', () => {
       let dispatchCount = 0;
       const dispatch = jest.fn(action => {
         switch (action.type) {
-          case ActionTypes.MESSAGES_UPDATE_CACHE:
+          case ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST:
           case ActionTypes.FOLDERS_UPDATE: {
             dispatchCount++;
             break;
@@ -59,13 +59,14 @@ describe('Message service test suite', () => {
       let dispatchCount = 0;
       const dispatch = jest.fn(action => {
         switch (action.type) {
-          case ActionTypes.MESSAGES_DELETE_FROM_CACHE:
-          case ActionTypes.MESSAGES_SET_SELECTED: {
+          case ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST:
+          case ActionTypes.MESSAGES_SET_SELECTED:
+          case ActionTypes.FOLDERS_UPDATE: {
             dispatchCount++;
             break;
           }
-          case ActionTypes.FOLDERS_UPDATE: {
-            expect(action.payload.fromServer).toEqual(true);
+          case ActionTypes.MESSAGES_DELETE_FROM_CACHE: {
+            expect(action.payload.folder.fromServer).toEqual(true);
             done();
             break;
           }
@@ -81,7 +82,7 @@ describe('Message service test suite', () => {
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
-      expect(dispatchCount).toEqual(2);
+      expect(dispatchCount).toEqual(3);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
     test('deleteMessages with valid message array, fetch has error, should dispatch previous folder/messages', done => {

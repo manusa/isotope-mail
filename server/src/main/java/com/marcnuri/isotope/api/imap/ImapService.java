@@ -356,14 +356,9 @@ public class ImapService {
         try {
             final IMAPFolder folder = getFolder(credentials, folderId);
             folder.open(READ_WRITE);
-            final IMAPMessage[] messages = Stream.of(
-                    folder.getMessagesByUID(uids.stream().mapToLong(Long::longValue).toArray()))
-                    .filter(Objects::nonNull)
-                    .map(IMAPMessage.class::cast)
-                    .toArray(IMAPMessage[]::new);
-            for(IMAPMessage message : messages) {
-                message.setFlag(Flags.Flag.DELETED, true);
-            }
+            final javax.mail.Message[] messages = folder.getMessagesByUID(
+                    uids.stream().mapToLong(Long::longValue).toArray());
+            folder.setFlags(messages, new Flags(Flags.Flag.DELETED), true);
             folder.expunge(messages);
             return Folder.from(folder, true);
         } catch (MessagingException ex) {

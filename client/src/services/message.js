@@ -185,7 +185,7 @@ export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
       expectedUpdatedFolder.unreadMessageCount += seen ? -1 : +1;
     }
   });
-  dispatch(updateCache(folder, messagesToUpdate));
+  dispatch(updateCacheIfExist(folder, messagesToUpdate));
   dispatch(updateFolder(expectedUpdatedFolder));
 
   fetch(messages[0]._links['seen.bulk'].href.replace('{seen}', seen.toString()), {
@@ -212,12 +212,21 @@ export function deleteMessages(dispatch, credentials, folder, messages) {
 
   const url = new URL(folder._links.messages.href);
   const messagesToDelete = [];
+  // Update state with expected response from server
+  const expectedUpdatedFolder = {...folder};
   messages.forEach(message => {
     url.searchParams.append('id', message.uid);
     messagesToDelete.push({...message, deleted: true});
+    expectedUpdatedFolder.deletedMessageCount++;
+    expectedUpdatedFolder.unreadMessageCount = message.seen ? expectedUpdatedFolder.unreadMessageCount
+      : expectedUpdatedFolder.unreadMessageCount - 1;
+    expectedUpdatedFolder.newMessageCount = message.recent ? expectedUpdatedFolder.newMessageCount - 1
+      : expectedUpdatedFolder.newMessageCount;
   });
-  dispatch(deleteFromCache(folder, messagesToDelete));
+  dispatch(updateCacheIfExist(folder, messagesToDelete));
   dispatch(setSelected(messagesToDelete, false));
+  dispatch(updateFolder(expectedUpdatedFolder));
+
   fetch(url, {
     method: 'DELETE',
     headers: credentialsHeaders(credentials)
@@ -225,6 +234,7 @@ export function deleteMessages(dispatch, credentials, folder, messages) {
     .then(toJson)
     .then(updatedFolder => {
       dispatch(updateFolder(updatedFolder));
+      dispatch(deleteFromCache(updatedFolder, messagesToDelete));
     })
     .catch(() => {
       // Rollback state from dispatched expected responses
