@@ -32,15 +32,13 @@ describe('Message service test suite', () => {
           default:
         }
       });
-      const credentials = {};
-      const folder = {};
       const messages = [
         {uid: 1, _links: {'seen.bulk': {href: 'http://test.url/folder1337?seen={seen}'}}},
         {uid: 1337}
       ];
 
       // When
-      messageService.setMessagesSeen(dispatch, credentials, folder, messages, true);
+      messageService.setMessagesSeen(dispatch, {}, {}, messages, true);
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
@@ -60,20 +58,14 @@ describe('Message service test suite', () => {
       fetch.abortFetch = jest.fn();
       let dispatchCount = 0;
       const dispatch = jest.fn(action => {
-        switch (action.type) {
-          case ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST: {
-            dispatchCount++;
-            break;
-          }
-          default:
+        if (action.type === ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST) {
+          dispatchCount++;
         }
       });
-      const credentials = {};
-      const folder = {};
       const message = {uid: 1, _links: {flagged: {href: 'http://test.url/folder1337/1/flagged'}}};
 
       // When
-      messageService.setMessageFlagged(dispatch, credentials, folder, message, true);
+      messageService.setMessageFlagged(dispatch, {}, {}, message, true);
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
@@ -131,12 +123,11 @@ describe('Message service test suite', () => {
           done();
         }
       });
-      const credentials = {};
       const folder = {_links: {messages: {href: 'http://test.url.witherror'}}, originalFolder: true};
       const messages = [{uid: 1}, {uid: 1337}];
 
       // When
-      messageService.deleteMessages(dispatch, credentials, folder, messages);
+      messageService.deleteMessages(dispatch, {}, folder, messages);
 
       // Then
       expect(global.fetch).toHaveBeenCalledTimes(1);
