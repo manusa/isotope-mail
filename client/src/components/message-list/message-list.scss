@@ -1,5 +1,9 @@
 @import '../../styles/partials/variables';
 
+$row-height: 32px;
+$font-size: $font-size-body-2;
+$flag-size: 18px;
+
 .messageList {
   position: relative;
   display: flex;
@@ -17,9 +21,9 @@
       .item {
         display: flex;
         font-weight: $font-weight-bold;
-        font-size: $font-size-body-2;
+        font-size: $font-size;
         padding: 0px;
-        height: 32px;
+        height: $row-height;
         border: 1px solid lighten($mdc-theme-background, 10%);
         cursor: pointer;
 
@@ -47,9 +51,23 @@
             text-overflow: ellipsis;
             white-space: nowrap;
           }
+          .flag {
+            display: block;
+            width: 20px;
+            min-width: 20px;
+            overflow: hidden;
+            visibility: hidden;
+            font-size: $flag-size;
+            line-height: 20px;
+
+            &.flagged {
+              visibility: visible;
+              color: $mdc-theme-secondary;
+            }
+          }
           .subject {
             flex-grow: 1;
-            margin-left: $default-spacing;
+            margin-left: $default-spacing / 4;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -64,6 +82,12 @@
             width: 85px;
             min-width: 85px;
             text-align: right;
+          }
+        }
+
+        .itemDetails:hover {
+          .flag {
+            visibility: visible;
           }
         }
 

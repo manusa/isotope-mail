@@ -94,6 +94,7 @@ class MessageList extends Component {
           onClick={ () => this.props.messageClicked(message) }
           draggable={true} onDragStart={event => this.onDragStart(event, folder, message)}>
           <span className={styles.from}>{parseFrom(message.from)}</span>
+          <span className={`material-icons ${styles.flag} ${message.flagged && styles.flagged}`}>{'outlined_flag'}</span>
           <span className={styles.subject}>{message.subject}</span>
           <span className={styles.receivedDate}>{prettyDate(message.receivedDate)}</span>
           <span className={styles.size}>{prettySize(message.size)}</span>

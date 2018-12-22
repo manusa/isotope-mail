@@ -57,6 +57,7 @@ public class Message extends IsotopeResource implements Serializable {
     private String subject;
     private ZonedDateTime receivedDate;
     private Long size;
+    private Boolean flagged;
     private Boolean seen;
     private Boolean recent;
     private Boolean deleted;
@@ -137,6 +138,14 @@ public class Message extends IsotopeResource implements Serializable {
         this.size = size;
     }
 
+    public Boolean getFlagged() {
+        return flagged;
+    }
+
+    public void setFlagged(Boolean flagged) {
+        this.flagged = flagged;
+    }
+
     public Boolean getSeen() {
         return seen;
     }
@@ -208,6 +217,7 @@ public class Message extends IsotopeResource implements Serializable {
                 Objects.equals(subject, message.subject) &&
                 Objects.equals(receivedDate, message.receivedDate) &&
                 Objects.equals(size, message.size) &&
+                Objects.equals(flagged, message.flagged) &&
                 Objects.equals(seen, message.seen) &&
                 Objects.equals(recent, message.recent) &&
                 Objects.equals(deleted, message.deleted) &&
@@ -220,7 +230,7 @@ public class Message extends IsotopeResource implements Serializable {
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), uid, messageId, modseq, from, replyTo, recipients, subject, receivedDate, size, seen, recent, deleted, content, attachments, references, inReplyTo);
+        return Objects.hash(super.hashCode(), uid, messageId, modseq, from, replyTo, recipients, subject, receivedDate, size, flagged, seen, recent, deleted, content, attachments, references, inReplyTo);
     }
 
     /**
@@ -261,6 +271,7 @@ public class Message extends IsotopeResource implements Serializable {
                 ret.setReferences(Arrays.asList(
                         Optional.ofNullable(imapMessage.getHeader(HEADER_REFERENCES)).orElse(new String[0])));
                 final Flags flags = imapMessage.getFlags();
+                ret.setFlagged(flags.contains(Flags.Flag.FLAGGED));
                 ret.setSeen(flags.contains(Flags.Flag.SEEN));
                 ret.setRecent(flags.contains(Flags.Flag.RECENT));
                 ret.setDeleted(flags.contains(Flags.Flag.DELETED));
