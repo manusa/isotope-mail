@@ -11,59 +11,63 @@
     padding: 0;
     height: 100%;
 
-    .item {
-      display: flex;
-      font-weight: $font-weight-bold;
-      font-size: $font-size-body-2;
-      padding: 0px;
-      height: 32px;
-      border: 1px solid lighten($mdc-theme-background, 10%);
-      cursor: pointer;
+    .virtualList {
+      outline: none;
 
-      &.seen {
-        font-weight: $font-weight-normal;
-      }
-
-      &.deleted {
-        color: lighten($base-color, 45%);
-        font-style: italic;
-      }
-
-      .itemDetails {
-        flex-grow: 1;
-        min-width: 0;
-        width: 1px;
-
+      .item {
         display: flex;
-        flex-flow: row nowrap;
+        font-weight: $font-weight-bold;
+        font-size: $font-size-body-2;
+        padding: 0px;
+        height: 32px;
+        border: 1px solid lighten($mdc-theme-background, 10%);
+        cursor: pointer;
 
-        .from {
-          width: 200px;
-          min-width: 200px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+        &.seen {
+          font-weight: $font-weight-normal;
         }
-        .subject {
+
+        &.deleted {
+          color: lighten($base-color, 45%);
+          font-style: italic;
+        }
+
+        .itemDetails {
           flex-grow: 1;
-          margin-left: $default-spacing;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        .receivedDate {
-          width: 90px;
-          min-width: 90px;
-          text-align: right;
-        }
-        .size {
-          margin-right: $default-spacing / 2;
-          width: 85px;
-          min-width: 85px;
-          text-align: right;
-        }
-      }
+          min-width: 0;
+          width: 1px;
 
+          display: flex;
+          flex-flow: row nowrap;
+
+          .from {
+            width: 200px;
+            min-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          .subject {
+            flex-grow: 1;
+            margin-left: $default-spacing;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          .receivedDate {
+            width: 90px;
+            min-width: 90px;
+            text-align: right;
+          }
+          .size {
+            margin-right: $default-spacing / 2;
+            width: 85px;
+            min-width: 85px;
+            text-align: right;
+          }
+        }
+
+      }
     }
   }
 

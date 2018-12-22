@@ -46,9 +46,11 @@ class MessageList extends Component {
           <ul className={`${mainCss['mdc-list']} ${styles.list}`}>
             <AutoSizer defaultHeight={100}>
               {({height, width}) => (
-                <List rowRenderer={this.renderItem.bind(this)}
+                <List
+                  className={styles.virtualList}
                   height={height}
                   width={width}
+                  rowRenderer={this.renderItem.bind(this)}
                   rowCount={this.props.messages.length}
                   rowHeight={32}
                 />
