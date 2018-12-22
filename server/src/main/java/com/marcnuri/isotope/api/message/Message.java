@@ -51,6 +51,7 @@ public class Message extends IsotopeResource implements Serializable {
     private String messageId;
     private Long modseq;
     private List<String> from;
+    private List<String>  replyTo;
     @NotEmpty(groups = {SmtpSend.class})
     private List<Recipient> recipients;
     private String subject;
@@ -94,6 +95,14 @@ public class Message extends IsotopeResource implements Serializable {
 
     public void setFrom(List<String> from) {
         this.from = from;
+    }
+
+    public List<String> getReplyTo() {
+        return replyTo;
+    }
+
+    public void setReplyTo(List<String> replyTo) {
+        this.replyTo = replyTo;
     }
 
     public List<Recipient> getRecipients() {
@@ -194,6 +203,7 @@ public class Message extends IsotopeResource implements Serializable {
                 Objects.equals(messageId, message.messageId) &&
                 Objects.equals(modseq, message.modseq) &&
                 Objects.equals(from, message.from) &&
+                Objects.equals(replyTo, message.replyTo) &&
                 Objects.equals(recipients, message.recipients) &&
                 Objects.equals(subject, message.subject) &&
                 Objects.equals(receivedDate, message.receivedDate) &&
@@ -210,7 +220,7 @@ public class Message extends IsotopeResource implements Serializable {
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), uid, messageId, modseq, from, recipients, subject, receivedDate, size, seen, recent, deleted, content, attachments, references, inReplyTo);
+        return Objects.hash(super.hashCode(), uid, messageId, modseq, from, replyTo, recipients, subject, receivedDate, size, seen, recent, deleted, content, attachments, references, inReplyTo);
     }
 
     /**
@@ -236,6 +246,7 @@ public class Message extends IsotopeResource implements Serializable {
                 ret.setUid(folder.getUID(imapMessage));
                 ret.setMessageId(imapMessage.getMessageID());
                 ret.setFrom(processAddress(imapMessage.getFrom()));
+                ret.setReplyTo(processAddress(imapMessage.getReplyTo()));
                 // Process only recipients received in ENVELOPE (don't use getAllRecipients)
                 ret.setRecipients(Stream.of(
                         processAddress(RecipientType.TO, imapMessage.getRecipients(RecipientType.TO)),

@@ -59,6 +59,7 @@ describe('Application service test suite', () => {
         expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
         const editedMessage = action.payload;
         expect(editedMessage.to.length).toEqual(2);
+        expect(editedMessage.to).toContain('from@mail.com');
         expect(editedMessage.cc.length).toEqual(1);
         expect(editedMessage.bcc.length).toEqual(1);
         expect(editedMessage.subject).toEqual(expect.stringMatching(/^Re: /));
@@ -71,6 +72,41 @@ describe('Application service test suite', () => {
         messageId: '1337-from@mail.com',
         references: '',
         from: ['from@mail.com'],
+        recipients: [
+          {type: 'To', address: 'to@mail.com'},
+          {type: 'Cc', address: 'cc@mail.com'},
+          {type: 'Bcc', address: 'bcc@mail.com'}
+        ],
+        subject: 'This message will be replied',
+        attachments: [{fileName: 'file.1st', size: 1337, contentType: 'application/octet-stream'}]
+      };
+
+      // When
+      applicationService.replyMessage(dispatch, message);
+
+      // Then
+      expect(dispatch).toHaveBeenCalledTimes(1);
+    });
+    test('replyMessage with valid message, reply-to address and all recipient types, should dispatch editMessage', () => {
+      // Given
+      const dispatch = jest.fn(action => {
+        expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
+        const editedMessage = action.payload;
+        expect(editedMessage.to.length).toEqual(2);
+        expect(editedMessage.to).toContain('replyTo@mail.com');
+        expect(editedMessage.cc.length).toEqual(1);
+        expect(editedMessage.bcc.length).toEqual(1);
+        expect(editedMessage.subject).toEqual(expect.stringMatching(/^Re: /));
+        expect(editedMessage.content).toEqual(expect.stringContaining('replyAction.From'));
+        expect(editedMessage.content).toEqual(expect.stringContaining('replyAction.Date'));
+        expect(editedMessage.content).toEqual(expect.stringContaining('replyAction.Subject'));
+        expect(editedMessage.content).toEqual(expect.not.stringContaining('bcc@mail.com'));
+      });
+      const message = {
+        messageId: '1337-from@mail.com',
+        references: '',
+        from: ['from@mail.com'],
+        replyTo: ['replyTo@mail.com'],
         recipients: [
           {type: 'To', address: 'to@mail.com'},
           {type: 'Cc', address: 'cc@mail.com'},

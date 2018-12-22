@@ -112,7 +112,9 @@ export function replyMessage(dispatch, originalMessage) {
   const recipientMapper = r => r.address;
   const inReplyTo = [originalMessage.messageId];
   const references = originalMessage.references.concat([originalMessage.messageId]);
-  const to = recipients.filter(r => r.type === 'To').map(recipientMapper).concat(originalMessage.from);
+  const replyTo = originalMessage.replyTo && originalMessage.replyTo.length > 0 ?
+    originalMessage.replyTo : originalMessage.from;
+  const to = recipients.filter(r => r.type === 'To').map(recipientMapper).concat(replyTo);
   const cc = recipients.filter(r => r.type === 'Cc').map(recipientMapper);
   const bcc = recipients.filter(r => r.type === 'Bcc').map(recipientMapper);
   const attachments = [];
