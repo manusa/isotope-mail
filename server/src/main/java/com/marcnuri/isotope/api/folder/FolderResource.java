@@ -69,6 +69,7 @@ public class FolderResource implements ApplicationContextAware {
     private static final String REL_MOVE_BULK = "move.bulk";
     private static final String REL_SEEN = "seen";
     private static final String REL_SEEN_BULK = "seen.bulk";
+    private static final String REL_FLAGGED = "flagged";
 
     private final CredentialsService credentialsService;
     private final ObjectFactory<ImapService> imapServiceFactory;
@@ -214,6 +215,17 @@ public class FolderResource implements ApplicationContextAware {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping(path = "/{folderId}/messages/{messageId}/flagged")
+    public ResponseEntity<Void> setMessageFlagged(
+            HttpServletRequest request, @PathVariable("folderId") String folderId, @PathVariable("messageId") long messageId,
+            @RequestBody boolean flagged) {
+
+        log.debug("Setting message flagged attribute to {} in message {} from folder {}", flagged, messageId, folderId);
+        imapServiceFactory.getObject().setMessagesFlagged(
+                credentialsService.fromRequest(request), Folder.toId(folderId), flagged, messageId);
+        return ResponseEntity.noContent().build();
+    }
+
     private static Folder[] addLinks(Folder... folders) {
         Stream.of(folders).forEach(FolderResource::addLinks);
         return folders;
@@ -257,6 +269,8 @@ public class FolderResource implements ApplicationContextAware {
                     false)).withRel(REL_SEEN));
             message.add(linkTo(methodOn(FolderResource.class).setMessagesSeen(null, folderId, null,
                     Collections.emptyList())).withRel(REL_SEEN_BULK));
+            message.add(linkTo(methodOn(FolderResource.class).setMessageFlagged(null, folderId, message.getUid(),
+                    false)).withRel(REL_FLAGGED));
         }
         return message;
     }

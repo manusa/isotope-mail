@@ -340,16 +340,21 @@ public class ImapService {
         }
     }
 
+    /**
+     * Sets the seen Flag ({@link javax.mail.Flags.Flag#SEEN}) to the provided boolean value for the specified
+     * messages uids
+     *
+     * @param credentials
+     * @param folderId
+     * @param seen
+     * @param uids
+     */
     public void setMessagesSeen(Credentials credentials, URLName folderId, boolean seen, long... uids) {
-        try {
-            final IMAPFolder folder = getFolder(credentials, folderId);
-            folder.open(READ_WRITE);
-            final javax.mail.Message[] messages = folder.getMessagesByUID(uids);
-            folder.setFlags(messages, new Flags(Flags.Flag.SEEN), seen);
-            folder.close(false);
-        } catch (MessagingException ex) {
-            throw new IsotopeException(ex.getMessage(), ex);
-        }
+        setMessagesFlag(credentials, folderId, Flags.Flag.SEEN, seen, uids);
+    }
+
+    public void setMessagesFlagged(Credentials credentials, URLName folderId, boolean flagged, long... uids) {
+       setMessagesFlag(credentials, folderId, Flags.Flag.FLAGGED, flagged, uids);
     }
 
     public Folder deleteMessages(@NonNull Credentials credentials, @NonNull URLName folderId, @NonNull List<Long> uids) {
@@ -434,6 +439,18 @@ public class ImapService {
             throw new NotFoundException("Folder not found");
         }
         return folder;
+    }
+
+    private void setMessagesFlag(Credentials credentials, URLName folderId, Flags.Flag flag, boolean flagValue, long... uids) {
+        try {
+            final IMAPFolder folder = getFolder(credentials, folderId);
+            folder.open(READ_WRITE);
+            final javax.mail.Message[] messages = folder.getMessagesByUID(uids);
+            folder.setFlags(messages, new Flags(flag), flagValue);
+            folder.close(false);
+        } catch (MessagingException ex) {
+            throw new IsotopeException(ex.getMessage(), ex);
+        }
     }
 
     /**

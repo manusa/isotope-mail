@@ -124,7 +124,7 @@ public class FolderResourceTest {
         result.andExpect(jsonPath("[0].uid").value(messageUid));
         result.andExpect(jsonPath("[0].subject").value("Message in a bottle"));
         result.andExpect(jsonPath("[0]._links").exists());
-        result.andExpect(jsonPath("[0]._links", aMapWithSize(5)));
+        result.andExpect(jsonPath("[0]._links", aMapWithSize(6)));
     }
 
     @Test
@@ -176,6 +176,23 @@ public class FolderResourceTest {
         final ResultActions result = mockMvc.perform(
                 put("/v1/folders/1337/messages/seen/true")
                         .content("[1337]")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaTypes.HAL_JSON_VALUE));
+
+        // Then
+        result.andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void setMessageFlagged_validFolderAndMessage_shouldReturnNoContent() throws Exception {
+        // Given
+        doNothing().when(imapService)
+                .setMessagesFlagged(Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(long[].class));
+
+        // When
+        final ResultActions result = mockMvc.perform(
+                put("/v1/folders/1337/messages/1337/flagged")
+                        .content("\"true\"")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaTypes.HAL_JSON_VALUE));
 
