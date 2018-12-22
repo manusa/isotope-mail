@@ -48,6 +48,39 @@ describe('Message service test suite', () => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
+  describe('setMessageFlagged', () => {
+    test('setMessageFlagged with valid message, should dispatch result and fetch (update BE)', done => {
+      // Given
+      global.fetch = jest.fn((url, options) => {
+        expect(url.toLocaleString()).toMatch('http://test.url/folder1337/1/flagged');
+        expect(options.body).toMatch('true');
+        done();
+        return Promise.resolve({});
+      });
+      fetch.abortFetch = jest.fn();
+      let dispatchCount = 0;
+      const dispatch = jest.fn(action => {
+        switch (action.type) {
+          case ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST: {
+            dispatchCount++;
+            break;
+          }
+          default:
+        }
+      });
+      const credentials = {};
+      const folder = {};
+      const message = {uid: 1, _links: {flagged: {href: 'http://test.url/folder1337/1/flagged'}}};
+
+      // When
+      messageService.setMessageFlagged(dispatch, credentials, folder, message, true);
+
+      // Then
+      expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
+      expect(dispatchCount).toEqual(1);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
   describe('deleteMessages', () => {
     test('deleteMessages with valid message array, should fetch and dispatch results', done => {
       // Given

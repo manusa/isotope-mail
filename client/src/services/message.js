@@ -202,6 +202,25 @@ export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
     });
 }
 
+export function setMessageFlagged(dispatch, credentials, folder, message, flagged) {
+  // Abort any operations that can affect operation result
+  _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
+  abortFetch(abortControllerWrappers.getFoldersAbortController);
+
+  dispatch(updateCacheIfExist(folder, [{...message, flagged}]));
+  fetch(message._links.flagged.href, {
+    method: 'PUT',
+    headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
+    body: JSON.stringify(flagged)
+  })
+    .then(response => {
+      if (!response.ok) {
+        // Rollback state from dispatched expected responses
+        dispatch(updateCacheIfExist(folder, [message]));
+      }
+    });
+}
+
 export function deleteMessages(dispatch, credentials, folder, messages) {
   if (messages.length === 0) {
     return;

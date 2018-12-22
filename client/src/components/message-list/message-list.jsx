@@ -8,7 +8,7 @@ import Spinner from '../spinner/spinner';
 import {prettyDate, prettySize} from '../../services/prettify';
 import {selectMessage} from '../../actions/application';
 import {setSelected} from '../../actions/messages';
-import {preloadMessages} from '../../services/message';
+import {preloadMessages, setMessageFlagged} from '../../services/message';
 import {readMessage} from '../../services/message-read';
 import mainCss from '../../styles/main.scss';
 import styles from './message-list.scss';
@@ -91,10 +91,17 @@ class MessageList extends Component {
           checked={selected}
         />
         <span className={styles.itemDetails}
-          onClick={ () => this.props.messageClicked(message) }
+          onClick={() => this.props.messageClicked(message)}
           draggable={true} onDragStart={event => this.onDragStart(event, folder, message)}>
           <span className={styles.from}>{parseFrom(message.from)}</span>
-          <span className={`material-icons ${styles.flag} ${message.flagged && styles.flagged}`}>{'outlined_flag'}</span>
+          <span className={`material-icons ${styles.flag} ${message.flagged && styles.flagged}`}
+            onClick={event => {
+              event.stopPropagation();
+              this.props.toggleMessageFlagged(message);
+            }}
+          >
+            {'outlined_flag'}
+          </span>
           <span className={styles.subject}>{message.subject}</span>
           <span className={styles.receivedDate}>{prettyDate(message.receivedDate)}</span>
           <span className={styles.size}>{prettySize(message.size)}</span>
@@ -210,13 +217,17 @@ const mapDispatchToProps = dispatch => ({
     readMessage(dispatch, credentials, downloadedMessages, folder, message);
   },
   messageSelected: (messages, selected, shiftKey) => dispatch(setSelected(messages, selected, shiftKey)),
-  preloadMessages: (credentials, folder, messageUids) => preloadMessages(dispatch, credentials, folder, messageUids)
+  preloadMessages: (credentials, folder, messageUids) => preloadMessages(dispatch, credentials, folder, messageUids),
+  toggleMessageFlagged: (credentials, folder, message) =>
+    setMessageFlagged(dispatch, credentials, folder, message, !message.flagged)
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
   messageClicked: message => dispatchProps.messageClicked(
     stateProps.credentials, stateProps.downloadedMessages, stateProps.selectedFolder, message),
-  preloadMessages: (folder, messageUids) => dispatchProps.preloadMessages(stateProps.credentials, folder, messageUids)
+  preloadMessages: (folder, messageUids) => dispatchProps.preloadMessages(stateProps.credentials, folder, messageUids),
+  toggleMessageFlagged: message => dispatchProps.toggleMessageFlagged(
+    stateProps.credentials, stateProps.selectedFolder, message)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(translate()(MessageList));
