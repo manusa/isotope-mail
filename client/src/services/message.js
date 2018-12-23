@@ -11,6 +11,7 @@ import {updateFolder} from '../actions/folders';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 import {persistMessageCache} from './indexed-db';
 import {notifyNewMail} from './notification';
+import {FolderTypes} from './folder';
 
 const _eventSourceWrappers = {};
 
@@ -89,7 +90,7 @@ export function preloadMessages(dispatch, credentials, folder, messageUids) {
   })
     .then(toJson)
     .then(messages => {
-      if (messages.some(m => m.recent === true)) {
+      if (folder.type === FolderTypes.INBOX && messages.some(m => m.recent === true)) {
         notifyNewMail();
       }
       dispatch(preDownloadMessages(messages));

@@ -1,6 +1,8 @@
 import * as messageService from '../message';
 import * as fetch from '../fetch';
+import * as notification from '../notification';
 import {ActionTypes} from '../../actions/action-types';
+import {FolderTypes} from '../folder';
 
 describe('Message service test suite', () => {
   // Backup mocked implementations
@@ -10,6 +12,56 @@ describe('Message service test suite', () => {
   // Restore mocked implementations
   afterEach(() => {
     global.fetch = global.fetchBu;
+  });
+  describe('preloadMessages', () => {
+    test('preloadMessages, INBOX folder, should return recent message and trigger notification', done => {
+      // Given
+      global.fetch = jest.fn(url => {
+        expect(url.toLocaleString()).toMatch('http://test.url/api/v1/folders/1337/messages?id=1337&id=1338');
+        return Promise.resolve({ok: true, json: () => [{recent: true}]});
+      });
+      notification.notifyNewMail = jest.fn();
+      const dispatch = jest.fn(action => {
+        if (action.type === ActionTypes.APPLICATION_MESSAGE_PRE_DOWNLOAD) {
+          expect(notification.notifyNewMail).toHaveBeenCalledTimes(1);
+          done();
+        }
+      });
+      const folder = {
+        type: FolderTypes.INBOX,
+        _links: {messages: {href: 'http://test.url/api/v1/folders/1337/messages'}}
+      };
+
+      // When
+      messageService.preloadMessages(dispatch, {}, folder, [1337, 1338]);
+
+      // Then
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+    test('preloadMessages, NOT INBOX folder, should return recent message and NOT trigger notification', done => {
+      // Given
+      global.fetch = jest.fn(url => {
+        expect(url.toLocaleString()).toMatch('http://test.url/api/v1/folders/1337/messages?id=1337&id=1338');
+        return Promise.resolve({ok: true, json: () => [{recent: true}]});
+      });
+      notification.notifyNewMail = jest.fn();
+      const dispatch = jest.fn(action => {
+        if (action.type === ActionTypes.APPLICATION_MESSAGE_PRE_DOWNLOAD) {
+          expect(notification.notifyNewMail).toHaveBeenCalledTimes(0);
+          done();
+        }
+      });
+      const folder = {
+        type: FolderTypes.FOLDER,
+        _links: {messages: {href: 'http://test.url/api/v1/folders/1337/messages'}}
+      };
+
+      // When
+      messageService.preloadMessages(dispatch, {}, folder, [1337, 1338]);
+
+      // Then
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
   });
   describe('setMessagesSeen', () => {
     test('setMessagesSeen with valid message array, should dispatch results and fetch (update BE)', done => {
