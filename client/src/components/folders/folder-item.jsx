@@ -18,10 +18,12 @@ class FolderItem extends Component {
   render() {
     const {className, selected, graphic, label, newMessageCount, unreadMessageCount, onClick, onRename} = this.props;
     const {dragOver} = this.state;
+    const labelWithCount = `${label} ${unreadMessageCount > 0 ? `(${unreadMessageCount})` : ''}`;
     return (
       <a className={`${className} ${mainCss['mdc-list-item']} ${styles.listItem}
         ${selected ? mainCss['mdc-list-item--selected'] : ''}
         ${dragOver ? mainCss['mdc-list-item--activated'] : ''}`}
+      title={labelWithCount}
       onClick={onClick}
       onDrop={this.handleOnDrop} onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave}>
         <span className={`material-icons ${mainCss['mdc-list-item__graphic']} ${styles.graphic}`}>
@@ -29,7 +31,7 @@ class FolderItem extends Component {
         </span>
         <span className={`${mainCss['mdc-list-item__primary-text']} ${styles.primaryText}
           ${newMessageCount > 0 ? styles.hasNewMessages : ''}`}>
-          {`${label} ${unreadMessageCount > 0 ? `(${unreadMessageCount})` : ''}`}
+          {labelWithCount}
         </span>
         <span className={styles.actions}>
           {

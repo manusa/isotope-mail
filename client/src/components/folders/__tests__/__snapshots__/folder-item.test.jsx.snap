@@ -8,6 +8,7 @@ exports[`FolderItem component test suite Snapshot render, should render FolderIt
   onDragLeave={[Function]}
   onDragOver={[Function]}
   onDrop={[Function]}
+  title="Red Label (13)"
 >
   <span
     className="material-icons mdc-list-item__graphic graphic"
