@@ -1,14 +1,19 @@
 @import '../../styles/partials/variables';
+@import '@material/drawer/mdc-drawer';
 
 .side-bar {
   display: flex;
   position: fixed;
   min-height: 100vh;
   width: 0px;
+  border: 0;
   transition: width $drawerAnimationSpeed;
 
   &.open {
     width: $drawerWidth;
+    @include mdc-drawer-border-color($mdc-drawer-divider-color);
+    border-right-width: 1px;
+    border-right-style: solid;
   }
 
   .top-container {
