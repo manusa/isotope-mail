@@ -142,7 +142,7 @@ export function replyMessage(dispatch, originalMessage) {
 
 export function forwardMessage(dispatch, originalMessage) {
   const t = i18n.t.bind(i18n);
-  const attachments = [...originalMessage.attachments];
+  const attachments = originalMessage.attachments ? [...originalMessage.attachments] : [];
   const subject = `${originalMessage.subject.toLowerCase().indexOf('fwd:') === 0 ? '' : 'Fwd: '}${originalMessage.subject}`;
   const formattedDate = new Date(originalMessage.receivedDate).toLocaleString(navigator.language, {
     year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'
