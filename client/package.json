@@ -61,7 +61,7 @@
     "@material/line-ripple": "^0.39.3",
     "@material/list": "^0.41.0",
     "@material/snackbar": "^0.39.1",
-    "@material/switch": "^0.39.3",
+    "@material/switch": "^0.42.0",
     "@material/textfield": "^0.39.3",
     "@material/top-app-bar": "^0.39.3",
     "babel-core": "^7.0.0-bridge.0",

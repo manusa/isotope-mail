@@ -20,7 +20,7 @@ class Switch extends Component {
           <div className={mainCss['mdc-switch__thumb-underlay']}>
             <div className={mainCss['mdc-switch__thumb']}>
               <input type='checkbox' ref={this.inputRef} id={id}
-                className={`${mainCss['mdc-checkbox__native-control']} ${inputClass}`}
+                className={`${mainCss['mdc-switch__native-control']} ${inputClass}`}
                 required={required}
                 checked={checked}
                 readOnly={true}

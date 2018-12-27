@@ -18,7 +18,7 @@ exports[`Checkbox component test suite Snapshot render, should render switch 1`]
       >
         <input
           checked={true}
-          className="mdc-checkbox__native-control input-class"
+          className="mdc-switch__native-control input-class"
           id="Bourne"
           readOnly={true}
           required={true}
