@@ -63,7 +63,7 @@
     "@material/snackbar": "^0.39.1",
     "@material/switch": "^0.42.0",
     "@material/textfield": "^0.39.3",
-    "@material/top-app-bar": "^0.39.3",
+    "@material/top-app-bar": "^0.42.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
