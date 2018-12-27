@@ -50,7 +50,7 @@
     "@babel/preset-react": "7.0.0",
     "@babel/runtime": "7.0.0",
     "@material/button": "^0.42.0",
-    "@material/card": "^0.39.3",
+    "@material/card": "^0.42.0",
     "@material/checkbox": "^0.39.3",
     "@material/chips": "^0.39.3",
     "@material/dialog": "^0.40.1",
