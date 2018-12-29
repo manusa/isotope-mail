@@ -60,7 +60,7 @@
     "@material/icon-button": "^0.42.0",
     "@material/line-ripple": "^0.39.3",
     "@material/list": "^0.42.0",
-    "@material/snackbar": "^0.39.1",
+    "@material/snackbar": "^0.42.0",
     "@material/switch": "^0.42.0",
     "@material/textfield": "^0.39.3",
     "@material/top-app-bar": "^0.42.0",
