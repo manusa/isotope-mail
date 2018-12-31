@@ -36,9 +36,19 @@ exports[`Dialog component test suite Snapshot render, should render dialog 1`] =
         >
           <Button
             className=" mdc-dialog__button"
+            disabled={false}
             icon=""
             key="0"
             label="Red label"
+            onClick={[Function]}
+            type="button"
+          />
+          <Button
+            className=" mdc-dialog__button"
+            disabled={true}
+            icon=""
+            key="1"
+            label="Black disabled label"
             onClick={[Function]}
             type="button"
           />

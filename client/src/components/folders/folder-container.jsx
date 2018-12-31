@@ -1,66 +1,30 @@
-import React, {Component} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import Spinner from '../spinner/spinner';
 import FolderList from './folder-list';
 import FolderRenameDialog from './folder-rename-dialog';
-import {moveMessages, resetFolderMessagesCache} from '../../services/message';
-import {renameFolder, selectFolder} from '../../actions/application';
-import {clearSelected} from '../../actions/messages';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
-import {clearSelectedMessage} from '../../services/application';
 
-export class FolderContainer extends Component {
-  render() {
-    return (
-      <nav className={`${mainCss['mdc-list']}`}>
-        <Spinner visible={this.props.activeRequests > 0 && this.props.folderList.length === 0}
-          canvasClassName={styles.spinnerCanvas} />
-        <FolderList folderList={this.props.folderList}
-          selectedFolder={this.props.selectedFolder}
-          onClickFolder={this.props.selectFolder}
-          onRenameFolder={this.props.renameFolder}
-          onDropMessages={this.props.moveMessages}
-        />
-        <FolderRenameDialog />
-      </nav>
-    );
-  }
-}
+export const FolderContainer =
+  ({activeRequests, folderList}) => (
+    <nav className={`${mainCss['mdc-list']}`}>
+      <Spinner visible={activeRequests > 0 && folderList.length === 0}
+        canvasClassName={styles.spinnerCanvas} />
+      <FolderList folderList={folderList}/>
+      <FolderRenameDialog />
+    </nav>
+  );
 
 FolderContainer.propTypes = {
   activeRequests: PropTypes.number.isRequired,
-  folderList: PropTypes.array.isRequired,
-  selectedFolder: PropTypes.object
+  folderList: PropTypes.array.isRequired
 };
 
 const mapStateToProps = state => ({
-  application: state.application,
   activeRequests: state.folders.activeRequests,
-  selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || {},
-  folderList: state.folders.items,
-  messages: state.messages
+  folderList: state.folders.items
 });
 
-const mapDispatchToProps = dispatch => ({
-  selectFolder: (folder, user) => {
-    dispatch(selectFolder(folder));
-    clearSelectedMessage(dispatch);
-    dispatch(clearSelected());
-    resetFolderMessagesCache(dispatch, user, folder);
-  },
-  renameFolder: folder => dispatch(renameFolder(folder)),
-  moveMessages: (credentials, fromFolder, toFolder, messages) => {
-    moveMessages(dispatch, credentials, fromFolder, toFolder, messages);
-  }
-});
-
-const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
-  selectFolder: folder =>
-    dispatchProps.selectFolder(folder, stateProps.application.user),
-  moveMessages: (fromFolder, toFolder, message) => dispatchProps.moveMessages(stateProps.application.user.credentials,
-    fromFolder, toFolder, message)
-}));
-
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(FolderContainer);
+export default connect(mapStateToProps)(FolderContainer);

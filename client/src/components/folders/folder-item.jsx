@@ -16,7 +16,9 @@ class FolderItem extends Component {
   }
 
   render() {
-    const {className, selected, graphic, label, newMessageCount, unreadMessageCount, onClick, onRename} = this.props;
+    const {
+      className, selected, graphic, label, newMessageCount, unreadMessageCount, onClick, onRename, onDelete
+    } = this.props;
     const {dragOver} = this.state;
     const labelWithCount = `${label} ${unreadMessageCount > 0 ? `(${unreadMessageCount})` : ''}`;
     return (
@@ -34,10 +36,8 @@ class FolderItem extends Component {
           {labelWithCount}
         </span>
         <span className={styles.actions}>
-          {
-            !onRename ? null :
-              <i className={'material-icons'} onClick={onRename}>edit</i>
-          }
+          {onDelete !== null && <i className={'material-icons'} onClick={onDelete}>delete</i>}
+          {onRename !== null && <i className={'material-icons'} onClick={onRename}>edit</i>}
         </span>
       </a>
     );
@@ -69,6 +69,7 @@ FolderItem.propTypes = {
   onDrop: PropTypes.func,
   onClick: PropTypes.func,
   onRename: PropTypes.func,
+  onDelete: PropTypes.func,
   unreadMessageCount: PropTypes.number,
   newMessageCount: PropTypes.number
 };
@@ -80,7 +81,8 @@ FolderItem.defaultProps = {
   unreadMessageCount: 0,
   newMessageCount: 0,
   onDrop: null,
-  onRename: null
+  onRename: null,
+  onDelete: null
 };
 
 export default FolderItem;

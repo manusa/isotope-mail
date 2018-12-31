@@ -132,3 +132,37 @@ export function renameFolder(dispatch, user, folderToRename, newName) {
     });
 }
 
+export function moveFolder(dispatch, user, folderToMove, targetFolder) {
+  abortFetch(abortControllerWrappers.getFoldersAbortController);
+  dispatch(applicationBackendRequest());
+  fetch(folderToMove._links.move.href, {
+    method: 'PUT',
+    headers: credentialsHeaders(user.credentials, {'Content-Type': 'application/json'}),
+    body: targetFolder.folderId
+  })
+    .then(toJson)
+    .then(updatedTargetFolder => {
+      dispatch(updateFolder(updatedTargetFolder));
+      updatedTargetFolder.children
+        .filter(f => f.previousFolderId)
+        .forEach(f => {
+          dispatch(renameFolderOk(f.previousFolderId, f.folderId));
+          renameMessageCache(user.id, user.hash, f.previousFolderId, f.folderId);
+        });
+      dispatch(applicationBackendRequestCompleted());
+    })
+    .catch(() => {
+      dispatch(applicationBackendRequestCompleted());
+    });
+}
+
+/**
+ * Finds the trash folder from within the current folder state's exploded items.
+ *
+ * TODO: Create cached selector within REDUX state
+ * @param foldersState
+ * @returns {any}
+ */
+export const findTrashFolder = foldersState =>
+  Object.values(foldersState.explodedItems).find(f => f.type === FolderTypes.TRASH);
+

@@ -40,6 +40,7 @@ exports[`LoginSnackbar component test suite Snapshot render User not logged in, 
       >
         <TextField
           autoComplete="on"
+          disabled={false}
           fieldClass="formField serverHost"
           focused={false}
           id="serverHost"
@@ -58,6 +59,7 @@ exports[`LoginSnackbar component test suite Snapshot render User not logged in, 
         />
         <TextField
           autoComplete="on"
+          disabled={false}
           fieldClass="formField serverPort"
           focused={false}
           id="serverPort"
@@ -78,6 +80,7 @@ exports[`LoginSnackbar component test suite Snapshot render User not logged in, 
       </div>
       <TextField
         autoComplete="on"
+        disabled={false}
         fieldClass="formField fullWidth"
         focused={false}
         id="user"
@@ -96,6 +99,7 @@ exports[`LoginSnackbar component test suite Snapshot render User not logged in, 
       />
       <TextField
         autoComplete="off"
+        disabled={false}
         fieldClass="formField fullWidth"
         focused={false}
         id="password"
@@ -114,6 +118,7 @@ exports[`LoginSnackbar component test suite Snapshot render User not logged in, 
       />
       <Button
         className="advancedButton"
+        disabled={false}
         icon="unfold_more"
         label="login.Advanced"
         onClick={[Function]}
@@ -121,6 +126,7 @@ exports[`LoginSnackbar component test suite Snapshot render User not logged in, 
       />
       <Button
         className="loginButton mdc-button--unelevated fullWidth"
+        disabled={false}
         icon=""
         label="login.actions.Login"
         onClick={[Function]}

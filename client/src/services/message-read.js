@@ -1,6 +1,6 @@
 import {
-  backendRequest,
-  backendRequestCompleted,
+  refreshMessageBackendRequest,
+  refreshMessageBackendRequestCompleted,
   replaceMessageEmbeddedImages
 } from '../actions/application';
 import {updateCacheIfExist} from '../actions/messages';
@@ -49,19 +49,19 @@ function _readMessageRequest(dispatch, credentials, message) {
   const signal = abortControllerWrappers.readMessageAbortController.signal;
 
   return () => {
-    dispatch(backendRequest());
+    dispatch(refreshMessageBackendRequest());
     return fetch(message._links.self.href, {
       method: 'GET',
       headers: credentialsHeaders(credentials),
       signal: signal
     })
       .then(response => {
-        dispatch(backendRequestCompleted());
+        dispatch(refreshMessageBackendRequestCompleted());
         return response;
       })
       .then(toJson)
       .catch(() => {
-        dispatch(backendRequestCompleted());
+        dispatch(refreshMessageBackendRequestCompleted());
         throw Error();
       });
   };

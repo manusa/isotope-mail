@@ -86,6 +86,7 @@ import static javax.mail.Folder.READ_WRITE;
 @Service
 @RequestScope
 @Primary
+@SuppressWarnings("squid:S4529")
 public class ImapService {
 
     private static final Logger log = LoggerFactory.getLogger(ImapService.class);
@@ -179,21 +180,59 @@ public class ImapService {
                     folderToRenameFullName.substring(0, folderToRenameFullName.lastIndexOf(folder.getName())),
                     newName
             );
-            final IMAPFolder renamedFolder = (IMAPFolder)getImapStore(credentials).getFolder(newFolderFullName);
-            if (!folder.renameTo(renamedFolder)) {
-                throw new InvalidFieldException("New folder name was not accepted by IMAP server");
-            }
-            final Folder parent = Folder.from((IMAPFolder)renamedFolder.getParent(), true);
-            // Identify renamed folder
-            Stream.of(parent.getChildren())
-                    .filter(f -> f.getFullName().equals(newFolderFullName))
-                    .findAny()
-                    .ifPresent(f -> f.setPreviousFolderId(Folder.toBase64Id((folderToRenameId))));
-            return parent;
+            return renameFolder(getImapStore(credentials), folderToRenameId, folder, newFolderFullName);
         } catch (MessagingException ex) {
             log.error("Error renaming folder " + folderToRenameId.toString(), ex);
             throw new IsotopeException(ex.getMessage());
         }
+    }
+
+    /**
+     * Moves the folder with the provided {@link URLName} to the specified target folder with the provided
+     * URLName.
+     *
+     * <p>Both folders must exist in order for the action to complete successfully.
+     *
+     * @param credentials for IMAP authentication
+     * @param folderToMoveId Id of the folder to move
+     * @param targetFolderId Id of the target folder
+     * @return
+     */
+    public Folder moveFolder(
+            @NonNull Credentials credentials, @NonNull URLName folderToMoveId, @NonNull URLName targetFolderId) {
+        try {
+            final IMAPFolder folderToMove = getFolder(credentials, folderToMoveId);
+            if (!folderToMove.exists()) {
+                throw new NotFoundException(String.format("Folder %s not found", folderToMove.getName()));
+            }
+            final IMAPFolder targetFolder = getFolder(credentials, targetFolderId);
+            if (!targetFolder.exists()) {
+                throw new NotFoundException(String.format("Folder %s not found", targetFolder.getName()));
+            }
+            final String movedFolderFullName = String.format("%s%s%s",
+                    targetFolder.getFullName(), targetFolder.getSeparator(), folderToMove.getName());
+            return renameFolder(getImapStore(credentials), folderToMoveId, folderToMove, movedFolderFullName);
+        } catch (MessagingException ex) {
+            log.error("Error moving folder " + folderToMoveId.toString(), ex);
+            throw new IsotopeException(ex.getMessage());
+        }
+    }
+
+    private static Folder renameFolder(
+            IMAPStore imapStore, URLName previousNameId, IMAPFolder folder, String newFolderFullName)
+            throws MessagingException {
+
+        final IMAPFolder renamedFolder = (IMAPFolder)imapStore.getFolder(newFolderFullName);
+        if (!folder.renameTo(renamedFolder)) {
+            throw new InvalidFieldException("New folder name was not accepted by IMAP server");
+        }
+        final Folder parent = Folder.from((IMAPFolder)renamedFolder.getParent(), true);
+        // Identify renamed folder
+        Stream.of(parent.getChildren())
+                .filter(f -> f.getFullName().equals(newFolderFullName))
+                .findAny()
+                .ifPresent(f -> f.setPreviousFolderId(Folder.toBase64Id(previousNameId)));
+        return parent;
     }
 
     public Flux<ServerSentEvent<List<Message>>> getMessagesFlux(

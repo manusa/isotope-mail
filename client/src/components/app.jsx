@@ -1,6 +1,7 @@
 import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import Spinner from './spinner/spinner';
 import TopBar from './top-bar/top-bar';
 import SideBar from './side-bar/side-bar';
 import MessageEditor from './message-editor/message-editor';
@@ -25,12 +26,14 @@ class App extends Component {
   }
 
   render() {
+    const {sideBar} = this.state;
     return (
       <div className={styles.app}>
-        <TopBar sideBarCollapsed={this.state.sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
-        <SideBar collapsed={this.state.sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
+        <Spinner visible={this.props.application.activeRequests > 0} className={styles.spinner}/>
+        <TopBar sideBarCollapsed={sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
+        <SideBar collapsed={sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
         <div className={`${mainCss['mdc-top-app-bar--fixed-adjust']} ${styles['content-wrapper']}
-            ${this.state.sideBar.collapsed ? '' : styles['with-side-bar']}`}>
+            ${sideBar.collapsed ? '' : styles['with-side-bar']}`}>
           {this.renderContent()}
         </div>
         <MessageSnackbar/>
