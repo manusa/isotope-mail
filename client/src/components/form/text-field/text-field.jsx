@@ -21,6 +21,7 @@ class TextField extends Component {
         ${this.props.fieldClass}`}>
         <input type={this.props.type} ref={this.inputRef} id={this.props.id}
           className={`${mainCss['mdc-text-field__input']} ${this.props.inputClass}`}
+          disabled={this.props.disabled}
           required={this.props.required} autoComplete={this.props.autoComplete}
           min={this.props.min}
           minLength={this.props.minLength}
@@ -74,6 +75,7 @@ TextField.propTypes = {
   inputClass: PropTypes.string,
   labelClass: PropTypes.string,
   lineRippleClass: PropTypes.string,
+  disabled: PropTypes.bool,
   required: PropTypes.bool,
   autoComplete: PropTypes.string,
   label: PropTypes.string,
@@ -98,6 +100,7 @@ TextField.defaultProps = {
   inputClass: '',
   labelClass: '',
   lineRippleClass: '',
+  disabled: false,
   required: false,
   autoComplete: 'off',
   type: 'text',

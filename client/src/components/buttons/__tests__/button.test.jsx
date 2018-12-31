@@ -4,9 +4,9 @@ import Button from '../button';
 
 describe('Button component test suite', () => {
   test('Snapshot render, should render button', () => {
-    const {className, type, label, icon} = {className: 'first-class', type: 'button', label: 'Black Label',
-      icon: 'Andy Warhol'};
-    const button = shallow(<Button className={className} type={type} label={label} icon={icon}/>);
+    const props = {className: 'first-class', type: 'button', label: 'Black Label',
+      icon: 'Andy Warhol', disabled: false};
+    const button = shallow(<Button {...props}/>);
     expect(button).toMatchSnapshot();
   });
   test('click, should trigger function', () => {

@@ -8,7 +8,8 @@ describe('Dialog component test suite', () => {
       visible: true,
       title: 'Dr. POTUS',
       actions: [
-        {label: 'Red label', action: () => {}}
+        {label: 'Red label', action: () => {}},
+        {label: 'Black disabled label', disabled: true, action: () => {}}
       ],
       className: 'first-class', containerClassName: 'container-class', contentClassName: 'content-class'};
     const dialog = shallow(<Dialog visible={visible} title={title} actions={actions}

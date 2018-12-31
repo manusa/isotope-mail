@@ -25,6 +25,7 @@ class Dialog extends Component {
               {actions.map((a, index) => (
                 <Button
                   key={index} className={mainCss[' mdc-dialog__button']} label={a.label} onClick={a.action}
+                  disabled={a.disabled === true}
                 />
               ))}
             </footer>

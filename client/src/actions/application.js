@@ -20,6 +20,9 @@ export const selectMessage = message => ({type: ActionTypes.APPLICATION_MESSAGE_
  */
 export const refreshMessage = (folder, message) =>
   ({type: ActionTypes.APPLICATION_MESSAGE_REFRESH, payload: {folder, message}});
+export const refreshMessageBackendRequest = () => ({type: ActionTypes.APPLICATION_MESSAGE_REFRESH_BE_REQUEST});
+export const refreshMessageBackendRequestCompleted = () =>
+  ({type: ActionTypes.APPLICATION_MESSAGE_REFRESH_BE_REQUEST_COMPLETED});
 export const preDownloadMessages = messages =>
   ({type: ActionTypes.APPLICATION_MESSAGE_PRE_DOWNLOAD, payload: {messages}});
 export const replaceMessageEmbeddedImages = (folder, message, attachment, blob) =>

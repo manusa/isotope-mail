@@ -46,6 +46,11 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
       }
       return newState;
     }
+    case ActionTypes.APPLICATION_MESSAGE_REFRESH_BE_REQUEST:
+      return {...state, refreshMessageActiveRequests: state.refreshMessageActiveRequests + 1};
+    case ActionTypes.APPLICATION_MESSAGE_REFRESH_BE_REQUEST_COMPLETED:
+      return {...state, refreshMessageActiveRequests:
+          state.refreshMessageActiveRequests > 0 ? state.refreshMessageActiveRequests - 1 : 0};
     case ActionTypes.APPLICATION_MESSAGE_PRE_DOWNLOAD: {
       const newState = {...state};
       const messages = action.payload.messages;

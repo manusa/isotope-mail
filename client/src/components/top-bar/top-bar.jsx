@@ -2,14 +2,11 @@ import React, {Component, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import ConfirmDeleteFromTrashDialog from './confirm-delete-from-trash-dialog';
-import {FolderTypes} from '../../services/folder';
+import {findTrashFolder, FolderTypes} from '../../services/folder';
 import {forwardMessage, replyMessage, clearSelectedMessage} from '../../services/application';
 import {deleteMessages, moveMessages, setMessagesSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
-
-const _findTrashFolder = foldersState =>
-  Object.values(foldersState.explodedItems).find(f => f.type === FolderTypes.TRASH);
 
 export class TopBar extends Component {
   constructor(props) {
@@ -177,7 +174,7 @@ const mapDispatchToProps = dispatch => ({
   replyMessage: selectedMessaage => replyMessage(dispatch, selectedMessaage),
   forwardMessage: selectedMessaage => forwardMessage(dispatch, selectedMessaage),
   deleteMessage: (credentials, folders, selectedFolder, selectedMessage) => {
-    const trashFolder = _findTrashFolder(folders);
+    const trashFolder = findTrashFolder(folders);
     if (selectedMessage && selectedFolder && trashFolder) {
       if (selectedFolder === trashFolder) {
         deleteMessages(dispatch, credentials, selectedFolder, [selectedMessage]);
@@ -192,7 +189,7 @@ const mapDispatchToProps = dispatch => ({
     clearSelectedMessage(dispatch);
   },
   deleteMessages: (credentials, folders, selectedFolder, selectedMessages) => {
-    const trashFolder = _findTrashFolder(folders);
+    const trashFolder = findTrashFolder(folders);
     if (selectedMessages.length > 0 && selectedFolder && trashFolder) {
       if (selectedFolder === trashFolder) {
         deleteMessages(dispatch, credentials, selectedFolder, selectedMessages);

@@ -3,6 +3,7 @@
 exports[`Button component test suite Snapshot render, should render button 1`] = `
 <button
   className="mdc-button first-class"
+  disabled={false}
   onClick={[Function]}
   type="button"
 >

@@ -51,7 +51,7 @@ export class MessageViewer extends Component {
           <HeaderTo className={styles.to} recipients={message.recipients} />
         </div>
         <div className={styles.body}>
-          <Spinner visible={this.props.activeRequests > 0 && !message.content}/>
+          <Spinner visible={this.props.refreshMessageActiveRequests > 0 && !message.content}/>
           <div className={styles.attachments}>
             {attachments.map((a, index) => <AttachmentCard key={index} attachment={a} />)}
           </div>
@@ -68,7 +68,7 @@ export class MessageViewer extends Component {
 }
 
 MessageViewer.propTypes = {
-  activeRequests: PropTypes.number,
+  refreshMessageActiveRequests: PropTypes.number,
   selectedMessage: PropTypes.object,
   className: PropTypes.string
 };
@@ -78,7 +78,7 @@ MessageViewer.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  activeRequests: state.application.activeRequests,
+  refreshMessageActiveRequests: state.application.refreshMessageActiveRequests,
   currentFolder: state.folders.explodedItems[state.application.selectedFolderId] || {},
   selectedMessage: state.application.selectedMessage
 });

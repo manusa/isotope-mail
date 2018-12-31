@@ -9,6 +9,7 @@ exports[`TextField component test suite Snapshot render Snapshot render, should 
   <input
     autoComplete="off"
     className="mdc-text-field__input "
+    disabled={false}
     id="Bourne"
     min={1337}
     minLength={null}

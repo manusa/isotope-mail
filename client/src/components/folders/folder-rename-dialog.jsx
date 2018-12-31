@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import Dialog from '../dialog/dialog';
-import Spinner from '../spinner/spinner';
 import TextField from '../form/text-field/text-field';
 import {translate} from 'react-i18next';
 import {connect} from 'react-redux';
@@ -22,9 +21,10 @@ class FolderRenameDialog extends Component {
 
   render() {
     const {t, folderToRename, cancel, application} = this.props;
+    const disabled = application.activeRequests > 0;
     const actions = [
-      {label: t('renameFolderDialog.cancel'), action: cancel},
-      {label: t('renameFolderDialog.rename'), action: this.handleRenameFolder}
+      {label: t('renameFolderDialog.cancel'), disabled, action: cancel},
+      {label: t('renameFolderDialog.rename'), disabled, action: this.handleRenameFolder}
     ];
     const folderName = folderToRename ? folderToRename.name : '';
     return (
@@ -36,10 +36,10 @@ class FolderRenameDialog extends Component {
         title={t('renameFolderDialog.title')}
         actions={actions}
       >
-        <Spinner visible={application.activeRequests > 0} className={styles.spinner}/>
         <span>{t('renameFolderDialog.message', {folderName: folderName})}</span>
         <form ref={this.formRef} onSubmit={this.handleRenameFolder}>
           <TextField id={'folderName'} focused={true} type={'text'} fieldClass={mainCss['mdc-text-field--fullwidth']}
+            disabled={disabled}
             label={t('renameFolderDialog.folderNameLabel')} value={this.state.value} required={true}
             onChange={e => this.setState({value: e.target.value})} onKeyDown={this.handleTextfieldKeyDown}
           />
@@ -59,7 +59,7 @@ class FolderRenameDialog extends Component {
   }
 
   renameFolder() {
-    if (this.formRef.current.reportValidity()) {
+    if (this.props.application.activeRequests === 0 && this.formRef.current.reportValidity()) {
       this.props.renameFolder(this.props.folderToRename, this.state.value);
     }
   }

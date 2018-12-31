@@ -18,6 +18,7 @@ export const INITIAL_STATE = {
       diskQuotaExceeded: false,
       authentication: null
     },
+    refreshMessageActiveRequests: 0,
     activeRequests: 0
   },
   folders: {

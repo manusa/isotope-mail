@@ -58,6 +58,7 @@ import static org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE;
  */
 @RestController
 @RequestMapping(path = "/v1/folders")
+@SuppressWarnings("squid:S4529")
 public class FolderResource implements ApplicationContextAware {
 
     private static final Logger log = LoggerFactory.getLogger(FolderResource.class);
@@ -96,6 +97,14 @@ public class FolderResource implements ApplicationContextAware {
             HttpServletRequest request, @PathVariable("folderId") String folderId, @RequestBody String newName) {
         return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().renameFolder(
                 credentialsService.fromRequest(request), Folder.toId(folderId), newName
+        )));
+    }
+
+    @PutMapping(path= "/{folderId}/parent", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<Folder> moveFolder(
+            HttpServletRequest request, @PathVariable("folderId") String folderId, @RequestBody String targetFolderId) {
+        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().moveFolder(
+                credentialsService.fromRequest(request), Folder.toId(folderId), Folder.toId(targetFolderId)
         )));
     }
 
@@ -243,6 +252,9 @@ public class FolderResource implements ApplicationContextAware {
         folder.add(linkTo(methodOn(FolderResource.class)
                 .renameFolder(null, folder.getFolderId(), null))
                 .withRel(REL_RENAME));
+        folder.add(linkTo(methodOn(FolderResource.class)
+                .moveFolder(null, folder.getFolderId(), null))
+                .withRel(REL_MOVE));
         addLinks(folder.getChildren());
         return folder;
     }

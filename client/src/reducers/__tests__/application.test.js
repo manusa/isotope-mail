@@ -16,6 +16,7 @@ describe('Application reducer test suite', () => {
     expect(applicationDefaultState).toHaveProperty('pollInterval');
     expect(applicationDefaultState).toHaveProperty('errors.diskQuotaExceeded', false);
     expect(applicationDefaultState).toHaveProperty('errors.authentication', null);
+    expect(applicationDefaultState).toHaveProperty('refreshMessageActiveRequests', 0);
     expect(applicationDefaultState).toHaveProperty('activeRequests', 0);
   });
   test('Application BE Request', () => {
@@ -30,5 +31,20 @@ describe('Application reducer test suite', () => {
     const updatedState = application({...INITIAL_STATE.application, activeRequests: 2},
       {type: ActionTypes.APPLICATION_BE_REQUEST_COMPLETED});
     expect(updatedState.activeRequests).toBe(1);
+  });
+  test('Application Message Refresh BE Request', () => {
+    const updatedState = application(INITIAL_STATE.application,
+      {type: ActionTypes.APPLICATION_MESSAGE_REFRESH_BE_REQUEST});
+    expect(updatedState.refreshMessageActiveRequests).toBe(1);
+  });
+  test('Application Message Refresh BE Request completed (was 0)', () => {
+    const updatedState = application(INITIAL_STATE.application,
+      {type: ActionTypes.APPLICATION_MESSAGE_REFRESH_BE_REQUEST_COMPLETED});
+    expect(updatedState.refreshMessageActiveRequests).toBe(0);
+  });
+  test('Application Message Refresh BE Request completed (was 2)', () => {
+    const updatedState = application({...INITIAL_STATE.application, refreshMessageActiveRequests: 2},
+      {type: ActionTypes.APPLICATION_MESSAGE_REFRESH_BE_REQUEST_COMPLETED});
+    expect(updatedState.refreshMessageActiveRequests).toBe(1);
   });
 });

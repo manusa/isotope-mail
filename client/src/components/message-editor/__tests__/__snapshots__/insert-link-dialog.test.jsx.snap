@@ -24,6 +24,7 @@ exports[`InsertLinkDialog component test suite Snapshot render, should render In
   <form>
     <TextField
       autoComplete="off"
+      disabled={false}
       fieldClass="mdc-text-field--fullwidth"
       focused={true}
       id="link"
