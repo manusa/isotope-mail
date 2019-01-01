@@ -173,9 +173,6 @@ public class ImapService {
             if (newName.isEmpty() || newName.indexOf(folder.getSeparator()) >= 0) {
                 throw new InvalidFieldException("New folder name contains invalid characters");
             }
-            if (!folder.exists()) {
-                throw new NotFoundException("Folder not found");
-            }
             final String folderToRenameFullName = folder.getFullName();
             final String newFolderFullName = String.format("%s%s",
                     folderToRenameFullName.substring(0, folderToRenameFullName.lastIndexOf(folder.getName())),
@@ -203,13 +200,7 @@ public class ImapService {
             @NonNull Credentials credentials, @NonNull URLName folderToMoveId, @NonNull URLName targetFolderId) {
         try {
             final IMAPFolder folderToMove = getFolder(credentials, folderToMoveId);
-            if (!folderToMove.exists()) {
-                throw new NotFoundException(String.format("Folder %s not found", folderToMove.getName()));
-            }
             final IMAPFolder targetFolder = getFolder(credentials, targetFolderId);
-            if (!targetFolder.exists()) {
-                throw new NotFoundException(String.format("Folder %s not found", targetFolder.getName()));
-            }
             final String movedFolderFullName = String.format("%s%s%s",
                     targetFolder.getFullName(), targetFolder.getSeparator(), folderToMove.getName());
             return FolderUtils.renameFolder(folderToMove, movedFolderFullName);
@@ -460,7 +451,7 @@ public class ImapService {
     private IMAPFolder getFolder(Credentials credentials, URLName folderId) throws MessagingException {
         final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
         if (!folder.exists()) {
-            throw new NotFoundException("Folder not found");
+            throw new NotFoundException(String.format("Folder %s not found", folderId.toString()));
         }
         return folder;
     }
