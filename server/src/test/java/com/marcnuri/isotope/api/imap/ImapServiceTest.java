@@ -125,7 +125,7 @@ public class ImapServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void moveFolder_folderToMoveNotFound_shouldThrowException() throws Exception {
+    public void moveFolder_folderNotFound_shouldThrowException() throws Exception {
         // Given
         final Credentials credentials = new Credentials();
         credentials.setUser("validUser");
@@ -134,32 +134,8 @@ public class ImapServiceTest {
         credentials.setServerPort(993);
 
         final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
-        doReturn(folder).when(imapStore).getFolder(Mockito.eq(new URLName("/1337")));
+        doReturn(folder).when(imapStore).getFolder(Mockito.any(URLName.class));
         doReturn(false).when(folder).exists();
-
-        // When
-        imapService.moveFolder(credentials, new URLName("/1337"), new URLName("/target/folder"));
-
-        // Then
-        fail();
-    }
-
-    @Test(expected = NotFoundException.class)
-    public void moveFolder_targetFolderNotFound_shouldThrowException() throws Exception {
-        // Given
-        final Credentials credentials = new Credentials();
-        credentials.setUser("validUser");
-        credentials.setServerHost("email.com");
-        credentials.setImapSsl(true);
-        credentials.setServerPort(993);
-
-        final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
-        doReturn(folder).when(imapStore).getFolder(Mockito.eq(new URLName("/1337")));
-        doReturn(true).when(folder).exists();
-
-        final IMAPFolder targetFolder = Mockito.mock(IMAPFolder.class);
-        doReturn(targetFolder).when(imapStore).getFolder(Mockito.eq(new URLName("/target/folder")));
-        doReturn(false).when(targetFolder).exists();
 
         // When
         imapService.moveFolder(credentials, new URLName("/1337"), new URLName("/target/folder"));
