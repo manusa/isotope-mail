@@ -38,11 +38,12 @@ function _readEmbeddedContent(dispatch, credentials, folder, message, signal, at
  *
  * @param dispatch
  * @param credentials
+ * @param folder
  * @param message
  * @returns {function(): Promise<Response>}
  * @private
  */
-function _readMessageRequest(dispatch, credentials, message) {
+function _readMessageRequest(dispatch, credentials, folder, message) {
   // Abort + new signal
   abortFetch(abortControllerWrappers.readMessageAbortController);
   abortControllerWrappers.readMessageAbortController = new AbortController();
@@ -50,7 +51,7 @@ function _readMessageRequest(dispatch, credentials, message) {
 
   return () => {
     dispatch(refreshMessageBackendRequest());
-    return fetch(message._links.self.href, {
+    return fetch(folder._links.message.href.replace('{messageId}', message.uid), {
       method: 'GET',
       headers: credentialsHeaders(credentials),
       signal: signal
@@ -70,12 +71,13 @@ function _readMessageRequest(dispatch, credentials, message) {
 /**
  * Performs a request to the BE to mark a message as seen
  * @param credentials
+ * @param folder
  * @param message
  * @returns {Promise<Response>}
  * @private
  */
-function _messageSeenRequest(credentials, message) {
-  return fetch(message._links.seen.href, {
+function _messageSeenRequest(credentials, folder, message) {
+  return fetch(folder._links['message.seen'].href.replace('{messageId}', message.uid), {
     method: 'PUT',
     headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
     body: JSON.stringify(true)
@@ -107,70 +109,68 @@ export function readMessage(dispatch, credentials, downloadedMessages, folder, m
   closeResetFolderMessagesCacheEventSource(dispatch);
   abortFetch(abortControllerWrappers.getFoldersAbortController);
 
-  const fetchMessage = _readMessageRequest(dispatch, credentials, message);
+  const fetchMessage = _readMessageRequest(dispatch, credentials, folder, message);
   const signal = abortControllerWrappers.readMessageAbortController.signal;
 
-  if (message && message._links) {
-    const downloadedMessage = downloadedMessages[message.messageId];
-    let $message;
-    if (downloadedMessage) {
-      // Read message from application.downloadedMessages cache
-      // //////////////////////////////////////////////////////
-      // Update cached/downloaded message (keep content), message may have been moved/read/...
-      let updatedMessage = {...message, folder: {...folder}, seen: true};
-      Object.entries(updatedMessage)
-        .filter(entry => entry[1] === null // Remove empty arrays/strings...
-          || entry[1].length === 0) // Remove null attributes
-        .forEach(([key]) => delete updatedMessage[key]);
-      updatedMessage = Object.assign({...downloadedMessage}, updatedMessage);
-      // Show optimistic version of updated downloadedMessage
-      dispatch(refreshMessage(folder, updatedMessage));
-      // Update folder message cache to set message as seen ASAP
-      dispatch(updateCacheIfExist(folder, [updatedMessage]));
-      // Update folder seen counter if applicable
-      if (!message.seen) {
-        dispatch(updateFolder({...folder, unreadMessageCount: folder.unreadMessageCount - 1}));
-        // Send request to BE to mark message as read
-        _messageSeenRequest(credentials, message);
-      }
-      // Read message from BE to update links (attachments) and other mutable properties
-      $message = fetchMessage()
-        .then(completeMessage => (
-          Promise.resolve({...completeMessage, content: updatedMessage.content})
-        ));
-    } else {
-      // Read message from BE (Set message seen only if request is successfull)
-      $message = fetchMessage()
-      // Message successfully loaded, send signal to BE to mark as read if applicable and change folder information
-        .then(completeMessage => {
-          if (!completeMessage.seen) {
-            _messageSeenRequest(credentials, completeMessage);
-            completeMessage.folder.unreadMessageCount--;
-          }
-          return Promise.resolve(completeMessage);
-        });
+  const downloadedMessage = downloadedMessages[message.messageId];
+  let $message;
+  if (downloadedMessage) {
+    // Read message from application.downloadedMessages cache
+    // //////////////////////////////////////////////////////
+    // Update cached/downloaded message (keep content), message may have been moved/read/...
+    let updatedMessage = {...message, folder: {...folder}, seen: true};
+    Object.entries(updatedMessage)
+      .filter(entry => entry[1] === null // Remove empty arrays/strings...
+        || entry[1].length === 0) // Remove null attributes
+      .forEach(([key]) => delete updatedMessage[key]);
+    updatedMessage = Object.assign({...downloadedMessage}, updatedMessage);
+    // Show optimistic version of updated downloadedMessage
+    dispatch(refreshMessage(folder, updatedMessage));
+    // Update folder message cache to set message as seen ASAP
+    dispatch(updateCacheIfExist(folder, [updatedMessage]));
+    // Update folder seen counter if applicable
+    if (!message.seen) {
+      dispatch(updateFolder({...folder, unreadMessageCount: folder.unreadMessageCount - 1}));
+      // Send request to BE to mark message as read
+      _messageSeenRequest(credentials, folder, message);
     }
-    $message
+    // Read message from BE to update links (attachments) and other mutable properties
+    $message = fetchMessage()
+      .then(completeMessage => (
+        Promise.resolve({...completeMessage, content: updatedMessage.content})
+      ));
+  } else {
+    // Read message from BE (Set message seen only if request is successful)
+    $message = fetchMessage()
+    // Message successfully loaded, send signal to BE to mark as read if applicable and change folder information
       .then(completeMessage => {
-        // Optimistically set message as seen
-        completeMessage.seen = true;
-        // Update folder with freshest BE information (and optimistic unreadMessageCount)
-        dispatch(updateFolder(completeMessage.folder));
-        // Update folder cache with message marked as read (don't store content in cache)
-        const messageWithNoContent = {...completeMessage};
-        delete messageWithNoContent.content;
-        dispatch(updateCacheIfExist(folder, [messageWithNoContent]));
-        // Refresh message view
-        dispatch(refreshMessage(folder, completeMessage));
-        // Read message's embedded images if used in message content
-        completeMessage.attachments
-          .filter(a => a.contentId && a.contentId.length > 0)
-          .filter(a => a.contentType.toLowerCase().indexOf('image/') === 0)
-          .filter(a => {
-            const contentId = a.contentId.replace(/[<>]/g, '');
-            return completeMessage.content.indexOf(`cid:${contentId}`) >= 0;
-          })
-          .forEach(a => _readEmbeddedContent(dispatch, credentials, folder, message, signal, a));
-      }).catch(() => {});
+        if (!completeMessage.seen) {
+          _messageSeenRequest(credentials, completeMessage.folder, completeMessage);
+          completeMessage.folder.unreadMessageCount--;
+        }
+        return Promise.resolve(completeMessage);
+      });
   }
+  $message
+    .then(completeMessage => {
+      // Optimistically set message as seen
+      completeMessage.seen = true;
+      // Update folder with freshest BE information (and optimistic unreadMessageCount)
+      dispatch(updateFolder(completeMessage.folder));
+      // Update folder cache with message marked as read (don't store content in cache)
+      const messageWithNoContent = {...completeMessage};
+      delete messageWithNoContent.content;
+      dispatch(updateCacheIfExist(folder, [messageWithNoContent]));
+      // Refresh message view
+      dispatch(refreshMessage(folder, completeMessage));
+      // Read message's embedded images if used in message content
+      completeMessage.attachments
+        .filter(a => a.contentId && a.contentId.length > 0)
+        .filter(a => a.contentType.toLowerCase().indexOf('image/') === 0)
+        .filter(a => {
+          const contentId = a.contentId.replace(/[<>]/g, '');
+          return completeMessage.content.indexOf(`cid:${contentId}`) >= 0;
+        })
+        .forEach(a => _readEmbeddedContent(dispatch, credentials, folder, message, signal, a));
+    }).catch(() => {});
 }

@@ -40,7 +40,7 @@ export function closeResetFolderMessagesCacheEventSource(dispatch) {
 /**
  *
  * @param dispatch
- * @param credentials
+ * @param user
  * @param folder
  */
 export async function resetFolderMessagesCache(dispatch, user, folder) {
@@ -69,11 +69,10 @@ export async function resetFolderMessagesCache(dispatch, user, folder) {
       }
     };
     // Return a promise
-    const eventSourceCompleted = new Promise(resolve => {
+    return new Promise(resolve => {
       // Store resolve function that will be called in _closeEventSource
       es.resolvePromise = resolve;
     });
-    return eventSourceCompleted;
   }
   return null;
 }
@@ -151,7 +150,7 @@ export function moveMessages(dispatch, credentials, fromFolder, toFolder, messag
   // Update state with expected response from server
   dispatch(deleteFromCache(fromFolder, messages));
   dispatch(updateFolder(fromFolderUpdated));
-  fetch(messages[0]._links['move.bulk'].href.replace('{toFolderId}', toFolder.folderId), {
+  fetch(fromFolder._links['message.move.bulk'].href.replace('{toFolderId}', toFolder.folderId), {
     method: 'PUT',
     headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
     body: JSON.stringify(messages.map(m => m.uid))
@@ -189,7 +188,7 @@ export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
   dispatch(updateCacheIfExist(folder, messagesToUpdate));
   dispatch(updateFolder(expectedUpdatedFolder));
 
-  fetch(messages[0]._links['seen.bulk'].href.replace('{seen}', seen.toString()), {
+  fetch(folder._links['message.seen.bulk'].href.replace('{seen}', seen.toString()), {
     method: 'PUT',
     headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
     body: JSON.stringify(messagesToUpdate.map(m => m.uid))
@@ -209,7 +208,7 @@ export function setMessageFlagged(dispatch, credentials, folder, message, flagge
   abortFetch(abortControllerWrappers.getFoldersAbortController);
 
   dispatch(updateCacheIfExist(folder, [{...message, flagged}]));
-  fetch(message._links.flagged.href, {
+  fetch(folder._links['message.flagged'].href.replace('{messageId}', message.uid), {
     method: 'PUT',
     headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
     body: JSON.stringify(flagged)

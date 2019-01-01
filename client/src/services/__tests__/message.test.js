@@ -67,7 +67,7 @@ describe('Message service test suite', () => {
     test('setMessagesSeen with valid message array, should dispatch results and fetch (update BE)', done => {
       // Given
       global.fetch = jest.fn((url, options) => {
-        expect(url.toLocaleString()).toMatch('http://test.url/folder1337?seen=true');
+        expect(url.toLocaleString()).toMatch('http://test.url/folder1337/messages/seen/true');
         expect(options.body).toMatch('[1,1337]');
         done();
         return Promise.resolve({});
@@ -84,13 +84,14 @@ describe('Message service test suite', () => {
           default:
         }
       });
+      const folder = {_links: {'message.seen.bulk': {href: 'http://test.url/folder1337/messages/seen/{seen}'}}};
       const messages = [
-        {uid: 1, _links: {'seen.bulk': {href: 'http://test.url/folder1337?seen={seen}'}}},
+        {uid: 1},
         {uid: 1337}
       ];
 
       // When
-      messageService.setMessagesSeen(dispatch, {}, {}, messages, true);
+      messageService.setMessagesSeen(dispatch, {}, folder, messages, true);
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
@@ -102,7 +103,7 @@ describe('Message service test suite', () => {
     test('setMessageFlagged with valid message, should dispatch result and fetch (update BE)', done => {
       // Given
       global.fetch = jest.fn((url, options) => {
-        expect(url.toLocaleString()).toMatch('http://test.url/folder1337/1/flagged');
+        expect(url.toLocaleString()).toMatch('http://test.url/folder1337/messages/1/flagged');
         expect(options.body).toMatch('true');
         done();
         return Promise.resolve({});
@@ -114,10 +115,11 @@ describe('Message service test suite', () => {
           dispatchCount++;
         }
       });
-      const message = {uid: 1, _links: {flagged: {href: 'http://test.url/folder1337/1/flagged'}}};
+      const folder = {_links: {'message.flagged': {href: 'http://test.url/folder1337/messages/{messageId}/flagged'}}};
+      const message = {uid: 1};
 
       // When
-      messageService.setMessageFlagged(dispatch, {}, {}, message, true);
+      messageService.setMessageFlagged(dispatch, {}, folder, message, true);
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);

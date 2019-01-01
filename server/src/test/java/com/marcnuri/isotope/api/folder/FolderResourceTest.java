@@ -100,8 +100,20 @@ public class FolderResourceTest {
         result.andExpect(jsonPath("$").isArray());
         result.andExpect(jsonPath("[0].folderId").value(folderId));
         result.andExpect(jsonPath("[0]._links").exists());
-        result.andExpect(jsonPath("[0]._links", aMapWithSize(3)));
+        result.andExpect(jsonPath("[0]._links", aMapWithSize(9)));
         result.andExpect(jsonPath("[0]._links.messages.href", endsWith("/v1/folders/1337/messages")));
+        result.andExpect(jsonPath("[0]._links['message'].href",
+                endsWith("/v1/folders/1337/messages/{messageId}")));
+        result.andExpect(jsonPath("[0]._links['message.flagged'].href",
+                endsWith("/v1/folders/1337/messages/{messageId}/flagged")));
+        result.andExpect(jsonPath("[0]._links['message.move'].href",
+                endsWith("/v1/folders/1337/messages/{messageId}/folder/{toFolderId}")));
+        result.andExpect(jsonPath("[0]._links['message.move.bulk'].href",
+                endsWith("/v1/folders/1337/messages/folder/{toFolderId}")));
+        result.andExpect(jsonPath("[0]._links['message.seen'].href",
+                endsWith("/v1/folders/1337/messages/{messageId}/seen")));
+        result.andExpect(jsonPath("[0]._links['message.seen.bulk'].href",
+                endsWith("/v1/folders/1337/messages/seen/{seen}")));
     }
 
     @Test
@@ -125,7 +137,7 @@ public class FolderResourceTest {
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.folderId").value(folderId));
         result.andExpect(jsonPath("$._links").exists());
-        result.andExpect(jsonPath("$._links", aMapWithSize(3)));
+        result.andExpect(jsonPath("$._links", aMapWithSize(9)));
     }
 
     @Test
@@ -148,8 +160,6 @@ public class FolderResourceTest {
         result.andExpect(jsonPath("$").isArray());
         result.andExpect(jsonPath("[0].uid").value(messageUid));
         result.andExpect(jsonPath("[0].subject").value("Message in a bottle"));
-        result.andExpect(jsonPath("[0]._links").exists());
-        result.andExpect(jsonPath("[0]._links", aMapWithSize(6)));
     }
 
     @Test
@@ -171,7 +181,7 @@ public class FolderResourceTest {
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.folderId").value(folderId));
         result.andExpect(jsonPath("$._links").exists());
-        result.andExpect(jsonPath("$._links", aMapWithSize(3)));
+        result.andExpect(jsonPath("$._links", aMapWithSize(9)));
     }
 
     @Test

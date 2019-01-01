@@ -31,7 +31,11 @@ describe('MessageRead service test suite', () => {
       const credentials = {};
       const downloadedMessages = {};
       const folder = {
-        unreadMessageCount: 1338
+        unreadMessageCount: 1338,
+        _links: {
+          message: {href: 'http://test.com/folderId/messages/{messageId}'},
+          'message.seen': {href: 'http://test.com/folderId/messages/{messageId}/seen'}
+        }
       };
       const message = {
         messageId: '1337@1337-server.com',
@@ -41,11 +45,7 @@ describe('MessageRead service test suite', () => {
         attachments: [
           {contentId: '<attachment1.png>', contentType: 'image/png',
             _links: {download: {href: 'http://test.com/folderId/messageId/attachments/1'}}}
-        ],
-        _links: {
-          self: {href: 'http://test.com/folderId/messageId'},
-          seen: {href: 'http://test.com/folderId/messageId/seen'}
-        }
+        ]
       };
       global.fetch = jest.fn((url, options) =>
         Promise.resolve({ok: true, url, options,
