@@ -18,6 +18,16 @@ export const FolderTypes = Object.freeze({
 });
 
 /**
+ * Finds the trash folder from within the current folder state's exploded items.
+ *
+ * TODO: Create cached selector within REDUX state
+ * @param foldersState
+ * @returns {any}
+ */
+export const findTrashFolder = foldersState =>
+  Object.values(foldersState.explodedItems).find(f => f.type === FolderTypes.TRASH);
+
+/**
  * Processes an initial folder list and adds the corresponding {@link FolderTypes}
  *
  * @param initialFolders {Array}
@@ -132,6 +142,16 @@ export function renameFolder(dispatch, user, folderToRename, newName) {
     });
 }
 
+/**
+ * Triggers BE API to move the provided folderToMove as a child of the specified targetFolder.
+ *
+ * REDUX store will only be updated once an OK response is received from te server.
+ *
+ * @param dispatch
+ * @param user
+ * @param folderToMove
+ * @param targetFolder
+ */
 export function moveFolder(dispatch, user, folderToMove, targetFolder) {
   abortFetch(abortControllerWrappers.getFoldersAbortController);
   dispatch(applicationBackendRequest());
@@ -155,14 +175,3 @@ export function moveFolder(dispatch, user, folderToMove, targetFolder) {
       dispatch(applicationBackendRequestCompleted());
     });
 }
-
-/**
- * Finds the trash folder from within the current folder state's exploded items.
- *
- * TODO: Create cached selector within REDUX state
- * @param foldersState
- * @returns {any}
- */
-export const findTrashFolder = foldersState =>
-  Object.values(foldersState.explodedItems).find(f => f.type === FolderTypes.TRASH);
-
