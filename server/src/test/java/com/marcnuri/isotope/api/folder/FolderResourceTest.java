@@ -39,6 +39,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import javax.mail.URLName;
 import java.util.Collections;
 
 import static org.hamcrest.Matchers.aMapWithSize;
@@ -99,8 +100,32 @@ public class FolderResourceTest {
         result.andExpect(jsonPath("$").isArray());
         result.andExpect(jsonPath("[0].folderId").value(folderId));
         result.andExpect(jsonPath("[0]._links").exists());
-        result.andExpect(jsonPath("[0]._links", aMapWithSize(2)));
+        result.andExpect(jsonPath("[0]._links", aMapWithSize(3)));
         result.andExpect(jsonPath("[0]._links.messages.href", endsWith("/v1/folders/1337/messages")));
+    }
+
+    @Test
+    public void moveFolder_validFolderAndNewName_shouldReturnOk() throws Exception {
+        // Given
+        final String folderId = "1337";
+        final Folder mockFolder = new Folder();
+        mockFolder.setChildren(new Folder[0]);
+        mockFolder.setFolderId(folderId);
+        doReturn(mockFolder).when(imapService).moveFolder(Mockito.any(),
+                Mockito.eq(new URLName("/original/folder")), Mockito.eq(new URLName("/target/folder/id")));
+
+        // When
+        final ResultActions result = mockMvc.perform(
+                put("/v1/folders/L29yaWdpbmFsL2ZvbGRlcg==/parent")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("L3RhcmdldC9mb2xkZXIvaWQ=")
+                        .accept(MediaTypes.HAL_JSON_VALUE));
+
+        // Then
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.folderId").value(folderId));
+        result.andExpect(jsonPath("$._links").exists());
+        result.andExpect(jsonPath("$._links", aMapWithSize(3)));
     }
 
     @Test
@@ -146,7 +171,7 @@ public class FolderResourceTest {
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.folderId").value(folderId));
         result.andExpect(jsonPath("$._links").exists());
-        result.andExpect(jsonPath("$._links", aMapWithSize(2)));
+        result.andExpect(jsonPath("$._links", aMapWithSize(3)));
     }
 
     @Test

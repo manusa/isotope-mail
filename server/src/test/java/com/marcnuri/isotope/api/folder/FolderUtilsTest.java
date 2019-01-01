@@ -20,7 +20,9 @@
  */
 package com.marcnuri.isotope.api.folder;
 
+import com.marcnuri.isotope.api.exception.InvalidFieldException;
 import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPStore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -33,12 +35,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.marcnuri.isotope.api.folder.FolderUtils.addSystemFolders;
+import static com.marcnuri.isotope.api.folder.FolderUtils.renameFolder;
 import static javax.mail.Folder.HOLDS_MESSAGES;
+import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-11-21.
@@ -103,5 +111,60 @@ public class FolderUtilsTest {
         int expectedSize = 1;
         assertThat(result, is(originalFolders));
         assertThat(result, hasSize(expectedSize));
+    }
+
+    @Test
+    public void renameFolder_validFolderAndName_shouldReturnParentWithRenamedChild() throws Exception {
+        // Given
+        final IMAPFolder folderToRename = Mockito.mock(IMAPFolder.class);
+        doReturn(new URLName("oldFolderId")).when(folderToRename).getURLName();
+        final String newFolderFullName = "/folder/newName";
+
+        final IMAPStore mockedStore = Mockito.mock(IMAPStore.class);
+        doReturn(mockedStore).when(folderToRename).getStore();
+        final IMAPFolder mockedFolder = Mockito.mock(IMAPFolder.class);
+        doReturn(mockedFolder).when(mockedStore).getFolder(Mockito.eq(newFolderFullName));
+        doReturn(true).when(folderToRename).renameTo(Mockito.eq(mockedFolder));
+        doReturn(new IMAPFolder[0]).when(mockedFolder).list();
+        doReturn(new URLName(newFolderFullName)).when(mockedFolder).getURLName();
+        doReturn(newFolderFullName).when(mockedFolder).getFullName();
+        doReturn(new String[0]).when(mockedFolder).getAttributes();
+        final IMAPFolder mockedFolderParent = Mockito.mock(IMAPFolder.class);
+        doReturn(mockedFolderParent).when(mockedFolder).getParent();
+        doReturn(new IMAPFolder[]{mockedFolder}).when(mockedFolderParent).list();
+        doReturn(new URLName("/folder")).when(mockedFolderParent).getURLName();
+        doReturn(new String[0]).when(mockedFolderParent).getAttributes();
+
+        // When
+        final Folder result = renameFolder(folderToRename, newFolderFullName);
+
+        // Then
+        assertThat(result.getFullURL(), is("/folder"));
+        assertThat(result.getPreviousFolderId(), nullValue());
+        assertThat(result.getChildren(), arrayWithSize(1));
+        assertThat(result.getChildren()[0].getFullURL(), is("/folder/newName"));
+        assertThat(result.getChildren()[0].getFolderId(), is("L2ZvbGRlci9uZXdOYW1l"));
+        assertThat(result.getChildren()[0].getPreviousFolderId(), is("b2xkRm9sZGVySWQ="));
+
+    }
+
+    @Test(expected = InvalidFieldException.class)
+    public void renameFolder_validFolderAndInvalidName_shouldThrowException() throws Exception {
+        // Given
+        final IMAPFolder folderToRename = Mockito.mock(IMAPFolder.class);
+        doReturn(new URLName("oldFolderId")).when(folderToRename).getURLName();
+        final String newFolderFullName = "/folder/newName";
+
+        final IMAPStore mockedStore = Mockito.mock(IMAPStore.class);
+        doReturn(mockedStore).when(folderToRename).getStore();
+        final IMAPFolder mockedFolder = Mockito.mock(IMAPFolder.class);
+        doReturn(mockedFolder).when(mockedStore).getFolder(Mockito.eq(newFolderFullName));
+        doReturn(false).when(folderToRename).renameTo(Mockito.eq(mockedFolder));
+
+        // When
+        final Folder result = renameFolder(folderToRename, newFolderFullName);
+
+        // Then
+        fail();
     }
 }
