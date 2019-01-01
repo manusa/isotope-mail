@@ -18,8 +18,8 @@ export const FolderContainer =
   );
 
 FolderContainer.propTypes = {
-  activeRequests: PropTypes.number.isRequired,
-  folderList: PropTypes.array.isRequired
+  activeRequests: PropTypes.number,
+  folderList: PropTypes.array
 };
 
 const mapStateToProps = state => ({

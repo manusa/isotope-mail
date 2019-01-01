@@ -122,7 +122,7 @@ export function downloadAttachment(credentials, attachment) {
 }
 
 /**
- * Moves the provided array of messaged from the original fromFolder to the target toFolder.
+ * Moves the provided array of messages from the original fromFolder to the target toFolder.
  *
  * This method is optimistic and will calculate fromFolder message counts before any server response is received.
  *

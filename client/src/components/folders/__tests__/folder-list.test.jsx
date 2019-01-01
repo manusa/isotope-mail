@@ -1,41 +1,76 @@
 import React from 'react';
 import {shallow} from 'enzyme';
-import * as messageService from '../../../services/message';
-import {MOCK_STORE} from '../../../__testutils__/store';
-import * as messageActions from '../../../actions/messages';
-import * as applicationActions from '../../../actions/application';
+import {createMockStore, MOCK_STORE} from '../../../__testutils__/store';
+import {INITIAL_STATE} from '../../../reducers';
 import FolderList from '../folder-list';
+import * as folderService from '../../../services/folder';
+import * as messageService from '../../../services/message';
+import {ActionTypes} from '../../../actions/action-types';
 
 describe('FolderList component test suite', () => {
-
   test('selectFolder, dispatch actions triggered', () => {
     // Given
-    const mockAction = {type: 'MOCK', action: 'MOCK'}
-    applicationActions.selectFolder = jest.fn(() => (mockAction));
-    applicationActions.selectMessage = jest.fn(() => (mockAction));
-    messageActions.clearSelected = jest.fn(() => (mockAction));
+    let dispatchCount = 0;
+    const store = createMockStore(INITIAL_STATE);
+    store.dispatch = jest.fn(action => {
+      switch (action.type) {
+        case ActionTypes.APPLICATION_FOLDER_SELECT:
+        case ActionTypes.APPLICATION_MESSAGE_SELECT:
+        case ActionTypes.MESSAGES_CLEAR_SELECTED:
+          dispatchCount++;
+          break;
+        default:
+      }
+    });
     messageService.resetFolderMessagesCache = jest.fn();
     const props = {
       activeRequests: 0, folderList: [{folderList: []}], selectedFolder: {folderId: '1337-3'}};
-    const folderContainer = shallow(
-      <FolderList store={MOCK_STORE} {...props}/>);
+    const folderList = shallow(<FolderList store={store} {...props}/>);
 
     // When
-    folderContainer.props().selectFolder({});
+    folderList.props().selectFolder({});
 
     // Then
-    expect(applicationActions.selectFolder).toHaveBeenCalledTimes(1);
-    expect(applicationActions.selectMessage).toHaveBeenCalledTimes(1);
-    expect(messageActions.clearSelected).toHaveBeenCalledTimes(1);
+    expect(dispatchCount).toEqual(3);
     expect(messageService.resetFolderMessagesCache).toHaveBeenCalledTimes(1);
+  });
+  test('renameFolder, dispatch actions triggered', done => {
+    // Given
+    const store = createMockStore(INITIAL_STATE);
+    store.dispatch = jest.fn(action => {
+      if (action.type === ActionTypes.APPLICATION_FOLDER_RENAME) {
+        expect(action.payload.folderId).toEqual('1337');
+        done();
+      }
+    });
+    const props = {
+      activeRequests: 0, folderList: [{folderList: []}], selectedFolder: {folderId: '1337-3'}};
+    const folderList = shallow(<FolderList store={store} {...props}/>);
+
+    // When
+    folderList.props().renameFolder({folderId: '1337'});
+
+    // Then
+  });
+  test('moveFolder, dispatch actions triggered', () => {
+    // Given
+    folderService.moveFolder = jest.fn();
+    const props = {
+      activeRequests: 0, folderList: [{folderList: []}], selectedFolder: {folderId: '1337-3'}};
+    const folderList = shallow(<FolderList store={MOCK_STORE} {...props}/>);
+
+    // When
+    folderList.props().moveFolder({folderId: 'folderToMove'}, {folderId: 'targetFolder'});
+
+    // Then
+    expect(folderService.moveFolder).toHaveBeenCalledTimes(1);
   });
   test('moveMessages, service called', () => {
     // Given
     messageService.moveMessages = jest.fn();
     const props = {
       activeRequests: 0, folderList: [{folderList: []}], selectedFolder: {folderId: '1337-3'}};
-    const folderContainer = shallow(
-      <FolderList store={MOCK_STORE} {...props}/>);
+    const folderContainer = shallow(<FolderList store={MOCK_STORE} {...props}/>);
 
     // When
     folderContainer.props().moveMessages();
