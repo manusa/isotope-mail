@@ -28,6 +28,7 @@ import com.marcnuri.isotope.api.exception.InvalidFieldException;
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.exception.NotFoundException;
 import com.marcnuri.isotope.api.folder.Folder;
+import com.marcnuri.isotope.api.folder.FolderUtils;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
 import com.marcnuri.isotope.api.message.MessageWithFolder;
@@ -180,7 +181,7 @@ public class ImapService {
                     folderToRenameFullName.substring(0, folderToRenameFullName.lastIndexOf(folder.getName())),
                     newName
             );
-            return renameFolder(getImapStore(credentials), folderToRenameId, folder, newFolderFullName);
+            return FolderUtils.renameFolder(folder, newFolderFullName);
         } catch (MessagingException ex) {
             log.error("Error renaming folder " + folderToRenameId.toString(), ex);
             throw new IsotopeException(ex.getMessage());
@@ -211,29 +212,13 @@ public class ImapService {
             }
             final String movedFolderFullName = String.format("%s%s%s",
                     targetFolder.getFullName(), targetFolder.getSeparator(), folderToMove.getName());
-            return renameFolder(getImapStore(credentials), folderToMoveId, folderToMove, movedFolderFullName);
+            return FolderUtils.renameFolder(folderToMove, movedFolderFullName);
         } catch (MessagingException ex) {
             log.error("Error moving folder " + folderToMoveId.toString(), ex);
             throw new IsotopeException(ex.getMessage());
         }
     }
 
-    private static Folder renameFolder(
-            IMAPStore imapStore, URLName previousNameId, IMAPFolder folder, String newFolderFullName)
-            throws MessagingException {
-
-        final IMAPFolder renamedFolder = (IMAPFolder)imapStore.getFolder(newFolderFullName);
-        if (!folder.renameTo(renamedFolder)) {
-            throw new InvalidFieldException("New folder name was not accepted by IMAP server");
-        }
-        final Folder parent = Folder.from((IMAPFolder)renamedFolder.getParent(), true);
-        // Identify renamed folder
-        Stream.of(parent.getChildren())
-                .filter(f -> f.getFullName().equals(newFolderFullName))
-                .findAny()
-                .ifPresent(f -> f.setPreviousFolderId(Folder.toBase64Id(previousNameId)));
-        return parent;
-    }
 
     public Flux<ServerSentEvent<List<Message>>> getMessagesFlux(
             Credentials credentials, URLName folderId, HttpServletResponse response) {
@@ -579,9 +564,5 @@ public class ImapService {
         ret.put("mail.imaps.ssl.socketFactory", mailSSLSocketFactory);
         return ret;
     }
-
-
-
-
 
 }

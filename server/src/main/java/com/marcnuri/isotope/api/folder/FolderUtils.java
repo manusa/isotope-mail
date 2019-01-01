@@ -20,12 +20,14 @@
  */
 package com.marcnuri.isotope.api.folder;
 
+import com.marcnuri.isotope.api.exception.InvalidFieldException;
 import com.sun.mail.imap.IMAPFolder;
 import org.springframework.lang.NonNull;
 
 import javax.mail.MessagingException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.marcnuri.isotope.api.folder.Folder.ATTR_TRASH;
 import static com.marcnuri.isotope.api.folder.Folder.TRASH_FOLDER_NAME;
@@ -66,5 +68,31 @@ public class FolderUtils {
             }
         }
         return existingFolders;
+    }
+
+    /**
+     * Renames the specified {@link IMAPFolder} to the provided newFolderFullName.
+     *
+     * <p>Method return the newly named folder parent and all its children. Renamed folder will have
+     * a reference to its previous id in order to help the API consumers identify which folder was renamed.
+     *
+     * @param folderToRename the folder to rename
+     * @param newFolderFullName the new folder name (can contain separator characters)
+     * @return renamed folder parent
+     * @throws MessagingException IMAP server related problems
+     */
+    public static Folder renameFolder(IMAPFolder folderToRename, String newFolderFullName) throws MessagingException {
+        final String previousFolderId = Folder.toBase64Id(folderToRename.getURLName());
+        final IMAPFolder renamedFolder = (IMAPFolder)folderToRename.getStore().getFolder(newFolderFullName);
+        if (!folderToRename.renameTo(renamedFolder)) {
+            throw new InvalidFieldException("New folder name was not accepted by IMAP server");
+        }
+        final Folder parent = Folder.from((IMAPFolder)renamedFolder.getParent(), true);
+        // Identify renamed folder
+        Stream.of(parent.getChildren())
+                .filter(f -> f.getFullName().equals(newFolderFullName))
+                .findAny()
+                .ifPresent(f -> f.setPreviousFolderId(previousFolderId));
+        return parent;
     }
 }

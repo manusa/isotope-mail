@@ -23,6 +23,8 @@ package com.marcnuri.isotope.api.imap;
 import com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration;
 import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.credentials.CredentialsService;
+import com.marcnuri.isotope.api.exception.NotFoundException;
+import com.marcnuri.isotope.api.folder.FolderUtils;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPStore;
 import com.sun.mail.util.MailSSLSocketFactory;
@@ -31,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.mockito.internal.verification.VerificationModeFactory;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -40,6 +43,7 @@ import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.URLName;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -49,7 +53,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-12-22.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Session.class, IMAPStore.class})
+@PrepareForTest({Session.class, IMAPStore.class, FolderUtils.class})
 public class ImapServiceTest {
 
     private Session mockedSession;
@@ -82,6 +86,84 @@ public class ImapServiceTest {
         credentialsService = null;
 
         imapService = null;
+    }
+
+    @Test
+    public void moveFolder_validParameters_shouldRenameFolder() throws Exception {
+        // Given
+        PowerMockito.mockStatic(FolderUtils.class);
+
+        final Credentials credentials = new Credentials();
+        credentials.setUser("validUser");
+        credentials.setServerHost("email.com");
+        credentials.setImapSsl(true);
+        credentials.setServerPort(993);
+
+        final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
+        doReturn(folder).when(imapStore).getFolder(Mockito.eq(new URLName("/1337")));
+        doReturn(true).when(folder).exists();
+        doReturn("/1337").when(folder).getFullName();
+        doReturn("1337").when(folder).getName();
+
+        final IMAPFolder targetFolder = Mockito.mock(IMAPFolder.class);
+        doReturn(targetFolder).when(imapStore).getFolder(Mockito.eq(new URLName("/target/folder")));
+        doReturn(true).when(targetFolder).exists();
+        doReturn("/target/folder").when(targetFolder).getFullName();
+        doReturn('/').when(targetFolder).getSeparator();
+
+        // When
+        imapService.moveFolder(credentials, new URLName("/1337"), new URLName("/target/folder"));
+
+        // Then
+        verify(imapStore, times(1)).connect(
+                Mockito.eq(credentials.getServerHost()), Mockito.eq(credentials.getServerPort()),
+                Mockito.eq(credentials.getUser()), Mockito.eq(credentials.getPassword()));
+        PowerMockito.verifyStatic(FolderUtils.class, VerificationModeFactory.times(1));
+        FolderUtils.renameFolder(Mockito.eq(folder), Mockito.eq("/target/folder/1337"));
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void moveFolder_folderToMoveNotFound_shouldThrowException() throws Exception {
+        // Given
+        final Credentials credentials = new Credentials();
+        credentials.setUser("validUser");
+        credentials.setServerHost("email.com");
+        credentials.setImapSsl(true);
+        credentials.setServerPort(993);
+
+        final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
+        doReturn(folder).when(imapStore).getFolder(Mockito.eq(new URLName("/1337")));
+        doReturn(false).when(folder).exists();
+
+        // When
+        imapService.moveFolder(credentials, new URLName("/1337"), new URLName("/target/folder"));
+
+        // Then
+        fail();
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void moveFolder_targetFolderNotFound_shouldThrowException() throws Exception {
+        // Given
+        final Credentials credentials = new Credentials();
+        credentials.setUser("validUser");
+        credentials.setServerHost("email.com");
+        credentials.setImapSsl(true);
+        credentials.setServerPort(993);
+
+        final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
+        doReturn(folder).when(imapStore).getFolder(Mockito.eq(new URLName("/1337")));
+        doReturn(true).when(folder).exists();
+
+        final IMAPFolder targetFolder = Mockito.mock(IMAPFolder.class);
+        doReturn(targetFolder).when(imapStore).getFolder(Mockito.eq(new URLName("/target/folder")));
+        doReturn(false).when(targetFolder).exists();
+
+        // When
+        imapService.moveFolder(credentials, new URLName("/1337"), new URLName("/target/folder"));
+
+        // Then
+        fail();
     }
 
     @Test
