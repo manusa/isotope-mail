@@ -22,6 +22,14 @@ function _updateFolder(folderToReplace, folders) {
   });
 }
 
+const _deleteChildFolder = toDeleteFolderId => {
+  const deleteChildFolderFunction = folder => {
+    folder.children = folder.children.filter(child => child.folderId !== toDeleteFolderId);
+    folder.children.forEach(deleteChildFolderFunction);
+  };
+  return deleteChildFolderFunction;
+};
+
 const folders = (state = INITIAL_STATE.folders, action = {}) => {
   switch (action.type) {
     case ActionTypes.FOLDERS_BE_REQUEST:
@@ -40,6 +48,16 @@ const folders = (state = INITIAL_STATE.folders, action = {}) => {
       newUpdateState.items = _updateFolder(action.payload, newUpdateState.items);
       newUpdateState.explodedItems = explodeFolders(newUpdateState.items);
       return newUpdateState;
+    }
+    case ActionTypes.APPLICATION_FOLDER_RENAME_OK: {
+      const newState = {...state};
+      // Remove previous folder from Tree
+      const {oldFolderId} = action.payload;
+      if (Object.keys(newState.explodedItems).includes(oldFolderId)) {
+        delete newState.explodedItems[oldFolderId];
+        newState.items.forEach(_deleteChildFolder(oldFolderId));
+      }
+      return newState;
     }
     default:
       return state;
