@@ -38,6 +38,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.JsonPathExpectationsHelper;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import reactor.core.publisher.Flux;
@@ -169,6 +170,7 @@ public class FolderResourceTest {
                 .accept("text/event-stream"));
 
         // Then
+        result.andDo(MvcResult::getAsyncResult);
         result.andExpect(status().isOk());
         final Pattern p = Pattern.compile("data:(.*)\\n");
         final Matcher m = p.matcher(result.andReturn().getResponse().getContentAsString());
