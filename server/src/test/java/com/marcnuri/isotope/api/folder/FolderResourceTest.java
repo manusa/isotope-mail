@@ -33,17 +33,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.util.JsonPathExpectationsHelper;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import reactor.core.publisher.Flux;
 
 import javax.mail.URLName;
 import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import static com.marcnuri.isotope.api.configuration.WebConfiguration.IMAP_SERVICE_PROTOTYPE;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -64,7 +73,7 @@ public class FolderResourceTest {
 
     @MockBean
     private CredentialsService credentialsService;
-    @MockBean
+    @MockBean(name=IMAP_SERVICE_PROTOTYPE)
     private ImapService imapService;
 
     private MockMvc mockMvc;
@@ -138,6 +147,40 @@ public class FolderResourceTest {
         result.andExpect(jsonPath("$.folderId").value(folderId));
         result.andExpect(jsonPath("$._links").exists());
         result.andExpect(jsonPath("$._links", aMapWithSize(9)));
+    }
+
+    @Test
+    public void getMessages_validFolderId_shouldReturnOk() throws Exception {
+        // Given
+        final Message mockMessage1 = new Message();
+        mockMessage1.setSubject("First Message in Stream");
+        final Message mockMessage2 = new Message();
+        mockMessage2.setSubject("Second Message in Stream");
+        final Flux<ServerSentEvent<List<Message>>> mockFlux = Flux.create(c -> {
+            c.next(ServerSentEvent.builder(Collections.singletonList(mockMessage1)).id("1").build());
+            c.next(ServerSentEvent.builder(Collections.singletonList(mockMessage2)).id("2").build());
+            c.complete();
+        });
+        doReturn(mockFlux).when(imapService).getMessagesFlux(
+                Mockito.any(), Mockito.eq(new URLName("1337")), Mockito.any());
+
+        // When
+        final ResultActions result = mockMvc.perform(get("/v1/folders/MTMzNw==/messages")
+                .accept("text/event-stream"));
+
+        // Then
+        result.andExpect(status().isOk());
+        final Pattern p = Pattern.compile("data:(.*)\\n");
+        final Matcher m = p.matcher(result.andReturn().getResponse().getContentAsString());
+        int results = 0;
+        while(m.find()) {
+            results++;
+            final String content = m.group(1);
+            new JsonPathExpectationsHelper("$").assertValueIsArray(content);
+            new JsonPathExpectationsHelper("$[0].subject")
+                    .assertValue(content, endsWith("Message in Stream"));
+        }
+        assertThat(results, equalTo(2));
     }
 
     @Test
