@@ -180,7 +180,7 @@ public class FolderResourceTest {
             new JsonPathExpectationsHelper("$[0].subject")
                     .assertValue(content, endsWith("Message in Stream"));
         }
-        assertThat(results, equalTo(2));
+        assertThat("Event Stream should contain 2 packets", results, equalTo(2));
     }
 
     @Test
