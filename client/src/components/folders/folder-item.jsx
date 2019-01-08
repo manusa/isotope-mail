@@ -8,7 +8,8 @@ class FolderItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dragOver: false
+      dragOver: false,
+      contextMenuVisible: false
     };
     this.handleOnDragOver = this.onDragOver.bind(this);
     this.handleOnDragLeave = this.onDragLeave.bind(this);
@@ -21,13 +22,16 @@ class FolderItem extends Component {
     } = this.props;
     const {dragOver} = this.state;
     const labelWithCount = `${label} ${unreadMessageCount > 0 ? `(${unreadMessageCount})` : ''}`;
+    const hasContextMenu = onDelete !== null || onRename !== null;
     return (
       <a className={`${className} ${mainCss['mdc-list-item']} ${styles.listItem}
         ${selected ? mainCss['mdc-list-item--selected'] : ''}
         ${dragOver ? mainCss['mdc-list-item--activated'] : ''}`}
       title={labelWithCount}
       onClick={onClick}
-      onDrop={this.handleOnDrop} onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave}>
+      onDrop={this.handleOnDrop} onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave}
+      onMouseLeave={event => this.hideContextMenu(event)}
+      >
         <span className={`material-icons ${mainCss['mdc-list-item__graphic']} ${styles.graphic}`}>
           {graphic}
         </span>
@@ -36,8 +40,12 @@ class FolderItem extends Component {
           {labelWithCount}
         </span>
         <span className={styles.actions}>
-          {onDelete !== null && <i className={'material-icons'} onClick={onDelete}>delete</i>}
-          {onRename !== null && <i className={'material-icons'} onClick={onRename}>edit</i>}
+          <span className={`${styles.contextMenu} ${this.state.contextMenuVisible ? styles.visible : ''}`}>
+            {onDelete !== null && <i className={'material-icons'} onClick={onDelete}>delete</i>}
+            {onRename !== null && <i className={'material-icons'} onClick={onRename}>edit</i>}
+          </span>
+          {hasContextMenu && !this.state.contextMenuVisible
+            && <i className={'material-icons'} onClick={event => this.showContextMenu(event)}>more_vert</i>}
         </span>
       </a>
     );
@@ -58,6 +66,16 @@ class FolderItem extends Component {
   onDragLeave(event) {
     event.preventDefault();
     this.setState({dragOver: false});
+  }
+
+  showContextMenu(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.setState({contextMenuVisible: true});
+  }
+
+  hideContextMenu(event) {
+    this.setState({contextMenuVisible: false});
   }
 }
 

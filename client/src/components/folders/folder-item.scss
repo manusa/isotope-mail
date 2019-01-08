@@ -22,6 +22,22 @@
   .actions {
     display: none;
     margin-right: -6px;
+
+    .contextMenu {
+      display:none;
+      transform: translateX(100%);
+
+      &.visible {
+        display: block;
+        transform: translateX(0%);
+        animation: slide-in 0.5s forwards;
+      }
+      @keyframes slide-in {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(0%); }
+      }
+    }
+
   }
 
   &:hover {
