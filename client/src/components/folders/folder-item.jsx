@@ -74,7 +74,7 @@ class FolderItem extends Component {
     this.setState({contextMenuVisible: true});
   }
 
-  hideContextMenu(event) {
+  hideContextMenu() {
     this.setState({contextMenuVisible: false});
   }
 }
