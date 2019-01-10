@@ -235,7 +235,7 @@ export async function persistMessageCache(userId, hash, folder, messages) {
  */
 export async function renameMessageCache(userId, hash, oldFolderId, newFolderId) {
   const oldKey = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(`${userId}|${oldFolderId}`));
-  const newKey = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(`${userId}|${newFolderId}`))
+  const newKey = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(`${userId}|${newFolderId}`));
   const db = await _openDatabaseSafe();
   const tx = db.transaction([MESSAGE_CACHE_STORE], 'readwrite');
   const store = tx.objectStore(MESSAGE_CACHE_STORE);
@@ -245,6 +245,27 @@ export async function renameMessageCache(userId, hash, oldFolderId, newFolderId)
     oldFolderCache.folderId = sjcl.encrypt(hash, newFolderId);
     await store.put(oldFolderCache);
     await store.delete(oldKey);
+  }
+  await tx.complete;
+  db.close();
+}
+
+/**
+ *  Deletes entries from MESSAGE_CACHE_STORE
+ *
+ * @param userId
+ * @param hash
+ * @param foldersToDeleteIds {Array} ids to delete from MESSAGE_CACHE_STORE
+ * @returns {Promise<void>}
+ */
+export async function deleteMessageCache(userId, hash, foldersToDeleteIds) {
+  const db = await _openDatabaseSafe();
+  const tx = db.transaction([MESSAGE_CACHE_STORE], 'readwrite');
+  const store = tx.objectStore(MESSAGE_CACHE_STORE);
+  const keys = foldersToDeleteIds
+    .map(folderId => sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(`${userId}|${folderId}`)));
+  for (const key of keys) {
+    await store.delete(key);
   }
   await tx.complete;
   db.close();

@@ -176,6 +176,36 @@ public class ImapServiceTest {
     }
 
     @Test
+    public void deleteFolder_validParameters_shouldDeleteFolder() throws Exception {
+        // Given
+        final Credentials credentials = new Credentials();
+        credentials.setUser("validUser");
+        credentials.setServerHost("email.com");
+        credentials.setImapSsl(true);
+        credentials.setServerPort(993);
+
+        final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
+        doReturn(folder).when(imapStore).getFolder(Mockito.eq(new URLName("/1337")));
+        doReturn(true).when(folder).exists();
+        doReturn("/1337").when(folder).getFullName();
+        doReturn("1337").when(folder).getName();
+        final IMAPFolder parent = Mockito.mock(IMAPFolder.class);
+        doReturn(parent).when(folder).getParent();
+        doReturn(new URLName("imap://account/1337")).when(parent).getURLName();
+        doReturn(new String[0]).when(parent).getAttributes();
+        doReturn(new javax.mail.Folder[0]).when(parent).list();
+
+        // When
+        imapService.deleteFolder(credentials, new URLName("/1337"));
+
+        // Then
+        verify(imapStore, times(1)).connect(
+                Mockito.eq(credentials.getServerHost()), Mockito.eq(credentials.getServerPort()),
+                Mockito.eq(credentials.getUser()), Mockito.eq(credentials.getPassword()));
+        verify(folder, times(1)).delete(Mockito.eq(true));
+    }
+
+    @Test
     public void setMessagesSeen_validParameters_shouldSetMessagesSeen() throws Exception {
         // Given
         final Credentials credentials = new Credentials();

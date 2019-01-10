@@ -5,7 +5,7 @@ import FolderItem from './folder-item';
 import {renameFolder, selectFolder} from '../../actions/application';
 import {clearSelected} from '../../actions/messages';
 import {clearSelectedMessage} from '../../services/application';
-import {findTrashFolder, FolderTypes, moveFolder} from '../../services/folder';
+import {deleteFolder, findTrashFolder, FolderTypes, moveFolder} from '../../services/folder';
 import {moveMessages, resetFolderMessagesCache} from '../../services/message';
 import styles from './folder-list.scss';
 import mainCss from '../../styles/main.scss';
@@ -62,6 +62,8 @@ class FolderListClass extends Component {
     }
     if (!trashFolder.children.map(f => f.folderId).includes(folder.folderId)) {
       this.props.moveFolder(folder, trashFolder);
+    } else {
+      this.props.deleteFolder(folder);
     }
   }
 }
@@ -97,6 +99,7 @@ const mapDispatchToProps = dispatch => ({
   },
   renameFolder: folder => dispatch(renameFolder(folder)),
   moveFolder: (user, folder, targetFolder) => moveFolder(dispatch, user, folder, targetFolder),
+  deleteFolder: (user, folder) => deleteFolder(dispatch, user, folder),
   moveMessages: (credentials, fromFolder, toFolder, messages) => {
     moveMessages(dispatch, credentials, fromFolder, toFolder, messages);
   }
@@ -106,6 +109,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, s
   selectFolder: folder =>
     dispatchProps.selectFolder(folder, stateProps.application.user),
   moveFolder: (folder, targetFolder) => dispatchProps.moveFolder(stateProps.application.user, folder, targetFolder),
+  deleteFolder: folder => dispatchProps.deleteFolder(stateProps.application.user, folder),
   moveMessages: (fromFolder, toFolder, message) => dispatchProps.moveMessages(stateProps.application.user.credentials,
     fromFolder, toFolder, message)
 }));

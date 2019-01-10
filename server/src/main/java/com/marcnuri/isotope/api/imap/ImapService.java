@@ -210,6 +210,24 @@ public class ImapService {
         }
     }
 
+    /**
+     * Permanently deletes the folder with the provided {@link URLName} and its children.
+     *
+     * @param credentials for IMAP authentication
+     * @param folderToDeleteId Id of the folder to delete
+     * @return Parent of deleted folder
+     */
+    public Folder deleteFolder(@NonNull Credentials credentials, @NonNull URLName folderToDeleteId) {
+        try {
+            final IMAPFolder folderToDelete = getFolder(credentials, folderToDeleteId);
+            final IMAPFolder parent = (IMAPFolder)folderToDelete.getParent();
+            folderToDelete.delete(true);
+            return Folder.from(parent, true);
+        } catch (MessagingException ex) {
+            log.error("Error deleting folder " + folderToDeleteId.toString(), ex);
+            throw new IsotopeException(ex.getMessage());
+        }
+    }
 
     public Flux<ServerSentEvent<List<Message>>> getMessagesFlux(
             Credentials credentials, URLName folderId, HttpServletResponse response) {

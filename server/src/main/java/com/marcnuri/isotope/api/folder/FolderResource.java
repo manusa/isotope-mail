@@ -69,6 +69,7 @@ public class FolderResource implements ApplicationContextAware {
 
     private static final String REL_MESSAGES = "messages";
     public static final String REL_DOWNLOAD = "download";
+    private static final String REL_DELETE = "delete";
     private static final String REL_RENAME = "rename";
     private static final String REL_MOVE = "move";
     private static final String REL_MESSAGE = "message";
@@ -96,6 +97,15 @@ public class FolderResource implements ApplicationContextAware {
         log.debug("Loading list of folders [children:{}]", loadChildren);
         return ResponseEntity.ok(addLinks(imapServiceFactory.getObject()
                 .getFolders(credentialsService.fromRequest(request), loadChildren)));
+    }
+
+    @DeleteMapping(path= "/{folderId}", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<Folder> deleteFolder(
+            HttpServletRequest request, @NonNull @PathVariable("folderId") String folderId) {
+
+        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().deleteFolder(
+                credentialsService.fromRequest(request), Folder.toId(folderId)
+        )));
     }
 
     @PutMapping(path= "/{folderId}/name", produces = MediaTypes.HAL_JSON_VALUE)
@@ -245,6 +255,9 @@ public class FolderResource implements ApplicationContextAware {
         folder.add(linkTo(methodOn(FolderResource.class)
                 .getMessages( folder.getFolderId(), null, null))
                 .withRel(REL_MESSAGES).expand());
+        folder.add(linkTo(methodOn(FolderResource.class)
+                .deleteFolder(null, folder.getFolderId()))
+                .withRel(REL_DELETE));
         folder.add(linkTo(methodOn(FolderResource.class)
                 .renameFolder(null, folder.getFolderId(), null))
                 .withRel(REL_RENAME));

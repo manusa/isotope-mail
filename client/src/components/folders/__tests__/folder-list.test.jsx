@@ -52,6 +52,19 @@ describe('FolderList component test suite', () => {
 
     // Then
   });
+  test('deleteFolder, dispatch actions triggered', () => {
+    // Given
+    folderService.deleteFolder = jest.fn();
+    const props = {
+      activeRequests: 0, folderList: [{folderList: []}], selectedFolder: {folderId: '1337-3'}};
+    const folderList = shallow(<FolderList store={MOCK_STORE} {...props}/>);
+
+    // When
+    folderList.props().deleteFolder({folderId: 'folderToDelete'});
+
+    // Then
+    expect(folderService.deleteFolder).toHaveBeenCalledTimes(1);
+  });
   test('moveFolder, dispatch actions triggered', () => {
     // Given
     folderService.moveFolder = jest.fn();

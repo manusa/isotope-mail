@@ -5,7 +5,7 @@ import {
   renameFolder as renameFolderAction, renameFolderOk
 } from '../actions/application';
 import {backendRequest, setFolders, updateFolder} from '../actions/folders';
-import {renameMessageCache} from './indexed-db';
+import {deleteMessageCache, renameMessageCache} from './indexed-db';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 import {notifyNewMail} from './notification';
 
@@ -169,6 +169,41 @@ export function moveFolder(dispatch, user, folderToMove, targetFolder) {
           dispatch(renameFolderOk(f.previousFolderId, f.folderId));
           renameMessageCache(user.id, user.hash, f.previousFolderId, f.folderId);
         });
+      dispatch(applicationBackendRequestCompleted());
+    })
+    .catch(() => {
+      dispatch(applicationBackendRequestCompleted());
+    });
+}
+
+/**
+ * Triggers BE API to premanently delete the provided folderToDelete and its children.
+ *
+ * REDUX store will only be updated once an OK response is received from te server.
+ *
+ * @param dispatch
+ * @param user
+ * @param folderToDelete
+ */
+export function deleteFolder(dispatch, user, folderToDelete) {
+  abortFetch(abortControllerWrappers.getFoldersAbortController);
+  dispatch(applicationBackendRequest());
+  fetch(folderToDelete._links.delete.href, {
+    method: 'DELETE',
+    headers: credentialsHeaders(user.credentials)
+  })
+    .then(toJson)
+    .then(updatedParentFolder => {
+      dispatch(updateFolder(updatedParentFolder));
+      const folderIds = [];
+      const gatherIds = folder => {
+        folderIds.push(folder.folderId);
+        if (Array.isArray(folder.children)) {
+          folder.children.forEach(gatherIds);
+        }
+      };
+      gatherIds(folderToDelete);
+      deleteMessageCache(user.id, user.hash, folderIds);
       dispatch(applicationBackendRequestCompleted());
     })
     .catch(() => {
