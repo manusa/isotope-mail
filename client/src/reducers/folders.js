@@ -54,7 +54,11 @@ const folders = (state = INITIAL_STATE.folders, action = {}) => {
       // Remove previous folder from Tree
       const {oldFolderId} = action.payload;
       if (Object.keys(newState.explodedItems).includes(oldFolderId)) {
+        // Delete from Exploded list
         delete newState.explodedItems[oldFolderId];
+        // Delete from tree (root folders)
+        newState.items = newState.items.filter(item => item.folderId !== oldFolderId);
+        // Delete from tree (child folders)
         newState.items.forEach(_deleteChildFolder(oldFolderId));
       }
       return newState;
