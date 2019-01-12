@@ -234,6 +234,9 @@ export async function persistMessageCache(userId, hash, folder, messages) {
  * @returns {Promise<void>}
  */
 export async function renameMessageCache(userId, hash, oldFolderId, newFolderId) {
+  if (!oldFolderId || !newFolderId || oldFolderId === newFolderId) {
+    return;
+  }
   const oldKey = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(`${userId}|${oldFolderId}`));
   const newKey = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(`${userId}|${newFolderId}`));
   const db = await _openDatabaseSafe();

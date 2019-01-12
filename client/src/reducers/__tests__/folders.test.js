@@ -58,9 +58,10 @@ describe('Folders reducer test suite', () => {
       // Given
       const stateFolders = {...INITIAL_STATE.folders};
       stateFolders.explodedItems.parent = {folderId: 'parent',
-        children: [{folderId: 'child1'}, {folderId: 'child2'}]};
+        children: [{folderId: 'child1'}, {folderId: 'child2', children: [{folderId: 'child2_1'}]}]};
       stateFolders.explodedItems.child1 = stateFolders.explodedItems.parent.children[0];
       stateFolders.explodedItems.child2 = stateFolders.explodedItems.parent.children[1];
+      stateFolders.explodedItems.child2_1 = stateFolders.explodedItems.parent.children[1].children[0];
       stateFolders.explodedItems.parentToRemain = {folderId: 'parentToRemain',
         children: [parent, {folderId: 'parentToRemainChild'}]};
       stateFolders.explodedItems.parentToRemainChild = stateFolders.explodedItems.parentToRemain.children[0];

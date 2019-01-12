@@ -49,6 +49,11 @@ export const deleteFromCache = (folder, messages) => ({
   payload: {folder, messages}
 });
 
+export const renameCache = (oldId, newId) => ({
+  type: ActionTypes.MESSAGES_RENAME_CACHE,
+  payload: {oldId, newId}
+});
+
 /**
  * Adds the provided message uid to the selected message list if selected or else removes it from the list
  *

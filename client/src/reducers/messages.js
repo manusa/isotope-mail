@@ -49,6 +49,14 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
       action.payload.messages.forEach(m => newUpdateState.cache[action.payload.folder.folderId].delete(m.uid));
       return newUpdateState;
     }
+    case ActionTypes.MESSAGES_RENAME_CACHE: {
+      const newState = {...state};
+      if (newState.cache[action.payload.oldId]) {
+        newState.cache[action.payload.newId] = newState.cache[action.payload.oldId];
+        delete newState.cache[action.payload.oldId];
+      }
+      return newState;
+    }
     case ActionTypes.MESSAGES_SET_SELECTED: {
       const newUpdateState = {...state};
       newUpdateState.selected = [...state.selected];

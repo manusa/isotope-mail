@@ -1,6 +1,6 @@
 import {INITIAL_STATE} from './';
 import {ActionTypes} from '../actions/action-types';
-import {explodeFolders, FolderTypes} from '../services/folder';
+import {explodeFolders, FolderTypes, gatherFolderIds} from '../services/folder';
 
 function _updateFolder(folderToReplace, folders) {
   if (!folders || !folders.length > 0) {
@@ -64,15 +64,8 @@ const folders = (state = INITIAL_STATE.folders, action = {}) => {
       const {oldFolderId} = action.payload;
       if (Object.keys(newState.explodedItems).includes(oldFolderId)) {
         // Delete from Exploded list (Parent + Children)
-        const explodedFoldersToDeleteIds = [];
-        const gatherDeletedFolderAndChildrenIds = folder => {
-          explodedFoldersToDeleteIds.push(folder.folderId);
-          if (Array.isArray(folder.children)) {
-            folder.children.forEach(gatherDeletedFolderAndChildrenIds);
-          }
-        };
-        gatherDeletedFolderAndChildrenIds(newState.explodedItems[oldFolderId]);
-        explodedFoldersToDeleteIds.forEach(folderToDeleteId => delete newState.explodedItems[folderToDeleteId]);
+        gatherFolderIds(newState.explodedItems[oldFolderId]).forEach(
+          folderToDeleteId => delete newState.explodedItems[folderToDeleteId]);
 
         // Delete from tree (root folders)
         newState.items = newState.items.filter(item => item.folderId !== oldFolderId);

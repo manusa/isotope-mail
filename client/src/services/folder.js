@@ -8,6 +8,7 @@ import {backendRequest, setFolders, updateFolder} from '../actions/folders';
 import {deleteMessageCache, renameMessageCache} from './indexed-db';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 import {notifyNewMail} from './notification';
+import {renameCache} from '../actions/messages';
 
 export const FolderTypes = Object.freeze({
   INBOX: {serverName: 'INBOX', icon: 'inbox', position: 0},
@@ -16,6 +17,7 @@ export const FolderTypes = Object.freeze({
   TRASH: {attribute: '\\Trash', icon: 'delete', position: 3},
   FOLDER: {icon: 'folder'}
 });
+
 
 /**
  * Finds the trash folder from within the current folder state's exploded items.
@@ -26,6 +28,57 @@ export const FolderTypes = Object.freeze({
  */
 export const findTrashFolder = foldersState =>
   Object.values(foldersState.explodedItems).find(f => f.type === FolderTypes.TRASH);
+
+/**
+ * Returns the id of the provided folder and all its children.
+ *
+ * @param {object} folder
+ * @returns {Array.<string>}
+ */
+export function gatherFolderIds(folder) {
+  const gatheredIds = [];
+  const gatherFolderIdsInner = folderInner => {
+    gatheredIds.push(folderInner.folderId);
+    if (Array.isArray(folderInner.children)) {
+      folderInner.children.forEach(gatherFolderIdsInner);
+    }
+    return gatheredIds;
+  };
+  return gatherFolderIdsInner(folder);
+}
+
+/**
+ * Renames message cache for a folder and all its children in Redux store and IndexedDB.
+ *
+ * This step is necessary as the "key" for the folder's message cache is the folder Id which is
+ * a base64 encoded string of the folder URL (which includes the name).
+ *
+ * @param dispatch
+ * @param user
+ * @param renamedParentFolder
+ * @private
+ */
+function _renameMessageCache(dispatch, user, renamedParentFolder) {
+  if (!renamedParentFolder || !renamedParentFolder.previousFolderId) {
+    return;
+  }
+  // Rename Parent cache in IndexedDB database
+  renameMessageCache(user.id, user.hash, renamedParentFolder.previousFolderId, renamedParentFolder.folderId);
+  const decodedPreviousFolderId = atob(renamedParentFolder.previousFolderId);
+  const decodedNewFolderId = atob(renamedParentFolder.folderId);
+  // Rename all child folders
+  gatherFolderIds(renamedParentFolder)
+    .filter(childFolderId => childFolderId !== renamedParentFolder.folderId)
+    .forEach(childFolderId => {
+      const decodedChildFolderId = atob(childFolderId);
+      const decodedPreviousChildFolderId = decodedChildFolderId.replace(decodedNewFolderId, decodedPreviousFolderId);
+      const previousChildFolderId = btoa(decodedPreviousChildFolderId);
+      // Rename cache in Redux store
+      dispatch(renameCache(previousChildFolderId, childFolderId));
+      // Rename cache in IndexedDB database
+      renameMessageCache(user.id, user.hash, previousChildFolderId, childFolderId);
+    });
+}
 
 /**
  * Processes an initial folder list and adds the corresponding {@link FolderTypes}
@@ -132,7 +185,7 @@ export function renameFolder(dispatch, user, folderToRename, newName) {
         .filter(f => f.previousFolderId)
         .forEach(f => {
           dispatch(renameFolderOk(f.previousFolderId, f.folderId));
-          renameMessageCache(user.id, user.hash, f.previousFolderId, f.folderId);
+          _renameMessageCache(dispatch, user, f);
         });
       dispatch(renameFolderAction(null));
       dispatch(applicationBackendRequestCompleted());
@@ -167,7 +220,7 @@ export function moveFolder(dispatch, user, folderToMove, targetFolder) {
         .filter(f => f.previousFolderId)
         .forEach(f => {
           dispatch(renameFolderOk(f.previousFolderId, f.folderId));
-          renameMessageCache(user.id, user.hash, f.previousFolderId, f.folderId);
+          _renameMessageCache(dispatch, user, f);
         });
       dispatch(applicationBackendRequestCompleted());
     })
@@ -195,14 +248,7 @@ export function deleteFolder(dispatch, user, folderToDelete) {
     .then(toJson)
     .then(updatedParentFolder => {
       dispatch(updateFolder(updatedParentFolder));
-      const folderIds = [];
-      const gatherIds = folder => {
-        folderIds.push(folder.folderId);
-        if (Array.isArray(folder.children)) {
-          folder.children.forEach(gatherIds);
-        }
-      };
-      gatherIds(folderToDelete);
+      const folderIds = gatherFolderIds(folderToDelete);
       deleteMessageCache(user.id, user.hash, folderIds);
       dispatch(applicationBackendRequestCompleted());
     })
