@@ -36,13 +36,15 @@ describe('Folder service test suite', () => {
   describe('moveFolder', () => {
     test('moveFolder, valid folders, OK response, should return target folder with children and update state', done => {
       // Given
-      const targetFolder = {folderId: 'targetFolderId'};
+      const targetFolder = {folderId: 'dGFyZ2V0'/* btoa('target') */};
       fetch.abortFetch = jest.fn();
       indexedDbService.renameMessageCache = jest.fn();
       global.fetch = jest.fn((url, options) => {
-        expect(options.body).toMatch('targetFolderId');
+        expect(options.body).toMatch('dGFyZ2V0');
         return Promise.resolve({ok: true, url, options,
-          json: () => ({...targetFolder, fromBackend: true, children: [{previousFolderId: '1337'}]})});
+          json: () => ({...targetFolder, fromBackend: true,
+            children: [{folderId: 'dGFyZ2V0LjEzMzc='/* btoa('target.1337') */,
+              previousFolderId: 'MTMzNw=='/* btoa('1337') */}]})});
       });
       let dispatchCount = 0;
       const dispatch = jest.fn(action => {

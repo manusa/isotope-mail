@@ -62,13 +62,10 @@ function _renameMessageCache(dispatch, user, renamedParentFolder) {
   if (!renamedParentFolder || !renamedParentFolder.previousFolderId) {
     return;
   }
-  // Rename Parent cache in IndexedDB database
-  renameMessageCache(user.id, user.hash, renamedParentFolder.previousFolderId, renamedParentFolder.folderId);
   const decodedPreviousFolderId = atob(renamedParentFolder.previousFolderId);
   const decodedNewFolderId = atob(renamedParentFolder.folderId);
   // Rename all child folders
   gatherFolderIds(renamedParentFolder)
-    .filter(childFolderId => childFolderId !== renamedParentFolder.folderId)
     .forEach(childFolderId => {
       const decodedChildFolderId = atob(childFolderId);
       const decodedPreviousChildFolderId = decodedChildFolderId.replace(decodedNewFolderId, decodedPreviousFolderId);
@@ -184,8 +181,8 @@ export function renameFolder(dispatch, user, folderToRename, newName) {
       renamedFolderParent.children
         .filter(f => f.previousFolderId)
         .forEach(f => {
-          dispatch(renameFolderOk(f.previousFolderId, f.folderId));
           _renameMessageCache(dispatch, user, f);
+          dispatch(renameFolderOk(f.previousFolderId, f.folderId));
         });
       dispatch(renameFolderAction(null));
       dispatch(applicationBackendRequestCompleted());
@@ -219,8 +216,8 @@ export function moveFolder(dispatch, user, folderToMove, targetFolder) {
       updatedTargetFolder.children
         .filter(f => f.previousFolderId)
         .forEach(f => {
-          dispatch(renameFolderOk(f.previousFolderId, f.folderId));
           _renameMessageCache(dispatch, user, f);
+          dispatch(renameFolderOk(f.previousFolderId, f.folderId));
         });
       dispatch(applicationBackendRequestCompleted());
     })

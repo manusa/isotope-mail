@@ -3,12 +3,6 @@ import {ActionTypes} from '../actions/action-types';
 
 const messages = (state = INITIAL_STATE.messages, action = {}) => {
   switch (action.type) {
-    case ActionTypes.APPLICATION_FOLDER_RENAME_OK: {
-      const newState = {...state};
-      newState.cache[action.payload.newFolderId] = newState.cache[action.payload.oldFolderId];
-      delete newState.cache[action.payload.oldFolderId];
-      return newState;
-    }
     case ActionTypes.MESSAGES_BE_REQUEST:
       return {...state, activeRequests: state.activeRequests + 1};
     case ActionTypes.MESSAGES_BE_REQUEST_COMPLETED:
