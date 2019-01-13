@@ -5,8 +5,10 @@ exports[`FolderItem component test suite Snapshot render Context Menu Visible, S
   className="the-one-percent mdc-list-item listItem
         mdc-list-item--selected
         "
+  draggable={true}
   onDragLeave={[Function]}
   onDragOver={[Function]}
+  onDragStart={[Function]}
   onDrop={[Function]}
   onMouseLeave={[Function]}
   title="Red Label (13)"
@@ -50,8 +52,10 @@ exports[`FolderItem component test suite Snapshot render Defaults with actions, 
   className="the-one-percent mdc-list-item listItem
         mdc-list-item--selected
         "
+  draggable={true}
   onDragLeave={[Function]}
   onDragOver={[Function]}
+  onDragStart={[Function]}
   onDrop={[Function]}
   onMouseLeave={[Function]}
   title="Red Label (13)"
@@ -101,8 +105,10 @@ exports[`FolderItem component test suite Snapshot render Defaults, Should render
   className="the-one-percent mdc-list-item listItem
         mdc-list-item--selected
         "
+  draggable={true}
   onDragLeave={[Function]}
   onDragOver={[Function]}
+  onDragStart={[Function]}
   onDrop={[Function]}
   onMouseLeave={[Function]}
   title="Red Label (13)"

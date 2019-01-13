@@ -11,6 +11,7 @@ class FolderItem extends Component {
       dragOver: false,
       contextMenuVisible: false
     };
+    this.handleOnDragStart = this.onDragStart.bind(this);
     this.handleOnDragOver = this.onDragOver.bind(this);
     this.handleOnDragLeave = this.onDragLeave.bind(this);
     this.handleOnDrop = this.onDrop.bind(this);
@@ -29,6 +30,7 @@ class FolderItem extends Component {
         ${dragOver ? mainCss['mdc-list-item--activated'] : ''}`}
       title={labelWithCount}
       onClick={onClick}
+      draggable={true} onDragStart={this.handleOnDragStart}
       onDrop={this.handleOnDrop} onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave}
       onMouseLeave={event => this.hideContextMenu(event)}
       >
@@ -51,11 +53,17 @@ class FolderItem extends Component {
     );
   }
 
+  onDragStart(event) {
+    event.stopPropagation();
+    this.props.onDragStart(event);
+  }
+
   onDrop(event) {
     event.preventDefault();
     this.setState({dragOver: false});
     this.props.onDrop(event);
   }
+
   onDragOver(event) {
     event.preventDefault();
     if (event.dataTransfer.types && Array.from(event.dataTransfer.types).includes('application/json')) {
@@ -84,6 +92,7 @@ FolderItem.propTypes = {
   graphic: PropTypes.string,
   label: PropTypes.string.isRequired,
   selected: PropTypes.bool.isRequired,
+  onDragStart: PropTypes.func,
   onDrop: PropTypes.func,
   onClick: PropTypes.func,
   onRename: PropTypes.func,
@@ -98,6 +107,7 @@ FolderItem.defaultProps = {
   selected: false,
   unreadMessageCount: 0,
   newMessageCount: 0,
+  onDragStart: () => {},
   onDrop: null,
   onRename: null,
   onDelete: null

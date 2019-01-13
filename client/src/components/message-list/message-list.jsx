@@ -12,6 +12,7 @@ import {preloadMessages, setMessageFlagged} from '../../services/message';
 import {readMessage} from '../../services/message-read';
 import mainCss from '../../styles/main.scss';
 import styles from './message-list.scss';
+import {DroppablePayloadTypes} from '../folders/folder-list';
 
 function parseFrom(from) {
   const firstFrom = from && from.length > 0 ? from[0] : '';
@@ -112,7 +113,7 @@ class MessageList extends Component {
 
   onDragStart(event, fromFolder, message) {
     event.stopPropagation();
-    const payload = {fromFolder};
+    const payload = {type: DroppablePayloadTypes.MESSAGES, fromFolder};
     if (this.props.selectedMessages.length > 0) {
       // Prevent dragging single messages when there is a selection and message is not part of the selection
       if (this.props.selectedMessages.indexOf(message.uid) < 0) {

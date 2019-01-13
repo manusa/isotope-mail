@@ -10,6 +10,11 @@ import {moveMessages, resetFolderMessagesCache} from '../../services/message';
 import styles from './folder-list.scss';
 import mainCss from '../../styles/main.scss';
 
+export const DroppablePayloadTypes = {
+  FOLDER: 'FOLDER',
+  MESSAGES: 'MESSAGES'
+};
+
 class FolderListClass extends Component {
   render() {
     const {folderList, selectedFolder} = this.props;
@@ -20,6 +25,7 @@ class FolderListClass extends Component {
             className={styles.item}
             selected={selectedFolder && folder.folderId === selectedFolder.folderId}
             onClick={event => this.onClick(event, folder)}
+            onDragStart={event => FolderListClass.onDragStart(event, folder)}
             onDrop={event => this.onDrop(event, folder)}
             onRename={FolderTypes.INBOX === folder.type ? null : event => this.onRename(event, folder)}
             onDelete={FolderTypes.FOLDER === folder.type ? event => this.onDelete(event, folder) : null}
@@ -41,11 +47,27 @@ class FolderListClass extends Component {
     this.props.selectFolder(folder);
   }
 
+  static onDragStart(event, folder) {
+    const payload = {type: DroppablePayloadTypes.FOLDER, folder};
+    event.dataTransfer.setData('application/json', JSON.stringify(payload));
+  }
+
   onDrop(event, toFolder) {
-    event.preventDefault();
     if (event.dataTransfer.types && Array.from(event.dataTransfer.types).includes('application/json')) {
       const payload = JSON.parse(event.dataTransfer.getData('application/json'));
-      this.props.moveMessages(payload.fromFolder, toFolder, payload.messages);
+      switch (payload.type) {
+        case DroppablePayloadTypes.FOLDER: {
+          const folderToMoveId = payload.folder.folderId;
+          if (folderToMoveId !== toFolder.folderId && !toFolder.children.some(f => f.folderId === folderToMoveId)) {
+            this.props.moveFolder(payload.folder, toFolder);
+          }
+          break;
+        }
+        case DroppablePayloadTypes.MESSAGES:
+          this.props.moveMessages(payload.fromFolder, toFolder, payload.messages);
+          break;
+        default:
+      }
     }
   }
 

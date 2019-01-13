@@ -45,24 +45,50 @@ describe('FolderItem component test suite', () => {
   describe('Component events', () => {
     test('Generic mouse events, events fired', () => {
       // Given
-      const onDrop = jest.fn();
       const onClick = jest.fn();
-      const folderItem = shallow(<FolderItem label={''} selected={false} onDrop={onDrop} onClick={onClick}/>);
+      const onDragStart = jest.fn();
+      const onDrop = jest.fn();
+      const folderItem = shallow(<FolderItem label={''} selected={false}
+        onClick={onClick} onDragStart={onDragStart} onDrop={onDrop}/>);
 
       // When
-      folderItem.find('.listItem').simulate('drop', {preventDefault: () => {}});
-      folderItem.find('.listItem').simulate('dragOver', {
-        preventDefault: () => {}, dataTransfer: {types: ['application/hal+json', 'text/plain', 'application/json']}});
       folderItem.find('.listItem').simulate('click');
+      folderItem.find('.listItem').simulate('dragStart', {stopPropagation: () => {}});
+      folderItem.find('.listItem').simulate('drop', {preventDefault: () => {}});
 
       // Then
-      expect(onDrop).toHaveBeenCalledTimes(1);
       expect(onClick).toHaveBeenCalledTimes(1);
+      expect(onDragStart).toHaveBeenCalledTimes(1);
+      expect(onDrop).toHaveBeenCalledTimes(1);
+    });
+    test('Folder dragged over, should set dragOver true', () => {
+      // Given
+      const props = {label: 'I\'m NOT dragged over', selected: false};
+      const folderItem = shallow(<FolderItem {...props} />);
+
+      // When
+      folderItem.find('.listItem').simulate('dragOver', {
+        preventDefault: () => {}, dataTransfer: {types: ['application/hal+json', 'text/plain', 'application/json']}});
+
+      // Then
+      expect(folderItem.state('dragOver')).toEqual(true);
+    });
+    test('Folder drag leave, was dragged over, should set dragOver false', () => {
+      // Given
+      const props = {label: 'I\'m dragged over', selected: false};
+      const folderItem = shallow(<FolderItem {...props} />);
+      folderItem.setState({dragOver: true});
+
+      // When
+      folderItem.find('.listItem').simulate('dragLeave', {preventDefault: () => {}});
+
+      // Then
+      expect(folderItem.state('dragOver')).toEqual(false);
     });
     test('Menu clicked, should show menu', () => {
       // Given
       const props = {
-        selected: true, onRename: () => {}, onDelete: () => {}};
+        label: 'My menu is hidden', selected: true, onRename: () => {}, onDelete: () => {}};
       const folderItem = shallow(<FolderItem {...props} />);
 
       // When
