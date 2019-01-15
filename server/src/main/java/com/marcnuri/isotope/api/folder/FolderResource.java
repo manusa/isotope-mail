@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
+import javax.mail.URLName;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
@@ -117,11 +118,23 @@ public class FolderResource implements ApplicationContextAware {
         )));
     }
 
+    /**
+     * Moves the folder with the provided folderId as a child of the folder with the provided targetFolderId or
+     * to the first level if null.
+     *
+     * @param request
+     * @param folderId
+     * @param targetFolderId
+     * @return
+     */
     @PutMapping(path= "/{folderId}/parent", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Folder> moveFolder(
-            HttpServletRequest request, @PathVariable("folderId") String folderId, @RequestBody String targetFolderId) {
+            HttpServletRequest request, @PathVariable("folderId") String folderId,
+            @RequestBody(required = false) String targetFolderId) {
+
+        final URLName targetFolderUrlName = targetFolderId == null ? null : Folder.toId(targetFolderId);
         return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().moveFolder(
-                credentialsService.fromRequest(request), Folder.toId(folderId), Folder.toId(targetFolderId)
+                credentialsService.fromRequest(request), Folder.toId(folderId), targetFolderUrlName
         )));
     }
 

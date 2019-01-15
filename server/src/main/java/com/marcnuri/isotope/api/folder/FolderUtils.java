@@ -87,7 +87,14 @@ public class FolderUtils {
         if (!folderToRename.renameTo(renamedFolder)) {
             throw new InvalidFieldException("New folder name was not accepted by IMAP server");
         }
-        final Folder parent = Folder.from((IMAPFolder)renamedFolder.getParent(), true);
+        final IMAPFolder imapParent;
+        if (renamedFolder.getParent().getFullName().equals("")) {
+            // If parent is Root, getParent doesn't return the default folder, override to return default folder instead.
+            imapParent = (IMAPFolder)renamedFolder.getStore().getDefaultFolder();
+        } else {
+            imapParent = (IMAPFolder)renamedFolder.getParent();
+        }
+        final Folder parent = Folder.from(imapParent, true);
         // Identify renamed folder
         Stream.of(parent.getChildren())
                 .filter(f -> f.getFullName().equals(newFolderFullName))

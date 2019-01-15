@@ -8,12 +8,15 @@
   width: 0px;
   border: 0;
   transition: width $drawerAnimationSpeed;
-
   &.open {
     width: $drawerWidth;
     @include mdc-drawer-border-color($mdc-drawer-divider-color);
     border-right-width: 1px;
     border-right-style: solid;
+  }
+
+  &.dropZone {
+    background-color: darken($mdc-drawer-surface-fill-color, 15%);
   }
 
   .top-container {

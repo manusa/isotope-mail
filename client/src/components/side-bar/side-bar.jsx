@@ -5,20 +5,33 @@ import PropTypes from 'prop-types';
 import FolderContainer from '../folders/folder-container';
 import mainCss from '../../styles/main.scss';
 import styles from './side-bar.scss';
+import {moveFolder} from '../../services/folder';
+import {DroppablePayloadTypes} from '../folders/folder-list';
 
 
 class SideBar extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      dragOver: false
+    };
+    this.handleOnDragOver = this.onDragOver.bind(this);
+    this.handleOnDragLeave = this.onDragLeave.bind(this);
+    this.handleOnDrop = this.onDrop.bind(this);
   }
 
   render() {
-    const t = this.props.t;
+    const {t, collapsed} = this.props;
+    const {dragOver} = this.state;
     return (
-      <aside className={`${styles['side-bar']}
+      <aside
+        onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave} onDrop={this.handleOnDrop}
+        className={`${styles['side-bar']}
           ${mainCss['mdc-drawer']}
           ${mainCss['mdc-drawer--dismissible']}
-          ${this.getCollapsedClassName()}`}>
+          ${SideBar.getCollapsedClassName(collapsed)}
+          ${dragOver ? styles.dropZone : ''}`}
+      >
         <div className={`${mainCss['mdc-drawer__header']} ${styles['top-container']}`}>
           {(location.protocol !== 'https:' ?
             <span className='material-icons' isotip={t('sideBar.errors.noSSL')}
@@ -42,8 +55,32 @@ class SideBar extends Component {
     );
   }
 
-  getCollapsedClassName() {
-    return this.props.collapsed ? '' : `${styles.open} ${mainCss['mdc-drawer--open']}`;
+  onDragOver(event) {
+    event.preventDefault();
+    if (event.dataTransfer.types && Array.from(event.dataTransfer.types).includes('application/json')) {
+      this.setState({dragOver: true});
+    }
+  }
+
+  onDragLeave(event) {
+    event.preventDefault();
+    this.setState({dragOver: false});
+  }
+
+  onDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.setState({dragOver: false});
+    if (event.dataTransfer.types && Array.from(event.dataTransfer.types).includes('application/json')) {
+      const payload = JSON.parse(event.dataTransfer.getData('application/json'));
+      if (payload.type === DroppablePayloadTypes.FOLDER) {
+        this.props.moveFolderToFirstLevel(payload.folder);
+      }
+    }
+  }
+
+  static getCollapsedClassName(collapsed) {
+    return collapsed ? '' : `${styles.open} ${mainCss['mdc-drawer--open']}`;
   }
 }
 
@@ -51,11 +88,21 @@ SideBar.propTypes = {
   t: PropTypes.func.isRequired,
   sideBarToggle: PropTypes.func.isRequired,
   collapsed: PropTypes.bool.isRequired,
-  errors: PropTypes.object.isRequired
+  application: PropTypes.object,
+  errors: PropTypes.object
 };
 
 const mapStateToProps = state => ({
+  application: state.application,
   errors: state.application.errors
 });
 
-export default connect(mapStateToProps)(translate()(SideBar));
+const mapDispatchToProps = dispatch => ({
+  moveFolderToFirstLevel: (user, folder) => moveFolder(dispatch, user, folder, null)
+});
+
+const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
+  moveFolderToFirstLevel: folder => dispatchProps.moveFolderToFirstLevel(stateProps.application.user, folder)
+}));
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(translate()(SideBar));

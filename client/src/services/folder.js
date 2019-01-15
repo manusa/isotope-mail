@@ -205,14 +205,19 @@ export function renameFolder(dispatch, user, folderToRename, newName) {
 export function moveFolder(dispatch, user, folderToMove, targetFolder) {
   abortFetch(abortControllerWrappers.getFoldersAbortController);
   dispatch(applicationBackendRequest());
+  const targetFolderId = targetFolder ? targetFolder.folderId : null;
   fetch(folderToMove._links.move.href, {
     method: 'PUT',
     headers: credentialsHeaders(user.credentials, {'Content-Type': 'application/json'}),
-    body: targetFolder.folderId
+    body: targetFolderId
   })
     .then(toJson)
     .then(updatedTargetFolder => {
-      dispatch(updateFolder(updatedTargetFolder));
+      if (targetFolder) {
+        dispatch(updateFolder(updatedTargetFolder));
+      } else {
+        dispatch(setFolders(updatedTargetFolder.children));
+      }
       updatedTargetFolder.children
         .filter(f => f.previousFolderId)
         .forEach(f => {

@@ -187,7 +187,7 @@ public class ImapService {
 
     /**
      * Moves the folder with the provided {@link URLName} to the specified target folder with the provided
-     * URLName.
+     * URLName or to the first level if the target folder is null.
      *
      * <p>Both folders must exist in order for the action to complete successfully.
      *
@@ -197,12 +197,17 @@ public class ImapService {
      * @return
      */
     public Folder moveFolder(
-            @NonNull Credentials credentials, @NonNull URLName folderToMoveId, @NonNull URLName targetFolderId) {
+            @NonNull Credentials credentials, @NonNull URLName folderToMoveId, @Nullable URLName targetFolderId) {
         try {
             final IMAPFolder folderToMove = getFolder(credentials, folderToMoveId);
-            final IMAPFolder targetFolder = getFolder(credentials, targetFolderId);
-            final String movedFolderFullName = String.format("%s%s%s",
-                    targetFolder.getFullName(), targetFolder.getSeparator(), folderToMove.getName());
+            final String movedFolderFullName;
+            if (targetFolderId == null) {
+                movedFolderFullName = folderToMove.getName();
+            } else {
+                final IMAPFolder targetFolder = getFolder(credentials, targetFolderId);
+                movedFolderFullName = String.format("%s%s%s",
+                        targetFolder.getFullName(), targetFolder.getSeparator(), folderToMove.getName());
+            }
             return FolderUtils.renameFolder(folderToMove, movedFolderFullName);
         } catch (MessagingException ex) {
             log.error("Error moving folder " + folderToMoveId.toString(), ex);

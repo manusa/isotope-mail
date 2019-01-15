@@ -54,7 +54,7 @@ describe('FolderItem component test suite', () => {
       // When
       folderItem.find('.listItem').simulate('click');
       folderItem.find('.listItem').simulate('dragStart', {stopPropagation: () => {}});
-      folderItem.find('.listItem').simulate('drop', {preventDefault: () => {}});
+      folderItem.find('.listItem').simulate('drop', {preventDefault: () => {}, stopPropagation: () => {}});
 
       // Then
       expect(onClick).toHaveBeenCalledTimes(1);
@@ -68,7 +68,8 @@ describe('FolderItem component test suite', () => {
 
       // When
       folderItem.find('.listItem').simulate('dragOver', {
-        preventDefault: () => {}, dataTransfer: {types: ['application/hal+json', 'text/plain', 'application/json']}});
+        preventDefault: () => {}, stopPropagation: () => {},
+        dataTransfer: {types: ['application/hal+json', 'text/plain', 'application/json']}});
 
       // Then
       expect(folderItem.state('dragOver')).toEqual(true);
@@ -80,7 +81,7 @@ describe('FolderItem component test suite', () => {
       folderItem.setState({dragOver: true});
 
       // When
-      folderItem.find('.listItem').simulate('dragLeave', {preventDefault: () => {}});
+      folderItem.find('.listItem').simulate('dragLeave', {preventDefault: () => {}, stopPropagation: () => {}});
 
       // Then
       expect(folderItem.state('dragOver')).toEqual(false);

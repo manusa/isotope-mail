@@ -60,12 +60,14 @@ class FolderItem extends Component {
 
   onDrop(event) {
     event.preventDefault();
+    event.stopPropagation();
     this.setState({dragOver: false});
     this.props.onDrop(event);
   }
 
   onDragOver(event) {
     event.preventDefault();
+    event.stopPropagation();
     if (event.dataTransfer.types && Array.from(event.dataTransfer.types).includes('application/json')) {
       this.setState({dragOver: true});
     }
@@ -73,6 +75,7 @@ class FolderItem extends Component {
 
   onDragLeave(event) {
     event.preventDefault();
+    event.stopPropagation();
     this.setState({dragOver: false});
   }
 

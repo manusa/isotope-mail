@@ -173,6 +173,29 @@ public class FolderResourceTest {
     }
 
     @Test
+    public void moveFolder_validFolderAndNullBody_shouldReturnOk_movesTargetToRoot() throws Exception {
+        // Given
+        final String folderId = "/";
+        final Folder mockRootFolder = new Folder();
+        mockRootFolder.setChildren(new Folder[0]);
+        mockRootFolder.setFolderId(folderId);
+        doReturn(mockRootFolder).when(imapService).moveFolder(Mockito.any(),
+                Mockito.eq(new URLName("/original/folder")), Mockito.isNull());
+
+        // When
+        final ResultActions result = mockMvc.perform(
+                put("/v1/folders/L29yaWdpbmFsL2ZvbGRlcg==/parent")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaTypes.HAL_JSON_VALUE));
+
+        // Then
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.folderId").value(folderId));
+        result.andExpect(jsonPath("$._links").exists());
+        result.andExpect(jsonPath("$._links", aMapWithSize(10)));
+    }
+
+    @Test
     public void getMessages_validFolderId_shouldReturnOk() throws Exception {
         // Given
         final Message mockMessage1 = new Message();

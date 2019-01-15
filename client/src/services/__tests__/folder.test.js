@@ -77,6 +77,49 @@ describe('Folder service test suite', () => {
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
+    test('moveFolder, valid folder null target -> move to first level, OK response,' +
+      'should return default/root folder with children and set all folders in state', done => {
+      // Given
+      fetch.abortFetch = jest.fn();
+      indexedDbService.renameMessageCache = jest.fn();
+      global.fetch = jest.fn((url, options) => {
+        expect(options.body).toBeNull();
+        return Promise.resolve({ok: true, url, options,
+          json: () => ({fromBackend: true,
+            children: [{folderId: 'MTMzNw=='/* btoa('1337') */,
+              previousFolderId: 'Zm9sZGVyLjEzMzc='/* btoa('folder.1337') */}]})});
+      });
+      let dispatchCount = 0;
+      const dispatch = jest.fn(action => {
+        switch (action.type) {
+          case ActionTypes.APPLICATION_BE_REQUEST:
+          case ActionTypes.APPLICATION_FOLDER_RENAME_OK:
+            dispatchCount++;
+            break;
+          case ActionTypes.FOLDERS_SET:
+            dispatchCount++;
+            expect(action.payload.length).toEqual(1);
+            break;
+          case ActionTypes.APPLICATION_BE_REQUEST_COMPLETED:
+            expect(dispatchCount).toEqual(3);
+            expect(indexedDbService.renameMessageCache).toHaveBeenCalledTimes(1);
+            done();
+            break;
+          default:
+        }
+      });
+      const folder = {
+        type: FolderTypes.FOLDER,
+        _links: {move: {href: 'http://test.url/api/v1/folders/Zm9sZGVyLjEzMzc=/parent'}}
+      };
+
+      // When
+      folderService.moveFolder(dispatch, {credentials: {}}, folder);
+
+      // Then
+      expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
     test('moveFolder, valid folders, NOT OK response, should complete and not update state', done => {
       // Given
       const targetFolder = {folderId: 'targetFolderId'};

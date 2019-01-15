@@ -124,6 +124,40 @@ public class ImapServiceTest {
         FolderUtils.renameFolder(Mockito.eq(folder), Mockito.eq("/target/folder/1337"));
     }
 
+    @Test
+    public void moveFolder_validParametersNullTarget_shouldRenameFolder() throws Exception {
+        // Given
+        PowerMockito.mockStatic(FolderUtils.class);
+
+        final Credentials credentials = new Credentials();
+        credentials.setUser("validUser");
+        credentials.setServerHost("email.com");
+        credentials.setImapSsl(true);
+        credentials.setServerPort(993);
+
+        final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
+        doReturn(folder).when(imapStore).getFolder(Mockito.eq(new URLName("/1337")));
+        doReturn(true).when(folder).exists();
+        doReturn("/1337").when(folder).getFullName();
+        doReturn("1337").when(folder).getName();
+
+        final IMAPFolder targetFolder = Mockito.mock(IMAPFolder.class);
+        doReturn(targetFolder).when(imapStore).getDefaultFolder();
+        doReturn(true).when(targetFolder).exists();
+        doReturn("").when(targetFolder).getFullName();
+        doReturn('/').when(targetFolder).getSeparator();
+
+        // When
+        imapService.moveFolder(credentials, new URLName("/1337"), null);
+
+        // Then
+        verify(imapStore, times(1)).connect(
+                Mockito.eq(credentials.getServerHost()), Mockito.eq(credentials.getServerPort()),
+                Mockito.eq(credentials.getUser()), Mockito.eq(credentials.getPassword()));
+        PowerMockito.verifyStatic(FolderUtils.class, VerificationModeFactory.times(1));
+        FolderUtils.renameFolder(Mockito.eq(folder), Mockito.eq("1337"));
+    }
+
     @Test(expected = NotFoundException.class)
     public void moveFolder_folderNotFound_shouldThrowException() throws Exception {
         // Given

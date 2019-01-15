@@ -132,6 +132,7 @@ public class FolderUtilsTest {
         final IMAPFolder mockedFolderParent = Mockito.mock(IMAPFolder.class);
         doReturn(mockedFolderParent).when(mockedFolder).getParent();
         doReturn(new IMAPFolder[]{mockedFolder}).when(mockedFolderParent).list();
+        doReturn("/folder").when(mockedFolderParent).getFullName();
         doReturn(new URLName("/folder")).when(mockedFolderParent).getURLName();
         doReturn(new String[0]).when(mockedFolderParent).getAttributes();
 
@@ -145,7 +146,6 @@ public class FolderUtilsTest {
         assertThat(result.getChildren()[0].getFullURL(), is("/folder/newName"));
         assertThat(result.getChildren()[0].getFolderId(), is("L2ZvbGRlci9uZXdOYW1l"));
         assertThat(result.getChildren()[0].getPreviousFolderId(), is("b2xkRm9sZGVySWQ="));
-
     }
 
     @Test(expected = InvalidFieldException.class)
