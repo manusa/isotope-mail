@@ -213,7 +213,7 @@ export async function persistMessageCache(userId, hash, folder, messages) {
       key: sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(`${userId}|${folder.folderId}`)),
       userId: userId,
       folderId: sjcl.encrypt(hash, folder.folderId),
-      messages: m.data
+      messages: m.data.encryptedData
     };
     const db = await _openDatabaseSafe();
     const tx = db.transaction([MESSAGE_CACHE_STORE], 'readwrite');
@@ -303,6 +303,7 @@ export async function persistApplicationNewMessageContent(application, content) 
     await tx.complete;
     db.close();
     worker.terminate();
+    URL.revokeObjectURL(m.data.workerHref);
   };
   worker.postMessage({password: application.user.hash, data: JSON.stringify(content)});
 }
