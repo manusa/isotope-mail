@@ -140,6 +140,29 @@ export async function persistState(dispatch, state) {
   // Only persist state if it contains a folder and message cache (don't overwrite previously stored state with this info)
   if (state.application.user.id && state.application.user.hash
     && state.folders.items.length > 0 && Object.keys(state.messages.cache).length > 0) {
+    // Create web-worker
+    const worker = new SjclWorker();
+    worker.onmessage = async encryptedStateMessage => {
+      // Persist state
+      try {
+        const db = await _openDatabaseSafe();
+        const tx = db.transaction([STATE_STORE], 'readwrite');
+        const store = tx.objectStore(STATE_STORE);
+        await store.put({key: state.application.user.id, value: encryptedStateMessage.data});
+        await tx.complete;
+        db.close();
+        if (state.application.errors.diskQuotaExceeded) {
+          dispatch(setError('diskQuotaExceeded', false));
+        }
+      } catch (e) {
+        console.error(`${e} ${e.name}`);
+        if (e.name === 'QuotaExceededError' && !state.application.errors.diskQuotaExceeded) {
+          dispatch(setError('diskQuotaExceeded', true));
+        }
+      }
+      worker.terminate();
+    };
+
     // Clone state
     const newState = {...state};
     newState.application = {...state.application};
@@ -165,28 +188,9 @@ export async function persistState(dispatch, state) {
 
     // Encrypt state
     const stateString = JSON.stringify(newState);
-    const encryptedState = sjcl.encrypt(state.application.user.hash, stateString);
-
-    // Persist state
-    try {
-      const db = await _openDatabaseSafe();
-      const tx = db.transaction([STATE_STORE], 'readwrite');
-      const store = tx.objectStore(STATE_STORE);
-      await store.put({key: state.application.user.id, value: encryptedState});
-      await tx.complete;
-      db.close();
-      if (state.application.errors.diskQuotaExceeded) {
-        dispatch(setError('diskQuotaExceeded', false));
-      }
-    } catch (e) {
-      console.error(`${e} ${e.name}`);
-      if (e.name === 'QuotaExceededError' && !state.application.errors.diskQuotaExceeded) {
-        dispatch(setError('diskQuotaExceeded', true));
-      }
-    }
+    worker.postMessage({password: state.application.user.hash, data: stateString});
   }
 }
-
 /**
  * Persists the provided array of messages into the Browser IndexedDB message cache store for the
  * specified userId and folder
