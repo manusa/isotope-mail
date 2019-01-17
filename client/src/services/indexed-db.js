@@ -148,7 +148,7 @@ export async function persistState(dispatch, state) {
         const db = await _openDatabaseSafe();
         const tx = db.transaction([STATE_STORE], 'readwrite');
         const store = tx.objectStore(STATE_STORE);
-        await store.put({key: state.application.user.id, value: encryptedStateMessage.data});
+        await store.put({key: state.application.user.id, value: encryptedStateMessage.data.encryptedData});
         await tx.complete;
         db.close();
         if (state.application.errors.diskQuotaExceeded) {
@@ -161,6 +161,7 @@ export async function persistState(dispatch, state) {
         }
       }
       worker.terminate();
+      URL.revokeObjectURL(encryptedStateMessage.data.workerHref);
     };
 
     // Clone state
@@ -221,6 +222,7 @@ export async function persistMessageCache(userId, hash, folder, messages) {
     await tx.complete;
     db.close();
     worker.terminate();
+    URL.revokeObjectURL(m.data.workerHref);
   };
   worker.postMessage({password: hash, data: JSON.stringify(messages)});
 }
@@ -292,7 +294,7 @@ export async function persistApplicationNewMessageContent(application, content) 
   worker.onmessage = async m => {
     const newMessage = {
       key: application.user.id,
-      newMessageContent: m.data
+      newMessageContent: m.data.encryptedData
     };
     const db = await _openDatabaseSafe();
     const tx = db.transaction([NEW_MESSAGE_STORE], 'readwrite');

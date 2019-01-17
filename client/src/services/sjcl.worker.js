@@ -8,5 +8,8 @@ import sjcl from 'sjcl';
  * @param {string} event.data.data - The data to encrypt
  */
 onmessage = event => {
-  postMessage(sjcl.encrypt(event.data.password, event.data.data));
+  postMessage({
+    encryptedData: sjcl.encrypt(event.data.password, event.data.data),
+    workerHref: self.location.href
+  });
 };
