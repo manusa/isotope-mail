@@ -7,6 +7,9 @@ import i18n from './services/i18n';
 import Routes from './routes/routes';
 import rootReducer from './reducers';
 import {loadState, saveState} from './services/state';
+import debounce from './services/debounce';
+
+const SAVE_STATE_DEBOUNCE_PERIOD_IN_MILLIS = 500;
 
 /**
  * Starts application asynchronously once all of the required information is available (loadState)
@@ -21,7 +24,7 @@ async function init () {
   }
   const store = createStore(rootReducer, previousState, enhancer);
 
-  store.subscribe(() => saveState(store.dispatch, store.getState()));
+  store.subscribe(debounce(() => saveState(store.dispatch, store.getState()), SAVE_STATE_DEBOUNCE_PERIOD_IN_MILLIS));
 
   ReactDOM.render(
     <Provider store={store}>

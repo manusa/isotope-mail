@@ -10,11 +10,11 @@ import MceButton from './mce-button';
 import InsertLinkDialog from './insert-link-dialog';
 import {editMessage} from '../../actions/application';
 import {sendMessage} from '../../services/smtp';
+import {prettySize} from '../../services/prettify';
+import Button from '../buttons/button';
 import {persistApplicationNewMessageContent} from '../../services/indexed-db';
 import styles from './message-editor.scss';
 import mainCss from '../../styles/main.scss';
-import {prettySize} from '../../services/prettify';
-import Button from '../buttons/button';
 
 const EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED = 50;
 
