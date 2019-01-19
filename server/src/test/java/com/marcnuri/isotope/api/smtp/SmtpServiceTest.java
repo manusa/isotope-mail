@@ -84,6 +84,7 @@ public class SmtpServiceTest {
         when(Session.getInstance(Mockito.any(), Mockito.any())).thenReturn(mockedSession);
         doReturn(mockedTransport).when(mockedSession).getTransport(Mockito.anyString());
         doReturn(new Properties()).when(mockedSession).getProperties();
+        doReturn("mockPropertyValue").when(mockedSession).getProperty(Mockito.anyString());
 
         smtpService = new SmtpService(Mockito.mock(MailSSLSocketFactory.class));
     }
