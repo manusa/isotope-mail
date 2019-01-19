@@ -2,6 +2,7 @@
 
 .listItem {
   cursor: pointer;
+  user-select: none;
   display: flex;
 
   .graphic {

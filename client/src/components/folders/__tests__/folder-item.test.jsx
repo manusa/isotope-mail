@@ -8,7 +8,7 @@ describe('FolderItem component test suite', () => {
       // Given
       const props = {
         className: 'the-one-percent', graphic: 'Andy Warhol', label: 'Red Label',
-        selected: true, unreadMessageCount: 13, newMessageCount: 37};
+        selected: true, draggable: true, unreadMessageCount: 13, newMessageCount: 37};
 
       // When
       const folderItem = shallow(<FolderItem {...props} />);
@@ -20,7 +20,8 @@ describe('FolderItem component test suite', () => {
       // Given
       const props = {
         className: 'the-one-percent', graphic: 'Andy Warhol', label: 'Red Label',
-        selected: true, unreadMessageCount: 13, newMessageCount: 37, onRename: () => {}, onDelete: () => {}};
+        selected: true, draggable: true, unreadMessageCount: 13, newMessageCount: 37,
+        onRename: () => {}, onDelete: () => {}};
 
       // When
       const folderItem = shallow(<FolderItem {...props} />);
@@ -32,7 +33,8 @@ describe('FolderItem component test suite', () => {
       // Given
       const props = {
         className: 'the-one-percent', graphic: 'Andy Warhol', label: 'Red Label',
-        selected: true, unreadMessageCount: 13, newMessageCount: 37, onRename: () => {}, onDelete: () => {}};
+        selected: true, draggable: true, unreadMessageCount: 13, newMessageCount: 37,
+        onRename: () => {}, onDelete: () => {}};
 
       // When
       const folderItem = shallow(<FolderItem {...props} />);

@@ -1,0 +1,80 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FolderList component test suite Snapshot render Inbox; folder and folder with children, Should render FolderListClass 1`] = `
+Array [
+  <div
+    className="itemContainer"
+  >
+    <FolderItem
+      className="item"
+      draggable={false}
+      graphic="inbox"
+      label="Inbox"
+      newMessageCount={1}
+      onClick={[Function]}
+      onDelete={null}
+      onDragStart={[Function]}
+      onDrop={[Function]}
+      onRename={null}
+      selected={true}
+      unreadMessageCount={1}
+    />
+  </div>,
+  <div
+    className="itemContainer"
+  >
+    <FolderItem
+      className="item"
+      draggable={true}
+      graphic="folder"
+      label="Folder 1"
+      newMessageCount={1}
+      onClick={[Function]}
+      onDelete={[Function]}
+      onDragStart={[Function]}
+      onDrop={[Function]}
+      onRename={[Function]}
+      selected={false}
+      unreadMessageCount={1}
+    />
+  </div>,
+  <div
+    className="itemContainer"
+  >
+    <FolderItem
+      className="item"
+      draggable={true}
+      graphic="folder"
+      label="Folder 2"
+      newMessageCount={1}
+      onClick={[Function]}
+      onDelete={[Function]}
+      onDragStart={[Function]}
+      onDrop={[Function]}
+      onRename={[Function]}
+      selected={false}
+      unreadMessageCount={1}
+    />
+    <nav
+      className="mdc-list childList"
+    >
+      <Connect(FolderListClass)
+        folderList={
+          Array [
+            Object {
+              "children": Array [],
+              "folderId": 4,
+              "name": "Folder 1",
+              "newMessageCount": 1,
+              "type": Object {
+                "icon": "folder",
+              },
+              "unreadMessageCount": 1,
+            },
+          ]
+        }
+      />
+    </nav>
+  </div>,
+]
+`;

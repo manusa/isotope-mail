@@ -2,12 +2,46 @@ import React from 'react';
 import {shallow} from 'enzyme';
 import {createMockStore, MOCK_STORE} from '../../../__testutils__/store';
 import {INITIAL_STATE} from '../../../reducers';
-import FolderList from '../folder-list';
+import FolderList, {FolderListClass} from '../folder-list';
 import * as folderService from '../../../services/folder';
 import * as messageService from '../../../services/message';
 import {ActionTypes} from '../../../actions/action-types';
+import {FolderTypes} from '../../../services/folder';
 
 describe('FolderList component test suite', () => {
+  describe('Snapshot render', () => {
+    test('Inbox; folder and folder with children, Should render FolderListClass', () => {
+      const selectedFolder = {
+        folderId: 1, type: FolderTypes.INBOX, name: 'Inbox',
+        unreadMessageCount: 1, newMessageCount: 1, children: []};
+      // Given
+      const props = {
+        folderList: [
+          selectedFolder,
+          {
+            folderId: 2, type: FolderTypes.FOLDER, name: 'Folder 1',
+            unreadMessageCount: 1, newMessageCount: 1, children: []
+          },
+          {
+            folderId: 3, type: FolderTypes.FOLDER, name: 'Folder 2',
+            unreadMessageCount: 1, newMessageCount: 1, children: [
+              {
+                folderId: 4, type: FolderTypes.FOLDER, name: 'Folder 1',
+                unreadMessageCount: 1, newMessageCount: 1, children: []
+              }
+            ]
+          }
+        ],
+        selectedFolder: selectedFolder
+      };
+
+      // When
+      const folderList = shallow(<FolderListClass {...props} />);
+
+      // Then
+      expect(folderList).toMatchSnapshot();
+    });
+  });
   test('selectFolder, dispatch actions triggered', () => {
     // Given
     let dispatchCount = 0;

@@ -19,7 +19,7 @@ class FolderItem extends Component {
 
   render() {
     const {
-      className, selected, graphic, label, newMessageCount, unreadMessageCount, onClick, onRename, onDelete
+      className, selected, draggable, graphic, label, newMessageCount, unreadMessageCount, onClick, onRename, onDelete
     } = this.props;
     const {dragOver} = this.state;
     const labelWithCount = `${label} ${unreadMessageCount > 0 ? `(${unreadMessageCount})` : ''}`;
@@ -30,7 +30,7 @@ class FolderItem extends Component {
         ${dragOver ? mainCss['mdc-list-item--activated'] : ''}`}
       title={labelWithCount}
       onClick={onClick}
-      draggable={true} onDragStart={this.handleOnDragStart}
+      draggable={draggable} onDragStart={this.handleOnDragStart}
       onDrop={this.handleOnDrop} onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave}
       onMouseLeave={event => this.hideContextMenu(event)}
       >
@@ -95,6 +95,7 @@ FolderItem.propTypes = {
   graphic: PropTypes.string,
   label: PropTypes.string.isRequired,
   selected: PropTypes.bool.isRequired,
+  draggable: PropTypes.bool,
   onDragStart: PropTypes.func,
   onDrop: PropTypes.func,
   onClick: PropTypes.func,
@@ -108,6 +109,7 @@ FolderItem.defaultProps = {
   className: '',
   graphic: FolderTypes.FOLDER.icon,
   selected: false,
+  draggable: false,
   unreadMessageCount: 0,
   newMessageCount: 0,
   onDragStart: () => {},

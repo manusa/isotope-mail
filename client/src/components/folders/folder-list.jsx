@@ -15,7 +15,7 @@ export const DroppablePayloadTypes = {
   MESSAGES: 'MESSAGES'
 };
 
-class FolderListClass extends Component {
+export class FolderListClass extends Component {
   render() {
     const {folderList, selectedFolder} = this.props;
     return (
@@ -25,6 +25,7 @@ class FolderListClass extends Component {
             className={styles.item}
             selected={selectedFolder && folder.folderId === selectedFolder.folderId}
             onClick={event => this.onClick(event, folder)}
+            draggable={FolderTypes.FOLDER === folder.type}
             onDragStart={event => FolderListClass.onDragStart(event, folder)}
             onDrop={event => this.onDrop(event, folder)}
             onRename={FolderTypes.INBOX === folder.type ? null : event => this.onRename(event, folder)}
