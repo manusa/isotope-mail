@@ -54,10 +54,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -124,6 +126,29 @@ public class FolderResourceTest {
                 endsWith("/v1/folders/1337/messages/{messageId}/seen")));
         result.andExpect(jsonPath("[0]._links['message.seen.bulk'].href",
                 endsWith("/v1/folders/1337/messages/seen/{seen}")));
+    }
+
+    @Test
+    public void createRootFolder_validNewName_shouldReturnOk() throws Exception {
+        // Given
+        final String folderId = "new-folder";
+        final Folder mockFolder = new Folder();
+        mockFolder.setChildren(new Folder[0]);
+        mockFolder.setFolderId(folderId);
+        doReturn(Collections.singletonList(mockFolder))
+                .when(imapService).createRootFolder(Mockito.any(), Mockito.eq("new-folder"));
+
+        // When
+        final ResultActions result = mockMvc.perform(
+                post("/v1/folders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("new-folder")
+                        .accept(MediaTypes.HAL_JSON_VALUE));
+
+        // Then
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$").isArray());
+        result.andExpect(jsonPath("$[0].folderId", is("new-folder")));
     }
 
     @Test

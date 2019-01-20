@@ -19,6 +19,12 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
         ...state,
         selectedFolderId: action.payload.folderId
       };
+    case ActionTypes.APPLICATION_FOLDER_CREATE: {
+      return {
+        ...state,
+        createFolderParentId: action.payload
+      };
+    }
     case ActionTypes.APPLICATION_FOLDER_RENAME: {
       return {
         ...state,

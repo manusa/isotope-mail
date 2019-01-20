@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SingleInputDialog component test suite Snapshot render, should render SingleInputDialog 1`] = `
+<Dialog
+  actions={
+    Array [
+      Object {
+        "action": [MockFunction],
+        "disabled": false,
+        "label": "Cancel",
+      },
+      Object {
+        "action": [Function],
+        "disabled": false,
+        "label": "OK",
+      },
+    ]
+  }
+  className="singleInputDialog"
+  containerClassName="container"
+  contentClassName="content"
+  scrimClick={[Function]}
+  title="Dr. POTUS"
+  visible={true}
+>
+  <span>
+    Christmas Message
+  </span>
+  <form
+    onSubmit={[Function]}
+  >
+    <TextField
+      autoComplete="off"
+      disabled={false}
+      fieldClass="mdc-text-field--fullwidth"
+      focused={true}
+      id="folderName"
+      inputClass=""
+      label="This is the input"
+      labelClass=""
+      lineRippleClass=""
+      min=""
+      minLength={null}
+      onChange={[Function]}
+      onKeyDown={[Function]}
+      onKeyPress={null}
+      required={true}
+      type="text"
+      value="Initial value"
+    />
+  </form>
+</Dialog>
+`;

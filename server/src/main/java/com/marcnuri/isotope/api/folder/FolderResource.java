@@ -38,6 +38,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -98,6 +99,15 @@ public class FolderResource implements ApplicationContextAware {
         log.debug("Loading list of folders [children:{}]", loadChildren);
         return ResponseEntity.ok(addLinks(imapServiceFactory.getObject()
                 .getFolders(credentialsService.fromRequest(request), loadChildren)));
+    }
+
+    @PostMapping(path = "", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<List<Folder>> createRootFolder(
+            HttpServletRequest request, @RequestBody() String newFolderName) {
+
+        log.debug("Creating new 1st level folder with name {}", newFolderName);
+        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject()
+                .createRootFolder(credentialsService.fromRequest(request), newFolderName)));
     }
 
     @DeleteMapping(path= "/{folderId}", produces = MediaTypes.HAL_JSON_VALUE)

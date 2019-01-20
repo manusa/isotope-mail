@@ -9,6 +9,7 @@ describe('Application reducer test suite', () => {
     expect(applicationDefaultState).toHaveProperty('user', {});
     expect(applicationDefaultState).toHaveProperty('newMessage', null);
     expect(applicationDefaultState).toHaveProperty('selectedFolderId', {});
+    expect(applicationDefaultState).toHaveProperty('createFolderParentId', null);
     expect(applicationDefaultState).toHaveProperty('renameFolderId', null);
     expect(applicationDefaultState).toHaveProperty('selectedMessage', null);
     expect(applicationDefaultState).toHaveProperty('downloadedMessages', {});

@@ -9,6 +9,7 @@ export const INITIAL_STATE = {
     user: {},
     newMessage: null,
     selectedFolderId: {},
+    createFolderParentId: null,
     renameFolderId: null,
     selectedMessage: null,
     downloadedMessages: {},

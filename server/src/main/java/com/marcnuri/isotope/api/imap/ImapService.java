@@ -63,6 +63,7 @@ import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -152,6 +153,27 @@ public class ImapService {
             return folders;
         } catch (MessagingException ex) {
             log.error("Error loading folders", ex);
+            throw  new IsotopeException(ex.getMessage());
+        }
+    }
+
+    /**
+     * Creates a new folder in the 1st level of the user's mailbox (root level)
+     *
+     * @param credentials for IMAP authentication
+     * @param newFolderName name for the folder to be created
+     * @return List of 1st level folders with the new folder included
+     */
+    public List<Folder> createRootFolder(Credentials credentials, @NonNull String newFolderName) {
+        try {
+            final IMAPFolder rootFolder = (IMAPFolder)getImapStore(credentials).getDefaultFolder();
+            final IMAPFolder newFolder = (IMAPFolder)rootFolder.getFolder(newFolderName);
+            if (!newFolder.exists()) {
+                newFolder.create(IMAPFolder.HOLDS_MESSAGES | IMAPFolder.HOLDS_FOLDERS);
+            }
+            return Arrays.asList(Folder.from(rootFolder, true).getChildren());
+        } catch (MessagingException ex) {
+            log.error("Error creating new root folder {}", newFolderName, ex);
             throw  new IsotopeException(ex.getMessage());
         }
     }

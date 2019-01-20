@@ -1,7 +1,7 @@
 import {URLS} from './url';
 import {
   backendRequest as applicationBackendRequest,
-  backendRequestCompleted as applicationBackendRequestCompleted,
+  backendRequestCompleted as applicationBackendRequestCompleted, createFolder,
   renameFolder as renameFolderAction, renameFolderOk
 } from '../actions/application';
 import {backendRequest, setFolders, updateFolder} from '../actions/folders';
@@ -252,6 +252,32 @@ export function deleteFolder(dispatch, user, folderToDelete) {
       dispatch(updateFolder(updatedParentFolder));
       const folderIds = gatherFolderIds(folderToDelete);
       deleteMessageCache(user.id, user.hash, folderIds);
+      dispatch(applicationBackendRequestCompleted());
+    })
+    .catch(() => {
+      dispatch(applicationBackendRequestCompleted());
+    });
+}
+
+/**
+ *
+ * @param dispatch
+ * @param user
+ * @param newFolderName
+ * @param parentFolder
+ */
+export function createRootFolder(dispatch, user, newFolderName) {
+  abortFetch(abortControllerWrappers.getFoldersAbortController);
+  dispatch(applicationBackendRequest());
+  fetch(URLS.FOLDERS, {
+    method: 'POST',
+    headers: credentialsHeaders(user.credentials),
+    body: newFolderName
+  })
+    .then(toJson)
+    .then(folders => {
+      dispatch(setFolders(folders));
+      dispatch(createFolder(null));
       dispatch(applicationBackendRequestCompleted());
     })
     .catch(() => {

@@ -71,6 +71,13 @@
     "messageError" : "Error enviando mensaje",
     "retry" : "Reintentar"
   },
+  "createFolderDialog": {
+    "title": "Crear carpeta",
+    "message": "Por favor, introduce el nombre para la nueva carpeta",
+    "folderNameLabel": "Nuevo nombre de carpeta",
+    "cancel": "Cancelar",
+    "create": "Crear"
+  },
   "renameFolderDialog": {
     "title": "Renombrar carpeta",
     "message": "Por favor, introduce el nuevo nombre para la carpeta {{folderName}}",

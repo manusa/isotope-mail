@@ -2,17 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import mainCss from '../../styles/main.scss';
 
-const Button = ({className, type, label, icon, onClick, disabled}) =>
+const Button = ({className, iconClassName, type, label, icon, onClick, disabled}) =>
   (<button type={type} className={`${mainCss['mdc-button']} ${className}`}
     disabled={disabled} onClick={onClick}>
     {icon.length > 0 ?
-      (<i className={`material-icons ${mainCss['mdc-button__icon']}`}>{icon}</i>)
+      (<i className={`material-icons ${mainCss['mdc-button__icon']} ${iconClassName}`}>{icon}</i>)
       : null}
     {label}
   </button>);
 
 Button.propTypes = {
   className: PropTypes.string,
+  iconClassName: PropTypes.string,
   type: PropTypes.oneOf(['button', 'submit', 'reset']),
   label: PropTypes.string,
   icon: PropTypes.string,
@@ -22,6 +23,7 @@ Button.propTypes = {
 
 Button.defaultProps = {
   className: '',
+  iconClassName: '',
   type: 'button',
   label: '',
   icon: '',

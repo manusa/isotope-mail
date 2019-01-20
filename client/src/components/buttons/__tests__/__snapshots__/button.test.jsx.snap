@@ -8,7 +8,7 @@ exports[`Button component test suite Snapshot render, should render button 1`] =
   type="button"
 >
   <i
-    className="material-icons mdc-button__icon"
+    className="material-icons mdc-button__icon "
   >
     Andy Warhol
   </i>

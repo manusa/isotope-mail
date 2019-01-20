@@ -120,6 +120,7 @@ exports[`LoginSnackbar component test suite Snapshot render User not logged in, 
         className="advancedButton"
         disabled={false}
         icon="unfold_more"
+        iconClassName=""
         label="login.Advanced"
         onClick={[Function]}
         type="button"
@@ -128,6 +129,7 @@ exports[`LoginSnackbar component test suite Snapshot render User not logged in, 
         className="loginButton mdc-button--unelevated fullWidth"
         disabled={false}
         icon=""
+        iconClassName=""
         label="login.actions.Login"
         onClick={[Function]}
         type="submit"

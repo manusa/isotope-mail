@@ -25,6 +25,7 @@ import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.exception.IsotopeException;
 import com.marcnuri.isotope.api.exception.NotFoundException;
+import com.marcnuri.isotope.api.folder.Folder;
 import com.marcnuri.isotope.api.folder.FolderUtils;
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.imap.IMAPStore;
@@ -44,7 +45,10 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.URLName;
+import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -88,6 +92,37 @@ public class ImapServiceTest {
         credentialsService = null;
 
         imapService = null;
+    }
+
+    @Test
+    public void createRootFolder_validParameters_shouldCreateFolder() throws Exception {
+        // Given
+        final Credentials credentials = new Credentials();
+        credentials.setUser("validUser");
+        credentials.setServerHost("email.com");
+        credentials.setImapSsl(true);
+        credentials.setServerPort(993);
+
+        final IMAPFolder rootFolder = Mockito.mock(IMAPFolder.class);
+        doReturn(rootFolder).when(imapStore).getDefaultFolder();
+        doReturn(new URLName("/")).when(rootFolder).getURLName();
+        doReturn(new String[0]).when(rootFolder).getAttributes();
+
+        final IMAPFolder newFolder = Mockito.mock(IMAPFolder.class);
+        doReturn(newFolder).when(rootFolder).getFolder(Mockito.eq("new-folder"));
+        doReturn(new IMAPFolder[]{newFolder}).when(rootFolder).list();
+        doReturn(false).when(newFolder).exists();
+        doReturn(new URLName("/new-folder")).when(newFolder).getURLName();
+        doReturn(new String[0]).when(newFolder).getAttributes();
+        doReturn(new IMAPFolder[0]).when(newFolder).list();
+
+        // When
+        final List<Folder> result = imapService.createRootFolder(credentials, "new-folder");
+
+        // Then
+        verify(newFolder, times(1))
+                .create(Mockito.eq(IMAPFolder.HOLDS_MESSAGES | IMAPFolder.HOLDS_FOLDERS));
+        assertThat(result, hasSize(1));
     }
 
     @Test
