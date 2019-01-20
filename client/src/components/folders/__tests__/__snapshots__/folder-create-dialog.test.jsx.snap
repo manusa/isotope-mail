@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FolderCreateDialog component test suite Snapshot render Defaults, Should render FolderCreateDialog 1`] = `
+<SingleInputDialog
+  cancelLabel="createFolderDialog.cancel"
+  disabled={false}
+  inputLabel="createFolderDialog.folderNameLabel"
+  inputValue=""
+  messageLabel="createFolderDialog.message"
+  okLabel="createFolderDialog.create"
+  titleLabel="createFolderDialog.title"
+  visible={true}
+/>
+`;

@@ -6,7 +6,7 @@ import SingleInputDialog from '../dialog/single-input-dialog';
 import {createFolder as actionCreateFolder} from '../../actions/application';
 import {createRootFolder} from '../../services/folder';
 
-const FolderCreateDialog = ({t, application, cancel, createFolder}) => {
+export const FolderCreateDialog = ({t, application, cancel, createFolder}) => {
   const visible = Object.keys(application).includes('createFolderParentId') && application.createFolderParentId !== null;
   const disabled = application.activeRequests > 0;
   return (
