@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FolderRenameDialog component test suite Snapshot render Defaults, Should render FolderRenameDialog 1`] = `
+<SingleInputDialog
+  cancelLabel="renameFolderDialog.cancel"
+  disabled={false}
+  inputLabel="renameFolderDialog.folderNameLabel"
+  inputValue="Name of the renamed Folder"
+  messageLabel="renameFolderDialog.message"
+  okAction={[Function]}
+  okLabel="renameFolderDialog.rename"
+  titleLabel="renameFolderDialog.title"
+  visible={true}
+/>
+`;

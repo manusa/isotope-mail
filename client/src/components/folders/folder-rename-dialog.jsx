@@ -6,7 +6,7 @@ import SingleInputDialog from '../dialog/single-input-dialog';
 import {renameFolder as actionRenameFolder} from '../../actions/application';
 import {renameFolder as serviceRenameFolder} from '../../services/folder';
 
-const FolderRenameDialog = ({t, folderToRename, cancel, renameFolder, application}) => {
+export const FolderRenameDialog = ({t, folderToRename, cancel, renameFolder, application}) => {
   const visible = folderToRename !== null;
   const disabled = application.activeRequests > 0;
   const folderName = folderToRename ? folderToRename.name : '';
