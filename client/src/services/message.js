@@ -3,7 +3,6 @@ import {
   backendRequest,
   backendRequestCompleted,
   deleteFromCache,
-  setFolderCache,
   setSelected,
   updateCache, updateCacheIfExist
 } from '../actions/messages';
