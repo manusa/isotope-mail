@@ -9,11 +9,12 @@ import {createRootFolder} from '../../services/folder';
 export const FolderCreateDialog = ({t, application, cancel, createFolder}) => {
   const visible = Object.keys(application).includes('createFolderParentId') && application.createFolderParentId !== null;
   const disabled = application.activeRequests > 0;
+  const inputValue = visible ? '' : null; // Resets the input field when dialog is closed
   return (
     <SingleInputDialog
       visible={visible} disabled={disabled}
       titleLabel={t('createFolderDialog.title')} messageLabel={t('createFolderDialog.message')}
-      inputLabel={t('createFolderDialog.folderNameLabel')} inputValue={''}
+      inputLabel={t('createFolderDialog.folderNameLabel')} inputValue={inputValue}
       cancelLabel={t('createFolderDialog.cancel')} cancelAction={cancel}
       okLabel={t('createFolderDialog.create')} okAction={createFolder}/>
   );
@@ -21,7 +22,6 @@ export const FolderCreateDialog = ({t, application, cancel, createFolder}) => {
 
 FolderCreateDialog.propTypes = {
   application: PropTypes.object,
-  folderToRename: PropTypes.object,
   cancel: PropTypes.func,
   createFolder: PropTypes.func
 };

@@ -44,8 +44,8 @@ class SingleInputDialog extends Component {
   }
 
   componentWillUpdate(nextProps) {
-    if (nextProps.inputValue) {
-      if (!this.props.inputValue || nextProps.inputValue !== this.props.inputValue) {
+    if (nextProps.inputValue === '' || nextProps.inputValue) {
+      if (this.props.inputValue === null || nextProps.inputValue !== this.props.inputValue) {
         this.setState({
           value: nextProps.inputValue
         });
