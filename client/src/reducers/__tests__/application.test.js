@@ -35,6 +35,11 @@ describe('Application reducer test suite', () => {
       expect(updatedState.activeRequests).toBe(1);
     });
   });
+  test('APPLICATION_FOLDER_CREATE, createFolderParentId was null, should change', () => {
+    const updatedState = application({...INITIAL_STATE.application, createFolderParentId: null},
+      {type: ActionTypes.APPLICATION_FOLDER_CREATE, payload: '1337'});
+    expect(updatedState.createFolderParentId).toBe('1337');
+  });
   test('APPLICATION_FOLDER_RENAME, renameFolderId was null, should change', () => {
     const updatedState = application({...INITIAL_STATE.application, renameFolderId: null},
       {type: ActionTypes.APPLICATION_FOLDER_RENAME, payload: {folderId: '1337'}});
