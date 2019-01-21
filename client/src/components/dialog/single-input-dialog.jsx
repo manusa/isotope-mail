@@ -76,7 +76,7 @@ SingleInputDialog.propTypes = {
   titleLabel: PropTypes.string.isRequired,
   messageLabel: PropTypes.string.isRequired,
   inputLabel: PropTypes.string.isRequired,
-  inputValue: PropTypes.string.isRequired,
+  inputValue: PropTypes.string,
   cancelLabel: PropTypes.string.isRequired,
   cancelAction: PropTypes.func.isRequired,
   okLabel: PropTypes.string.isRequired,
