@@ -65,6 +65,14 @@ export async function resetFolderMessagesCache(dispatch, user, folder) {
         persistMessageCache(
           user.id, user.hash, folder, [...allMessages]);
       } else {
+        // Remove UIDs not included in batch update from store
+        const originalUids = messages.map(m => m.uid);
+        const maxUid = originalUids.reduce((a, b) => Math.max(a, b));
+        const minUid = originalUids.reduce((a, b) => Math.min(a, b));
+        const completeUidSequence = Array(maxUid - minUid + 1).fill('').map((v, i) => i + minUid);
+        const uidsToRemove = completeUidSequence.filter(uid => !originalUids.includes(uid));
+        dispatch(deleteFromCache(folder, uidsToRemove.map(uid => ({uid}))));
+
         dispatch(updateCache(folder, messages));
       }
     };
