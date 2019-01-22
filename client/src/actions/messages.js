@@ -40,13 +40,16 @@ export const updateCacheIfExist = (folder, messages) => ({
 /**
  * Delete messages from state folder's messages cache.
  *
- * @param folder from which the messages will be deleted
- * @param messages {Array} array of messages to delete from the folder's cache
+ * @param {!object} folder from which the messages will be deleted
+ * @param {!Array} messages array of messages to delete from the folder's cache
+ * @param {object} [deleteUidRange] Range of message UIDs to keep (inclusive)
+ * @param {number} [deleteUidRange.from] delete all messages starting with this UID
+ * @param {number} [deleteUidRange.to] delete all messages until this UID
  * @returns {{type: string, payload: {folder: *, messages: *}}}
  */
-export const deleteFromCache = (folder, messages) => ({
+export const deleteFromCache = (folder, messages, deleteUidRange) => ({
   type: ActionTypes.MESSAGES_DELETE_FROM_CACHE,
-  payload: {folder, messages}
+  payload: {folder, messages, deleteUidRange}
 });
 
 export const renameCache = (oldId, newId) => ({
