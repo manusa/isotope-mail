@@ -62,7 +62,7 @@ export async function resetFolderMessagesCache(dispatch, user, folder) {
       const originalUids = messages.map(m => m.uid);
       let maxUid = null;
       let minUid = null;
-      if (originalUids.length) {
+      if (originalUids.length > 0) {
         maxUid = originalUids.reduce((a, b) => Math.max(a, b));
         minUid = originalUids.reduce((a, b) => Math.min(a, b));
         const completeUidSequence = Array(maxUid - minUid + 1).fill('').map((v, i) => i + minUid);
@@ -75,16 +75,21 @@ export async function resetFolderMessagesCache(dispatch, user, folder) {
       dispatch(updateCache(folder, messages));
 
       // This is the First Batch -> Delete all messages with a higher UID not included in the batch
-      if (isFirstBatch && maxUid > 0) {
+      if (isFirstBatch) {
         isFirstBatch = false;
-        dispatch(deleteFromCache(folder, [], {from: maxUid + 1}));
+        if (maxUid) {
+          dispatch(deleteFromCache(folder, [], {from: maxUid + 1}));
+        } else {
+          // Clear empty folder if first batch has no uids
+          dispatch(deleteFromCache(folder, [], {from: 0}));
+        }
       }
 
       // This is the last batch -> persistMessageCache with all new gathered messages
       if (e.lastEventId === '1') {
         _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
         // Remove uids not included in batch (0-minUidInBatch)
-        if (minUid || minUid === 0) {
+        if (minUid) {
           dispatch(deleteFromCache(folder, [], {to: minUid - 1}));
         }
         // Manually persist newest version of message cache
