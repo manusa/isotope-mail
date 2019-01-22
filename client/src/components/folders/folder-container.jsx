@@ -9,17 +9,23 @@ import {createFolder as createFolderAction} from '../../actions/application';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
 
-export const FolderContainer =
-  ({activeRequests, folderList, createFolder}) => (
+export const FolderContainer = ({activeRequests, folderList, createFolder}) => {
+  const initialListLoading = activeRequests > 0 && folderList.length === 0;
+  return (
     <nav className={`${mainCss['mdc-list']}`}>
-      <Spinner visible={activeRequests > 0 && folderList.length === 0}
+      <Spinner visible={initialListLoading}
         canvasClassName={styles.spinnerCanvas} />
       <FolderList folderList={folderList}/>
-      <button className={`material-icons ${mainCss['mdc-icon-button']} ${styles.addButton}`} onClick={createFolder}>add_circle</button>
+      {!initialListLoading &&
+      (<button
+        className={`material-icons ${mainCss['mdc-icon-button']} ${styles.addButton}`}onClick={createFolder}>
+        add_circle
+      </button>)}
       <FolderCreateDialog />
       <FolderRenameDialog />
     </nav>
   );
+};
 
 FolderContainer.propTypes = {
   activeRequests: PropTypes.number,
