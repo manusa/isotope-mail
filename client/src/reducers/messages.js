@@ -41,6 +41,9 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
         return state;
       }
 
+      newUpdateState.cache = {...newUpdateState.cache};
+      newUpdateState.cache[action.payload.folder.folderId] =
+        new Map(newUpdateState.cache[action.payload.folder.folderId]);
       // Delete unitary messages
       const cache = newUpdateState.cache[action.payload.folder.folderId];
       action.payload.messages.forEach(m => cache.delete(m.uid));
@@ -49,10 +52,10 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
       const {deleteUidRange} = action.payload;
       if (deleteUidRange) {
         let toDeleteUids = Array.from(cache.keys());
-        if (deleteUidRange.from >= 0) {
+        if (deleteUidRange.from || deleteUidRange.from === 0) {
           toDeleteUids = toDeleteUids.filter(uid => uid >= deleteUidRange.from);
         }
-        if (deleteUidRange.to >= 0) {
+        if (deleteUidRange.to || deleteUidRange.to === 0) {
           toDeleteUids = toDeleteUids.filter(uid => uid <= deleteUidRange.to);
         }
         toDeleteUids.forEach(uid => cache.delete(uid));
