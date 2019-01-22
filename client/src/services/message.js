@@ -60,18 +60,22 @@ export async function resetFolderMessagesCache(dispatch, user, folder) {
 
       // Remove UIDs not included in batch update from store
       const originalUids = messages.map(m => m.uid);
-      const maxUid = originalUids.reduce((a, b) => Math.max(a, b));
-      const minUid = originalUids.reduce((a, b) => Math.min(a, b));
-      const completeUidSequence = Array(maxUid - minUid + 1).fill('').map((v, i) => i + minUid);
-      const uidsToRemove = completeUidSequence.filter(uid => !originalUids.includes(uid));
-      if (uidsToRemove.length > 0) {
-        dispatch(deleteFromCache(folder, uidsToRemove.map(uid => ({uid}))));
+      let maxUid = null;
+      let minUid = null;
+      if (originalUids.length) {
+        maxUid = originalUids.reduce((a, b) => Math.max(a, b));
+        minUid = originalUids.reduce((a, b) => Math.min(a, b));
+        const completeUidSequence = Array(maxUid - minUid + 1).fill('').map((v, i) => i + minUid);
+        const uidsToRemove = completeUidSequence.filter(uid => !originalUids.includes(uid));
+        if (uidsToRemove.length > 0) {
+          dispatch(deleteFromCache(folder, uidsToRemove.map(uid => ({uid}))));
+        }
       }
 
       dispatch(updateCache(folder, messages));
 
       // This is the First Batch -> Delete all messages with a higher UID not included in the batch
-      if (isFirstBatch) {
+      if (isFirstBatch && maxUid > 0) {
         isFirstBatch = false;
         dispatch(deleteFromCache(folder, [], {from: maxUid + 1}));
       }
@@ -80,7 +84,9 @@ export async function resetFolderMessagesCache(dispatch, user, folder) {
       if (e.lastEventId === '1') {
         _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
         // Remove uids not included in batch (0-minUidInBatch)
-        dispatch(deleteFromCache(folder, [], {to: minUid - 1}));
+        if (minUid || minUid === 0) {
+          dispatch(deleteFromCache(folder, [], {to: minUid - 1}));
+        }
         // Manually persist newest version of message cache
         persistMessageCache(user.id, user.hash, folder, [...allMessages]);
       }
