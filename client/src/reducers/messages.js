@@ -11,22 +11,29 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
       return {...state, cache: action.payload};
     case ActionTypes.MESSAGES_SET_FOLDER_CACHE: {
       const newState = {...state};
-      newState.cache[action.payload.folder.folderId] =
-        new Map(action.payload.messages.map(m => [m.uid, m]));
+      newState.cache = {...newState.cache};
+      newState.cache[action.payload.folder.folderId] = new Map(action.payload.messages.map(m => [m.uid, m]));
       return newState;
     }
     case ActionTypes.MESSAGES_UPDATE_CACHE: {
       const newUpdateState = {...state};
+      newUpdateState.cache = {...newUpdateState.cache};
       if (newUpdateState.cache[action.payload.folder.folderId] instanceof Map === false) {
         newUpdateState.cache[action.payload.folder.folderId] = new Map();
+      } else {
+        newUpdateState.cache[action.payload.folder.folderId] =
+          new Map(newUpdateState.cache[action.payload.folder.folderId]);
       }
       action.payload.messages.forEach(m => newUpdateState.cache[action.payload.folder.folderId].set(m.uid, m));
       return newUpdateState;
     }
     case ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST: {
       const newUpdateState = {...state};
-      const cache = newUpdateState.cache[action.payload.folder.folderId];
-      if (cache instanceof Map === true) {
+      newUpdateState.cache = {...newUpdateState.cache};
+      if (newUpdateState.cache[action.payload.folder.folderId] instanceof Map === true) {
+        newUpdateState.cache[action.payload.folder.folderId] =
+          new Map(newUpdateState.cache[action.payload.folder.folderId]);
+        const cache = newUpdateState.cache[action.payload.folder.folderId];
         action.payload.messages.forEach(m => {
           if (cache.has(m.uid)) {
             cache.set(m.uid, m);
@@ -65,6 +72,7 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
     case ActionTypes.MESSAGES_RENAME_CACHE: {
       const newState = {...state};
       if (newState.cache[action.payload.oldId]) {
+        newState.cache = {...newState.cache};
         newState.cache[action.payload.newId] = newState.cache[action.payload.oldId];
         delete newState.cache[action.payload.oldId];
       }
