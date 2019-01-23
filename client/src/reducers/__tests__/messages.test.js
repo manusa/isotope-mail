@@ -177,7 +177,7 @@ describe('Messages reducer test suite', () => {
       // Then
       expect(initialState).not.toMatchObject(updatedState);
       expect(updatedState.cache['1337'].size).toEqual(2);
-      expect(Array.from(updatedState.cache['1337'].keys())).toEqual(expect.arrayContaining([1, 3]));
+      expect(Array.from(updatedState.cache['1337'].keys())).toMatchObject([1, 3]);
       expect(updatedState.cache['1337'].get(1).property).toEqual('updated value');
     });
     test('Existent folder and non-existent message, should NOT add message entry in folder cache', () => {
@@ -198,7 +198,7 @@ describe('Messages reducer test suite', () => {
       // Then
       expect(initialState).toMatchObject(updatedState);
       expect(updatedState.cache['1337'].size).toEqual(1);
-      expect(Array.from(updatedState.cache['1337'].keys())).toEqual(expect.arrayContaining([3]));
+      expect(Array.from(updatedState.cache['1337'].keys())).toMatchObject([3]);
     });
   });
   describe('MESSAGES_DELETE_FROM_CACHE', () => {
@@ -232,7 +232,7 @@ describe('Messages reducer test suite', () => {
       expect(initialState).not.toMatchObject(updatedState);
       expect(updatedState).not.toMatchObject(initialState);
       expect(updatedState.cache['1337'].size).toEqual(7);
-      expect(Array.from(updatedState.cache['1337'].keys())).toEqual(expect.arrayContaining([0, 2, 4, 5, 6, 8, 9]));
+      expect(Array.from(updatedState.cache['1337'].keys())).toMatchObject([0, 2, 4, 5, 6, 8, 9]);
       expect(updatedState.cache['1337'].keys()).not.toContain(1);
       expect(updatedState.cache['1337'].keys()).not.toContain(3);
       expect(updatedState.cache['1337'].keys()).not.toContain(7);
@@ -251,7 +251,7 @@ describe('Messages reducer test suite', () => {
       expect(initialState).not.toMatchObject(updatedState);
       expect(updatedState).not.toMatchObject(initialState);
       expect(updatedState.cache['1337'].size).toEqual(9);
-      expect(Array.from(updatedState.cache['1337'].keys())).toEqual(expect.arrayContaining([1, 2, 3, 4, 5, 6, 7, 8, 9]));
+      expect(Array.from(updatedState.cache['1337'].keys())).toMatchObject([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       expect(updatedState.cache['1337'].keys()).not.toContain(0);
     });
     test('deleteUidRange.from = 0, should delete all messages', () => {
@@ -283,7 +283,7 @@ describe('Messages reducer test suite', () => {
       expect(initialState).not.toMatchObject(updatedState);
       expect(updatedState).not.toMatchObject(initialState);
       expect(updatedState.cache['1337'].size).toEqual(9);
-      expect(Array.from(updatedState.cache['1337'].keys())).toEqual(expect.arrayContaining([0, 1, 2, 3, 4, 5, 6, 7, 8]));
+      expect(Array.from(updatedState.cache['1337'].keys())).toMatchObject([0, 1, 2, 3, 4, 5, 6, 7, 8]);
       expect(updatedState.cache['1337'].keys()).not.toContain(9);
     });
     test('deleteUidRange.from = 1 deleteUidRange.to = 8, should keep messages 0 and 9', () => {
@@ -300,7 +300,7 @@ describe('Messages reducer test suite', () => {
       expect(initialState).not.toMatchObject(updatedState);
       expect(updatedState).not.toMatchObject(initialState);
       expect(updatedState.cache['1337'].size).toEqual(2);
-      expect(Array.from(updatedState.cache['1337'].keys())).toEqual(expect.arrayContaining([0, 9]));
+      expect(Array.from(updatedState.cache['1337'].keys())).toMatchObject([0, 9]);
       expect(updatedState.cache['1337'].keys()).not.toContain(1);
       expect(updatedState.cache['1337'].keys()).not.toContain(2);
       expect(updatedState.cache['1337'].keys()).not.toContain(3);
@@ -309,6 +309,156 @@ describe('Messages reducer test suite', () => {
       expect(updatedState.cache['1337'].keys()).not.toContain(6);
       expect(updatedState.cache['1337'].keys()).not.toContain(7);
       expect(updatedState.cache['1337'].keys()).not.toContain(8);
+    });
+  });
+  describe('MESSAGES_RENAME_CACHE', () => {
+    test('Non-existent folder with messages,  should return same state', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages};
+      initialState.cache = {...initialState.cache};
+      initialState.cache['1337'] = new Map([{uid: 3}, {uid: 1}].map(m => [m.uid, m]));
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_RENAME_CACHE,
+        payload: {
+          oldId: '313373',
+          newId: '1337'
+        }
+      });
+
+      // Then
+      expect(updatedState.cache['1337'].size).toEqual(2);
+      expect(updatedState).toMatchObject(initialState);
+    });
+    test('Existent folder with messages, should rename folder entry in cache', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages};
+      initialState.cache = {...initialState.cache};
+      initialState.cache['1337'] = new Map([{uid: 3}, {uid: 1}].map(m => [m.uid, m]));
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_RENAME_CACHE,
+        payload: {
+          oldId: '1337',
+          newId: '313373'
+        }
+      });
+
+      // Then
+      expect(initialState).not.toMatchObject(updatedState);
+      expect(Object.keys(updatedState.cache)).not.toContain('1337');
+      expect(Object.keys(updatedState.cache)).toContain('313373');
+      expect(updatedState.cache['313373'].size).toEqual(2);
+      expect(Array.from(updatedState.cache['313373'].keys())).toMatchObject([3, 1]);
+    });
+  });
+  describe('MESSAGES_SET_SELECTED', () => {
+    test('Initial empty selection and action select, should select message uids', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages};
+      initialState.selected = [];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_SET_SELECTED,
+        payload: {
+          selected: true,
+          messages: [{uid: 3}, {uid: 1}, {uid: 7}]
+        }
+      });
+
+      // Then
+      expect(initialState).not.toMatchObject(updatedState);
+      expect(updatedState.selected.length).toEqual(3);
+      expect(updatedState.selected).toMatchObject([3, 1, 7]);
+    });
+    test('Initial selection containing one of the messages and action select, should select message uids', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages};
+      initialState.selected = [3];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_SET_SELECTED,
+        payload: {
+          selected: true,
+          messages: [{uid: 3}, {uid: 1}, {uid: 7}]
+        }
+      });
+
+      // Then
+      expect(initialState).not.toMatchObject(updatedState);
+      expect(updatedState.selected.length).toEqual(3);
+      expect(updatedState.selected).toMatchObject([3, 1, 7]);
+    });
+    test('Initial selection NOT containing one of the messages and action select, should select message uids', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages};
+      initialState.selected = [9];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_SET_SELECTED,
+        payload: {
+          selected: true,
+          messages: [{uid: 3}, {uid: 1}, {uid: 7}]
+        }
+      });
+
+      // Then
+      expect(initialState).not.toMatchObject(updatedState);
+      expect(updatedState.selected.length).toEqual(4);
+      expect(updatedState.selected).toMatchObject([9, 3, 1, 7]);
+    });
+    test('Initial selection containing one of the messages and action deselect, should deselect message uids', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages};
+      initialState.selected = [3];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_SET_SELECTED,
+        payload: {
+          selected: false,
+          messages: [{uid: 3}, {uid: 1}, {uid: 7}]
+        }
+      });
+
+      // Then
+      expect(initialState).not.toMatchObject(updatedState);
+      expect(updatedState.selected.length).toEqual(0);
+    });
+  });
+  describe('MESSAGES_CLEAR_SELECTED', () => {
+    test('Initial selection containing messages, should clear selection', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages};
+      initialState.selected = [1, 3, 7];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_CLEAR_SELECTED
+      });
+
+      // Then
+      expect(initialState).not.toMatchObject(updatedState);
+      expect(updatedState.selected.length).toEqual(0);
+    });
+    test('Initial empty selection, should remain empty', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages};
+      initialState.selected = [];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_CLEAR_SELECTED
+      });
+
+      // Then
+      expect(updatedState).toMatchObject(initialState);
+      expect(updatedState.selected.length).toEqual(0);
     });
   });
 });
