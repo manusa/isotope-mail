@@ -35,9 +35,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.marcnuri.isotope.api.folder.FolderUtils.addSystemFolders;
+import static com.marcnuri.isotope.api.folder.FolderUtils.getFileWithRef;
 import static com.marcnuri.isotope.api.folder.FolderUtils.renameFolder;
 import static javax.mail.Folder.HOLDS_MESSAGES;
 import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -166,5 +168,44 @@ public class FolderUtilsTest {
 
         // Then
         fail();
+    }
+
+    @Test
+    public void getFileWithRef_URLNameWithHash_shouldReturnProperFolderName() {
+        // Given
+        final URLName urlName = new URLName("imaps://server.host:993/Inbox/Folder#With#Hash");
+
+        // When
+        final String result = getFileWithRef(urlName);
+
+        // Then
+        assertThat(urlName.getFile(), equalTo("Inbox/Folder"));
+        assertThat(result, equalTo("Inbox/Folder#With#Hash"));
+    }
+
+    @Test
+    public void getFileWithRef_URLNameWithEndHash_shouldReturnProperFolderName() {
+        // Given
+        final URLName urlName = new URLName("imaps://server.host:993/Inbox/Folder#");
+
+        // When
+        final String result = getFileWithRef(urlName);
+
+        // Then
+        assertThat(urlName.getFile(), equalTo("Inbox/Folder"));
+        assertThat(result, equalTo("Inbox/Folder#"));
+    }
+
+    @Test
+    public void getFileWithRef_URLNameWithNoHash_shouldReturnProperFolderName() {
+        // Given
+        final URLName urlName = new URLName("imaps://server.host:993/Inbox/FolderWithNoHash");
+
+        // When
+        final String result = getFileWithRef(urlName);
+
+        // Then
+        assertThat(result, equalTo(urlName.getFile()));
+        assertThat(result, equalTo("Inbox/FolderWithNoHash"));
     }
 }

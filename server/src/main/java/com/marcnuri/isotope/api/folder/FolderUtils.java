@@ -25,6 +25,7 @@ import com.sun.mail.imap.IMAPFolder;
 import org.springframework.lang.NonNull;
 
 import javax.mail.MessagingException;
+import javax.mail.URLName;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -101,5 +102,23 @@ public class FolderUtils {
                 .findAny()
                 .ifPresent(f -> f.setPreviousFolderId(previousFolderId));
         return parent;
+    }
+
+    /**
+     * Method to resolve the proper name of a folder from an {@link URLName}.
+     *
+     * <p>{@link URLName#URLName(String)} truncates anything behind a # symbol and treats it as a ref.
+     *
+     * <p>This is a problem in {@link javax.mail.Store#getFolder(URLName)} as any folder with a # in its name
+     * will not be loaded properly.
+     *
+     * <p>This method can be used to resolve the complete folder name before passing it to the
+     * {@link javax.mail.Store#getFolder(String)} method so the proper folder gets loaded.
+     *
+     * @param folder URLName to get a safe proper name from
+     * @return the name of the folder including the ref if applicable
+     */
+    public static String getFileWithRef(@NonNull  URLName folder) {
+        return String.format("%s%s", folder.getFile(), folder.getRef() == null ? "" : "#" + folder.getRef());
     }
 }

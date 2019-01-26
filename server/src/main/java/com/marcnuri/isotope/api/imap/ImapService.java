@@ -75,6 +75,7 @@ import static com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration.DEF
 import static com.marcnuri.isotope.api.exception.AuthenticationException.Type.IMAP;
 import static com.marcnuri.isotope.api.folder.FolderResource.addLinks;
 import static com.marcnuri.isotope.api.folder.FolderUtils.addSystemFolders;
+import static com.marcnuri.isotope.api.folder.FolderUtils.getFileWithRef;
 import static com.marcnuri.isotope.api.message.MessageUtils.envelopeFetch;
 import static com.marcnuri.isotope.api.message.MessageUtils.extractBodypart;
 import static com.marcnuri.isotope.api.message.MessageUtils.extractContent;
@@ -494,7 +495,7 @@ public class ImapService {
     }
 
     private IMAPFolder getFolder(Credentials credentials, URLName folderId) throws MessagingException {
-        final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(folderId);
+        final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(getFileWithRef(folderId));
         if (!folder.exists()) {
             throw new NotFoundException(String.format("Folder %s not found", folderId.toString()));
         }

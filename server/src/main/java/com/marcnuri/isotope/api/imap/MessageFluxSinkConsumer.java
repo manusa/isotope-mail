@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static com.marcnuri.isotope.api.folder.FolderUtils.getFileWithRef;
 import static com.marcnuri.isotope.api.imap.ImapService.DEFAULT_INITIAL_MESSAGES_BATCH_SIZE;
 import static com.marcnuri.isotope.api.imap.ImapService.DEFAULT_MAX_MESSAGES_BATCH_SIZE;
 import static com.marcnuri.isotope.api.imap.ImapService.IMAP_CAPABILITY_CONDSTORE;
@@ -68,7 +69,7 @@ public class MessageFluxSinkConsumer implements Consumer<FluxSink<ServerSentEven
         try {
             final IMAPStore store = imapService.getImapStore(credentials);
             final boolean fetchModseq = store.hasCapability(IMAP_CAPABILITY_CONDSTORE);
-            final IMAPFolder folder = (IMAPFolder)store.getFolder(folderId);
+            final IMAPFolder folder = (IMAPFolder)store.getFolder(getFileWithRef(folderId));
             processFolder(serverSentEventFluxSink, folder, fetchModseq);
             folder.close();
         } catch (MessagingException ex) {
