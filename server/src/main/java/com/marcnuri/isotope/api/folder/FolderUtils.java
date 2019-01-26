@@ -118,7 +118,7 @@ public class FolderUtils {
      * @param folder URLName to get a safe proper name from
      * @return the name of the folder including the ref if applicable
      */
-    public static String getFileWithRef(@NonNull  URLName folder) {
+    public static String getFileWithRef(@NonNull URLName folder) {
         return String.format("%s%s", folder.getFile(), folder.getRef() == null ? "" : "#" + folder.getRef());
     }
 }

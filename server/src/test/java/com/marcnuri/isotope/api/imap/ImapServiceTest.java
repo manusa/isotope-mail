@@ -62,7 +62,6 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PrepareForTest({Session.class, IMAPStore.class, FolderUtils.class})
 public class ImapServiceTest {
 
-    private Session mockedSession;
     private IMAPStore imapStore;
     private IsotopeApiConfiguration isotopeApiConfiguration;
     private MailSSLSocketFactory mailSSLSocketFactory;
@@ -73,7 +72,7 @@ public class ImapServiceTest {
     @Before
     public void setUp() throws Exception {
         PowerMockito.mockStatic(Session.class);
-        mockedSession = Mockito.mock(Session.class);
+        final Session mockedSession = Mockito.mock(Session.class);
         imapStore = Mockito.mock(IMAPStore.class);
         when(Session.getInstance(Mockito.any(), Mockito.any())).thenReturn(mockedSession);
         doReturn(imapStore).when(mockedSession).getStore(Mockito.anyString());
@@ -129,6 +128,8 @@ public class ImapServiceTest {
     public void moveFolder_validParameters_shouldRenameFolder() throws Exception {
         // Given
         PowerMockito.mockStatic(FolderUtils.class);
+        PowerMockito.doCallRealMethod()
+                .when(FolderUtils.class, "getFileWithRef", Mockito.any(URLName.class));
 
         final Credentials credentials = new Credentials();
         credentials.setUser("validUser");
@@ -137,13 +138,13 @@ public class ImapServiceTest {
         credentials.setServerPort(993);
 
         final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
-        doReturn(folder).when(imapStore).getFolder(Mockito.eq(new URLName("/1337")));
+        doReturn(folder).when(imapStore).getFolder(Mockito.eq("/1337"));
         doReturn(true).when(folder).exists();
         doReturn("/1337").when(folder).getFullName();
         doReturn("1337").when(folder).getName();
 
         final IMAPFolder targetFolder = Mockito.mock(IMAPFolder.class);
-        doReturn(targetFolder).when(imapStore).getFolder(Mockito.eq(new URLName("/target/folder")));
+        doReturn(targetFolder).when(imapStore).getFolder(Mockito.eq("/target/folder"));
         doReturn(true).when(targetFolder).exists();
         doReturn("/target/folder").when(targetFolder).getFullName();
         doReturn('/').when(targetFolder).getSeparator();
@@ -163,6 +164,8 @@ public class ImapServiceTest {
     public void moveFolder_validParametersNullTarget_shouldRenameFolder() throws Exception {
         // Given
         PowerMockito.mockStatic(FolderUtils.class);
+        PowerMockito.doCallRealMethod()
+                .when(FolderUtils.class, "getFileWithRef", Mockito.any(URLName.class));
 
         final Credentials credentials = new Credentials();
         credentials.setUser("validUser");
@@ -171,7 +174,7 @@ public class ImapServiceTest {
         credentials.setServerPort(993);
 
         final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
-        doReturn(folder).when(imapStore).getFolder(Mockito.eq(new URLName("/1337")));
+        doReturn(folder).when(imapStore).getFolder(Mockito.eq("/1337"));
         doReturn(true).when(folder).exists();
         doReturn("/1337").when(folder).getFullName();
         doReturn("1337").when(folder).getName();
@@ -203,7 +206,7 @@ public class ImapServiceTest {
         credentials.setServerPort(993);
 
         final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
-        doReturn(folder).when(imapStore).getFolder(Mockito.any(URLName.class));
+        doReturn(folder).when(imapStore).getFolder(Mockito.any(String.class));
         doReturn(false).when(folder).exists();
 
         // When
@@ -217,6 +220,8 @@ public class ImapServiceTest {
     public void moveFolder_validParametersMessagingException_shouldThrowException() throws Exception {
         // Given
         PowerMockito.mockStatic(FolderUtils.class);
+        PowerMockito.doCallRealMethod()
+                .when(FolderUtils.class, "getFileWithRef", Mockito.any(URLName.class));
         PowerMockito.when(FolderUtils.renameFolder(Mockito.any(), Mockito.any())).thenThrow(new MessagingException());
 
         final Credentials credentials = new Credentials();
@@ -226,13 +231,13 @@ public class ImapServiceTest {
         credentials.setServerPort(993);
 
         final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
-        doReturn(folder).when(imapStore).getFolder(Mockito.eq(new URLName("/1337")));
+        doReturn(folder).when(imapStore).getFolder(Mockito.eq("/1337"));
         doReturn(true).when(folder).exists();
         doReturn("/1337").when(folder).getFullName();
         doReturn("1337").when(folder).getName();
 
         final IMAPFolder targetFolder = Mockito.mock(IMAPFolder.class);
-        doReturn(targetFolder).when(imapStore).getFolder(Mockito.eq(new URLName("/target/folder")));
+        doReturn(targetFolder).when(imapStore).getFolder(Mockito.eq("/target/folder"));
         doReturn(true).when(targetFolder).exists();
         doReturn("/target/folder").when(targetFolder).getFullName();
         doReturn('/').when(targetFolder).getSeparator();
@@ -254,7 +259,7 @@ public class ImapServiceTest {
         credentials.setServerPort(993);
 
         final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
-        doReturn(folder).when(imapStore).getFolder(Mockito.eq(new URLName("/1337")));
+        doReturn(folder).when(imapStore).getFolder(Mockito.eq("/1337"));
         doReturn(true).when(folder).exists();
         doReturn("/1337").when(folder).getFullName();
         doReturn("1337").when(folder).getName();
@@ -284,7 +289,7 @@ public class ImapServiceTest {
         credentials.setServerPort(993);
 
         final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
-        doReturn(folder).when(imapStore).getFolder(Mockito.any(URLName.class));
+        doReturn(folder).when(imapStore).getFolder(Mockito.any(String.class));
         doReturn(true).when(folder).exists();
         doReturn(new Message[0]).when(folder).getMessagesByUID(new long[]{1337L});
 
@@ -310,7 +315,7 @@ public class ImapServiceTest {
         credentials.setServerPort(993);
 
         final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
-        doReturn(folder).when(imapStore).getFolder(Mockito.any(URLName.class));
+        doReturn(folder).when(imapStore).getFolder(Mockito.any(String.class));
         doReturn(true).when(folder).exists();
         doReturn(new Message[0]).when(folder).getMessagesByUID(new long[]{1337L});
 
