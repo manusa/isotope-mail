@@ -81,6 +81,18 @@ public class FolderTest {
     }
 
     @Test
+    public void toBase64Id_fullMixedUrlString2_shouldEncodeOk() {
+        // Given
+        final URLName folderName = new URLName("imaps://isotope@isotope:993/原种 - 1337");
+
+        // When
+        final String result = Folder.toBase64Id(folderName);
+
+        // Then
+        assertThat(result, equalTo("aW1hcHM6Ly9pc290b3BlQGlzb3RvcGU6OTkzL-WOn-enjSAtIDEzMzc="));
+    }
+
+    @Test
     public void toId_asciiString_shouldDecodeOk() {
         // Given
         final String encodedId = "VGhpcyBpcyBhIHJlZ3VsYXIgU3RyaW5nITo=";
@@ -126,5 +138,17 @@ public class FolderTest {
 
         // Then
         assertThat(result.toString(), equalTo("imaps://isotope@marcnuri.com:993/原种 - 1337"));
+    }
+
+    @Test
+    public void toId_fullMixedUrlString2_shouldDecodeOk() {
+        // Given
+        final String encodedId = "aW1hcHM6Ly9pc290b3BlQGlzb3RvcGU6OTkzL-WOn-enjSAtIDEzMzc=";
+
+        // When
+        final URLName result = Folder.toId(encodedId);
+
+        // Then
+        assertThat(result.toString(), equalTo("imaps://isotope@isotope:993/原种 - 1337"));
     }
 }

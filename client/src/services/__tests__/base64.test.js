@@ -14,6 +14,10 @@ describe('base64 service test suite', () => {
       const result = unicodeUrlBtoa('原种 - 1337');
       expect(result).toEqual('5Y6f56eNIC0gMTMzNw==');
     });
+    test('Specific URL 1, should encode OK', () => {
+      const result = unicodeUrlBtoa('imaps://isotope@isotope:993/原种 - 1337');
+      expect(result).toEqual('aW1hcHM6Ly9pc290b3BlQGlzb3RvcGU6OTkzL-WOn-enjSAtIDEzMzc=');
+    });
   });
   describe('unicodeUrlAtob function test suite', () => {
     test('ASCII string, should decode OK', () => {
@@ -27,6 +31,11 @@ describe('base64 service test suite', () => {
     test('Mixed chinese characters string, should decode OK', () => {
       const result = unicodeUrlAtob('5Y6f56eNIC0gMTMzNw==');
       expect(result).toEqual('原种 - 1337');
+    });
+    test('Specific URL 1, should decode OK', () => {
+      const result = unicodeUrlAtob('aW1hcHM6Ly9pc290b3BlQGlzb3RvcGU6OTkzL-WOn-enjSAtIDEzMzc=');
+      expect(result).toEqual('imaps://isotope@isotope:993/原种 - 1337');
+
     });
   });
 });

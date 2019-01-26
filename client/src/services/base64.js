@@ -5,11 +5,11 @@
 export function unicodeUrlBtoa(string) {
   return btoa(encodeURIComponent(string).replace(/%([0-9A-F]{2})/g,
     (match, p1) => String.fromCharCode(`0x${p1}`)
-  )).replace('+', '-').replace('/', '_');
+  )).replace(/\+/g, '-').replace(/\//g, '_');
 }
 
 export function unicodeUrlAtob(string) {
-  string = string.replace('-', '+').replace('_', '/');
+  string = string.replace(/-/g, '+').replace(/_/g, '/');
   return decodeURIComponent(atob(string)
     .split('')
     // eslint-disable-next-line prefer-template
