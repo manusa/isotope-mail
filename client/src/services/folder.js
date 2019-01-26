@@ -4,6 +4,7 @@ import {
   backendRequestCompleted as applicationBackendRequestCompleted, createFolder,
   renameFolder as renameFolderAction, renameFolderOk
 } from '../actions/application';
+import {unicodeUrlAtob as atob, unicodeUrlBtoa as btoa} from './base64';
 import {backendRequest, setFolders, updateFolder} from '../actions/folders';
 import {deleteMessageCache, renameMessageCache} from './indexed-db';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';

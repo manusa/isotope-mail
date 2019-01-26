@@ -29,6 +29,7 @@ import org.springframework.lang.Nullable;
 import javax.mail.MessagingException;
 import javax.mail.URLName;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -241,10 +242,10 @@ public class Folder extends IsotopeResource implements Serializable {
     }
 
     private static String encodeId(String id) {
-        return Base64.getUrlEncoder().encodeToString(id.getBytes());
+        return Base64.getUrlEncoder().encodeToString(id.getBytes(StandardCharsets.UTF_8));
     }
 
     private static String decodeId(String encodedId) {
-        return new String(Base64.getUrlDecoder().decode(encodedId));
+        return new String(Base64.getUrlDecoder().decode(encodedId), StandardCharsets.UTF_8);
     }
 }
