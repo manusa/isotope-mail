@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {translate} from 'react-i18next';
 import SingleInputDialog from '../dialog/single-input-dialog';
 import {createFolder as actionCreateFolder} from '../../actions/application';
-import {createRootFolder} from '../../services/folder';
+import {createChildFolder, createRootFolder} from '../../services/folder';
 
 export const FolderCreateDialog = ({t, application, cancel, createFolder}) => {
   const visible = Object.keys(application).includes('createFolderParentId') && application.createFolderParentId !== null;
@@ -30,16 +30,27 @@ FolderCreateDialog.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  application: state.application
+  application: state.application,
+  folders: state.folders
 });
 
 const mapDispatchToProps = dispatch => ({
   cancel: () => dispatch(actionCreateFolder(null)),
-  createFolder: (user, newFolderName) => createRootFolder(dispatch, user, newFolderName)
+  createRootFolder: (user, newFolderName) => createRootFolder(dispatch, user, newFolderName),
+  createChildFolder: (user, parentFolder, newFolderName) =>
+    createChildFolder(dispatch, user, parentFolder, newFolderName)
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
-  createFolder: newFolderName => dispatchProps.createFolder(stateProps.application.user, newFolderName)
+  createFolder: newFolderName => {
+    const folderParentId = stateProps.application.createFolderParentId;
+    if (folderParentId.length > 0 && stateProps.folders.explodedItems[folderParentId]) {
+      dispatchProps.createChildFolder(
+        stateProps.application.user, stateProps.folders.explodedItems[folderParentId], newFolderName);
+    } else {
+      dispatchProps.createRootFolder(stateProps.application.user, newFolderName);
+    }
+  }
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(translate()(FolderCreateDialog));

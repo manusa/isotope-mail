@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import FolderItem from './folder-item';
-import {renameFolder, selectFolder} from '../../actions/application';
+import {createFolder as createFolderAction, renameFolder, selectFolder} from '../../actions/application';
 import {clearSelected} from '../../actions/messages';
 import {clearSelectedMessage} from '../../services/application';
 import {deleteFolder, findTrashFolder, FolderTypes, moveFolder} from '../../services/folder';
@@ -29,6 +29,7 @@ export class FolderListClass extends Component {
             onDragStart={event => FolderListClass.onDragStart(event, folder)}
             onDrop={event => this.onDrop(event, folder)}
             onRename={FolderTypes.INBOX === folder.type ? null : event => this.onRename(event, folder)}
+            onAddChild={event => this.onAddChild(event, folder)}
             onDelete={FolderTypes.FOLDER === folder.type ? event => this.onDelete(event, folder) : null}
             unreadMessageCount={folder.unreadMessageCount}
             newMessageCount={folder.newMessageCount}/>
@@ -77,6 +78,11 @@ export class FolderListClass extends Component {
     this.props.renameFolder(folder);
   }
 
+  onAddChild(event, folder) {
+    event.stopPropagation();
+    this.props.createChildInFolder(folder);
+  }
+
   onDelete(event, folder) {
     event.stopPropagation();
     const trashFolder = findTrashFolder(this.props.foldersState);
@@ -121,6 +127,7 @@ const mapDispatchToProps = dispatch => ({
     resetFolderMessagesCache(dispatch, user, folder);
   },
   renameFolder: folder => dispatch(renameFolder(folder)),
+  createChildInFolder: folder => dispatch(createFolderAction(folder.folderId)),
   moveFolder: (user, folder, targetFolder) => moveFolder(dispatch, user, folder, targetFolder),
   deleteFolder: (user, folder) => deleteFolder(dispatch, user, folder),
   moveMessages: (credentials, fromFolder, toFolder, messages) => {

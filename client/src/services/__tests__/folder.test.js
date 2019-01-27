@@ -285,4 +285,67 @@ describe('Folder service test suite', () => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
+  describe('createChildFolder', () => {
+    test('createChildFolder, valid parent and newName, OK response, should return updated parent folder and update state', done => {
+      // Given
+      fetch.abortFetch = jest.fn();
+      global.fetch = jest.fn((url, options) => {
+        expect(options.body).toMatch('new-folder-name');
+        return Promise.resolve({ok: true, url, options,
+          json: () => ([])});
+      });
+      let dispatchCount = 0;
+      const dispatch = jest.fn(action => {
+        switch (action.type) {
+          case ActionTypes.APPLICATION_BE_REQUEST:
+          case ActionTypes.FOLDERS_UPDATE:
+          case ActionTypes.APPLICATION_FOLDER_CREATE:
+            dispatchCount++;
+            break;
+          case ActionTypes.APPLICATION_BE_REQUEST_COMPLETED:
+            expect(dispatchCount).toEqual(3);
+            done();
+            break;
+          default:
+        }
+      });
+
+      // When
+      folderService.createChildFolder(dispatch, {credentials: {}}, {_links: {self: {href: '://url/parent'}}}, 'new-folder-name');
+
+      // Then
+      expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+    test('createChildFolder, valid parent and newName, NOT OK response, should complete and not update state', done => {
+      // Given
+      fetch.abortFetch = jest.fn();
+      global.fetch = jest.fn((url, options) => {
+        expect(options.body).toMatch('new-folder-name');
+        return Promise.resolve({ok: false, url, options});
+      });
+      let dispatchCount = 0;
+      const dispatch = jest.fn(action => {
+        switch (action.type) {
+          case ActionTypes.APPLICATION_BE_REQUEST:
+          case ActionTypes.FOLDERS_UPDATE:
+          case ActionTypes.APPLICATION_FOLDER_CREATE:
+            dispatchCount++;
+            break;
+          case ActionTypes.APPLICATION_BE_REQUEST_COMPLETED:
+            expect(dispatchCount).toEqual(1);
+            done();
+            break;
+          default:
+        }
+      });
+
+      // When
+      folderService.createChildFolder(dispatch, {credentials: {}}, {_links: {self: {href: '://url/parent'}}}, 'new-folder-name');
+
+      // Then
+      expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
 });

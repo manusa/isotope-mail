@@ -47,6 +47,7 @@ import javax.mail.Session;
 import javax.mail.URLName;
 import java.util.List;
 
+import static org.hamcrest.Matchers.arrayWithSize;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -122,6 +123,38 @@ public class ImapServiceTest {
         verify(newFolder, times(1))
                 .create(Mockito.eq(IMAPFolder.HOLDS_MESSAGES | IMAPFolder.HOLDS_FOLDERS));
         assertThat(result, hasSize(1));
+    }
+
+    @Test
+    public void createChildFolder_validParameters_shouldCreateFolder() throws Exception {
+        // Given
+        final Credentials credentials = new Credentials();
+        credentials.setUser("validUser");
+        credentials.setServerHost("email.com");
+        credentials.setImapSsl(true);
+        credentials.setServerPort(993);
+
+        final IMAPFolder parentFolder = Mockito.mock(IMAPFolder.class);
+        doReturn(parentFolder).when(imapStore).getFolder(Mockito.eq("/parent"));
+        doReturn(true).when(parentFolder).exists();
+        doReturn(new URLName("/parent")).when(parentFolder).getURLName();
+        doReturn(new String[0]).when(parentFolder).getAttributes();
+
+        final IMAPFolder newFolder = Mockito.mock(IMAPFolder.class);
+        doReturn(newFolder).when(parentFolder).getFolder(Mockito.eq("new-folder"));
+        doReturn(new IMAPFolder[]{newFolder}).when(parentFolder).list();
+        doReturn(false).when(newFolder).exists();
+        doReturn(new URLName("/new-folder")).when(newFolder).getURLName();
+        doReturn(new String[0]).when(newFolder).getAttributes();
+        doReturn(new IMAPFolder[0]).when(newFolder).list();
+
+        // When
+        final Folder result = imapService.createChildFolder(credentials, new URLName("/parent"), "new-folder");
+
+        // Then
+        verify(newFolder, times(1))
+                .create(Mockito.eq(IMAPFolder.HOLDS_MESSAGES | IMAPFolder.HOLDS_FOLDERS));
+        assertThat(result.getChildren(), arrayWithSize(1));
     }
 
     @Test

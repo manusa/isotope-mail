@@ -19,11 +19,12 @@ class FolderItem extends Component {
 
   render() {
     const {
-      className, selected, draggable, graphic, label, newMessageCount, unreadMessageCount, onClick, onRename, onDelete
+      className, selected, draggable, graphic, label, newMessageCount, unreadMessageCount, onClick,
+      onRename, onAddChild, onDelete
     } = this.props;
     const {dragOver} = this.state;
     const labelWithCount = `${label} ${unreadMessageCount > 0 ? `(${unreadMessageCount})` : ''}`;
-    const hasContextMenu = onDelete !== null || onRename !== null;
+    const hasContextMenu = onDelete !== null || onAddChild !== null || onRename !== null;
     return (
       <a className={`${className} ${mainCss['mdc-list-item']} ${styles.listItem}
         ${selected ? mainCss['mdc-list-item--selected'] : ''}
@@ -44,6 +45,7 @@ class FolderItem extends Component {
         <span className={styles.actions}>
           <span className={`${styles.contextMenu} ${this.state.contextMenuVisible ? styles.visible : ''}`}>
             {onDelete !== null && <i className={'material-icons'} onClick={onDelete}>delete</i>}
+            {onAddChild !== null && <i className={'material-icons'} onClick={onAddChild}>add</i>}
             {onRename !== null && <i className={'material-icons'} onClick={onRename}>edit</i>}
           </span>
           {hasContextMenu && !this.state.contextMenuVisible
@@ -100,6 +102,7 @@ FolderItem.propTypes = {
   onDrop: PropTypes.func,
   onClick: PropTypes.func,
   onRename: PropTypes.func,
+  onAddChild: PropTypes.func,
   onDelete: PropTypes.func,
   unreadMessageCount: PropTypes.number,
   newMessageCount: PropTypes.number
@@ -115,6 +118,7 @@ FolderItem.defaultProps = {
   onDragStart: () => {},
   onDrop: null,
   onRename: null,
+  onAddChild: null,
   onDelete: null
 };
 

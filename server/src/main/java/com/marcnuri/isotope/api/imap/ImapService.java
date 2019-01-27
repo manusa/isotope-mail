@@ -180,6 +180,31 @@ public class ImapService {
     }
 
     /**
+     * Creates a new folder in the 1st level of the user's mailbox (root level)
+     *
+     * @param credentials for IMAP authentication
+     * @param parentFolderId Id of the folder to which to add the new child
+     * @param newFolderName name for the folder to be created
+     * @return Updated parent folder with child folders with the new folder included
+     */
+    public Folder createChildFolder(
+            Credentials credentials, @NonNull  URLName parentFolderId, @NonNull String newFolderName) {
+
+        try {
+            final IMAPFolder parentFolder = getFolder(credentials, parentFolderId);
+            final IMAPFolder newFolder = (IMAPFolder)parentFolder.getFolder(newFolderName);
+            if (!newFolder.exists()) {
+                newFolder.create(IMAPFolder.HOLDS_MESSAGES | IMAPFolder.HOLDS_FOLDERS);
+            }
+            // Must fetch folder again as attributes for the folder have changed and are cached in IMAPFolder
+            return Folder.from(getFolder(credentials, parentFolderId), true);
+        } catch (MessagingException ex) {
+            log.error("Error creating new folder {} under {}", newFolderName, parentFolderId, ex);
+            throw  new IsotopeException(ex.getMessage());
+        }
+    }
+
+    /**
      * Renames the folder with the provided {@link URLName} to the specified newName.
      *
      * <p>The newName must not contain the folder separator character.

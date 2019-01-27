@@ -85,6 +85,26 @@ describe('FolderList component test suite', () => {
     folderList.props().renameFolder({folderId: '1337'});
 
     // Then
+    // Async assertions in APPLICATION_FOLDER_RENAME action
+  });
+  test('createChildInFolder, dispatch actions triggered', done => {
+    // Given
+    const store = createMockStore(INITIAL_STATE);
+    store.dispatch = jest.fn(action => {
+      if (action.type === ActionTypes.APPLICATION_FOLDER_CREATE) {
+        expect(action.payload).toEqual('1337');
+        done();
+      }
+    });
+    const props = {
+      activeRequests: 0, folderList: [{folderList: []}], selectedFolder: {folderId: '1337-3'}};
+    const folderList = shallow(<FolderList store={store} {...props}/>);
+
+    // When
+    folderList.props().createChildInFolder({folderId: '1337'});
+
+    // Then
+    // Async assertions in APPLICATION_FOLDER_CREATE action
   });
   test('deleteFolder, dispatch actions triggered', () => {
     // Given

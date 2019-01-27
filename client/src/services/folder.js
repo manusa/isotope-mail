@@ -261,11 +261,11 @@ export function deleteFolder(dispatch, user, folderToDelete) {
 }
 
 /**
+ * Creates a new 1st/root level folder.
  *
- * @param dispatch
- * @param user
- * @param newFolderName
- * @param parentFolder
+ * @param dispatch {Dispatch & function}
+ * @param credentials {Credentials}
+ * @param newFolderName name for the folder to be created
  */
 export function createRootFolder(dispatch, user, newFolderName) {
   abortFetch(abortControllerWrappers.getFoldersAbortController);
@@ -278,6 +278,34 @@ export function createRootFolder(dispatch, user, newFolderName) {
     .then(toJson)
     .then(folders => {
       dispatch(setFolders(folders));
+      dispatch(createFolder(null));
+      dispatch(applicationBackendRequestCompleted());
+    })
+    .catch(() => {
+      dispatch(applicationBackendRequestCompleted());
+    });
+}
+
+
+/**
+ * Creates a new folder under the specified parentFolder.
+ *
+ * @param dispatch {Dispatch & function}
+ * @param credentials {Credentials}
+ * @param parentFolder {object} folder to add new child folder
+ * @param newFolderName name for the folder to be created
+ */
+export function createChildFolder(dispatch, user, parentFolder, newFolderName) {
+  abortFetch(abortControllerWrappers.getFoldersAbortController);
+  dispatch(applicationBackendRequest());
+  fetch(parentFolder._links.self.href, {
+    method: 'POST',
+    headers: credentialsHeaders(user.credentials),
+    body: newFolderName
+  })
+    .then(toJson)
+    .then(updatedParentFolder => {
+      dispatch(updateFolder(updatedParentFolder));
       dispatch(createFolder(null));
       dispatch(applicationBackendRequestCompleted());
     })

@@ -110,6 +110,16 @@ public class FolderResource implements ApplicationContextAware {
                 .createRootFolder(credentialsService.fromRequest(request), newFolderName)));
     }
 
+    @PostMapping(path= "/{folderId}", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<Folder> createChildFolder(
+            HttpServletRequest request,
+            @NonNull @PathVariable("folderId") String folderId, @RequestBody() String newFolderName) {
+
+        log.debug("Creating new folder with name {} under {}folder", newFolderName, folderId);
+        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject()
+                .createChildFolder(credentialsService.fromRequest(request), Folder.toId(folderId), newFolderName)));
+    }
+
     @DeleteMapping(path= "/{folderId}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Folder> deleteFolder(
             HttpServletRequest request, @NonNull @PathVariable("folderId") String folderId) {
@@ -275,6 +285,9 @@ public class FolderResource implements ApplicationContextAware {
     }
 
     private static Folder addLinks(Folder folder) {
+        folder.add(linkTo(methodOn(FolderResource.class)
+                .createChildFolder(null, folder.getFolderId(), null))
+                .withSelfRel());
         folder.add(linkTo(methodOn(FolderResource.class)
                 .getMessages( folder.getFolderId(), null, null))
                 .withRel(REL_MESSAGES).expand());

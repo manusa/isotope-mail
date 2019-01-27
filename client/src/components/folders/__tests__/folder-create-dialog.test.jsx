@@ -46,9 +46,10 @@ describe('FolderCreateDialog component test suite', () => {
       // Then
       expect(dispatchCount).toEqual(1);
     });
-    test('createFolder, service function called', () => {
+    test('createFolder, blank parentFolderId (root), createRootFolder service function called', () => {
       // Given
       const store = createMockStore(INITIAL_STATE);
+      store.getState().application.createFolderParentId = '';
       folderService.createRootFolder = jest.fn();
       const folderCreateDialog = shallow(<ConnectedFolderCreateDialog store={store} {...DEFAULT_PROPS}/>);
 
@@ -57,6 +58,20 @@ describe('FolderCreateDialog component test suite', () => {
 
       // Then
       expect(folderService.createRootFolder).toHaveBeenCalledTimes(1);
+    });
+    test('createFolder, existent parentFolderId, createChildFolder service function called', () => {
+      // Given
+      const store = createMockStore(INITIAL_STATE);
+      store.getState().application.createFolderParentId = 'parent-folder-id';
+      store.getState().folders.explodedItems['parent-folder-id'] = {};
+      folderService.createChildFolder = jest.fn();
+      const folderCreateDialog = shallow(<ConnectedFolderCreateDialog store={store} {...DEFAULT_PROPS}/>);
+
+      // When
+      folderCreateDialog.props().createFolder('new-folder');
+
+      // Then
+      expect(folderService.createChildFolder).toHaveBeenCalledTimes(1);
     });
   });
 });

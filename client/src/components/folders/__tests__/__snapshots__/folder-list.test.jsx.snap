@@ -11,6 +11,7 @@ Array [
       graphic="inbox"
       label="Inbox"
       newMessageCount={1}
+      onAddChild={[Function]}
       onClick={[Function]}
       onDelete={null}
       onDragStart={[Function]}
@@ -29,6 +30,7 @@ Array [
       graphic="folder"
       label="Folder 1"
       newMessageCount={1}
+      onAddChild={[Function]}
       onClick={[Function]}
       onDelete={[Function]}
       onDragStart={[Function]}
@@ -47,6 +49,7 @@ Array [
       graphic="folder"
       label="Folder 2"
       newMessageCount={1}
+      onAddChild={[Function]}
       onClick={[Function]}
       onDelete={[Function]}
       onDragStart={[Function]}
