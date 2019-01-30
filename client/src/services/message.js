@@ -7,7 +7,7 @@ import {
   updateCache, updateCacheIfExist
 } from '../actions/messages';
 import {updateFolder} from '../actions/folders';
-import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
+import {abortControllerWrappers, abortFetch, AuthenticationException, credentialsHeaders, toJson} from './fetch';
 import {persistMessageCache} from './indexed-db';
 import {notifyNewMail} from './notification';
 import {FolderTypes} from './folder';
@@ -97,9 +97,14 @@ export async function resetFolderMessagesCache(dispatch, user, folder) {
       }
     };
     // Return a promise
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       // Store resolve function that will be called in _closeEventSource
       es.resolvePromise = resolve;
+      es.onerror = ({status, message}) => {
+        if (status === 401) {
+          reject(new AuthenticationException(message));
+        }
+      };
     });
   }
   return null;

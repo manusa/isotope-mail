@@ -7,6 +7,9 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
       return {...state, activeRequests: state.activeRequests + 1};
     case ActionTypes.APPLICATION_BE_REQUEST_COMPLETED:
       return {...state, activeRequests: state.activeRequests > 0 ? state.activeRequests - 1 : 0};
+    case ActionTypes.APPLICATION_USER_CREDENTIALS_CLEAR: {
+      return {...state, user: {}};
+    }
     case ActionTypes.APPLICATION_USER_CREDENTIALS_SET:
       return {
         ...state, user: {

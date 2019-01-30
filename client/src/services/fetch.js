@@ -12,6 +12,14 @@ export const HttpStatusFamilies = {
   SERVER_ERROR: 5
 };
 
+export class AuthenticationException extends Error {
+  constructor(message, cause) {
+    super(message);
+    this.cause = cause;
+    this.name = 'AuthenticationException';
+  }
+}
+
 /**
  * Object to store the different AbortController(s) that will be used in the service methods to fetch from the API backend.
  *
@@ -28,7 +36,11 @@ export const abortControllerWrappers = {};
  */
 export function toJson(response) {
   if (!response.ok) {
-    throw Error(`${response.status}`);
+    if (response.status === 401) {
+      throw new AuthenticationException(response.statusText);
+    } else {
+      throw Error(`${response.status}`);
+    }
   }
   return response.json();
 }
@@ -67,3 +79,4 @@ export function credentialsHeaders(credentials, originalHeaders) {
 export function isSuccessful(status) {
   return Math.floor(status / 100) === HttpStatusFamilies.SUCCESSFUL;
 }
+
