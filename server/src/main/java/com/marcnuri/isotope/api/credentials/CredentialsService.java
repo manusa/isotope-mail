@@ -33,6 +33,8 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static com.marcnuri.isotope.api.exception.AuthenticationException.Type.BLACKLISTED;
@@ -68,8 +70,12 @@ public class CredentialsService {
      */
     public  Credentials fromRequest(HttpServletRequest httpServletRequest) {
         try {
-            return decrypt(httpServletRequest.getHeader(HttpHeaders.ISOTOPE_CRDENTIALS),
+            final Credentials credentials =  decrypt(httpServletRequest.getHeader(HttpHeaders.ISOTOPE_CRDENTIALS),
                     httpServletRequest.getHeader(HttpHeaders.ISOTOPE_SALT));
+            if (credentials.getExpiryDate().compareTo(ZonedDateTime.now(ZoneOffset.UTC)) < 0) {
+                throw new AuthenticationException("Expired credentials");
+            }
+            return credentials;
         } catch(IOException ex) {
             throw new AuthenticationException("Invalid credentials", ex);
         }
@@ -77,6 +83,9 @@ public class CredentialsService {
 
     public Credentials encrypt(Credentials credentials) throws JsonProcessingException {
         final Credentials encrytpedCredentials = new Credentials();
+        // Add expiry date
+        credentials.setExpiryDate(ZonedDateTime.now(ZoneOffset.UTC).plus(isotopeApiConfiguration.getCredentialsDuration()));
+        // Perform encryption
         encrytpedCredentials.setSalt(KeyGenerators.string().generateKey());
         final TextEncryptor encryptor = Encryptors.text(isotopeApiConfiguration.getEncryptionPassword(),
                 encrytpedCredentials.getSalt());

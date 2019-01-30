@@ -27,6 +27,7 @@ import com.marcnuri.isotope.api.resource.IsotopeResource;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 /**
@@ -57,6 +58,7 @@ public class Credentials extends IsotopeResource implements Serializable {
     private Integer smtpPort;
     @NotNull(groups=Login.class)
     private Boolean smtpSsl;
+    private ZonedDateTime expiryDate;
 
     public String getEncrypted() {
         return encrypted;
@@ -138,6 +140,14 @@ public class Credentials extends IsotopeResource implements Serializable {
         this.smtpSsl = smtpSsl;
     }
 
+    public ZonedDateTime getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(ZonedDateTime expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -153,13 +163,14 @@ public class Credentials extends IsotopeResource implements Serializable {
                 Objects.equals(imapSsl, that.imapSsl) &&
                 Objects.equals(smtpHost, that.smtpHost) &&
                 Objects.equals(smtpPort, that.smtpPort) &&
-                Objects.equals(smtpSsl, that.smtpSsl);
+                Objects.equals(smtpSsl, that.smtpSsl) &&
+                Objects.equals(expiryDate, that.expiryDate);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), encrypted, salt, serverHost, serverPort, user, password, imapSsl, smtpHost, smtpPort, smtpSsl);
+        return Objects.hash(super.hashCode(), encrypted, salt, serverHost, serverPort, user, password, imapSsl, smtpHost, smtpPort, smtpSsl, expiryDate);
     }
 
     /**
