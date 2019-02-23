@@ -1,6 +1,7 @@
 import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import history from '../routes/history';
 import Spinner from './spinner/spinner';
 import TopBar from './top-bar/top-bar';
 import SideBar from './side-bar/side-bar';
@@ -8,6 +9,8 @@ import MessageEditor from './message-editor/message-editor';
 import MessageList from './message-list/message-list';
 import MessageViewer from './message-viewer/message-viewer';
 import MessageSnackbar from './message-snackbar/message-snackbar';
+import {clearUserCredentials} from '../actions/application';
+import {AuthenticationException} from '../services/fetch';
 import {editNewMessage} from '../services/application';
 import {getFolders} from '../services/folder';
 import {resetFolderMessagesCache} from '../services/message';
@@ -90,6 +93,7 @@ class App extends Component {
    * @returns {Promise<void>}
    */
   async refreshPoll() {
+    let keepPolling = true;
     try {
       const folderPromise = this.props.reloadFolders();
       const selectedFolder = this.props.folders.explodedItems[this.props.application.selectedFolderId] || {};
@@ -97,8 +101,14 @@ class App extends Component {
       await Promise.all([folderPromise, messagePromise]);
     } catch (e) {
       console.log(`Error in refresh poll: ${e}`);
+      if (e instanceof AuthenticationException) {
+        keepPolling = false;
+        this.props.logout();
+      }
     }
-    this.refreshPollTimeout = setTimeout(this.refreshPoll.bind(this), this.props.application.pollInterval);
+    if (keepPolling) {
+      this.refreshPollTimeout = setTimeout(this.refreshPoll.bind(this), this.props.application.pollInterval);
+    }
   }
 
   toggleSideBar() {
@@ -130,7 +140,11 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   reloadFolders: credentials => getFolders(dispatch, credentials, true),
   reloadMessageCache: (user, folder) => resetFolderMessagesCache(dispatch, user, folder),
-  newMessage: () => editNewMessage(dispatch)
+  newMessage: () => editNewMessage(dispatch),
+  logout: () => {
+    dispatch(clearUserCredentials());
+    history.push('/login');
+  }
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {

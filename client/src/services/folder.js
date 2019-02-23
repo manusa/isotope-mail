@@ -7,7 +7,7 @@ import {
 import {unicodeUrlAtob as atob, unicodeUrlBtoa as btoa} from './base64';
 import {backendRequest, setFolders, updateFolder} from '../actions/folders';
 import {deleteMessageCache, renameMessageCache} from './indexed-db';
-import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
+import {abortControllerWrappers, abortFetch, credentialsHeaders, refreshCredentials, toJson} from './fetch';
 import {notifyNewMail} from './notification';
 import {renameCache} from '../actions/messages';
 
@@ -154,6 +154,7 @@ export async function getFolders(dispatch, credentials, loadChildren) {
     headers: credentialsHeaders(credentials),
     signal: signal
   });
+  await refreshCredentials(dispatch, response);
   const folders = await toJson(response);
   const foldersAction = setFolders(folders);
   const inbox = Object.values(foldersAction.payload).find(f => f.type === FolderTypes.INBOX);

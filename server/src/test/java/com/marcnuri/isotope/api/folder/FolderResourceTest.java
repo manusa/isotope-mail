@@ -20,8 +20,6 @@
  */
 package com.marcnuri.isotope.api.folder;
 
-import com.marcnuri.isotope.api.credentials.Credentials;
-import com.marcnuri.isotope.api.credentials.CredentialsService;
 import com.marcnuri.isotope.api.imap.ImapService;
 import com.marcnuri.isotope.api.message.Message;
 import org.junit.After;
@@ -73,9 +71,6 @@ public class FolderResourceTest {
 
     @Autowired
     private FolderResource folderResource;
-
-    @MockBean
-    private CredentialsService credentialsService;
     @MockBean(name=IMAP_SERVICE_PROTOTYPE)
     private ImapService imapService;
 
@@ -84,7 +79,6 @@ public class FolderResourceTest {
     @Before
     public void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(folderResource).build();
-        doReturn(new Credentials()).when(credentialsService).fromRequest(Mockito.any());
     }
 
     @After

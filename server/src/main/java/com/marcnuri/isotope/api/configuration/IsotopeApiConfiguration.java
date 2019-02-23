@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
+import java.time.Duration;
+import java.time.temporal.TemporalAmount;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,6 +56,8 @@ public class IsotopeApiConfiguration {
     private static final String EMBEDDED_IMAGE_SIZE_THRESHOLD = "EMBEDDED_IMAGE_SIZE_THRESHOLD";
     private static final long EMBEDDED_IMAGE_SIZE_THRESHOLD_DEFAULT_50KB = 51200L;
 
+    private static final int CREDENTIALS_DURATION_MINUTES = 15;
+
     private final Environment environment;
 
     @Autowired
@@ -66,7 +70,7 @@ public class IsotopeApiConfiguration {
      *
      * If no password was specified in an environment variable ENCRYPTION_PASSWORD_DEFAULT will be used by default.
      *
-     * @return
+     * @return the password for encryption operations
      */
     public String getEncryptionPassword() {
         return environment.getProperty(ENCRYPTION_PASSWORD, ENCRYPTION_PASSWORD_DEFAULT);
@@ -80,6 +84,10 @@ public class IsotopeApiConfiguration {
 
     public long getEmbeddedImageSizeThreshold() {
         return environment.getProperty(EMBEDDED_IMAGE_SIZE_THRESHOLD, Long.class, EMBEDDED_IMAGE_SIZE_THRESHOLD_DEFAULT_50KB);
+    }
+
+    public TemporalAmount getCredentialsDuration() {
+        return Duration.ofMinutes(CREDENTIALS_DURATION_MINUTES);
     }
 
 }

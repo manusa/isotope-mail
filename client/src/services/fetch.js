@@ -1,3 +1,5 @@
+import {refreshUserCredentials} from '../actions/application';
+
 export const HttpHeaders = {
   ISOTOPE_CREDENTIALS: 'X-Isotope-Credentials',
   ISOTOPE_SALT: 'X-Isotope-Salt',
@@ -11,6 +13,14 @@ export const HttpStatusFamilies = {
   CLIENT_ERROR: 4,
   SERVER_ERROR: 5
 };
+
+export class AuthenticationException extends Error {
+  constructor(message, cause) {
+    super(message);
+    this.cause = cause;
+    this.name = 'AuthenticationException';
+  }
+}
 
 /**
  * Object to store the different AbortController(s) that will be used in the service methods to fetch from the API backend.
@@ -28,9 +38,29 @@ export const abortControllerWrappers = {};
  */
 export function toJson(response) {
   if (!response.ok) {
-    throw Error(`${response.status}`);
+    if (response.status === 401 || response.status === 403) {
+      throw new AuthenticationException(response.statusText);
+    } else {
+      throw Error(`${response.status}`);
+    }
   }
   return response.json();
+}
+
+/**
+ * Dispatches the refreshUserCredentials action with the values obtained from the Http Response headers.
+ *
+ * @param dispatch
+ * @param response
+ * @returns {*}
+ */
+export function refreshCredentials(dispatch, response) {
+  const credentials = response.headers.get(HttpHeaders.ISOTOPE_CREDENTIALS);
+  const salt = response.headers.get(HttpHeaders.ISOTOPE_SALT);
+  if (credentials && salt) {
+    dispatch(refreshUserCredentials(credentials, salt));
+  }
+  return Promise.resolve(response);
 }
 
 /**
@@ -67,3 +97,4 @@ export function credentialsHeaders(credentials, originalHeaders) {
 export function isSuccessful(status) {
   return Math.floor(status / 100) === HttpStatusFamilies.SUCCESSFUL;
 }
+

@@ -25,14 +25,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration;
 import com.marcnuri.isotope.api.exception.AuthenticationException;
 import com.marcnuri.isotope.api.http.HttpHeaders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static com.marcnuri.isotope.api.exception.AuthenticationException.Type.BLACKLISTED;
@@ -42,6 +48,8 @@ import static com.marcnuri.isotope.api.exception.AuthenticationException.Type.BL
  */
 @Service
 public class CredentialsService {
+
+    private static final Logger log = LoggerFactory.getLogger(CredentialsService.class);
 
     private final ObjectMapper objectMapper;
     private final IsotopeApiConfiguration isotopeApiConfiguration;
@@ -66,17 +74,45 @@ public class CredentialsService {
      * @param httpServletRequest
      * @return
      */
-    public  Credentials fromRequest(HttpServletRequest httpServletRequest) {
+    Credentials fromRequest(HttpServletRequest httpServletRequest) {
         try {
-            return decrypt(httpServletRequest.getHeader(HttpHeaders.ISOTOPE_CRDENTIALS),
-                    httpServletRequest.getHeader(HttpHeaders.ISOTOPE_SALT));
+            final String encryptedCredentials = httpServletRequest.getHeader(HttpHeaders.ISOTOPE_CRDENTIALS);
+            final String salt = httpServletRequest.getHeader(HttpHeaders.ISOTOPE_SALT);
+            if (StringUtils.isEmpty(encryptedCredentials) || StringUtils.isEmpty(salt)) {
+                throw new AuthenticationException("Isotope credentials headers missing");
+            }
+            final Credentials credentials =  decrypt(encryptedCredentials,salt);
+            if (credentials.getExpiryDate().compareTo(ZonedDateTime.now(ZoneOffset.UTC)) < 0) {
+                throw new AuthenticationException("Expired credentials");
+            }
+            credentials.setAuthenticated(true);
+            return credentials;
         } catch(IOException ex) {
             throw new AuthenticationException("Invalid credentials", ex);
         }
     }
 
+    /**
+     * Refreshes Credentials expiry date and writes new values to the provided {@link HttpServletResponse} Headers
+     *
+     * @param oldCredentials with "outdated" expiry date
+     * @param response to which to write new encrypted credentials headers
+     */
+    void refreshCredentials(Credentials oldCredentials, HttpServletResponse response) {
+        try {
+            final Credentials newCredentials = encrypt(oldCredentials);
+            response.setHeader(HttpHeaders.ISOTOPE_CRDENTIALS, newCredentials.getEncrypted());
+            response.setHeader(HttpHeaders.ISOTOPE_SALT, newCredentials.getSalt());
+        } catch(JsonProcessingException ex) {
+            log.info("Couldn't refresh credentials", ex);
+        }
+    }
+
     public Credentials encrypt(Credentials credentials) throws JsonProcessingException {
         final Credentials encrytpedCredentials = new Credentials();
+        // Add expiry date
+        credentials.setExpiryDate(ZonedDateTime.now(ZoneOffset.UTC).plus(isotopeApiConfiguration.getCredentialsDuration()));
+        // Perform encryption
         encrytpedCredentials.setSalt(KeyGenerators.string().generateKey());
         final TextEncryptor encryptor = Encryptors.text(isotopeApiConfiguration.getEncryptionPassword(),
                 encrytpedCredentials.getSalt());
