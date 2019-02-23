@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,6 +60,7 @@ public class ApplicationResource {
         log.info("User logging into application");
         final Credentials encryptedCredentials = imapService.checkCredentials(credentials);
         smtpService.checkCredentials(credentials);
+        SecurityContextHolder.getContext().setAuthentication(encryptedCredentials);
         return ResponseEntity.ok(encryptedCredentials);
     }
 

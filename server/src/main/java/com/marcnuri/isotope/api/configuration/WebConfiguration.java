@@ -31,9 +31,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -49,9 +46,8 @@ import static org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROT
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-09.
  */
 @Configuration
-@EnableWebSecurity
 @EnableWebFlux
-public class WebConfiguration extends WebSecurityConfigurerAdapter implements WebMvcConfigurer, AsyncConfigurer {
+public class WebConfiguration implements WebMvcConfigurer, AsyncConfigurer {
 
     public static final String IMAP_SERVICE_PROTOTYPE = "prototypeImapService";
     private static final String DEVELOPMENT_PROFILE = "dev";
@@ -61,16 +57,6 @@ public class WebConfiguration extends WebSecurityConfigurerAdapter implements We
     @Autowired
     public WebConfiguration(Environment environment) {
         this.environment = environment;
-    }
-
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests()
-                .regexMatchers("/v1/*").permitAll().and()
-                .cors().and()
-                .logout().permitAll();
     }
 
     @Override

@@ -20,13 +20,14 @@
  */
 package com.marcnuri.isotope.api.smtp;
 
-import com.marcnuri.isotope.api.credentials.CredentialsService;
+import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,12 +45,10 @@ public class SmtpResource {
 
     private static final Logger log = LoggerFactory.getLogger(SmtpResource.class);
 
-    private final CredentialsService credentialsService;
     private final ObjectFactory<SmtpService> smtpServiceFactory;
 
     @Autowired
-    public SmtpResource(CredentialsService credentialsService, ObjectFactory<SmtpService> smtpServiceFactory) {
-        this.credentialsService = credentialsService;
+    public SmtpResource(ObjectFactory<SmtpService> smtpServiceFactory) {
         this.smtpServiceFactory = smtpServiceFactory;
     }
 
@@ -58,8 +57,11 @@ public class SmtpResource {
             HttpServletRequest request, @Validated({Message.SmtpSend.class}) @RequestBody Message message) {
 
         log.debug("Sending SMTP message");
-        smtpServiceFactory.getObject().sendMessage(request, credentialsService.fromRequest(request), message);
+        smtpServiceFactory.getObject().sendMessage(request, getCredentials(), message);
         return ResponseEntity.noContent().build();
     }
 
+    private Credentials getCredentials() {
+        return (Credentials)SecurityContextHolder.getContext().getAuthentication();
+    }
 }

@@ -17,6 +17,13 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
           id: action.payload.userId, hash: action.payload.hash, credentials: action.payload.credentials
         }
       };
+    case ActionTypes.APPLICATION_USER_CREDENTIALS_REFRESH: {
+      const newState = {...state};
+      newState.user = {...newState.user};
+      newState.user.credentials = {...newState.user.credentials,
+        encrypted: action.payload.encrypted, salt: action.payload.salt};
+      return newState;
+    }
     case ActionTypes.APPLICATION_FOLDER_SELECT:
       return {
         ...state,

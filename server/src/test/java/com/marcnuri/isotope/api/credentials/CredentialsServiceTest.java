@@ -20,6 +20,7 @@
  */
 package com.marcnuri.isotope.api.credentials;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration;
 import com.marcnuri.isotope.api.exception.AuthenticationException;
@@ -27,15 +28,25 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.servlet.http.HttpServletResponse;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.marcnuri.isotope.api.http.HttpHeaders.ISOTOPE_CRDENTIALS;
+import static com.marcnuri.isotope.api.http.HttpHeaders.ISOTOPE_SALT;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-10-07.
@@ -105,5 +116,42 @@ public class CredentialsServiceTest {
 
         // Then
         fail("AuthenticationException was expected");
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // refreshCredentials
+    @Test
+    public void refreshCredentials_validCredentials_shouldWriteResponseHeaders() throws Exception {
+        // Given
+        doReturn(Duration.ofMillis(1337L)).when(isotopeApiConfiguration).getCredentialsDuration();
+        doReturn("I'M SECRET").when(isotopeApiConfiguration).getEncryptionPassword();
+        doReturn("{}").when(objectMapper).writeValueAsString(Mockito.any(Credentials.class));
+        final HttpServletResponse response = new MockHttpServletResponse();
+        final Credentials credentials = new Credentials();
+
+        // When
+        credentialsService.refreshCredentials(credentials, response);
+
+        // Then
+        assertThat(response.getHeader(ISOTOPE_CRDENTIALS), not(emptyOrNullString()));
+        assertThat(response.getHeader(ISOTOPE_SALT), not(emptyOrNullString()));
+    }
+
+    @Test
+    public void refreshCredentials_invalidCredentials_shouldNotWriteResponseHeaders() throws Exception {
+        // Given
+        doReturn(Duration.ofMillis(1337L)).when(isotopeApiConfiguration).getCredentialsDuration();
+        doReturn("I'M SECRET").when(isotopeApiConfiguration).getEncryptionPassword();
+        doThrow(JsonProcessingException.class).when(objectMapper).writeValueAsString(Mockito.any(Credentials.class));
+        final HttpServletResponse response = new MockHttpServletResponse();
+        final Credentials credentials = new Credentials();
+
+        // When
+        credentialsService.refreshCredentials(credentials, response);
+
+        // Then
+        assertThat(response.getHeader(ISOTOPE_CRDENTIALS), emptyOrNullString());
+        assertThat(response.getHeader(ISOTOPE_SALT), emptyOrNullString());
     }
 }

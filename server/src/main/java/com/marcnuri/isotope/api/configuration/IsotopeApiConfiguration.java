@@ -56,7 +56,7 @@ public class IsotopeApiConfiguration {
     private static final String EMBEDDED_IMAGE_SIZE_THRESHOLD = "EMBEDDED_IMAGE_SIZE_THRESHOLD";
     private static final long EMBEDDED_IMAGE_SIZE_THRESHOLD_DEFAULT_50KB = 51200L;
 
-    private static final int CREDENTIALS_DURATION_MINUTES = 1;
+    private static final int CREDENTIALS_DURATION_MINUTES = 15;
 
     private final Environment environment;
 

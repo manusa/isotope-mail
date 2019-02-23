@@ -93,6 +93,7 @@ class App extends Component {
    * @returns {Promise<void>}
    */
   async refreshPoll() {
+    let keepPolling = true;
     try {
       const folderPromise = this.props.reloadFolders();
       const selectedFolder = this.props.folders.explodedItems[this.props.application.selectedFolderId] || {};
@@ -101,10 +102,13 @@ class App extends Component {
     } catch (e) {
       console.log(`Error in refresh poll: ${e}`);
       if (e instanceof AuthenticationException) {
+        keepPolling = false;
         this.props.logout();
       }
     }
-    this.refreshPollTimeout = setTimeout(this.refreshPoll.bind(this), this.props.application.pollInterval);
+    if (keepPolling) {
+      this.refreshPollTimeout = setTimeout(this.refreshPoll.bind(this), this.props.application.pollInterval);
+    }
   }
 
   toggleSideBar() {

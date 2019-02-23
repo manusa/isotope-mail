@@ -1,3 +1,5 @@
+import {refreshUserCredentials} from '../actions/application';
+
 export const HttpHeaders = {
   ISOTOPE_CREDENTIALS: 'X-Isotope-Credentials',
   ISOTOPE_SALT: 'X-Isotope-Salt',
@@ -36,13 +38,29 @@ export const abortControllerWrappers = {};
  */
 export function toJson(response) {
   if (!response.ok) {
-    if (response.status === 401) {
+    if (response.status === 401 || response.status === 403) {
       throw new AuthenticationException(response.statusText);
     } else {
       throw Error(`${response.status}`);
     }
   }
   return response.json();
+}
+
+/**
+ * Dispatches the refreshUserCredentials action with the values obtained from the Http Response headers.
+ *
+ * @param dispatch
+ * @param response
+ * @returns {*}
+ */
+export function refreshCredentials(dispatch, response) {
+  const credentials = response.headers.get(HttpHeaders.ISOTOPE_CREDENTIALS);
+  const salt = response.headers.get(HttpHeaders.ISOTOPE_SALT);
+  if (credentials && salt) {
+    dispatch(refreshUserCredentials(credentials, salt));
+  }
+  return Promise.resolve(response);
 }
 
 /**

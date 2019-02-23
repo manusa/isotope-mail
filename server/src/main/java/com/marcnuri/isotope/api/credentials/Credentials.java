@@ -20,24 +20,30 @@
  */
 package com.marcnuri.isotope.api.credentials;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.marcnuri.isotope.api.resource.IsotopeResource;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.Objects;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-15.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Credentials extends IsotopeResource implements Serializable {
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"authorities"})
+public class Credentials extends AbstractAuthenticationToken implements Serializable {
 
     private static final long serialVersionUID = -3763522029969923952L;
+
+    private static final GrantedAuthority ISOTOPE_USER = new SimpleGrantedAuthority("ISOTOPE_USER");
 
     private String encrypted;
     private String salt;
@@ -59,6 +65,22 @@ public class Credentials extends IsotopeResource implements Serializable {
     @NotNull(groups=Login.class)
     private Boolean smtpSsl;
     private ZonedDateTime expiryDate;
+
+    @JsonCreator
+    public Credentials() {
+        super(Collections.singleton(ISOTOPE_USER));
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return getUser();
+    }
+
+    @Override
+    public Object getCredentials() {
+        return getPassword();
+    }
+
 
     public String getEncrypted() {
         return encrypted;

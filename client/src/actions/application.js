@@ -5,6 +5,8 @@ export const backendRequestCompleted = () => ({type: ActionTypes.APPLICATION_BE_
 export const clearUserCredentials = () => ({type: ActionTypes.APPLICATION_USER_CREDENTIALS_CLEAR});
 export const setUserCredentials = (userId, hash, credentials) =>
   ({type: ActionTypes.APPLICATION_USER_CREDENTIALS_SET, payload: {userId, hash, credentials}});
+export const refreshUserCredentials = (encrypted, salt) =>
+  ({type: ActionTypes.APPLICATION_USER_CREDENTIALS_REFRESH, payload: {encrypted, salt}});
 export const selectFolder = folder => ({type: ActionTypes.APPLICATION_FOLDER_SELECT, payload: folder});
 export const createFolder = folderParentId => ({type: ActionTypes.APPLICATION_FOLDER_CREATE, payload: folderParentId});
 export const renameFolder = folder => ({type: ActionTypes.APPLICATION_FOLDER_RENAME, payload: folder});

@@ -35,6 +35,26 @@ describe('Application reducer test suite', () => {
       expect(updatedState.activeRequests).toBe(1);
     });
   });
+  test('APPLICATION_USER_CREDENTIALS_CLEAR, user was not null, use should be empty', () => {
+    const updatedState = application({...INITIAL_STATE.application, user: {name: 'Luke'}},
+      {type: ActionTypes.APPLICATION_USER_CREDENTIALS_CLEAR});
+    expect(updatedState.user).toEqual({});
+  });
+  test('APPLICATION_USER_CREDENTIALS_REFRESH, new encrypted and salt fields, should update user fields', () => {
+    // Given
+    const initialState = {...INITIAL_STATE.application};
+    initialState.user = {credentials: {encrypted: 'Typex', salt: 'AndPepper'}};
+
+    // When
+    const updatedState = application(initialState,
+      {type: ActionTypes.APPLICATION_USER_CREDENTIALS_REFRESH, payload: {encrypted: 'Enigma', salt: 'Himalayas'}});
+
+    // Then
+    expect(initialState).not.toMatchObject(updatedState);
+    expect(initialState.user).not.toMatchObject(updatedState.user);
+    expect(updatedState.user.credentials.encrypted).toBe('Enigma');
+    expect(updatedState.user.credentials.salt).toBe('Himalayas');
+  });
   test('APPLICATION_FOLDER_CREATE, createFolderParentId was null, should change', () => {
     const updatedState = application({...INITIAL_STATE.application, createFolderParentId: null},
       {type: ActionTypes.APPLICATION_FOLDER_CREATE, payload: '1337'});
