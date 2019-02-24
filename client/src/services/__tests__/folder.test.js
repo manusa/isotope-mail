@@ -3,6 +3,7 @@ import * as indexedDbService from '../indexed-db';
 import {FolderTypes} from '../folder';
 import {ActionTypes} from '../../actions/action-types';
 import * as fetch from '../fetch';
+import * as notification from '../notification';
 
 describe('Folder service test suite', () => {
   describe('findTrashFolder', () => {
@@ -31,6 +32,44 @@ describe('Folder service test suite', () => {
 
       // Then
       expect(trashFolder).toBeUndefined();
+    });
+  });
+  describe('getFolders', () => {
+    test('getFolders, loadChildren=true, OK response, should return folders and update state', done => {
+      // Given
+      fetch.abortFetch = jest.fn();
+      fetch.refreshCredentials = jest.fn();
+      notification.notifyNewMail = jest.fn();
+      global.fetch = jest.fn((url, options) => {
+        expect(url.search).toBe('?loadChildren=true');
+        return Promise.resolve({
+          ok: true, url, options, headers: {get: jest.fn()},
+          json: () => ([{name: 'INBOX', newMessageCount: 1337}])
+        });
+      });
+      let dispatchCount = 0;
+      const dispatch = jest.fn(action => {
+        switch (action.type) {
+          case ActionTypes.FOLDERS_BE_REQUEST:
+            dispatchCount++;
+            break;
+          case ActionTypes.FOLDERS_SET:
+            expect(fetch.refreshCredentials).toHaveBeenCalledTimes(1);
+            expect(notification.notifyNewMail).toHaveBeenCalledTimes(1);
+            expect(dispatchCount).toEqual(1);
+            done();
+            break;
+          default:
+        }
+      });
+
+      // When
+      folderService.getFolders(dispatch, {credentials: {}}, true);
+
+      // Then
+      expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+
     });
   });
   describe('moveFolder', () => {
