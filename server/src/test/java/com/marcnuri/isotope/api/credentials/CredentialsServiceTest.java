@@ -39,7 +39,7 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.marcnuri.isotope.api.http.HttpHeaders.ISOTOPE_CRDENTIALS;
+import static com.marcnuri.isotope.api.http.HttpHeaders.ISOTOPE_CREDENTIALS;
 import static com.marcnuri.isotope.api.http.HttpHeaders.ISOTOPE_SALT;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.not;
@@ -134,7 +134,7 @@ public class CredentialsServiceTest {
         credentialsService.refreshCredentials(credentials, response);
 
         // Then
-        assertThat(response.getHeader(ISOTOPE_CRDENTIALS), not(emptyOrNullString()));
+        assertThat(response.getHeader(ISOTOPE_CREDENTIALS), not(emptyOrNullString()));
         assertThat(response.getHeader(ISOTOPE_SALT), not(emptyOrNullString()));
     }
 
@@ -151,7 +151,7 @@ public class CredentialsServiceTest {
         credentialsService.refreshCredentials(credentials, response);
 
         // Then
-        assertThat(response.getHeader(ISOTOPE_CRDENTIALS), emptyOrNullString());
+        assertThat(response.getHeader(ISOTOPE_CREDENTIALS), emptyOrNullString());
         assertThat(response.getHeader(ISOTOPE_SALT), emptyOrNullString());
     }
 }

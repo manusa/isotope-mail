@@ -76,7 +76,7 @@ public class CredentialsService {
      */
     Credentials fromRequest(HttpServletRequest httpServletRequest) {
         try {
-            final String encryptedCredentials = httpServletRequest.getHeader(HttpHeaders.ISOTOPE_CRDENTIALS);
+            final String encryptedCredentials = httpServletRequest.getHeader(HttpHeaders.ISOTOPE_CREDENTIALS);
             final String salt = httpServletRequest.getHeader(HttpHeaders.ISOTOPE_SALT);
             if (StringUtils.isEmpty(encryptedCredentials) || StringUtils.isEmpty(salt)) {
                 throw new AuthenticationException("Isotope credentials headers missing");
@@ -101,7 +101,7 @@ public class CredentialsService {
     void refreshCredentials(Credentials oldCredentials, HttpServletResponse response) {
         try {
             final Credentials newCredentials = encrypt(oldCredentials);
-            response.setHeader(HttpHeaders.ISOTOPE_CRDENTIALS, newCredentials.getEncrypted());
+            response.setHeader(HttpHeaders.ISOTOPE_CREDENTIALS, newCredentials.getEncrypted());
             response.setHeader(HttpHeaders.ISOTOPE_SALT, newCredentials.getSalt());
         } catch(JsonProcessingException ex) {
             log.info("Couldn't refresh credentials", ex);

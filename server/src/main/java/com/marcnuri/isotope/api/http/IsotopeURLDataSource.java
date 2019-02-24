@@ -32,7 +32,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import static com.marcnuri.isotope.api.http.HttpHeaders.ISOTOPE_CRDENTIALS;
+import static com.marcnuri.isotope.api.http.HttpHeaders.ISOTOPE_CREDENTIALS;
 import static com.marcnuri.isotope.api.http.HttpHeaders.ISOTOPE_SALT;
 
 /**
@@ -64,7 +64,7 @@ public class IsotopeURLDataSource implements DataSource, EncodingAware {
      */
     public IsotopeURLDataSource(@NonNull URL url, String contentType, @NonNull HttpServletRequest request) {
         this.url = url;
-        this.credentials = request.getHeader(ISOTOPE_CRDENTIALS);
+        this.credentials = request.getHeader(ISOTOPE_CREDENTIALS);
         this.salt = request.getHeader(ISOTOPE_SALT);
         this.contentType = contentType;
     }
@@ -76,7 +76,7 @@ public class IsotopeURLDataSource implements DataSource, EncodingAware {
      */
     private URLConnection openConnection() throws IOException {
         final URLConnection urlConnection = url.openConnection();
-        urlConnection.setRequestProperty (ISOTOPE_CRDENTIALS, credentials);
+        urlConnection.setRequestProperty (ISOTOPE_CREDENTIALS, credentials);
         urlConnection.setRequestProperty (ISOTOPE_SALT, salt);
         urlConnection.setUseCaches(false);
         urlConnection.setDoInput(true);

@@ -1,8 +1,8 @@
 import {refreshUserCredentials} from '../actions/application';
 
 export const HttpHeaders = {
-  ISOTOPE_CREDENTIALS: 'X-Isotope-Credentials',
-  ISOTOPE_SALT: 'X-Isotope-Salt',
+  ISOTOPE_CREDENTIALS: 'Isotope-Credentials',
+  ISOTOPE_SALT: 'Isotope-Salt',
   CONTENT_TYPE: 'Content-Type'
 };
 
