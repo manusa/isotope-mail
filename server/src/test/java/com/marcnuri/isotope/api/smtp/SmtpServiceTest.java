@@ -20,6 +20,7 @@
  */
 package com.marcnuri.isotope.api.smtp;
 
+import com.marcnuri.isotope.api.configuration.WithMockCredentials;
 import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.exception.AuthenticationException;
 import com.marcnuri.isotope.api.http.IsotopeURLDataSource;
@@ -37,8 +38,10 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.springframework.hateoas.Link;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -69,6 +72,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-11-16.
  */
 @RunWith(PowerMockRunner.class)
+@PowerMockRunnerDelegate(SpringRunner.class)
 @PrepareForTest({Session.class, Transport.class})
 public class SmtpServiceTest {
 
@@ -145,14 +149,9 @@ public class SmtpServiceTest {
     }
 
     @Test
+    @WithMockCredentials(user="test", serverHost = "email.com")
     public void sendMessageTestFrom_userWithNoDomain_shouldAppendDomainInFrom() throws Exception {
         // Given
-        final Credentials credentials = new Credentials();
-        credentials.setUser("test");
-        credentials.setServerHost("email.com");
-        credentials.setSmtpSsl(true);
-        credentials.setSmtpPort(1);
-
         final Message message = new Message();
         message.setSubject("");
         message.setContent("");
@@ -162,7 +161,7 @@ public class SmtpServiceTest {
         final ArgumentCaptor<MimeMessage> mimeMessage = ArgumentCaptor.forClass(MimeMessage.class);
 
         // When
-        smtpService.sendMessage(new MockHttpServletRequest(), credentials, message);
+        smtpService.sendMessage(new MockHttpServletRequest(), message);
 
         // Then
         verify(mockedTransport, times(1)).sendMessage(mimeMessage.capture(), Mockito.any());
@@ -170,14 +169,9 @@ public class SmtpServiceTest {
     }
 
     @Test
+    @WithMockCredentials(user="test@email.com", serverHost = "mail.email.com")
     public void sendMessageTestFrom_userWithDomain_shouldNotAppendDomainInFrom() throws Exception {
         // Given
-        final Credentials credentials = new Credentials();
-        credentials.setUser("test@email.com");
-        credentials.setServerHost("mail.email.com");
-        credentials.setSmtpSsl(true);
-        credentials.setSmtpPort(1);
-
         final Message message = new Message();
         message.setSubject("");
         message.setContent("");
@@ -187,7 +181,7 @@ public class SmtpServiceTest {
         final ArgumentCaptor<MimeMessage> mimeMessage = ArgumentCaptor.forClass(MimeMessage.class);
 
         // When
-        smtpService.sendMessage(new MockHttpServletRequest(), credentials, message);
+        smtpService.sendMessage(new MockHttpServletRequest(), message);
 
         // Then
         verify(mockedTransport, times(1)).sendMessage(mimeMessage.capture(), Mockito.any());
@@ -196,14 +190,9 @@ public class SmtpServiceTest {
 
 
     @Test
+    @WithMockCredentials(user="test@attachments.com", serverHost = "mail.attachments.com")
     public void sendMessageTestAttachments_messageWithAttachments_shouldCreateAttachments() throws Exception {
         // Given
-        final Credentials credentials = new Credentials();
-        credentials.setUser("test@attachments.com");
-        credentials.setServerHost("mail.attachments.com");
-        credentials.setSmtpSsl(true);
-        credentials.setSmtpPort(1);
-
         final Message message = new Message();
         message.setSubject("");
         message.setContent("");
@@ -219,7 +208,7 @@ public class SmtpServiceTest {
         final ArgumentCaptor<MimeMessage> mimeMessage = ArgumentCaptor.forClass(MimeMessage.class);
 
         // When
-        smtpService.sendMessage(new MockHttpServletRequest(), credentials, message);
+        smtpService.sendMessage(new MockHttpServletRequest(), message);
 
         // Then
         verify(mockedTransport, times(1)).sendMessage(mimeMessage.capture(), Mockito.any());

@@ -20,7 +20,6 @@
  */
 package com.marcnuri.isotope.api.folder;
 
-import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.imap.ImapService;
 import com.marcnuri.isotope.api.message.Attachment;
 import com.marcnuri.isotope.api.message.Message;
@@ -35,7 +34,6 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.lang.NonNull;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,41 +93,35 @@ public class FolderResource implements ApplicationContextAware {
             @RequestParam(value = "loadChildren", required = false) Boolean loadChildren) {
 
         log.debug("Loading list of folders [children:{}]", loadChildren);
-        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject()
-                .getFolders(getCredentials(), loadChildren)));
+        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().getFolders(loadChildren)));
     }
 
     @PostMapping(path = "", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<List<Folder>> createRootFolder(@RequestBody() String newFolderName) {
         log.debug("Creating new 1st level folder with name {}", newFolderName);
-        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject()
-                .createRootFolder(getCredentials(), newFolderName)));
+        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().createRootFolder(newFolderName)));
     }
 
     @PostMapping(path= "/{folderId}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Folder> createChildFolder(
             @NonNull @PathVariable("folderId") String folderId, @RequestBody() String newFolderName) {
 
-        log.debug("Creating new folder with name {} under {}folder", newFolderName, folderId);
+        log.debug("Creating new folder with name {} under {} folder", newFolderName, folderId);
         return ResponseEntity.ok(addLinks(imapServiceFactory.getObject()
-                .createChildFolder(getCredentials(), Folder.toId(folderId), newFolderName)));
+                .createChildFolder(Folder.toId(folderId), newFolderName)));
     }
 
     @DeleteMapping(path= "/{folderId}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Folder> deleteFolder(@NonNull @PathVariable("folderId") String folderId) {
-
-        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().deleteFolder(
-                getCredentials(), Folder.toId(folderId)
-        )));
+        log.debug("Deleting folder with id {}", folderId);
+        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().deleteFolder(Folder.toId(folderId))));
     }
 
     @PutMapping(path= "/{folderId}/name", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Folder> renameFolder(
             @NonNull @PathVariable("folderId") String folderId, @RequestBody String newName) {
-
-        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().renameFolder(
-                getCredentials(), Folder.toId(folderId), newName
-        )));
+        log.debug("Renaming folder with id {} to {}", folderId, newName);
+        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().renameFolder(Folder.toId(folderId), newName)));
     }
 
     /**
@@ -145,9 +137,8 @@ public class FolderResource implements ApplicationContextAware {
             @PathVariable("folderId") String folderId, @RequestBody(required = false) String targetFolderId) {
 
         final URLName targetFolderUrlName = targetFolderId == null ? null : Folder.toId(targetFolderId);
-        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().moveFolder(
-                getCredentials(), Folder.toId(folderId), targetFolderUrlName
-        )));
+        return ResponseEntity.ok(
+                addLinks(imapServiceFactory.getObject().moveFolder(Folder.toId(folderId), targetFolderUrlName)));
     }
 
     @GetMapping(path = "/{folderId}/messages", produces = TEXT_EVENT_STREAM_VALUE)
@@ -156,7 +147,7 @@ public class FolderResource implements ApplicationContextAware {
 
         log.debug("Loading list of messages for folder {} ", folderId);
         return applicationContext.getBean(IMAP_SERVICE_PROTOTYPE, ImapService.class)
-                .getMessagesFlux(getCredentials(), Folder.toId(folderId), response)
+                .getMessagesFlux(Folder.toId(folderId), response)
                 .subscribeOn(Schedulers.elastic())
                 .publishOn(Schedulers.immediate()) // Will allow server to stop sending events in case client disconnects
                 ;
@@ -167,8 +158,7 @@ public class FolderResource implements ApplicationContextAware {
             @PathVariable("folderId") String folderId, @RequestParam("id") List<Long> messageIds) {
 
         log.debug("Preloading {} messages for folder {} ", messageIds.size(), folderId);
-        return ResponseEntity.ok(imapServiceFactory.getObject()
-                .preloadMessages(getCredentials(), Folder.toId(folderId), messageIds));
+        return ResponseEntity.ok(imapServiceFactory.getObject().preloadMessages(Folder.toId(folderId), messageIds));
     }
 
     @DeleteMapping(path = "/{folderId}/messages")
@@ -176,8 +166,7 @@ public class FolderResource implements ApplicationContextAware {
             @PathVariable("folderId") String folderId, @RequestParam("id") List<Long> messageIds) {
 
         log.debug("Deleting {} messages for folder {} ", messageIds.size(), folderId);
-        final Folder folder = imapServiceFactory.getObject()
-                .deleteMessages(getCredentials(), Folder.toId(folderId), messageIds);
+        final Folder folder = imapServiceFactory.getObject().deleteMessages(Folder.toId(folderId), messageIds);
         addLinks(folder);
         return ResponseEntity.ok(folder);
     }
@@ -187,8 +176,7 @@ public class FolderResource implements ApplicationContextAware {
             @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId) {
 
         log.debug("Loading message {} from folder {}", messageId, folderId);
-        final MessageWithFolder message = imapServiceFactory.getObject()
-                .getMessage(getCredentials(), Folder.toId(folderId), messageId);
+        final MessageWithFolder message = imapServiceFactory.getObject().getMessage(Folder.toId(folderId), messageId);
         addLinks(message.getFolder());
         addLinks(folderId, message);
         return ResponseEntity.ok(message);
@@ -201,8 +189,7 @@ public class FolderResource implements ApplicationContextAware {
             HttpServletResponse response) {
 
         log.debug("Loading attachment {} from message {} from folder {}", id, messageId, folderId);
-        imapServiceFactory.getObject().readAttachment(response, getCredentials(),
-                Folder.toId(folderId), messageId, id, contentId);
+        imapServiceFactory.getObject().readAttachment(response, Folder.toId(folderId), messageId, id, contentId);
         return ResponseEntity.ok().build();
     }
 
@@ -213,7 +200,7 @@ public class FolderResource implements ApplicationContextAware {
 
         log.debug("Moving {} messages from folder {} to folder {}", messageIds.size(), fromFolderId, toFolderId);
         final List<MessageWithFolder> movedMessages = imapServiceFactory.getObject().moveMessages(
-                getCredentials(), Folder.toId(fromFolderId), Folder.toId(toFolderId), messageIds);
+                Folder.toId(fromFolderId), Folder.toId(toFolderId), messageIds);
         movedMessages.forEach(mwf -> addLinks(mwf.getFolder()));
         return ResponseEntity.ok(movedMessages);
     }
@@ -225,8 +212,7 @@ public class FolderResource implements ApplicationContextAware {
 
         log.debug("Moving message {} from folder {} to folder {}", messageId, fromFolderId, toFolderId);
         final List<MessageWithFolder> movedMessages = imapServiceFactory.getObject().moveMessages(
-                getCredentials(), Folder.toId(fromFolderId), Folder.toId(toFolderId),
-                Collections.singletonList(messageId));
+                Folder.toId(fromFolderId), Folder.toId(toFolderId), Collections.singletonList(messageId));
         movedMessages.forEach(mwf -> addLinks(mwf.getFolder()));
         return ResponseEntity.ok(movedMessages);
     }
@@ -237,8 +223,7 @@ public class FolderResource implements ApplicationContextAware {
             @RequestBody boolean seen) {
 
         log.debug("Setting message seen attribute to {} in message {} from folder {}", seen, messageId, folderId);
-        imapServiceFactory.getObject().setMessagesSeen(
-                getCredentials(), Folder.toId(folderId), seen, messageId);
+        imapServiceFactory.getObject().setMessagesSeen(Folder.toId(folderId), seen, messageId);
         return ResponseEntity.noContent().build();
     }
 
@@ -249,8 +234,7 @@ public class FolderResource implements ApplicationContextAware {
 
         log.debug("Setting {} messages in folder {} seen attribute to {}" , messageIds.size(), folderId, seen);
         imapServiceFactory.getObject().setMessagesSeen(
-                getCredentials(), Folder.toId(folderId), seen,
-                messageIds.stream().mapToLong(Long::longValue).toArray());
+                Folder.toId(folderId), seen, messageIds.stream().mapToLong(Long::longValue).toArray());
         return ResponseEntity.noContent().build();
     }
 
@@ -260,8 +244,7 @@ public class FolderResource implements ApplicationContextAware {
             @PathVariable("messageId") Long messageId, @RequestBody boolean flagged) {
 
         log.debug("Setting message flagged attribute to {} in message {} from folder {}", flagged, messageId, folderId);
-        imapServiceFactory.getObject().setMessagesFlagged(
-                getCredentials(), Folder.toId(folderId), flagged, messageId);
+        imapServiceFactory.getObject().setMessagesFlagged(Folder.toId(folderId), flagged, messageId);
         return ResponseEntity.noContent().build();
     }
 
@@ -332,10 +315,6 @@ public class FolderResource implements ApplicationContextAware {
                     .withRel(REL_DOWNLOAD).expand());
         }
         return attachment;
-    }
-
-    private Credentials getCredentials() {
-        return (Credentials)SecurityContextHolder.getContext().getAuthentication();
     }
 
     @Override

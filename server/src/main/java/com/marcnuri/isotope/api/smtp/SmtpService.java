@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -91,6 +92,7 @@ public class SmtpService {
     public SmtpService(MailSSLSocketFactory mailSSLSocketFactory) {
         this.mailSSLSocketFactory = mailSSLSocketFactory;
     }
+
     /**
      * Checks if specified {@link Credentials} are valid
      *
@@ -105,8 +107,9 @@ public class SmtpService {
         }
     }
 
-    public void sendMessage(HttpServletRequest request, Credentials credentials, Message message) {
+    void sendMessage(HttpServletRequest request, Message message) {
         try {
+            final Credentials credentials = getCredentials();
             final Charset currentCharset = Charset.defaultCharset();
             final MimeMessage mimeMessage = new MimeMessage(getSession(credentials));
             mimeMessage.setSentDate(new Date());
@@ -204,6 +207,10 @@ public class SmtpService {
             log.debug("Opened new SMTP transport");
         }
         return smtpTransport;
+    }
+
+    private Credentials getCredentials() {
+        return (Credentials)SecurityContextHolder.getContext().getAuthentication();
     }
 
     private static Properties initMailProperties(Credentials credentials, MailSSLSocketFactory socketFactory) {

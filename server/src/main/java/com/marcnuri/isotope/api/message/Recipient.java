@@ -20,6 +20,9 @@
  */
 package com.marcnuri.isotope.api.message;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -33,7 +36,8 @@ public class Recipient implements Serializable {
     private String type;
     private String address;
 
-    public Recipient(String type, String address) {
+    @JsonCreator
+    public Recipient(@JsonProperty("type") String type, @JsonProperty("address") String address) {
         this.type = type;
         this.address = address;
     }

@@ -22,6 +22,7 @@ package com.marcnuri.isotope.api.folder;
 
 import com.marcnuri.isotope.api.imap.ImapService;
 import com.marcnuri.isotope.api.message.Message;
+import com.marcnuri.isotope.api.message.MessageWithFolder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -93,8 +94,7 @@ public class FolderResourceTest {
         final Folder mockFolder = new Folder();
         mockFolder.setChildren(new Folder[0]);
         mockFolder.setFolderId(folderId);
-        doReturn(Collections.singletonList(mockFolder))
-                .when(imapService).getFolders(Mockito.any(), Mockito.isNull());
+        doReturn(Collections.singletonList(mockFolder)).when(imapService).getFolders(Mockito.isNull());
 
         // When
         final ResultActions result = mockMvc.perform(
@@ -131,7 +131,7 @@ public class FolderResourceTest {
         mockFolder.setChildren(new Folder[0]);
         mockFolder.setFolderId(folderId);
         doReturn(Collections.singletonList(mockFolder))
-                .when(imapService).createRootFolder(Mockito.any(), Mockito.eq("new-folder"));
+                .when(imapService).createRootFolder(Mockito.eq("new-folder"));
 
         // When
         final ResultActions result = mockMvc.perform(
@@ -153,8 +153,8 @@ public class FolderResourceTest {
         final Folder mockFolder = new Folder();
         mockFolder.setChildren(new Folder[0]);
         mockFolder.setFolderId(folderId);
-        doReturn(mockFolder).when(imapService).createChildFolder(
-                Mockito.any(), Mockito.eq(new URLName("/parent/folder")), Mockito.eq("new-folder"));
+        doReturn(mockFolder).when(imapService)
+                .createChildFolder(Mockito.eq(new URLName("/parent/folder")), Mockito.eq("new-folder"));
 
         // When
         final ResultActions result = mockMvc.perform(
@@ -175,8 +175,7 @@ public class FolderResourceTest {
         final Folder mockFolder = new Folder();
         mockFolder.setChildren(new Folder[0]);
         mockFolder.setFolderId(folderId);
-        doReturn(mockFolder).when(imapService).deleteFolder(Mockito.any(),
-                Mockito.eq(new URLName("/original/folder")));
+        doReturn(mockFolder).when(imapService).deleteFolder(Mockito.eq(new URLName("/original/folder")));
 
         // When
         final ResultActions result = mockMvc.perform(
@@ -191,13 +190,38 @@ public class FolderResourceTest {
     }
 
     @Test
+    public void renameFolder_validFolderAndNewName_shouldReturnOk() throws Exception {
+        // Given
+        final String folderId = "1337";
+        final Folder mockFolder = new Folder();
+        mockFolder.setName("31337");
+        mockFolder.setChildren(new Folder[0]);
+        mockFolder.setFolderId(folderId);
+        doReturn(mockFolder).when(imapService).renameFolder(Mockito.eq(new URLName("/original/folder")), Mockito.eq("31337"));
+
+        // When
+        final ResultActions result = mockMvc.perform(
+                put("/v1/folders/L29yaWdpbmFsL2ZvbGRlcg==/name")
+                        .accept(MediaTypes.HAL_JSON_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("31337")
+        );
+
+        // Then
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.folderId").value(folderId));
+        result.andExpect(jsonPath("$.name").value("31337"));
+        result.andExpect(jsonPath("$._links").exists());
+        result.andExpect(jsonPath("$._links", aMapWithSize(11)));
+    }
+    @Test
     public void moveFolder_validFolderAndNewName_shouldReturnOk() throws Exception {
         // Given
         final String folderId = "1337";
         final Folder mockFolder = new Folder();
         mockFolder.setChildren(new Folder[0]);
         mockFolder.setFolderId(folderId);
-        doReturn(mockFolder).when(imapService).moveFolder(Mockito.any(),
+        doReturn(mockFolder).when(imapService).moveFolder(
                 Mockito.eq(new URLName("/original/folder")), Mockito.eq(new URLName("/target/folder/id")));
 
         // When
@@ -221,8 +245,8 @@ public class FolderResourceTest {
         final Folder mockRootFolder = new Folder();
         mockRootFolder.setChildren(new Folder[0]);
         mockRootFolder.setFolderId(folderId);
-        doReturn(mockRootFolder).when(imapService).moveFolder(Mockito.any(),
-                Mockito.eq(new URLName("/original/folder")), Mockito.isNull());
+        doReturn(mockRootFolder).when(imapService)
+                .moveFolder(Mockito.eq(new URLName("/original/folder")), Mockito.isNull());
 
         // When
         final ResultActions result = mockMvc.perform(
@@ -249,8 +273,7 @@ public class FolderResourceTest {
             c.next(ServerSentEvent.builder(Collections.singletonList(mockMessage2)).id("2").build());
             c.complete();
         });
-        doReturn(mockFlux).when(imapService).getMessagesFlux(
-                Mockito.any(), Mockito.eq(new URLName("1337")), Mockito.any());
+        doReturn(mockFlux).when(imapService).getMessagesFlux(Mockito.eq(new URLName("1337")), Mockito.any());
 
         // When
         final ResultActions result = mockMvc.perform(get("/v1/folders/MTMzNw==/messages")
@@ -279,8 +302,7 @@ public class FolderResourceTest {
         final Message message = new Message();
         message.setUid(messageUid);
         message.setSubject("Message in a bottle");
-        doReturn(Collections.singletonList(message))
-                .when(imapService).preloadMessages(Mockito.any(), Mockito.any(), Mockito.anyList());
+        doReturn(Collections.singletonList(message)).when(imapService).preloadMessages(Mockito.any(), Mockito.anyList());
 
         // When
         final ResultActions result = mockMvc.perform(
@@ -301,8 +323,7 @@ public class FolderResourceTest {
         final Folder folder = new Folder();
         folder.setChildren(new Folder[0]);
         folder.setFolderId(folderId);
-        doReturn(folder)
-                .when(imapService).deleteMessages(Mockito.any(), Mockito.any(), Mockito.anyList());
+        doReturn(folder).when(imapService).deleteMessages(Mockito.any(), Mockito.anyList());
 
         // When
         final ResultActions result = mockMvc.perform(
@@ -317,10 +338,32 @@ public class FolderResourceTest {
     }
 
     @Test
+    public void getMessage_validFolderAndMessageIds_shouldReturnOk() throws Exception {
+        // Given
+        final MessageWithFolder message = new MessageWithFolder();
+        message.setUid(1337L);
+        message.setSubject("Message in a bottle");
+        message.setFolder(new Folder());
+        message.getFolder().setChildren(new Folder[0]);
+        message.getFolder().setFolderId("1337");
+        doReturn(message).when(imapService).getMessage(Mockito.eq(new URLName("1337")), Mockito.eq(1337L));
+
+        // When
+        final ResultActions result = mockMvc.perform(
+                get("/v1/folders/MTMzNw==/messages/1337")
+                        .accept(MediaTypes.HAL_JSON_VALUE));
+
+        // Then
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.uid").value(1337L));
+        result.andExpect(jsonPath("$.subject").value("Message in a bottle"));
+        result.andExpect(jsonPath("$.folder.folderId").value("1337"));
+    }
+
+    @Test
     public void setMessageSeen_validFolderAndMessage_shouldReturnNoContent() throws Exception {
         // Given
-        doNothing().when(imapService)
-                .setMessagesSeen(Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(long[].class));
+        doNothing().when(imapService).setMessagesSeen( Mockito.any(), Mockito.anyBoolean(), Mockito.any(long[].class));
 
         // When
         final ResultActions result = mockMvc.perform(
@@ -336,8 +379,7 @@ public class FolderResourceTest {
     @Test
     public void setMessagesSeen_validFolderAndMessages_shouldReturnNoContent() throws Exception {
         // Given
-        doNothing().when(imapService)
-                .setMessagesSeen(Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(long[].class));
+        doNothing().when(imapService).setMessagesSeen(Mockito.any(), Mockito.anyBoolean(), Mockito.any(long[].class));
 
         // When
         final ResultActions result = mockMvc.perform(
@@ -353,8 +395,7 @@ public class FolderResourceTest {
     @Test
     public void setMessageFlagged_validFolderAndMessage_shouldReturnNoContent() throws Exception {
         // Given
-        doNothing().when(imapService)
-                .setMessagesFlagged(Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any(long[].class));
+        doNothing().when(imapService).setMessagesFlagged(Mockito.any(), Mockito.anyBoolean(), Mockito.any(long[].class));
 
         // When
         final ResultActions result = mockMvc.perform(

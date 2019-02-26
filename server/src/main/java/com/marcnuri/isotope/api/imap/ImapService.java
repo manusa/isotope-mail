@@ -44,6 +44,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.RequestScope;
 import reactor.core.publisher.Flux;
@@ -134,9 +135,9 @@ public class ImapService {
         }
     }
 
-    public List<Folder> getFolders(Credentials credentials, @Nullable Boolean loadChildren) {
+    public List<Folder> getFolders(@Nullable Boolean loadChildren) {
         try {
-            final IMAPFolder rootFolder = (IMAPFolder)getImapStore(credentials).getDefaultFolder();
+            final IMAPFolder rootFolder = (IMAPFolder)getImapStore().getDefaultFolder();
             final List<Folder> folders = Stream.of(rootFolder.list())
                     .map(IMAPFolder.class::cast)
                     .map(mf -> Folder.from(mf, loadChildren))
@@ -154,20 +155,19 @@ public class ImapService {
             return folders;
         } catch (MessagingException ex) {
             log.error("Error loading folders", ex);
-            throw  new IsotopeException(ex.getMessage());
+            throw new IsotopeException(ex.getMessage());
         }
     }
 
     /**
      * Creates a new folder in the 1st level of the user's mailbox (root level)
      *
-     * @param credentials for IMAP authentication
      * @param newFolderName name for the folder to be created
      * @return List of 1st level folders with the new folder included
      */
-    public List<Folder> createRootFolder(Credentials credentials, @NonNull String newFolderName) {
+    public List<Folder> createRootFolder(@NonNull String newFolderName) {
         try {
-            final IMAPFolder rootFolder = (IMAPFolder)getImapStore(credentials).getDefaultFolder();
+            final IMAPFolder rootFolder = (IMAPFolder)getImapStore().getDefaultFolder();
             final IMAPFolder newFolder = (IMAPFolder)rootFolder.getFolder(newFolderName);
             if (!newFolder.exists()) {
                 newFolder.create(IMAPFolder.HOLDS_MESSAGES | IMAPFolder.HOLDS_FOLDERS);
@@ -175,32 +175,30 @@ public class ImapService {
             return Arrays.asList(Folder.from(rootFolder, true).getChildren());
         } catch (MessagingException ex) {
             log.error("Error creating new root folder {}", newFolderName, ex);
-            throw  new IsotopeException(ex.getMessage());
+            throw new IsotopeException(ex.getMessage());
         }
     }
 
     /**
      * Creates a new folder in the 1st level of the user's mailbox (root level)
      *
-     * @param credentials for IMAP authentication
      * @param parentFolderId Id of the folder to which to add the new child
      * @param newFolderName name for the folder to be created
      * @return Updated parent folder with child folders with the new folder included
      */
-    public Folder createChildFolder(
-            Credentials credentials, @NonNull  URLName parentFolderId, @NonNull String newFolderName) {
+    public Folder createChildFolder(@NonNull  URLName parentFolderId, @NonNull String newFolderName) {
 
         try {
-            final IMAPFolder parentFolder = getFolder(credentials, parentFolderId);
+            final IMAPFolder parentFolder = getFolder(parentFolderId);
             final IMAPFolder newFolder = (IMAPFolder)parentFolder.getFolder(newFolderName);
             if (!newFolder.exists()) {
                 newFolder.create(IMAPFolder.HOLDS_MESSAGES | IMAPFolder.HOLDS_FOLDERS);
             }
             // Must fetch folder again as attributes for the folder have changed and are cached in IMAPFolder
-            return Folder.from(getFolder(credentials, parentFolderId), true);
+            return Folder.from(getFolder(parentFolderId), true);
         } catch (MessagingException ex) {
             log.error("Error creating new folder {} under {}", newFolderName, parentFolderId, ex);
-            throw  new IsotopeException(ex.getMessage());
+            throw new IsotopeException(ex.getMessage());
         }
     }
 
@@ -209,14 +207,13 @@ public class ImapService {
      *
      * <p>The newName must not contain the folder separator character.
      *
-     * @param credentials for IMAP authentication
      * @param folderToRenameId Id of the folder to rename
      * @param newName New name for the provided folder Id
      * @return Folder with containing metadata from the parent of the renamed folder and all of its children
      */
-    public Folder renameFolder(Credentials credentials, URLName folderToRenameId, @NonNull String newName) {
+    public Folder renameFolder(URLName folderToRenameId, @NonNull String newName) {
         try {
-            final IMAPFolder folder = getFolder(credentials, folderToRenameId);
+            final IMAPFolder folder = getFolder(folderToRenameId);
             newName = newName.replaceAll("[.\\[\\]/\\\\&~*]", ""); /// Sanitize name
             if (newName.isEmpty() || newName.indexOf(folder.getSeparator()) >= 0) {
                 throw new InvalidFieldException("New folder name contains invalid characters");
@@ -239,20 +236,18 @@ public class ImapService {
      *
      * <p>Both folders must exist in order for the action to complete successfully.
      *
-     * @param credentials for IMAP authentication
      * @param folderToMoveId Id of the folder to move
      * @param targetFolderId Id of the target folder
      * @return
      */
-    public Folder moveFolder(
-            @NonNull Credentials credentials, @NonNull URLName folderToMoveId, @Nullable URLName targetFolderId) {
+    public Folder moveFolder(@NonNull URLName folderToMoveId, @Nullable URLName targetFolderId) {
         try {
-            final IMAPFolder folderToMove = getFolder(credentials, folderToMoveId);
+            final IMAPFolder folderToMove = getFolder(folderToMoveId);
             final String movedFolderFullName;
             if (targetFolderId == null) {
                 movedFolderFullName = folderToMove.getName();
             } else {
-                final IMAPFolder targetFolder = getFolder(credentials, targetFolderId);
+                final IMAPFolder targetFolder = getFolder(targetFolderId);
                 movedFolderFullName = String.format("%s%s%s",
                         targetFolder.getFullName(), targetFolder.getSeparator(), folderToMove.getName());
             }
@@ -266,13 +261,12 @@ public class ImapService {
     /**
      * Permanently deletes the folder with the provided {@link URLName} and its children.
      *
-     * @param credentials for IMAP authentication
      * @param folderToDeleteId Id of the folder to delete
      * @return Parent of deleted folder
      */
-    public Folder deleteFolder(@NonNull Credentials credentials, @NonNull URLName folderToDeleteId) {
+    public Folder deleteFolder(@NonNull URLName folderToDeleteId) {
         try {
-            final IMAPFolder folderToDelete = getFolder(credentials, folderToDeleteId);
+            final IMAPFolder folderToDelete = getFolder(folderToDeleteId);
             final IMAPFolder parent = (IMAPFolder)folderToDelete.getParent();
             folderToDelete.delete(true);
             return Folder.from(parent, true);
@@ -282,15 +276,15 @@ public class ImapService {
         }
     }
 
-    public Flux<ServerSentEvent<List<Message>>> getMessagesFlux(
-            Credentials credentials, URLName folderId, HttpServletResponse response) {
+    public Flux<ServerSentEvent<List<Message>>> getMessagesFlux(URLName folderId, HttpServletResponse response) {
 
-        return Flux.create(new MessageFluxSinkConsumer(credentials, folderId, response,this));
+        return Flux.create(new MessageFluxSinkConsumer(
+                (Credentials)SecurityContextHolder.getContext().getAuthentication(), folderId, response,this));
     }
 
-    public MessageWithFolder getMessage(Credentials credentials, URLName folderId, Long uid) {
+    public MessageWithFolder getMessage(URLName folderId, Long uid) {
         try {
-            final IMAPFolder folder = getFolder(credentials, folderId);
+            final IMAPFolder folder = getFolder(folderId);
             if (!folder.isOpen()) {
                 folder.open(READ_ONLY);
             }
@@ -309,11 +303,10 @@ public class ImapService {
         }
     }
 
-    public List<Message> preloadMessages(
-            @NonNull Credentials credentials, @NonNull URLName folderId, @NonNull List<Long> uids) {
+    public List<Message> preloadMessages(@NonNull URLName folderId, @NonNull List<Long> uids) {
 
         try {
-            final IMAPFolder folder = getFolder(credentials, folderId);
+            final IMAPFolder folder = getFolder(folderId);
             if (!folder.isOpen()) {
                 folder.open(READ_ONLY);
             }
@@ -336,10 +329,10 @@ public class ImapService {
     }
 
     public void readAttachment(
-            HttpServletResponse response, Credentials credentials, URLName folderId, Long messageId,
-            String id, Boolean isContentId) {
+            HttpServletResponse response, URLName folderId, Long messageId, String id, Boolean isContentId) {
+
         try {
-            final IMAPFolder folder = getFolder(credentials, folderId);
+            final IMAPFolder folder = getFolder(folderId);
             if (!folder.isOpen()) {
                 folder.open(READ_ONLY);
             }
@@ -368,17 +361,16 @@ public class ImapService {
      * To maximize compatibility with IMAP servers, move is performed using a regular copy and delete in the originating
      * folder, and a retrieval of messages in the target folder.
      *
-     * @param credentials to authenticate the user in the IMAP server
      * @param fromFolderId name of the originating folder
      * @param toFolderId name of the target folder
      * @param uids list of uids to move
      * @return list of new messages in the target folder since the move operation started (may include additional messages)
      */
-    public List<MessageWithFolder> moveMessages(Credentials credentials, URLName fromFolderId, URLName toFolderId, List<Long> uids) {
+    public List<MessageWithFolder> moveMessages(URLName fromFolderId, URLName toFolderId, List<Long> uids) {
         try {
-            final IMAPFolder fromFolder = getFolder(credentials, fromFolderId);
+            final IMAPFolder fromFolder = getFolder(fromFolderId);
             fromFolder.open(READ_WRITE);
-            final IMAPFolder toFolder = getFolder(credentials, toFolderId);
+            final IMAPFolder toFolder = getFolder(toFolderId);
             toFolder.open(READ_ONLY);
             long toFolderNextUID = toFolder.getUIDNext();
             toFolder.close(false);
@@ -430,22 +422,21 @@ public class ImapService {
      * Sets the seen Flag ({@link javax.mail.Flags.Flag#SEEN}) to the provided boolean value for the specified
      * messages uids
      *
-     * @param credentials
      * @param folderId
      * @param seen
      * @param uids
      */
-    public void setMessagesSeen(Credentials credentials, URLName folderId, boolean seen, long... uids) {
-        setMessagesFlag(credentials, folderId, Flags.Flag.SEEN, seen, uids);
+    public void setMessagesSeen(URLName folderId, boolean seen, long... uids) {
+        setMessagesFlag(folderId, Flags.Flag.SEEN, seen, uids);
     }
 
-    public void setMessagesFlagged(Credentials credentials, URLName folderId, boolean flagged, long... uids) {
-       setMessagesFlag(credentials, folderId, Flags.Flag.FLAGGED, flagged, uids);
+    public void setMessagesFlagged(URLName folderId, boolean flagged, long... uids) {
+       setMessagesFlag(folderId, Flags.Flag.FLAGGED, flagged, uids);
     }
 
-    public Folder deleteMessages(@NonNull Credentials credentials, @NonNull URLName folderId, @NonNull List<Long> uids) {
+    public Folder deleteMessages(@NonNull URLName folderId, @NonNull List<Long> uids) {
         try {
-            final IMAPFolder folder = getFolder(credentials, folderId);
+            final IMAPFolder folder = getFolder(folderId);
             folder.open(READ_WRITE);
             final javax.mail.Message[] messages = folder.getMessagesByUID(
                     uids.stream().mapToLong(Long::longValue).toArray());
@@ -467,6 +458,10 @@ public class ImapService {
                 log.error("Error closing IMAP Store", ex);
             }
         }
+    }
+
+    private IMAPStore getImapStore() throws MessagingException {
+        return getImapStore((Credentials)SecurityContextHolder.getContext().getAuthentication());
     }
 
     IMAPStore getImapStore(Credentials credentials) throws MessagingException {
@@ -519,17 +514,17 @@ public class ImapService {
                 .collect(Collectors.toList());
     }
 
-    private IMAPFolder getFolder(Credentials credentials, URLName folderId) throws MessagingException {
-        final IMAPFolder folder = (IMAPFolder)getImapStore(credentials).getFolder(getFileWithRef(folderId));
+    private IMAPFolder getFolder(URLName folderId) throws MessagingException {
+        final IMAPFolder folder = (IMAPFolder)getImapStore().getFolder(getFileWithRef(folderId));
         if (!folder.exists()) {
             throw new NotFoundException(String.format("Folder %s not found", folderId.toString()));
         }
         return folder;
     }
 
-    private void setMessagesFlag(Credentials credentials, URLName folderId, Flags.Flag flag, boolean flagValue, long... uids) {
+    private void setMessagesFlag(URLName folderId, Flags.Flag flag, boolean flagValue, long... uids) {
         try {
-            final IMAPFolder folder = getFolder(credentials, folderId);
+            final IMAPFolder folder = getFolder(folderId);
             folder.open(READ_WRITE);
             final javax.mail.Message[] messages = folder.getMessagesByUID(uids);
             folder.setFlags(messages, new Flags(flag), flagValue);

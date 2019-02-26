@@ -20,14 +20,12 @@
  */
 package com.marcnuri.isotope.api.smtp;
 
-import com.marcnuri.isotope.api.credentials.Credentials;
 import com.marcnuri.isotope.api.message.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,11 +55,8 @@ public class SmtpResource {
             HttpServletRequest request, @Validated({Message.SmtpSend.class}) @RequestBody Message message) {
 
         log.debug("Sending SMTP message");
-        smtpServiceFactory.getObject().sendMessage(request, getCredentials(), message);
+        smtpServiceFactory.getObject().sendMessage(request, message);
         return ResponseEntity.noContent().build();
     }
 
-    private Credentials getCredentials() {
-        return (Credentials)SecurityContextHolder.getContext().getAuthentication();
-    }
 }

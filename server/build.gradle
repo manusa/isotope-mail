@@ -35,6 +35,7 @@ dependencies {
 	compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
 	compile('commons-io:commons-io:2.6')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('org.springframework.security:spring-security-test')
 	testCompile('com.marcnuri:spring-common-test:0.0.2')
 	testCompile('org.hamcrest:java-hamcrest:2.0.0.0')
 	testCompile('org.powermock:powermock-module-junit4:2.0.0-RC.3')
