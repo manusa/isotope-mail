@@ -67,7 +67,7 @@ public class CredentialsServiceTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         credentialsService = null;
     }
 

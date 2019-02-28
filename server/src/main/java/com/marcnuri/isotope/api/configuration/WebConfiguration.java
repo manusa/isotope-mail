@@ -52,7 +52,7 @@ public class WebConfiguration implements WebMvcConfigurer, AsyncConfigurer {
     public static final String IMAP_SERVICE_PROTOTYPE = "prototypeImapService";
     private static final String DEVELOPMENT_PROFILE = "dev";
 
-    private Environment environment;
+    private final Environment environment;
 
     @Autowired
     public WebConfiguration(Environment environment) {

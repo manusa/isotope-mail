@@ -376,9 +376,7 @@ public class ImapService {
             toFolder.close(false);
 
             // Maximize IMAP compatibility, perform COPY and DELETE
-            final javax.mail.Message[] messagesToMove = Stream.of(fromFolder.getMessagesByUID(
-                    uids.stream().mapToLong(Long::longValue).toArray()))
-                    .filter(Objects::nonNull)
+            final javax.mail.Message[] messagesToMove = Stream.of(getMessagesByUID(fromFolder, uids))
                     .filter(m -> !m.isExpunged())
                     .toArray(javax.mail.Message[]::new);
             if (messagesToMove.length > 0) {
@@ -438,8 +436,7 @@ public class ImapService {
         try {
             final IMAPFolder folder = getFolder(folderId);
             folder.open(READ_WRITE);
-            final javax.mail.Message[] messages = folder.getMessagesByUID(
-                    uids.stream().mapToLong(Long::longValue).toArray());
+            final javax.mail.Message[] messages = getMessagesByUID(folder, uids);
             folder.setFlags(messages, new Flags(Flags.Flag.DELETED), true);
             folder.expunge(messages);
             return Folder.from(folder, true);
@@ -506,10 +503,7 @@ public class ImapService {
         }
         return Stream.of(messages)
                 .map(m -> Message.from(folder, (IMAPMessage)m))
-                .map(m -> {
-                    m.setModseq(highestModseq);
-                    return m;
-                })
+                .peek(m -> m.setModseq(highestModseq))
                 .sorted(Comparator.comparingLong(Message::getUid).reversed())
                 .collect(Collectors.toList());
     }
@@ -526,7 +520,7 @@ public class ImapService {
         try {
             final IMAPFolder folder = getFolder(folderId);
             folder.open(READ_WRITE);
-            final javax.mail.Message[] messages = folder.getMessagesByUID(uids);
+            final javax.mail.Message[] messages = getMessagesByUID(folder, uids);
             folder.setFlags(messages, new Flags(flag), flagValue);
             folder.close(false);
         } catch (MessagingException ex) {
@@ -606,6 +600,23 @@ public class ImapService {
                     .replace("\r\n", "<br />" )
                     .replaceAll("[\\r\\n]", "<br />"));
         }
+    }
+
+    /**
+     * Returns an array of {@link javax.mail.Message} with <strong>no</strong> null entries from an array of uids for
+     * the provided {@link IMAPFolder}
+     *
+     * @param folder for which to retrieve the null-checked array of Messages
+     * @param uids to retrieve the messages from the folder
+     * @return array of Messages with no null entries
+     * @throws MessagingException
+     */
+    private static javax.mail.Message[] getMessagesByUID(IMAPFolder folder, long[] uids) throws MessagingException {
+        return Stream.of(folder.getMessagesByUID(uids)).filter(Objects::nonNull).toArray(javax.mail.Message[]::new);
+    }
+
+    private static javax.mail.Message[] getMessagesByUID(IMAPFolder folder, List<Long> uids) throws MessagingException {
+        return getMessagesByUID(folder, uids.stream().mapToLong(Long::longValue).toArray());
     }
 
     private static Properties initMailProperties(@NonNull Credentials credentials, MailSSLSocketFactory mailSSLSocketFactory) {

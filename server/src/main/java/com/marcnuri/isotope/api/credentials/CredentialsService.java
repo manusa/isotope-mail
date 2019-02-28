@@ -71,8 +71,8 @@ public class CredentialsService {
      * Parses {@link HttpServletRequest} for isotope credentials to decode them and return
      * a valid {@link Credentials} object.
      *
-     * @param httpServletRequest
-     * @return
+     * @param httpServletRequest from which to extract Isotope Credentials HttpHeaders
+     * @return Credentials obtained and validated from httpServletRequest headers
      */
     Credentials fromRequest(HttpServletRequest httpServletRequest) {
         try {

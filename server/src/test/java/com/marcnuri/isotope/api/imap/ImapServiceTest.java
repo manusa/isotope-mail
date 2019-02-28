@@ -47,6 +47,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.URLName;
+import java.util.Collections;
 import java.util.List;
 
 import static com.marcnuri.isotope.api.configuration.WithMockCredentials.PASSWORD;
@@ -324,5 +325,29 @@ public class ImapServiceTest {
         verify(folder, times(1)).setFlags(
                 Mockito.any(Message[].class), Mockito.eq(new Flags(Flags.Flag.FLAGGED)), Mockito.eq(true));
         verify(folder, times(1)).close(Mockito.eq(false));
+    }
+
+    @Test
+    @WithMockCredentials
+    public void deleteMessages_validParameters_shouldFlagAndExpungeMessages() throws Exception {
+        // Given
+        final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
+        doReturn(folder).when(imapStore).getFolder(Mockito.any(String.class));
+        doReturn(new URLName("/")).when(folder).getURLName();
+        doReturn(new String[0]).when(folder).getAttributes();
+        doReturn(new IMAPFolder[0]).when(folder).list();
+        doReturn(true).when(folder).exists();
+        doReturn(new Message[]{null}).when(folder).getMessagesByUID(new long[]{1337L});
+
+        // When
+        imapService.deleteMessages(new URLName("1337"), Collections.singletonList(1337L));
+
+        // Then
+        verify(imapStore, times(1)).connect(
+                Mockito.eq(SERVER_HOST), Mockito.eq(SERVER_PORT),
+                Mockito.eq(USER), Mockito.eq(PASSWORD));
+        verify(folder, times(1)).setFlags(
+                Mockito.any(Message[].class), Mockito.eq(new Flags(Flags.Flag.DELETED)), Mockito.eq(true));
+        verify(folder, times(1)).expunge(Mockito.any());
     }
 }
