@@ -93,12 +93,19 @@ public class CredentialsService {
     }
 
     /**
-     * Refreshes Credentials expiry date and writes new values to the provided {@link HttpServletResponse} Headers
+     * Refreshes {@link Credentials} expiry date and writes new values to the provided {@link HttpServletResponse} Headers.
+     *
+     * <p>Credentials only refreshed if they are close to expiry (remaining lifetime < 10 minutes)
      *
      * @param oldCredentials with "outdated" expiry date
      * @param response to which to write new encrypted credentials headers
      */
     void refreshCredentials(Credentials oldCredentials, HttpServletResponse response) {
+        final ZonedDateTime timeToRefresh = oldCredentials.getExpiryDate()
+                .minus(isotopeApiConfiguration.getCredentialsRefreshBeforeDuration());
+        if (ZonedDateTime.now(ZoneOffset.UTC).isBefore(timeToRefresh)) {
+            return;
+        }
         try {
             final Credentials newCredentials = encrypt(oldCredentials);
             response.setHeader(HttpHeaders.ISOTOPE_CREDENTIALS, newCredentials.getEncrypted());

@@ -57,6 +57,7 @@ public class IsotopeApiConfiguration {
     private static final long EMBEDDED_IMAGE_SIZE_THRESHOLD_DEFAULT_50KB = 51200L;
 
     private static final int CREDENTIALS_DURATION_MINUTES = 15;
+    private static final int CREDENTIALS_REFRESH_BEFORE_DURATION_MINUTES = 10;
 
     private final Environment environment;
 
@@ -88,6 +89,10 @@ public class IsotopeApiConfiguration {
 
     public TemporalAmount getCredentialsDuration() {
         return Duration.ofMinutes(CREDENTIALS_DURATION_MINUTES);
+    }
+
+    public TemporalAmount getCredentialsRefreshBeforeDuration() {
+        return Duration.ofMinutes(CREDENTIALS_REFRESH_BEFORE_DURATION_MINUTES);
     }
 
 }
