@@ -35,6 +35,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.servlet.http.HttpServletResponse;
 import java.time.Duration;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -122,13 +124,16 @@ public class CredentialsServiceTest {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // refreshCredentials
     @Test
-    public void refreshCredentials_validCredentials_shouldWriteResponseHeaders() throws Exception {
+    public void refreshCredentials_validCredentialsAboutToExpire_shouldWriteResponseHeaders() throws Exception {
         // Given
         doReturn(Duration.ofMillis(1337L)).when(isotopeApiConfiguration).getCredentialsDuration();
         doReturn("I'M SECRET").when(isotopeApiConfiguration).getEncryptionPassword();
+        doReturn(Duration.ofMinutes(5L)).when(isotopeApiConfiguration).getCredentialsRefreshBeforeDuration();
         doReturn("{}").when(objectMapper).writeValueAsString(Mockito.any(Credentials.class));
+
         final HttpServletResponse response = new MockHttpServletResponse();
         final Credentials credentials = new Credentials();
+        credentials.setExpiryDate(ZonedDateTime.now(ZoneOffset.UTC).plus(Duration.ofMinutes(1L)));
 
         // When
         credentialsService.refreshCredentials(credentials, response);
@@ -139,13 +144,35 @@ public class CredentialsServiceTest {
     }
 
     @Test
-    public void refreshCredentials_invalidCredentials_shouldNotWriteResponseHeaders() throws Exception {
+    public void refreshCredentials_validCredentialsJustCreated_shouldNotWriteResponseHeaders() throws Exception {
         // Given
         doReturn(Duration.ofMillis(1337L)).when(isotopeApiConfiguration).getCredentialsDuration();
         doReturn("I'M SECRET").when(isotopeApiConfiguration).getEncryptionPassword();
+        doReturn(Duration.ofMinutes(5L)).when(isotopeApiConfiguration).getCredentialsRefreshBeforeDuration();
+        doReturn("{}").when(objectMapper).writeValueAsString(Mockito.any(Credentials.class));
+
+        final HttpServletResponse response = new MockHttpServletResponse();
+        final Credentials credentials = new Credentials();
+        credentials.setExpiryDate(ZonedDateTime.now(ZoneOffset.UTC).plus(Duration.ofMinutes(6L)));
+
+        // When
+        credentialsService.refreshCredentials(credentials, response);
+
+        // Then
+        assertThat(response.getHeader(ISOTOPE_CREDENTIALS), emptyOrNullString());
+        assertThat(response.getHeader(ISOTOPE_SALT), emptyOrNullString());
+    }
+
+    @Test
+    public void refreshCredentials_invalidCredentialsAboutToExpire_shouldNotWriteResponseHeaders() throws Exception {
+        // Given
+        doReturn(Duration.ofMillis(1337L)).when(isotopeApiConfiguration).getCredentialsDuration();
+        doReturn("I'M SECRET").when(isotopeApiConfiguration).getEncryptionPassword();
+        doReturn(Duration.ofMinutes(15)).when(isotopeApiConfiguration).getCredentialsRefreshBeforeDuration();
         doThrow(JsonProcessingException.class).when(objectMapper).writeValueAsString(Mockito.any(Credentials.class));
         final HttpServletResponse response = new MockHttpServletResponse();
         final Credentials credentials = new Credentials();
+        credentials.setExpiryDate(ZonedDateTime.now(ZoneOffset.UTC).plus(Duration.ofMinutes(1L)));
 
         // When
         credentialsService.refreshCredentials(credentials, response);
