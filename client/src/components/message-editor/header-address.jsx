@@ -4,15 +4,11 @@ import PropTypes from 'prop-types';
 import Autosuggest from 'react-autosuggest';
 import mainCss from '../../styles/main.scss';
 
-const TEST_RECIPIENTS = [
-  '"Peter" <peter@email.com>',
-  '"Qatar Airways" <email@qr.qatarairways.com>'
-];
-
 export class HeaderAddress extends Component {
   constructor(props) {
     super(props);
     this.inputRef = React.createRef();
+    this.handleOnSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
     this.handleOnHeaderKeyPress = this.onHeaderKeyPress.bind(this);
     this.handleOnHeaderBlur = this.onHeaderBlur.bind(this);
 
@@ -23,7 +19,12 @@ export class HeaderAddress extends Component {
   }
 
   render() {
-    const {id, className, chipClassName, autoSuggestClassName, autoSuggestMenuClassName, label, addresses, onAddressRemove} = this.props;
+    const {
+      id,
+      className, chipClassName, autoSuggestClassName, autoSuggestMenuClassName,
+      label, addresses, onAddressRemove
+    } = this.props;
+    const {suggestions, value} = this.state;
     return (
       <div className={`${className} ${mainCss['mdc-menu-surface--anchor']}`} onClick={() => this.fieldClick()}
         onDragOver={e => e.preventDefault()} onDrop={e => this.onDrop(e, id)}>
@@ -38,20 +39,20 @@ export class HeaderAddress extends Component {
           </div>
         ))}
         <Autosuggest
-          suggestions={TEST_RECIPIENTS}
+          suggestions={suggestions}
           ref={this.inputRef}
           inputProps={{
             id: id,
             type: 'email',
-            value: this.state.value,
+            value,
             onChange: (event, {newValue}) => this.setState({value: newValue}),
             onKeyPress: this.handleOnHeaderKeyPress,
             onBlur: this.handleOnHeaderBlur
           }}
           getSuggestionValue={suggestion => suggestion}
-          renderSuggestion={suggestion => <div>{suggestion}</div>}
-          onSuggestionsFetchRequested={() => {}}
-          onSuggestionsClearRequested={() => {}}
+          renderSuggestion={suggestion => suggestion}
+          onSuggestionsFetchRequested={this.handleOnSuggestionsFetchRequested}
+          onSuggestionsClearRequested={() => this.setState({suggestions: []})}
           onSuggestionSelected={(event, {suggestionValue}) => {
             this.setState({value: ''});
             this.props.onAddressAdd(id, suggestionValue);
@@ -60,7 +61,7 @@ export class HeaderAddress extends Component {
             container: `${autoSuggestClassName} `,
             suggestionsContainer: `${mainCss['mdc-menu']} ${mainCss['mdc-menu-surface']} ${autoSuggestMenuClassName}`,
             suggestionsContainerOpen: `${mainCss['mdc-menu-surface--open']}`,
-            suggestionsList: mainCss['mdc-list'],
+            suggestionsList: `${mainCss['mdc-list']} ${mainCss['mdc-list--dense']}`,
             suggestion: mainCss['mdc-list-item'],
             suggestionHighlighted: mainCss['mdc-list-item--activated']
           }}
@@ -73,6 +74,9 @@ export class HeaderAddress extends Component {
     this.inputRef.current.input.focus();
   }
 
+  onSuggestionsFetchRequested({value}) {
+    this.setState({suggestions: this.props.getAddresses(value)});
+  }
 
   onHeaderKeyPress(event) {
     const target = event.target;
@@ -132,6 +136,7 @@ HeaderAddress.propTypes = {
   autoSuggestMenuClassName: PropTypes.string,
   addresses: PropTypes.arrayOf(PropTypes.string),
   label: PropTypes.string,
+  getAddresses: PropTypes.func,
   onAddressAdd: PropTypes.func,
   onAddressRemove: PropTypes.func,
   onAddressMove: PropTypes.func

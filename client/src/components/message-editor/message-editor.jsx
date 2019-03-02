@@ -15,6 +15,7 @@ import Button from '../buttons/button';
 import {persistApplicationNewMessageContent} from '../../services/indexed-db';
 import styles from './message-editor.scss';
 import mainCss from '../../styles/main.scss';
+import {getAddresses} from '../../services/message-addresses';
 
 const EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED = 50;
 
@@ -72,19 +73,19 @@ class MessageEditor extends Component {
               onAddressMove={this.handleMoveAddress}
               className={styles.address} chipClassName={styles.chip}
               autoSuggestClassName={styles.autoSuggest} autoSuggestMenuClassName={styles.autoSuggestMenu}
-              label={t('messageEditor.to')} />
+              getAddresses={this.props.getAddresses} label={t('messageEditor.to')} />
             <HeaderAddress id={'cc'} addresses={cc} onAddressAdd={this.handleAddAddress}
               onAddressRemove={this.handleRemoveAddress}
               onAddressMove={this.handleMoveAddress}
               className={styles.address} chipClassName={styles.chip}
               autoSuggestClassName={styles.autoSuggest} autoSuggestMenuClassName={styles.autoSuggestMenu}
-              label={t('messageEditor.cc')} />
+              getAddresses={this.props.getAddresses} label={t('messageEditor.cc')} />
             <HeaderAddress id={'bcc'} addresses={bcc} onAddressAdd={this.handleAddAddress}
               onAddressRemove={this.handleRemoveAddress}
               onAddressMove={this.handleMoveAddress}
               className={styles.address} chipClassName={styles.chip}
               autoSuggestClassName={styles.autoSuggest} autoSuggestMenuClassName={styles.autoSuggestMenu}
-              label={t('messageEditor.bcc')} />
+              getAddresses={this.props.getAddresses} label={t('messageEditor.bcc')} />
             <div className={styles.subject}>
               <input type={'text'} placeholder={t('messageEditor.subject')}
                 value={subject} onChange={this.handleOnSubjectChange} />
@@ -381,7 +382,8 @@ const mapStateToProps = state => ({
   attachments: state.application.newMessage.attachments,
   subject: state.application.newMessage.subject,
   editor: state.application.newMessage.editor,
-  content: state.application.newMessage.content
+  content: state.application.newMessage.content,
+  getAddresses: value => getAddresses(value, state.messages.cache)
 });
 
 const mapDispatchToProps = dispatch => ({
