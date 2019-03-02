@@ -96,9 +96,20 @@ $editor-border-color: lighten($mdc-theme-primary, 50%) !default;
         line-height: $header-chip-height;
       }
 
-      input {
-        min-width: 60px;
+      .autoSuggest {
+        display: flex;
         flex: 1;
+
+        .autoSuggestMenu {
+          left: 0;
+          top: 100%;
+          max-width: 100%;
+        }
+
+        input {
+          min-width: 60px;
+          flex: 1;
+        }
       }
     }
 
