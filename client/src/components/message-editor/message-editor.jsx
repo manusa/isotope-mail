@@ -70,15 +70,21 @@ class MessageEditor extends Component {
             <HeaderAddress id={'to'} addresses={to} onAddressAdd={this.handleAddAddress}
               onAddressRemove={this.handleRemoveAddress}
               onAddressMove={this.handleMoveAddress}
-              className={styles.address} chipClassName={styles.chip} label={t('messageEditor.to')} />
+              className={styles.address} chipClassName={styles.chip}
+              autoSuggestClassName={styles.autoSuggest} autoSuggestMenuClassName={styles.autoSuggestMenu}
+              label={t('messageEditor.to')} />
             <HeaderAddress id={'cc'} addresses={cc} onAddressAdd={this.handleAddAddress}
               onAddressRemove={this.handleRemoveAddress}
               onAddressMove={this.handleMoveAddress}
-              className={styles.address} chipClassName={styles.chip} label={t('messageEditor.cc')} />
+              className={styles.address} chipClassName={styles.chip}
+              autoSuggestClassName={styles.autoSuggest} autoSuggestMenuClassName={styles.autoSuggestMenu}
+              label={t('messageEditor.cc')} />
             <HeaderAddress id={'bcc'} addresses={bcc} onAddressAdd={this.handleAddAddress}
               onAddressRemove={this.handleRemoveAddress}
               onAddressMove={this.handleMoveAddress}
-              className={styles.address} chipClassName={styles.chip} label={t('messageEditor.bcc')} />
+              className={styles.address} chipClassName={styles.chip}
+              autoSuggestClassName={styles.autoSuggest} autoSuggestMenuClassName={styles.autoSuggestMenu}
+              label={t('messageEditor.bcc')} />
             <div className={styles.subject}>
               <input type={'text'} placeholder={t('messageEditor.subject')}
                 value={subject} onChange={this.handleOnSubjectChange} />

@@ -1,7 +1,13 @@
 import React, {Component} from 'react';
 import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
+import Autosuggest from 'react-autosuggest';
 import mainCss from '../../styles/main.scss';
+
+const TEST_RECIPIENTS = [
+  '"Peter" <peter@email.com>',
+  '"Qatar Airways" <email@qr.qatarairways.com>'
+];
 
 export class HeaderAddress extends Component {
   constructor(props) {
@@ -9,12 +15,17 @@ export class HeaderAddress extends Component {
     this.inputRef = React.createRef();
     this.handleOnHeaderKeyPress = this.onHeaderKeyPress.bind(this);
     this.handleOnHeaderBlur = this.onHeaderBlur.bind(this);
+
+    this.state = {
+      value: '',
+      suggestions: []
+    };
   }
 
   render() {
-    const {id, className, chipClassName, label, addresses, onAddressRemove} = this.props;
+    const {id, className, chipClassName, autoSuggestClassName, autoSuggestMenuClassName, label, addresses, onAddressRemove} = this.props;
     return (
-      <div className={className} onClick={() => this.fieldClick()}
+      <div className={`${className} ${mainCss['mdc-menu-surface--anchor']}`} onClick={() => this.fieldClick()}
         onDragOver={e => e.preventDefault()} onDrop={e => this.onDrop(e, id)}>
         <label>{label}:</label>
         {addresses.map((address, index) => (
@@ -26,15 +37,42 @@ export class HeaderAddress extends Component {
                ${mainCss['mdc-chip__icon--trailing']}`}>cancel</i>
           </div>
         ))}
-        <input id={id} ref={this.inputRef} type={'email'}
-          onKeyPress={this.handleOnHeaderKeyPress} onBlur={this.handleOnHeaderBlur} />
+        <Autosuggest
+          suggestions={TEST_RECIPIENTS}
+          ref={this.inputRef}
+          inputProps={{
+            id: id,
+            type: 'email',
+            value: this.state.value,
+            onChange: (event, {newValue}) => this.setState({value: newValue}),
+            onKeyPress: this.handleOnHeaderKeyPress,
+            onBlur: this.handleOnHeaderBlur
+          }}
+          getSuggestionValue={suggestion => suggestion}
+          renderSuggestion={suggestion => <div>{suggestion}</div>}
+          onSuggestionsFetchRequested={() => {}}
+          onSuggestionsClearRequested={() => {}}
+          onSuggestionSelected={(event, {suggestionValue}) => {
+            this.setState({value: ''});
+            this.props.onAddressAdd(id, suggestionValue);
+          }}
+          theme={{
+            container: `${autoSuggestClassName} `,
+            suggestionsContainer: `${mainCss['mdc-menu']} ${mainCss['mdc-menu-surface']} ${autoSuggestMenuClassName}`,
+            suggestionsContainerOpen: `${mainCss['mdc-menu-surface--open']}`,
+            suggestionsList: mainCss['mdc-list'],
+            suggestion: mainCss['mdc-list-item'],
+            suggestionHighlighted: mainCss['mdc-list-item--activated']
+          }}
+        />
       </div>
     );
   }
 
   fieldClick() {
-    this.inputRef.current.focus();
+    this.inputRef.current.input.focus();
   }
+
 
   onHeaderKeyPress(event) {
     const target = event.target;
@@ -43,7 +81,7 @@ export class HeaderAddress extends Component {
         const id = target.id;
         const value = target.value.replace(/;/g, '');
         this.props.onAddressAdd(id, value);
-        target.value = '';
+        this.setState({value: ''});
         target.focus();
         event.preventDefault();
       } else {
@@ -57,7 +95,7 @@ export class HeaderAddress extends Component {
     if (target.value.length > 0) {
       if (target.validity.valid) {
         this.props.onAddressAdd(target.id, target.value);
-        target.value = '';
+        this.setState({value: ''});
       } else {
         event.preventDefault();
         setTimeout(() => target.reportValidity());
@@ -90,6 +128,8 @@ HeaderAddress.propTypes = {
   id: PropTypes.string.isRequired,
   className: PropTypes.string,
   chipClassName: PropTypes.string,
+  autoSuggestClassName: PropTypes.string,
+  autoSuggestMenuClassName: PropTypes.string,
   addresses: PropTypes.arrayOf(PropTypes.string),
   label: PropTypes.string,
   onAddressAdd: PropTypes.func,
@@ -100,6 +140,8 @@ HeaderAddress.propTypes = {
 HeaderAddress.defaultProps = {
   className: '',
   chipClassName: '',
+  autoSuggestClassName: '',
+  autoSuggestMenuClassName: '',
   addresses: [],
   label: '',
   onAddressAdd: () => {},
