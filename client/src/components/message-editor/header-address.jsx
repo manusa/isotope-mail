@@ -2,12 +2,14 @@ import React, {Component} from 'react';
 import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
 import Autosuggest from 'react-autosuggest';
+import {validateEmail} from '../../services/validation';
 import mainCss from '../../styles/main.scss';
 
 export class HeaderAddress extends Component {
   constructor(props) {
     super(props);
     this.inputRef = React.createRef();
+    this.handleOnSuggestionChange = this.onSuggestionChange.bind(this);
     this.handleOnSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
     this.handleOnHeaderKeyPress = this.onHeaderKeyPress.bind(this);
     this.handleOnHeaderBlur = this.onHeaderBlur.bind(this);
@@ -43,10 +45,11 @@ export class HeaderAddress extends Component {
           ref={this.inputRef}
           inputProps={{
             id: id,
-            type: 'email',
-            value,
-            onChange: (event, {newValue}) => this.setState({value: newValue}),
-            onKeyPress: this.handleOnHeaderKeyPress,
+            // type: 'email', <- Chrome in combination with autosuggest has bug with backspace, must perform manual validation
+            type: 'text',
+            value: value,
+            onChange: this.handleOnSuggestionChange,
+            onKeyDown: this.handleOnHeaderKeyPress,
             onBlur: this.handleOnHeaderBlur
           }}
           getSuggestionValue={suggestion => suggestion}
@@ -56,6 +59,7 @@ export class HeaderAddress extends Component {
           onSuggestionSelected={(event, {suggestionValue}) => {
             this.setState({value: ''});
             this.props.onAddressAdd(id, suggestionValue);
+            setTimeout(() => this.inputRef.current.input.setCustomValidity(''));
           }}
           theme={{
             container: `${autoSuggestClassName} `,
@@ -74,22 +78,41 @@ export class HeaderAddress extends Component {
     this.inputRef.current.input.focus();
   }
 
+  onSuggestionChange(event, {newValue}) {
+    this.setState({value: newValue});
+  }
+
   onSuggestionsFetchRequested({value}) {
     this.setState({suggestions: this.props.getAddresses(value)});
   }
 
+  clearValidation(target) {
+    target.setCustomValidity('');
+  }
+
+  validateEmail(event) {
+    const target = event.target;
+    const error = validateEmail(target.value);
+    if (error) {
+      event.preventDefault();
+      target.setCustomValidity(error);
+      setTimeout(() => target.reportValidity());
+      return false;
+    }
+    return true;
+  }
+
   onHeaderKeyPress(event) {
     const target = event.target;
+    this.clearValidation(target);
     if (event.key === 'Enter' || event.key === ';') {
-      if (target.validity.valid) {
+      if (this.validateEmail(event)) {
         const id = target.id;
         const value = target.value.replace(/;/g, '');
         this.props.onAddressAdd(id, value);
         this.setState({value: ''});
         target.focus();
         event.preventDefault();
-      } else {
-        target.reportValidity();
       }
     }
   }
@@ -97,12 +120,9 @@ export class HeaderAddress extends Component {
   onHeaderBlur(event) {
     const target = event.target;
     if (target.value.length > 0) {
-      if (target.validity.valid) {
+      if (this.validateEmail(event)) {
         this.props.onAddressAdd(target.id, target.value);
         this.setState({value: ''});
-      } else {
-        event.preventDefault();
-        setTimeout(() => target.reportValidity());
       }
     }
   }
