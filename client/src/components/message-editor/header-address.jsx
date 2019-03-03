@@ -11,7 +11,9 @@ export class HeaderAddress extends Component {
     this.inputRef = React.createRef();
     this.handleOnSuggestionChange = this.onSuggestionChange.bind(this);
     this.handleOnSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
-    this.handleOnHeaderKeyPress = this.onHeaderKeyPress.bind(this);
+    this.handleOnSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this);
+    this.handleOnSuggestionSelected = this.onSuggestionSelected.bind(this);
+    this.handleOnHeaderKeyDown = this.onHeaderKeyDown.bind(this);
     this.handleOnHeaderBlur = this.onHeaderBlur.bind(this);
 
     this.state = {
@@ -34,7 +36,7 @@ export class HeaderAddress extends Component {
         {addresses.map((address, index) => (
           <div key={index} className={`${chipClassName} ${mainCss['mdc-chip']}`}
             draggable={true}
-            onDragStart={event => this.onAddressDragStart(event, id, address)}>
+            onDragStart={event => HeaderAddress.onAddressDragStart(event, id, address)}>
             <div className={mainCss['mdc-chip__text']}>{address}</div>
             <i onClick={() => onAddressRemove(id, address)} className={`material-icons ${mainCss['mdc-chip__icon']}
                ${mainCss['mdc-chip__icon--trailing']}`}>cancel</i>
@@ -49,18 +51,14 @@ export class HeaderAddress extends Component {
             type: 'text',
             value: value,
             onChange: this.handleOnSuggestionChange,
-            onKeyDown: this.handleOnHeaderKeyPress,
+            onKeyDown: this.handleOnHeaderKeyDown,
             onBlur: this.handleOnHeaderBlur
           }}
-          getSuggestionValue={suggestion => suggestion}
-          renderSuggestion={suggestion => suggestion}
+          getSuggestionValue={HeaderAddress.getSuggestionValue}
+          renderSuggestion={HeaderAddress.renderSuggestion}
           onSuggestionsFetchRequested={this.handleOnSuggestionsFetchRequested}
-          onSuggestionsClearRequested={() => this.setState({suggestions: []})}
-          onSuggestionSelected={(event, {suggestionValue}) => {
-            this.setState({value: ''});
-            this.props.onAddressAdd(id, suggestionValue);
-            setTimeout(() => this.inputRef.current.input.setCustomValidity(''));
-          }}
+          onSuggestionsClearRequested={this.handleOnSuggestionsClearRequested}
+          onSuggestionSelected={this.handleOnSuggestionSelected}
           theme={{
             container: `${autoSuggestClassName} `,
             suggestionsContainer: `${mainCss['mdc-menu']} ${mainCss['mdc-menu-surface']} ${autoSuggestMenuClassName}`,
@@ -78,6 +76,15 @@ export class HeaderAddress extends Component {
     this.inputRef.current.input.focus();
   }
 
+  /**
+   * Clears any HTML 5 validation errors from the provided target.
+   *
+   * @param target
+   */
+  static clearValidation(target) {
+    target.setCustomValidity('');
+  }
+
   onSuggestionChange(event, {newValue}) {
     this.setState({value: newValue});
   }
@@ -86,8 +93,35 @@ export class HeaderAddress extends Component {
     this.setState({suggestions: this.props.getAddresses(value)});
   }
 
-  clearValidation(target) {
-    target.setCustomValidity('');
+  onSuggestionsClearRequested() {
+    this.setState({suggestions: []});
+  }
+
+  onSuggestionSelected(event, {suggestionValue}) {
+    this.setState({value: ''});
+    this.props.onAddressAdd(this.props.id, suggestionValue);
+    setTimeout(() => HeaderAddress.clearValidation(this.inputRef.current.input));
+  }
+
+  /**
+   * Computes the value for the provided suggestion object, as suggestions are an array of strings, no computation is
+   * required.
+   *
+   * @param suggestion object
+   * @returns {string} value to render
+   */
+  static getSuggestionValue(suggestion) {
+    return suggestion;
+  }
+
+  /**
+   * Returns a component to be rendered in the suggestionList container of the Autosuggest component
+   *
+   * @param suggestionValue
+   * @returns {*}
+   */
+  static renderSuggestion(suggestionValue) {
+    return suggestionValue;
   }
 
   validateEmail(event) {
@@ -102,9 +136,9 @@ export class HeaderAddress extends Component {
     return true;
   }
 
-  onHeaderKeyPress(event) {
+  onHeaderKeyDown(event) {
     const target = event.target;
-    this.clearValidation(target);
+    HeaderAddress.clearValidation(target);
     if (event.key === 'Enter' || event.key === ';') {
       if (this.validateEmail(event)) {
         const id = target.id;
@@ -127,7 +161,7 @@ export class HeaderAddress extends Component {
     }
   }
 
-  onAddressDragStart(event, id, address) {
+  static onAddressDragStart(event, id, address) {
     event.stopPropagation();
     const payload = {id, address};
     event.dataTransfer.setData('application/json', JSON.stringify(payload));
