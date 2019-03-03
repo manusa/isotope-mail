@@ -7,7 +7,7 @@
 function getAllAddresses(messageCaches) {
   return Object.values(messageCaches)
     .flatMap(mc => Array.from(mc.values()))
-    .flatMap(m => Array.concat(m.from, m.recipients.map(r => r.address)));
+    .flatMap(m => [].concat(m.from, m.recipients.map(r => r.address)));
 }
 
 /**
@@ -27,6 +27,18 @@ function getAllAddressesCounted(messageCaches) {
   return counts;
 }
 
+/**
+ * Returns an array of addresses compiled from the provided messageCaches.
+ *
+ * Addresses will be filtered by the provided value, if filter is a sentence containing different words, the address
+ * must contain all of the words in any order.
+ *
+ * Addresses will be sorted by number of entries in the cache, most popular addresses will be returned first.
+ *
+ * @param value to filter addresses
+ * @param messageCaches from which to extract e-mail addresses
+ * @returns {string[]}
+ */
 export function getAddresses(value, messageCaches) {
   const lowerCaseValues = value.toLowerCase().split(' ');
   return Object.entries(getAllAddressesCounted(messageCaches))

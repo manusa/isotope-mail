@@ -2,7 +2,7 @@
 
 exports[`HeaderAddress component test suite Snapshot render, should render HeaderAddress 1`] = `
 <div
-  className="Business"
+  className="Business mdc-menu-surface--anchor"
   onClick={[Function]}
   onDragOver={[Function]}
   onDrop={[Function]}
@@ -49,11 +49,40 @@ exports[`HeaderAddress component test suite Snapshot render, should render Heade
       cancel
     </i>
   </div>
-  <input
-    id="I'mDown"
-    onBlur={[Function]}
-    onKeyPress={[Function]}
-    type="email"
+  <Autosuggest
+    alwaysRenderSuggestions={false}
+    focusInputOnSuggestionClick={true}
+    getSuggestionValue={[Function]}
+    highlightFirstSuggestion={false}
+    id="1"
+    inputProps={
+      Object {
+        "id": "I'mDown",
+        "onBlur": [Function],
+        "onChange": [Function],
+        "onKeyDown": [Function],
+        "type": "text",
+        "value": "",
+      }
+    }
+    multiSection={false}
+    onSuggestionSelected={[Function]}
+    onSuggestionsClearRequested={[Function]}
+    onSuggestionsFetchRequested={[Function]}
+    renderSuggestion={[Function]}
+    renderSuggestionsContainer={[Function]}
+    shouldRenderSuggestions={[Function]}
+    suggestions={Array []}
+    theme={
+      Object {
+        "container": " ",
+        "suggestion": "mdc-list-item",
+        "suggestionHighlighted": "mdc-list-item--activated",
+        "suggestionsContainer": "mdc-menu mdc-menu-surface ",
+        "suggestionsContainerOpen": "mdc-menu-surface--open",
+        "suggestionsList": "mdc-list mdc-list--dense",
+      }
+    }
   />
 </div>
 `;
