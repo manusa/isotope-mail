@@ -5,8 +5,10 @@
  * @returns {*} null if email is valid or validation error message if it isn't
  */
 export function validateEmail(email) {
+  const mimeMail = email.match(/.*?<([^>]*?)>$/);
+  const emailToValidate = mimeMail ? mimeMail[1] : email;
   const fakeEmailComponent = document.createElement('input');
   fakeEmailComponent.setAttribute('type', 'email');
-  fakeEmailComponent.value = email;
+  fakeEmailComponent.value = emailToValidate;
   return fakeEmailComponent.reportValidity() ? null : fakeEmailComponent.validationMessage;
 }
