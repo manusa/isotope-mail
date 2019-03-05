@@ -12,9 +12,9 @@ describe('Validation service test suite', () => {
     });
     test('invalid email, should return validation error message', () => {
       // Given
-      const validEmail = 'invalid';
+      const invalidEmail = 'invalid';
       // When
-      const result = validateEmail(validEmail);
+      const result = validateEmail(invalidEmail);
       // Then
       expect(result).not.toBeNull();
       expect(result).not.toHaveLength(0);
@@ -29,9 +29,27 @@ describe('Validation service test suite', () => {
     });
     test('invalid email mime formatted, should return validation error message', () => {
       // Given
-      const validEmail = '"I Suck" <invalid>';
+      const invalidEmail = '"I Suck" <invalid>';
       // When
-      const result = validateEmail(validEmail);
+      const result = validateEmail(invalidEmail);
+      // Then
+      expect(result).not.toBeNull();
+      expect(result).not.toHaveLength(0);
+    });
+    test('empty email mime formatted, should return validation error message', () => {
+      // Given
+      const invalidEmail = '"I Suck" <>';
+      // When
+      const result = validateEmail(invalidEmail);
+      // Then
+      expect(result).not.toBeNull();
+      expect(result).not.toHaveLength(0);
+    });
+    test('empty email and name mime formatted, should return validation error message', () => {
+      // Given
+      const invalidEmail = '<>';
+      // When
+      const result = validateEmail(invalidEmail);
       // Then
       expect(result).not.toBeNull();
       expect(result).not.toHaveLength(0);
