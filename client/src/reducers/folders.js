@@ -11,7 +11,7 @@ function _updateFolder(folderToReplace, folders) {
       f.children = _updateFolder(folderToReplace, f.children);
     }
     if (f.folderId === folderToReplace.folderId) {
-      // Keep trash attribute (may have been arbitrarily set from API server)
+      // Keep trash attribute (may have been arbitrarily set from API server when loading initial complete folder tree)
       if (f.type === FolderTypes.TRASH && folderToReplace.type !== FolderTypes.TRASH) {
         folderToReplace.attributes.push(FolderTypes.TRASH.attribute);
         folderToReplace.type = FolderTypes.TRASH;

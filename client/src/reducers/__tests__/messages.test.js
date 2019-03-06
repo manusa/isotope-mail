@@ -10,18 +10,20 @@ describe('Messages reducer test suite', () => {
     expect(messagesDefaultState).toHaveProperty('selected', []);
     expect(messagesDefaultState).toHaveProperty('activeRequests', 0);
   });
-  test('Messages BE Request', () => {
+  test('MESSAGES_BE_REQUEST', () => {
     const updatedState = messages(INITIAL_STATE.messages, {type: ActionTypes.MESSAGES_BE_REQUEST});
     expect(updatedState.activeRequests).toBe(1);
   });
-  test('Messages BE Request completed (was 0)', () => {
-    const updatedState = messages(INITIAL_STATE.messages, {type: ActionTypes.MESSAGES_BE_REQUEST_COMPLETED});
-    expect(updatedState.activeRequests).toBe(0);
-  });
-  test('Messages BE Request completed (was 2)', () => {
-    const updatedState = messages({...INITIAL_STATE.messages, activeRequests: 2},
-      {type: ActionTypes.MESSAGES_BE_REQUEST_COMPLETED});
-    expect(updatedState.activeRequests).toBe(1);
+  describe('MESSAGES_BE_REQUEST_COMPLETED', () => {
+    test('Initial state was 0, should stay 0', () => {
+      const updatedState = messages(INITIAL_STATE.messages, {type: ActionTypes.MESSAGES_BE_REQUEST_COMPLETED});
+      expect(updatedState.activeRequests).toBe(0);
+    });
+    test('Initial state was 2, should change to 1', () => {
+      const updatedState = messages({...INITIAL_STATE.messages, activeRequests: 2},
+        {type: ActionTypes.MESSAGES_BE_REQUEST_COMPLETED});
+      expect(updatedState.activeRequests).toBe(1);
+    });
   });
   test('Messages set cache (original cache)', () => {
     const replacedCachePayload = {otherFolder: {}};

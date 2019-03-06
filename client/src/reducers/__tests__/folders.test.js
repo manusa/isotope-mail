@@ -1,6 +1,7 @@
 import folders from '../folders';
 import {ActionTypes} from '../../actions/action-types';
 import {INITIAL_STATE} from '../index';
+import {FolderTypes} from '../../services/folder';
 
 describe('Folders reducer test suite', () => {
   test('Folders default state', () => {
@@ -9,9 +10,120 @@ describe('Folders reducer test suite', () => {
     expect(foldersDefaultState).toHaveProperty('explodedItems', {});
     expect(foldersDefaultState).toHaveProperty('activeRequests', 0);
   });
-  test('Folders BE Request', () => {
+  test('FOLDERS_BE_REQUEST', () => {
     const updatedState = folders(INITIAL_STATE.folders, {type: ActionTypes.FOLDERS_BE_REQUEST});
     expect(updatedState.activeRequests).toBe(1);
+  });
+  describe('FOLDERS_SET', () => {
+    test('Initial state contains no folders, set folder with children, should set new folders', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.folders, activeRequests: 1};
+      const payload = [{folderId: '1337', children: [{folderId: '313373', children: []}]}];
+
+      // When
+      const updatedState = folders(initialState,
+        {type: ActionTypes.FOLDERS_SET, payload});
+
+      // Then
+      expect(initialState.items).toHaveLength(0);
+      expect(updatedState.activeRequests).toBe(0);
+      expect(updatedState.items).toHaveLength(1);
+      expect(Object.keys(updatedState.explodedItems)).toHaveLength(2);
+      expect(updatedState.items).toEqual(expect.arrayContaining([expect.objectContaining({folderId: '1337'})]));
+      expect(Object.keys(updatedState.explodedItems)).toEqual(['1337', '313373']);
+    });
+    test('Initial state contains folders, set folder with children, should set new folders', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.folders, items: [{folderId: 'L337'}], activeRequests: 2};
+      const payload = [{folderId: '1337', children: [{folderId: '313373', children: []}]}];
+
+      // When
+      const updatedState = folders(initialState,
+        {type: ActionTypes.FOLDERS_SET, payload});
+
+      // Then
+      expect(initialState.items).toHaveLength(1);
+      expect(initialState.items)
+        .toEqual(expect.arrayContaining([expect.objectContaining({folderId: 'L337'})]));
+      expect(updatedState.activeRequests).toBe(1);
+      expect(updatedState.items).toHaveLength(1);
+      expect(Object.keys(updatedState.explodedItems)).toHaveLength(2);
+      expect(updatedState.items)
+        .toEqual(expect.arrayContaining([expect.objectContaining({folderId: '1337'})]));
+      expect(Object.keys(updatedState.explodedItems)).toEqual(['1337', '313373']);
+    });
+  });
+  describe('FOLDERS_UPDATE', () => {
+    test('Initial state containing folder, existing folder with updated folder, should replace folder', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.folders,
+        items: [{folderId: '1337', children: [{folderId: '313373', newMessageCount: 2}]}],
+        explodedItems: {
+          1337: {folderId: '1337'},
+          313373: {folderId: '313373', newMessageCount: 2}
+        }
+      };
+      const payload = {
+        folderId: '313373', newMessageCount: 1
+      };
+
+      // When
+      const updatedState = folders(initialState, {type: ActionTypes.FOLDERS_UPDATE, payload});
+
+      // Then
+      expect(updatedState.items).toHaveLength(1);
+      expect(updatedState.items[0].children)
+        .toEqual([expect.objectContaining({folderId: '313373', newMessageCount: 1})]);
+      expect(Object.keys(updatedState.explodedItems)).toHaveLength(2);
+      expect(updatedState.explodedItems['313373'])
+        .toEqual({folderId: '313373', newMessageCount: 1});
+    });
+    test('Initial state containing folder marked as TRASH, payload with existing folder, should replace folder', () => {
+      // Given
+      const items = [{folderId: '1337',
+        children: [{folderId: '313373', type: FolderTypes.TRASH, newMessageCount: 2}]}];
+      const initialState = {...INITIAL_STATE.folders,
+        items,
+        explodedItems: {
+          1337: items[0],
+          313373: items[0].children[0]
+        }
+      };
+      const payload = {
+        folderId: '313373', newMessageCount: 1, attributes: []
+      };
+
+      // When
+      const updatedState = folders(initialState, {type: ActionTypes.FOLDERS_UPDATE, payload});
+
+      // Then
+      expect(updatedState.items).toHaveLength(1);
+      expect(updatedState.items[0].children).toEqual([expect.objectContaining(
+        {folderId: '313373', newMessageCount: 1,
+          attributes: expect.arrayContaining([FolderTypes.TRASH.attribute])
+        })]);
+      expect(Object.keys(updatedState.explodedItems)).toHaveLength(2);
+      expect(updatedState.explodedItems['313373'])
+        .toEqual(expect.objectContaining({folderId: '313373', newMessageCount: 1}));
+    });
+    test('Initial state containing NO folders, payload with folder, state should not change', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.folders,
+        items: [],
+        explodedItems: {}
+      };
+      const payload = {
+        folderId: '313373', newMessageCount: 1
+      };
+
+      // When
+      const updatedState = folders(initialState, {type: ActionTypes.FOLDERS_UPDATE, payload});
+
+      // Then
+      expect(initialState.items).not.toBe(updatedState.items);
+      expect(updatedState.items).toHaveLength(0);
+      expect(Object.keys(updatedState.explodedItems)).toHaveLength(0);
+    });
   });
   describe('APPLICATION_FOLDER_RENAME_OK', () => {
     test('Folder renamed no longer exists in current state, should return unchanged state', () => {
