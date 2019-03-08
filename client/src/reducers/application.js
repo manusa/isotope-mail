@@ -53,6 +53,7 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
     case ActionTypes.APPLICATION_MESSAGE_REFRESH: {
       const newState = {...state};
       const message = action.payload.message;
+      newState.downloadedMessages = {...newState.downloadedMessages};
       // Store in application.downloadedMessages
       newState.downloadedMessages[message.messageId] = message;
       // Update selected message if is currently selected

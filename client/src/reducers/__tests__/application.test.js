@@ -35,10 +35,24 @@ describe('Application reducer test suite', () => {
       expect(updatedState.activeRequests).toBe(1);
     });
   });
-  test('APPLICATION_USER_CREDENTIALS_CLEAR, user was not null, use should be empty', () => {
+  test('APPLICATION_USER_CREDENTIALS_CLEAR, user was not null, user should be empty', () => {
     const updatedState = application({...INITIAL_STATE.application, user: {name: 'Luke'}},
       {type: ActionTypes.APPLICATION_USER_CREDENTIALS_CLEAR});
     expect(updatedState.user).toEqual({});
+  });
+  test('APPLICATION_USER_CREDENTIALS_SET, user was not null, user credentials should be set', () => {
+    // Given
+    const initialState = {...INITIAL_STATE.application, user: {name: 'Luke'}};
+
+    // When
+    const updatedState = application(initialState, {
+      type: ActionTypes.APPLICATION_USER_CREDENTIALS_SET,
+      payload: {userId: 'encryptedId', hash: 'hashValue', credentials: {encrypted: 'randomHash', salt: 'pepper'}}});
+
+    // Then
+    expect(Object.keys(initialState.user)).not.toContain('credentials');
+    expect(updatedState.user).toEqual(expect.objectContaining(
+      {name: 'Luke', id: 'encryptedId', hash: 'hashValue', credentials: {encrypted: 'randomHash', salt: 'pepper'}}));
   });
   test('APPLICATION_USER_CREDENTIALS_REFRESH, new encrypted and salt fields, should update user fields', () => {
     // Given
@@ -54,6 +68,20 @@ describe('Application reducer test suite', () => {
     expect(initialState.user).not.toMatchObject(updatedState.user);
     expect(updatedState.user.credentials.encrypted).toBe('Enigma');
     expect(updatedState.user.credentials.salt).toBe('Himalayas');
+  });
+  test('APPLICATION_FOLDER_SELECT, new folderId should be set', () => {
+    // Given
+    const initialState = {...INITIAL_STATE.application};
+
+    // When
+    const updatedState = application(initialState, {
+      type: ActionTypes.APPLICATION_FOLDER_SELECT,
+      payload: {folderId: '1337'}});
+
+    // Then
+    expect(initialState).not.toBe(updatedState);
+    expect(initialState.selectedFolderId).not.toEqual('1337');
+    expect(updatedState.selectedFolderId).toEqual('1337');
   });
   test('APPLICATION_FOLDER_CREATE, createFolderParentId was null, should change', () => {
     const updatedState = application({...INITIAL_STATE.application, createFolderParentId: null},
@@ -77,6 +105,82 @@ describe('Application reducer test suite', () => {
         {type: ActionTypes.APPLICATION_FOLDER_RENAME_OK, payload:
             {oldFolderId: '313373', newFolderId: '313373R8'}});
       expect(updatedState.selectedFolderId).toBe('1337');
+    });
+  });
+  test('APPLICATION_MESSAGE_SELECT, selected message was null, provided message is selected', () => {
+    // Given
+    const initialState = {...INITIAL_STATE.application};
+
+    // When
+    const updatedState = application(initialState, {
+      type: ActionTypes.APPLICATION_MESSAGE_SELECT,
+      payload: {uid: 1337, subject: 'I\'m a complete message'}});
+
+    // Then
+    expect(initialState).not.toBe(updatedState);
+    expect(initialState.selectedMessage).toBeNull();
+    expect(updatedState.selectedMessage).toEqual(expect.objectContaining(
+      {uid: 1337, subject: 'I\'m a complete message'}
+    ));
+  });
+  describe('APPLICATION_MESSAGE_REFRESH', () => {
+    test('message NOT in downloaded messages and NOT selected, should save message to downloaded messages', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.application};
+
+      // When
+      const updatedState = application(initialState, {
+        type: ActionTypes.APPLICATION_MESSAGE_REFRESH, payload: {
+          message: {uid: 1337, messageId: '1337@uid', subject: 'I\'m a complete message'},
+          folder: {folderId: '1337'}
+        }});
+
+      // Then
+      expect(Object.keys(initialState.downloadedMessages)).not.toContain('1337@uid');
+      expect(updatedState.downloadedMessages['1337@uid']).toEqual(expect.objectContaining(
+        {uid: 1337, messageId: '1337@uid', subject: 'I\'m a complete message'}
+      ));
+    });
+    test('message in downloaded messages and NOT selected, should save updated message to downloaded messages', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.application};
+      initialState.downloadedMessages['1337@uid'] = {uid: 1337, messageId: '1337@uid', subject: 'Original'};
+
+      // When
+      const updatedState = application(initialState, {
+        type: ActionTypes.APPLICATION_MESSAGE_REFRESH, payload: {
+          message: {uid: 1337, messageId: '1337@uid', subject: 'I\'m a complete message'},
+          folder: {folderId: '1337'}
+        }});
+
+      // Then
+      expect(initialState.downloadedMessages['1337@uid'].subject).toBe('Original');
+      expect(updatedState.downloadedMessages['1337@uid']).toEqual(expect.objectContaining(
+        {uid: 1337, messageId: '1337@uid', subject: 'I\'m a complete message'}
+      ));
+    });
+    test('message in downloaded messages and selected, should save updated message to downloaded messages and refresh selected message', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.application};
+      const initialMessage = {uid: 1337, messageId: '1337@uid', subject: 'Original'};
+      initialState.downloadedMessages['1337@uid'] = initialMessage;
+      initialState.selectedFolderId = '1337';
+      initialState.selectedMessage = initialMessage;
+
+      // When
+      const updatedState = application(initialState, {
+        type: ActionTypes.APPLICATION_MESSAGE_REFRESH, payload: {
+          message: {uid: 1337, messageId: '1337@uid', subject: 'I\'m a complete message'},
+          folder: {folderId: '1337'}
+        }});
+
+      // Then
+      expect(initialState.downloadedMessages['1337@uid'].subject).toBe('Original');
+      expect(updatedState.downloadedMessages['1337@uid']).toEqual(expect.objectContaining(
+        {uid: 1337, messageId: '1337@uid', subject: 'I\'m a complete message'}
+      ));
+      expect(initialState.selectedMessage.subject).toBe('Original');
+      expect(updatedState.selectedMessage.subject).toBe('I\'m a complete message');
     });
   });
   test('APPLICATION_MESSAGE_REFRESH_BE_REQUEST', () => {
