@@ -319,6 +319,7 @@ public class ImapService {
             for(IMAPMessage imapMessage : messages) {
                 final Message message = Message.from(folder, imapMessage);
                 ret.add(message);
+                imapMessage.setPeek(true);
                 readContentIntoMessage(folderId, imapMessage, message);
             }
             folder.close();
