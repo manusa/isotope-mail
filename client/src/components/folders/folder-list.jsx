@@ -17,11 +17,13 @@ export const DroppablePayloadTypes = {
 
 export class FolderListClass extends Component {
   render() {
-    const {folderList, selectedFolder} = this.props;
+    const {folderTree, folders, selectedFolder} = this.props;
     return (
-      folderList.map(folder =>
-        <div key={folder.fullURL} className={`${styles.itemContainer}`}>
-          <FolderItem label={folder.name} graphic={folder.type.icon}
+      folderTree.map(folderReference => {
+        const folder = folders[folderReference.folderId];
+        return <div key={folder.fullURL} className={`${styles.itemContainer}`}>
+          <FolderItem
+            label={folder.name} graphic={folder.type.icon}
             className={styles.item}
             selected={selectedFolder && folder.folderId === selectedFolder.folderId}
             onClick={event => this.onClick(event, folder)}
@@ -33,14 +35,14 @@ export class FolderListClass extends Component {
             onDelete={FolderTypes.FOLDER === folder.type ? event => this.onDelete(event, folder) : null}
             unreadMessageCount={folder.unreadMessageCount}
             newMessageCount={folder.newMessageCount}/>
-          {(folder.children.length > 0 ?
+          {(folderReference.children.length > 0 ?
             <nav className={`${mainCss['mdc-list']} ${styles.childList}`}>
-              <FolderList folderList={folder.children} />
+              <FolderList folderTree={folderReference.children} folders={folders}/>
             </nav> :
             null
           )}
-        </div>
-      )
+        </div>;
+      })
     );
   }
 
@@ -99,7 +101,8 @@ export class FolderListClass extends Component {
 
 
 FolderListClass.propTypes = {
-  folderList: PropTypes.array.isRequired,
+  folderTree: PropTypes.array.isRequired,
+  folders: PropTypes.object.isRequired,
   application: PropTypes.object,
   selectedFolder: PropTypes.object,
   foldersState: PropTypes.object,

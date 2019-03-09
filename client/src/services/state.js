@@ -1,6 +1,6 @@
 import {persistState, recoverState} from './indexed-db';
 import {INITIAL_STATE} from '../reducers';
-import {explodeFolders} from './folder';
+import {processFolders} from './folder';
 
 export const KEY_USER_ID = 'KEY_USER_ID';
 export const KEY_HASH = 'KEY_HASH';
@@ -27,7 +27,8 @@ export async function loadState() {
     if (dbState && dbState.application && dbState.folders && dbState.messages) {
       state.application = {...dbState.application};
       state.folders.items = [...dbState.folders.items];
-      state.folders.explodedItems = explodeFolders(state.folders.items);
+      state.folders.explodedItems = {...dbState.folders.explodedItems};
+      processFolders(Object.values(state.folders.explodedItems));
       state.messages.cache = {...dbState.messages.cache};
     }
   }

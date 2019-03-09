@@ -1,6 +1,6 @@
 import {INITIAL_STATE} from './';
 import {ActionTypes} from '../actions/action-types';
-import {explodeFolders, FolderTypes, gatherFolderIds} from '../services/folder';
+import {explodeFolders, FolderTypes, gatherFolderIds, removeAttributesFromFolders} from '../services/folder';
 
 function _updateFolder(folderToReplace, folders) {
   if (!folders || !folders.length > 0) {
@@ -40,15 +40,21 @@ const folders = (state = INITIAL_STATE.folders, action = {}) => {
       const newItems = [...action.payload];
       return {
         ...state,
-        items: newItems,
+        items: removeAttributesFromFolders(newItems),
         explodedItems: explodeFolders(newItems),
         activeRequests: state.activeRequests - 1
       };
     }
     case ActionTypes.FOLDERS_UPDATE: {
       const newUpdateState = {...state};
-      newUpdateState.items = _updateFolder(action.payload, newUpdateState.items);
-      newUpdateState.explodedItems = explodeFolders(newUpdateState.items);
+      newUpdateState.items = removeAttributesFromFolders(_updateFolder(action.payload, newUpdateState.items));
+      // Update changed folders
+      newUpdateState.explodedItems = {...newUpdateState.explodedItems, ...explodeFolders([action.payload])};
+      // Remove any deleted folder
+      const remainingFolderIds = Object.keys(explodeFolders(newUpdateState.items));
+      Object.keys(newUpdateState.explodedItems)
+        .filter(key => !remainingFolderIds.includes(key))
+        .forEach(key => delete newUpdateState.explodedItems[key]);
       return newUpdateState;
     }
     /**

@@ -119,13 +119,24 @@ export function processFolders(initialFolders) {
 }
 
 /**
- * Builds an object containing all of the folders and their children at the same level
+ * Returns an array with a folder tree with just folderId and children properties.
+ *
+ * @param {Array} folderTree
+ * @returns {{folderId, children: *}[]}
  */
-export function explodeFolders(originalFolders, explodedFolders = {}) {
-  originalFolders.forEach(f => {
-    explodedFolders[f.folderId] = f;
+export function removeAttributesFromFolders(folderTree) {
+  return [...folderTree].map(({folderId, children}) => ({folderId, children: removeAttributesFromFolders(children)}));
+}
+
+/**
+ * Builds an object containing all of the folders and their children at the same level from the provided folderTree
+ */
+export function explodeFolders(folderTree, explodedFolders = {}) {
+  folderTree.forEach(f => {
+    explodedFolders[f.folderId] = {...f};
     if (f.children && f.children.length > 0) {
       explodeFolders(f.children, explodedFolders);
+      explodedFolders[f.folderId].children = removeAttributesFromFolders(explodedFolders[f.folderId].children);
     }
   });
   return explodedFolders;

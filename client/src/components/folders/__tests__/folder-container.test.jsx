@@ -4,11 +4,18 @@ import {FolderContainer} from '../folder-container';
 
 describe('FolderContainer component test suite', () => {
   test('Snapshot render, should render FolderContainer', () => {
-    const {activeRequests, folderList, selectedFolder} = {
-      activeRequests: 0, folderList: [{folderList: []}], selectedFolder: {folderId: '1337-3'}};
-    const folderContainer = shallow(
-      <FolderContainer activeRequests={activeRequests} folderList={folderList}
-        selectedFolder={selectedFolder}/>);
+    // Given
+    const props = {
+      activeRequests: 0,
+      folders: {},
+      folderTree: [{folders: {}, folderTree: []}],
+      selectedFolder: {folderId: '1337-3'}
+    };
+
+    // When
+    const folderContainer = shallow(<FolderContainer {...props} />);
+
+    // Then
     expect(folderContainer).toMatchSnapshot();
   });
 });

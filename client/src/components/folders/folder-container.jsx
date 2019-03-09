@@ -9,13 +9,13 @@ import {createFolder as createFolderAction} from '../../actions/application';
 import styles from './folder-container.scss';
 import mainCss from '../../styles/main.scss';
 
-export const FolderContainer = ({activeRequests, folderList, createFolder}) => {
-  const initialListLoading = activeRequests > 0 && folderList.length === 0;
+export const FolderContainer = ({activeRequests, folderTree, folders, createFolder}) => {
+  const initialListLoading = activeRequests > 0 && folderTree.length === 0;
   return (
     <nav className={`${mainCss['mdc-list']}`}>
       <Spinner visible={initialListLoading}
         canvasClassName={styles.spinnerCanvas} />
-      <FolderList folderList={folderList}/>
+      <FolderList folderTree={folderTree} folders={folders}/>
       {!initialListLoading &&
       (<button
         className={`material-icons ${mainCss['mdc-icon-button']} ${styles.addButton}`}onClick={createFolder}>
@@ -29,13 +29,15 @@ export const FolderContainer = ({activeRequests, folderList, createFolder}) => {
 
 FolderContainer.propTypes = {
   activeRequests: PropTypes.number,
-  folderList: PropTypes.array,
+  folderTree: PropTypes.array,
+  folders: PropTypes.object,
   createFolder: PropTypes.func
 };
 
 const mapStateToProps = state => ({
   activeRequests: state.folders.activeRequests,
-  folderList: state.folders.items
+  folderTree: state.folders.items,
+  folders: state.folders.explodedItems
 });
 
 const mapDispatchToProps = dispatch => ({

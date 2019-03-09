@@ -18,7 +18,7 @@ describe('Folders reducer test suite', () => {
     test('Initial state contains no folders, set folder with children, should set new folders', () => {
       // Given
       const initialState = {...INITIAL_STATE.folders, activeRequests: 1};
-      const payload = [{folderId: '1337', children: [{folderId: '313373', children: []}]}];
+      const payload = [{folderId: '1337', messageCount: 1, children: [{folderId: '313373', children: []}]}];
 
       // When
       const updatedState = folders(initialState,
@@ -28,9 +28,11 @@ describe('Folders reducer test suite', () => {
       expect(initialState.items).toHaveLength(0);
       expect(updatedState.activeRequests).toBe(0);
       expect(updatedState.items).toHaveLength(1);
-      expect(Object.keys(updatedState.explodedItems)).toHaveLength(2);
+      expect(Object.keys(updatedState.items[0])).toEqual(['folderId', 'children']); // Items only contain folderId and children fields
       expect(updatedState.items).toEqual(expect.arrayContaining([expect.objectContaining({folderId: '1337'})]));
+      expect(Object.keys(updatedState.explodedItems)).toHaveLength(2);
       expect(Object.keys(updatedState.explodedItems)).toEqual(['1337', '313373']);
+      expect(updatedState.explodedItems['1337']).toEqual(expect.objectContaining({messageCount: 1}));
     });
     test('Initial state contains folders, set folder with children, should set new folders', () => {
       // Given
@@ -47,9 +49,9 @@ describe('Folders reducer test suite', () => {
         .toEqual(expect.arrayContaining([expect.objectContaining({folderId: 'L337'})]));
       expect(updatedState.activeRequests).toBe(1);
       expect(updatedState.items).toHaveLength(1);
-      expect(Object.keys(updatedState.explodedItems)).toHaveLength(2);
       expect(updatedState.items)
         .toEqual(expect.arrayContaining([expect.objectContaining({folderId: '1337'})]));
+      expect(Object.keys(updatedState.explodedItems)).toHaveLength(2);
       expect(Object.keys(updatedState.explodedItems)).toEqual(['1337', '313373']);
     });
   });
@@ -57,14 +59,14 @@ describe('Folders reducer test suite', () => {
     test('Initial state containing folder, existing folder with updated folder, should replace folder', () => {
       // Given
       const initialState = {...INITIAL_STATE.folders,
-        items: [{folderId: '1337', children: [{folderId: '313373', newMessageCount: 2}]}],
+        items: [{folderId: '1337', children: [{folderId: '313373', newMessageCount: 2, children: []}]}],
         explodedItems: {
-          1337: {folderId: '1337'},
-          313373: {folderId: '313373', newMessageCount: 2}
+          1337: {folderId: '1337', children: []},
+          313373: {folderId: '313373', newMessageCount: 2, children: []}
         }
       };
       const payload = {
-        folderId: '313373', newMessageCount: 1
+        folderId: '313373', newMessageCount: 1, children: []
       };
 
       // When
@@ -72,16 +74,14 @@ describe('Folders reducer test suite', () => {
 
       // Then
       expect(updatedState.items).toHaveLength(1);
-      expect(updatedState.items[0].children)
-        .toEqual([expect.objectContaining({folderId: '313373', newMessageCount: 1})]);
+      expect(updatedState.items[0].children[0]).toEqual({folderId: '313373', children: []});
       expect(Object.keys(updatedState.explodedItems)).toHaveLength(2);
-      expect(updatedState.explodedItems['313373'])
-        .toEqual({folderId: '313373', newMessageCount: 1});
+      expect(updatedState.explodedItems['313373']).toEqual({folderId: '313373', newMessageCount: 1, children: []});
     });
     test('Initial state containing folder marked as TRASH, payload with existing folder, should replace folder', () => {
       // Given
       const items = [{folderId: '1337',
-        children: [{folderId: '313373', type: FolderTypes.TRASH, newMessageCount: 2}]}];
+        children: [{folderId: '313373', type: FolderTypes.TRASH, newMessageCount: 2, children: []}]}];
       const initialState = {...INITIAL_STATE.folders,
         items,
         explodedItems: {
@@ -90,7 +90,7 @@ describe('Folders reducer test suite', () => {
         }
       };
       const payload = {
-        folderId: '313373', newMessageCount: 1, attributes: []
+        folderId: '313373', newMessageCount: 1, attributes: [], children: []
       };
 
       // When
@@ -98,13 +98,10 @@ describe('Folders reducer test suite', () => {
 
       // Then
       expect(updatedState.items).toHaveLength(1);
-      expect(updatedState.items[0].children).toEqual([expect.objectContaining(
-        {folderId: '313373', newMessageCount: 1,
-          attributes: expect.arrayContaining([FolderTypes.TRASH.attribute])
-        })]);
+      expect(updatedState.items[0].children).toEqual([{folderId: '313373', children: []}]);
       expect(Object.keys(updatedState.explodedItems)).toHaveLength(2);
-      expect(updatedState.explodedItems['313373'])
-        .toEqual(expect.objectContaining({folderId: '313373', newMessageCount: 1}));
+      expect(updatedState.explodedItems['313373']).toEqual(expect.objectContaining(
+        {folderId: '313373', newMessageCount: 1, attributes: expect.arrayContaining([FolderTypes.TRASH.attribute])}));
     });
     test('Initial state containing NO folders, payload with folder, state should not change', () => {
       // Given

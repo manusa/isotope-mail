@@ -62,9 +62,54 @@ Array [
       className="mdc-list childList"
     >
       <Connect(FolderListClass)
-        folderList={
+        folderTree={
           Array [
             Object {
+              "children": Array [],
+              "folderId": 4,
+            },
+          ]
+        }
+        folders={
+          Object {
+            "1": Object {
+              "children": Array [],
+              "folderId": 1,
+              "name": "Inbox",
+              "newMessageCount": 1,
+              "type": Object {
+                "icon": "inbox",
+                "position": 0,
+                "serverName": "INBOX",
+              },
+              "unreadMessageCount": 1,
+            },
+            "2": Object {
+              "children": Array [],
+              "folderId": 2,
+              "name": "Folder 1",
+              "newMessageCount": 1,
+              "type": Object {
+                "icon": "folder",
+              },
+              "unreadMessageCount": 1,
+            },
+            "3": Object {
+              "children": Array [
+                Object {
+                  "children": Array [],
+                  "folderId": 4,
+                },
+              ],
+              "folderId": 3,
+              "name": "Folder 2",
+              "newMessageCount": 1,
+              "type": Object {
+                "icon": "folder",
+              },
+              "unreadMessageCount": 1,
+            },
+            "4": Object {
               "children": Array [],
               "folderId": 4,
               "name": "Folder 1",
@@ -74,7 +119,7 @@ Array [
               },
               "unreadMessageCount": 1,
             },
-          ]
+          }
         }
       />
     </nav>

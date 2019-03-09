@@ -1,6 +1,7 @@
 import * as folderService from '../folder';
 import * as indexedDbService from '../indexed-db';
 import {FolderTypes} from '../folder';
+import {removeAttributesFromFolders} from '../folder';
 import {ActionTypes} from '../../actions/action-types';
 import * as fetch from '../fetch';
 import * as notification from '../notification';
@@ -32,6 +33,22 @@ describe('Folder service test suite', () => {
 
       // Then
       expect(trashFolder).toBeUndefined();
+    });
+  });
+  describe('removeAttributesFromFolders', () => {
+    test('folder array with many attributes, only folder Id and children attributes should remain', () => {
+      // Given
+      const folderTree = [
+        {folderId: 1, attribute: 'something', children: [{folderId: 2, attribute: 'other', children: []}]},
+        {folderId: 3, otherAttribute: 'other', children: []}
+      ];
+
+      // When
+      const result = removeAttributesFromFolders(folderTree);
+
+      // Then
+      expect(result[0]).toEqual({folderId: 1, children: [{folderId: 2, children: []}]});
+      expect(result[1]).toEqual({folderId: 3, children: []});
     });
   });
   describe('getFolders', () => {

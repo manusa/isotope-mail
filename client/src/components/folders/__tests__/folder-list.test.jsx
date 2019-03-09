@@ -16,22 +16,27 @@ describe('FolderList component test suite', () => {
         unreadMessageCount: 1, newMessageCount: 1, children: []};
       // Given
       const props = {
-        folderList: [
+        folderTree: [
           selectedFolder,
-          {
+          {folderId: 2, children: []},
+          {folderId: 3, children: [{folderId: 4, children: []}]}
+        ],
+        folders: {
+          1: selectedFolder,
+          2: {
             folderId: 2, type: FolderTypes.FOLDER, name: 'Folder 1',
             unreadMessageCount: 1, newMessageCount: 1, children: []
           },
-          {
+          3: {
             folderId: 3, type: FolderTypes.FOLDER, name: 'Folder 2',
-            unreadMessageCount: 1, newMessageCount: 1, children: [
-              {
-                folderId: 4, type: FolderTypes.FOLDER, name: 'Folder 1',
-                unreadMessageCount: 1, newMessageCount: 1, children: []
-              }
+            unreadMessageCount: 1, newMessageCount: 1, children: [{folderId: 4, children: []}
             ]
+          },
+          4: {
+            folderId: 4, type: FolderTypes.FOLDER, name: 'Folder 1',
+            unreadMessageCount: 1, newMessageCount: 1, children: []
           }
-        ],
+        },
         selectedFolder: selectedFolder
       };
 

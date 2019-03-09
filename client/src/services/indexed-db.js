@@ -120,7 +120,11 @@ export async function recoverState(userId, hash) {
     recoveredState.application.newMessage.content = await _recoverApplicationNewMessageContent(userId, hash);
   }
   // Process folders
-  recoveredState.folders.items = processFolders(recoveredState.folders.items);
+  const mergeFolderItems = (folderTree, explodedFolders) =>
+    folderTree.map(folder =>
+      ({...explodedFolders[folder.folderId], children: mergeFolderItems(folder.children, explodedFolders)}));
+  recoveredState.folders.items = processFolders(
+    mergeFolderItems(recoveredState.folders.items, recoveredState.folders.explodedItems));
   // Recover message cache from other store
   recoveredState.messages.cache = await _recoverMessageCache(userId, hash);
   db.close();

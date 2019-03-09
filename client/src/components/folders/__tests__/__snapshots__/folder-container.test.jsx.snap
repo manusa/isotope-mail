@@ -11,13 +11,15 @@ exports[`FolderContainer component test suite Snapshot render, should render Fol
     visible={false}
   />
   <Connect(FolderListClass)
-    folderList={
+    folderTree={
       Array [
         Object {
-          "folderList": Array [],
+          "folderTree": Array [],
+          "folders": Object {},
         },
       ]
     }
+    folders={Object {}}
   />
   <button
     className="material-icons mdc-icon-button addButton"
