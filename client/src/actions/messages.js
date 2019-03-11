@@ -30,11 +30,12 @@ export const updateCache = (folder, messages) => ({
  *
  * @param folder to which the messages will be added
  * @param messages {Array} array of messages to add to the folder's cache
+ * @param {boolean} ignoreLocked
  * @returns {{type: string, payload: {folder: *, messages: *}}}
  */
-export const updateCacheIfExist = (folder, messages) => ({
+export const updateCacheIfExist = (folder, messages, ignoreLocked = false) => ({
   type: ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST,
-  payload: {folder, messages}
+  payload: {folder, messages, ignoreLocked}
 });
 
 /**
@@ -76,4 +77,24 @@ export const setSelected = (messages, selected) => ({
  */
 export const clearSelected = () => ({
   type: ActionTypes.MESSAGES_CLEAR_SELECTED
+});
+
+/**
+ * Adds the messageId(s) of the provided messages to the messages.locked array in the Redux store.
+ *
+ * @param {Array.<{messageId: string}>} messages
+ * @returns {{type: string, payload: *}}
+ */
+export const lockMessages = messages => ({
+  type: ActionTypes.MESSAGES_LOCK_ADD, payload: messages
+});
+
+/**
+ * Removes the messageId(s) of the provided messages from the messages.locked array in the Redux store.
+ *
+ * @param {Array.<{messageId: string}>} messages
+ * @returns {{type: string, payload: *}}
+ */
+export const unlockMessages = messages => ({
+  type: ActionTypes.MESSAGES_LOCK_REMOVE, payload: messages
 });

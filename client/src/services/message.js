@@ -2,8 +2,8 @@ import {preDownloadMessages} from '../actions/application';
 import {
   backendRequest,
   backendRequestCompleted,
-  deleteFromCache,
-  setSelected,
+  deleteFromCache, lockMessages,
+  setSelected, unlockMessages,
   updateCache, updateCacheIfExist
 } from '../actions/messages';
 import {updateFolder} from '../actions/folders';
@@ -126,7 +126,8 @@ export function preloadMessages(dispatch, credentials, folder, messageUids) {
         notifyNewMail();
       }
       dispatch(preDownloadMessages(messages));
-    });
+    })
+    .catch(() => {/* Ignore any preload error */});
 }
 
 export function downloadAttachment(credentials, attachment) {
@@ -183,6 +184,7 @@ export function moveMessages(dispatch, credentials, fromFolder, toFolder, messag
   // Update state with expected response from server
   dispatch(deleteFromCache(fromFolder, messages));
   dispatch(updateFolder(fromFolderUpdated));
+  dispatch(lockMessages(messages));
   fetch(fromFolder._links['message.move.bulk'].href.replace('{toFolderId}', toFolder.folderId), {
     method: 'PUT',
     headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
@@ -190,6 +192,7 @@ export function moveMessages(dispatch, credentials, fromFolder, toFolder, messag
   })
     .then(toJson)
     .then(newMessages => {
+      dispatch(unlockMessages(messages));
       if (Array.isArray(newMessages)) {
         dispatch(updateCache(toFolder, newMessages));
         // Update folder info with the last message (contains the most recent information)
@@ -197,6 +200,7 @@ export function moveMessages(dispatch, credentials, fromFolder, toFolder, messag
       }
     })
     .catch(() => {
+      dispatch(unlockMessages(messages));
       // Rollback state from dispatched expected responses
       dispatch(updateCache(fromFolder, messages));
       dispatch(updateFolder(fromFolder));
@@ -218,8 +222,9 @@ export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
       expectedUpdatedFolder.unreadMessageCount += seen ? -1 : +1;
     }
   });
-  dispatch(updateCacheIfExist(folder, messagesToUpdate));
+  dispatch(updateCacheIfExist(folder, messagesToUpdate, true));
   dispatch(updateFolder(expectedUpdatedFolder));
+  dispatch(lockMessages(messagesToUpdate));
 
   fetch(folder._links['message.seen.bulk'].href.replace('{seen}', seen.toString()), {
     method: 'PUT',
@@ -227,6 +232,7 @@ export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
     body: JSON.stringify(messagesToUpdate.map(m => m.uid))
   })
     .then(response => {
+      dispatch(unlockMessages(messagesToUpdate));
       if (!response.ok) {
         // Rollback state from dispatched expected responses
         dispatch(updateCacheIfExist(folder, messages));
@@ -240,13 +246,15 @@ export function setMessageFlagged(dispatch, credentials, folder, message, flagge
   _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
   abortFetch(abortControllerWrappers.getFoldersAbortController);
 
-  dispatch(updateCacheIfExist(folder, [{...message, flagged}]));
+  dispatch(updateCacheIfExist(folder, [{...message, flagged}], true));
+  dispatch(lockMessages([message]));
   fetch(folder._links['message.flagged'].href.replace('{messageId}', message.uid), {
     method: 'PUT',
     headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
     body: JSON.stringify(flagged)
   })
     .then(response => {
+      dispatch(unlockMessages([message]));
       if (!response.ok) {
         // Rollback state from dispatched expected responses
         dispatch(updateCacheIfExist(folder, [message]));
@@ -275,9 +283,10 @@ export function deleteMessages(dispatch, credentials, folder, messages) {
     expectedUpdatedFolder.newMessageCount = message.recent ? expectedUpdatedFolder.newMessageCount - 1
       : expectedUpdatedFolder.newMessageCount;
   });
-  dispatch(updateCacheIfExist(folder, messagesToDelete));
+  dispatch(updateCacheIfExist(folder, messagesToDelete, true));
   dispatch(setSelected(messagesToDelete, false));
   dispatch(updateFolder(expectedUpdatedFolder));
+  dispatch(lockMessages(messagesToDelete));
 
   fetch(url, {
     method: 'DELETE',
@@ -285,10 +294,12 @@ export function deleteMessages(dispatch, credentials, folder, messages) {
   })
     .then(toJson)
     .then(updatedFolder => {
+      dispatch(unlockMessages(messagesToDelete));
       dispatch(updateFolder(updatedFolder));
       dispatch(deleteFromCache(updatedFolder, messagesToDelete));
     })
     .catch(() => {
+      dispatch(unlockMessages(messagesToDelete));
       // Rollback state from dispatched expected responses
       dispatch(updateCacheIfExist(folder, messages));
       dispatch(updateFolder(folder));

@@ -97,6 +97,38 @@ describe('Messages reducer test suite', () => {
       expect(Array.from(updatedState.cache['1337'].keys())).toEqual(expect.arrayContaining([1, 3]));
       expect(updatedState.cache['1337'].get(1).property).toEqual('updated value');
     });
+    test('Existent folder and existent messages with one lock, should only update unlocked message entry in cache', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages};
+      initialState.cache = {...initialState.cache};
+      initialState.cache['1337'] = new Map(
+        [
+          {uid: 1, messageId: '<blockedMessage@server.com>', property: 'initial value'},
+          {uid: 2, messageId: '<notBlocked1@server.com>', property: 'initial value'},
+          {uid: 3, messageId: '<notBlocked2@server.com>', property: 'initial value'}
+        ]
+          .map(m => [m.uid, m]));
+      initialState.locked = ['<blockedMessage@server.com>'];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_UPDATE_CACHE,
+        payload: {
+          folder: {folderId: '1337'},
+          messages: [
+            {uid: 1, messageId: '<blockedMessage@server.com>', property: 'updated value'},
+            {uid: 3, messageId: '<notBlocked2@server.com>', property: 'updated value'}]
+        }
+      });
+
+      // Then
+      expect(initialState).not.toMatchObject(updatedState);
+      expect(updatedState.cache['1337'].size).toEqual(3);
+      expect(Array.from(updatedState.cache['1337'].keys())).toEqual(expect.arrayContaining([1, 2, 3]));
+      expect(updatedState.cache['1337'].get(1).property).toEqual('initial value');
+      expect(updatedState.cache['1337'].get(2).property).toEqual('initial value');
+      expect(updatedState.cache['1337'].get(3).property).toEqual('updated value');
+    });
     test('Existent folder and non-existent message, should add message entry in folder cache', () => {
       // Given
       const initialState = {...INITIAL_STATE.messages};
@@ -201,6 +233,72 @@ describe('Messages reducer test suite', () => {
       expect(initialState).toMatchObject(updatedState);
       expect(updatedState.cache['1337'].size).toEqual(1);
       expect(Array.from(updatedState.cache['1337'].keys())).toMatchObject([3]);
+    });
+    test('Existent folder with messages and locked entries, should only update non-blocked existent message entry in cache', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages};
+      initialState.cache = {...initialState.cache};
+      initialState.cache['1337'] = new Map(
+        [
+          {uid: 1, messageId: '<blockedMessage@server.com>', property: 'initial value'},
+          {uid: 3, messageId: '<notBlocked2@server.com>', property: 'initial value'}
+        ]
+          .map(m => [m.uid, m]));
+      initialState.locked = ['<blockedMessage@server.com>'];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST,
+        payload: {
+          folder: {folderId: '1337'},
+          messages: [
+            {uid: 1, messageId: '<blockedMessage@server.com>', property: 'updated value'},
+            {uid: 2, messageId: '<notBlocked1@server.com>', property: 'updated value'},
+            {uid: 3, messageId: '<notBlocked2@server.com>', property: 'updated value'}
+          ]
+        }
+      });
+
+      // Then
+      expect(initialState).not.toMatchObject(updatedState);
+      expect(updatedState.cache['1337'].size).toEqual(2);
+      expect(Array.from(updatedState.cache['1337'].keys())).toEqual([1, 3]);
+      expect(updatedState.cache['1337'].get(1).property).toEqual('initial value');
+      expect(updatedState.cache['1337'].get(3).property).toEqual('updated value');
+    });
+    test('Existent folder with messages and locked entries ignored,' +
+      'should only update non-blocked existent message entry in cache', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages};
+      initialState.cache = {...initialState.cache};
+      initialState.cache['1337'] = new Map(
+        [
+          {uid: 1, messageId: '<blockedMessage@server.com>', property: 'initial value'},
+          {uid: 3, messageId: '<notBlocked2@server.com>', property: 'initial value'}
+        ]
+          .map(m => [m.uid, m]));
+      initialState.locked = ['<blockedMessage@server.com>'];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST,
+        payload: {
+          folder: {folderId: '1337'},
+          messages: [
+            {uid: 1, messageId: '<blockedMessage@server.com>', property: 'updated value'},
+            {uid: 2, messageId: '<notBlocked1@server.com>', property: 'updated value'},
+            {uid: 3, messageId: '<notBlocked2@server.com>', property: 'updated value'}
+          ],
+          ignoreLocked: true
+        }
+      });
+
+      // Then
+      expect(initialState).not.toMatchObject(updatedState);
+      expect(updatedState.cache['1337'].size).toEqual(2);
+      expect(Array.from(updatedState.cache['1337'].keys())).toEqual([1, 3]);
+      expect(updatedState.cache['1337'].get(1).property).toEqual('updated value');
+      expect(updatedState.cache['1337'].get(3).property).toEqual('updated value');
     });
   });
   describe('MESSAGES_DELETE_FROM_CACHE', () => {
@@ -461,6 +559,104 @@ describe('Messages reducer test suite', () => {
       // Then
       expect(updatedState).toMatchObject(initialState);
       expect(updatedState.selected.length).toEqual(0);
+    });
+  });
+  describe('MESSAGES_LOCK_ADD', () => {
+    test('Initial empty locked, payload with several messages (some with no messageId),' +
+      'should add all valid entries', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages, locked: []};
+      const payload = [
+        {uid: 1, messageId: '<entry1@server.com>'},
+        {uid: 2},
+        {uid: 3, messageId: ''},
+        {uid: 4, messageId: null},
+        // eslint-disable-next-line no-undefined
+        {uid: 5, messageId: undefined},
+        {uid: 6, messageId: '<entry6@server.com>'}
+      ];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_LOCK_ADD, payload
+      });
+
+      // Then
+      expect(initialState.locked).toEqual([]);
+      expect(updatedState.locked).toEqual(['<entry1@server.com>', '<entry6@server.com>']);
+    });
+    test('Initial locked list with entries, payload with several messages an already existent entry,' +
+      'should keep old and add new valid entries (even if already present)', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages, locked: ['<repeated>']};
+      const payload = [
+        {uid: 1, messageId: '<entry1@server.com>'},
+        {uid: 2},
+        {uid: 3, messageId: ''},
+        {uid: 4, messageId: null},
+        // eslint-disable-next-line no-undefined
+        {uid: 5, messageId: undefined},
+        {uid: 6, messageId: '<entry6@server.com>'},
+        {uid: 7, messageId: '<repeated>'}
+      ];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_LOCK_ADD, payload
+      });
+
+      // Then
+      expect(initialState.locked).toEqual(['<repeated>']);
+      expect(updatedState.locked)
+        .toEqual(['<repeated>', '<entry1@server.com>', '<entry6@server.com>', '<repeated>']);
+    });
+  });
+  describe('MESSAGES_LOCK_REMOVE', () => {
+    test('Initial empty locked list, payload with several messages (some with no messageId),' +
+      'should remain empty', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages, locked: []};
+      const payload = [
+        {uid: 1, messageId: '<entry1@server.com>'},
+        {uid: 6, messageId: '<entry6@server.com>'}
+      ];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_LOCK_REMOVE, payload
+      });
+
+      // Then
+      expect(initialState.locked).toEqual([]);
+      expect(updatedState.locked).toEqual([]);
+    });
+    test('Initial locked list with repeated values, payload with several messages (some with no messageId),' +
+      'should keep instance of repeated value and remove others', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.messages, locked: [
+        '<repeated>', '<repeated>', '<repeated>', '<entry1@server.com>', '<entry2@server.com>'
+      ]};
+      const payload = [
+        {uid: 1, messageId: '<entry1@server.com>'},
+        {uid: 2},
+        {uid: 3, messageId: ''},
+        {uid: 4, messageId: null},
+        // eslint-disable-next-line no-undefined
+        {uid: 5, messageId: undefined},
+        {uid: 6, messageId: '<entry6@server.com>'},
+        {uid: 7, messageId: '<repeated>'}
+      ];
+
+      // When
+      const updatedState = messages(initialState, {
+        type: ActionTypes.MESSAGES_LOCK_REMOVE, payload
+      });
+
+      // Then
+      expect(initialState.locked)
+        .toEqual(['<repeated>', '<repeated>', '<repeated>', '<entry1@server.com>', '<entry2@server.com>']);
+      expect(updatedState.locked)
+        .toEqual(['<repeated>', '<repeated>', '<entry2@server.com>']);
     });
   });
 });

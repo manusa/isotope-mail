@@ -77,7 +77,8 @@ describe('Message service test suite', () => {
       const dispatch = jest.fn(action => {
         switch (action.type) {
           case ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST:
-          case ActionTypes.FOLDERS_UPDATE: {
+          case ActionTypes.FOLDERS_UPDATE:
+          case ActionTypes.MESSAGES_LOCK_ADD: {
             dispatchCount++;
             break;
           }
@@ -95,7 +96,7 @@ describe('Message service test suite', () => {
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
-      expect(dispatchCount).toEqual(2);
+      expect(dispatchCount).toEqual(3);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
@@ -111,8 +112,13 @@ describe('Message service test suite', () => {
       fetch.abortFetch = jest.fn();
       let dispatchCount = 0;
       const dispatch = jest.fn(action => {
-        if (action.type === ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST) {
-          dispatchCount++;
+        switch (action.type) {
+          case ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST:
+          case ActionTypes.MESSAGES_LOCK_ADD: {
+            dispatchCount++;
+            break;
+          }
+          default:
         }
       });
       const folder = {_links: {'message.flagged': {href: 'http://test.url/folder1337/messages/{messageId}/flagged'}}};
@@ -123,7 +129,7 @@ describe('Message service test suite', () => {
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
-      expect(dispatchCount).toEqual(1);
+      expect(dispatchCount).toEqual(2);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
@@ -140,11 +146,14 @@ describe('Message service test suite', () => {
         switch (action.type) {
           case ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST:
           case ActionTypes.MESSAGES_SET_SELECTED:
-          case ActionTypes.FOLDERS_UPDATE: {
+          case ActionTypes.FOLDERS_UPDATE:
+          case ActionTypes.MESSAGES_LOCK_ADD:
+          case ActionTypes.MESSAGES_LOCK_REMOVE: {
             dispatchCount++;
             break;
           }
           case ActionTypes.MESSAGES_DELETE_FROM_CACHE: {
+            expect(dispatchCount).toEqual(6);
             expect(action.payload.folder.fromServer).toEqual(true);
             done();
             break;
@@ -161,7 +170,6 @@ describe('Message service test suite', () => {
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
-      expect(dispatchCount).toEqual(3);
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
     test('deleteMessages with valid message array, fetch has error, should dispatch previous folder/messages', done => {

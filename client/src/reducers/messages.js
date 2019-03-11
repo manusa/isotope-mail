@@ -24,7 +24,9 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
         newUpdateState.cache[action.payload.folder.folderId] =
           new Map(newUpdateState.cache[action.payload.folder.folderId]);
       }
-      action.payload.messages.forEach(m => newUpdateState.cache[action.payload.folder.folderId].set(m.uid, m));
+      action.payload.messages
+        .filter(m => !m.messageId || !newUpdateState.locked.includes(m.messageId))
+        .forEach(m => newUpdateState.cache[action.payload.folder.folderId].set(m.uid, m));
       return newUpdateState;
     }
     case ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST: {
@@ -34,7 +36,14 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
         newUpdateState.cache[action.payload.folder.folderId] =
           new Map(newUpdateState.cache[action.payload.folder.folderId]);
         const cache = newUpdateState.cache[action.payload.folder.folderId];
-        action.payload.messages.forEach(m => {
+        let messagesToUpdate;
+        if (action.payload.ignoreLocked) {
+          messagesToUpdate = action.payload.messages;
+        } else {
+          messagesToUpdate = action.payload.messages
+            .filter(m => !m.messageId || !newUpdateState.locked.includes(m.messageId));
+        }
+        messagesToUpdate.forEach(m => {
           if (cache.has(m.uid)) {
             cache.set(m.uid, m);
           }
@@ -96,6 +105,32 @@ const messages = (state = INITIAL_STATE.messages, action = {}) => {
     case ActionTypes.MESSAGES_CLEAR_SELECTED: {
       const newUpdateState = {...state, selected: []};
       return newUpdateState;
+    }
+    case ActionTypes.MESSAGES_LOCK_ADD: {
+      const newState = {...state};
+      newState.locked = [
+        ...newState.locked,
+        ...action.payload
+          .filter(m => m.messageId && m.messageId.length > 0)
+          .map(m => m.messageId)
+      ];
+      return newState;
+    }
+    case ActionTypes.MESSAGES_LOCK_REMOVE: {
+      const newState = {...state};
+      const remainingItems = [
+        ...action.payload.filter(m => m.messageId && m.messageId.length > 0).map(m => m.messageId)
+      ];
+      newState.locked = [];
+      for (const messageId of state.locked) {
+        const i = remainingItems.indexOf(messageId);
+        if (i > -1) {
+          remainingItems.splice(i, 1);
+        } else {
+          newState.locked.push(messageId);
+        }
+      }
+      return newState;
     }
     default:
       return state;
