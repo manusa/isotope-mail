@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TopBarMessageViewer component test suite Snapshot render, should render top bar message viewer 1`] = `
+<div
+  className="mdc-top-app-bar__row"
+>
+  <section
+    className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
+  >
+    <ButtonCollapse
+      collapsed={true}
+      sideBarToggle={[MockFunction]}
+    />
+    <button
+      className="material-icons mdc-top-app-bar__navigation-icon"
+      onClick={[MockFunction]}
+    >
+      arrow_back
+    </button>
+  </section>
+  <section
+    className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
+  >
+    <ButtonReply
+      outboxEmpty={true}
+      replyMessage={[MockFunction]}
+    />
+    <ButtonForward
+      forwardMessage={[MockFunction]}
+      outboxEmpty={true}
+    />
+    <ButtonDelete
+      onClick={[MockFunction]}
+    />
+    <ButtonMarkUnread
+      onClick={[MockFunction]}
+    />
+  </section>
+</div>
+`;

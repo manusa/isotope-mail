@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ButtonMarkUnread component test suite Snapshot render, should render button 1`] = `
+<button
+  className="material-icons mdc-top-app-bar__action-item"
+  onClick={[MockFunction]}
+>
+  markunread
+</button>
+`;

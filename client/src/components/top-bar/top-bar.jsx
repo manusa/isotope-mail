@@ -1,4 +1,4 @@
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import ConfirmDeleteFromTrashDialog from './confirm-delete-from-trash-dialog';
@@ -7,6 +7,9 @@ import {forwardMessage, replyMessage, clearSelectedMessage} from '../../services
 import {deleteMessages, moveMessages, setMessagesSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
+import TopBarMessageList from './top-bar-message-list';
+import TopBarMessageViewer from './top-bar-message-viewer';
+import TopBarMessageEditor from './top-bar-message-editor';
 
 export class TopBar extends Component {
   constructor(props) {
@@ -18,105 +21,47 @@ export class TopBar extends Component {
   }
 
   render() {
-    const collapsed = this.props.sideBarCollapsed;
-    const isEditing = this.props.newMessage && Object.keys(this.props.newMessage).length > 0;
-    const isMessageViewer = this.props.selectedMessage && Object.keys(this.props.selectedMessage).length > 0;
-    let title = this.props.title;
-    if (this.props.selectedFolder && this.props.selectedFolder.name
-      && this.props.selectedFolder.type !== FolderTypes.INBOX) {
-      title = `${this.props.selectedFolder.name} - ${title}`;
+    const props = this.props;
+    const {sideBarToggle, selectedMessagesAllUnread, outbox, toggleMessageSeen} = props;
+    const collapsed = props.sideBarCollapsed;
+    const isEditing = props.newMessage && Object.keys(props.newMessage).length > 0;
+    const isMessageViewer = props.selectedMessage && Object.keys(props.selectedMessage).length > 0;
+    let title = props.title;
+    if (props.selectedFolder && props.selectedFolder.name
+      && props.selectedFolder.type !== FolderTypes.INBOX) {
+      title = `${props.selectedFolder.name} - ${title}`;
     }
     return (
       <header className={`${styles.topBar} ${styles['with-custom-styles']}
       ${collapsed ? '' : styles['with-side-bar']}
       ${mainCss['mdc-top-app-bar']} ${mainCss['mdc-top-app-bar--fixed']}`}>
-        <div className={mainCss['mdc-top-app-bar__row']}>
-          <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-start']}`}>
-            {collapsed ?
-              <button onClick={this.props.sideBarToggle}
-                className={`material-icons ${mainCss['mdc-top-app-bar__navigation-icon']}`}>
-                menu
-              </button> :
-              null
-            }
-            {isMessageViewer && !isEditing ?
-              <Fragment>
-                <button onClick={this.props.clearSelectedMessage}
-                  className={`material-icons ${mainCss['mdc-top-app-bar__navigation-icon']}`}>
-                  arrow_back
-                </button>
-              </Fragment>
-              :
-              <span className={mainCss['mdc-top-app-bar__title']}>{title}</span>
-            }
-          </section>
-          {isEditing ? null :
-            <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-end']}`}>
-              {isMessageViewer ? this.renderMessageViewerActions() : this.renderMessageListActions()}
-            </section>
-          }
-        </div>
+        {!isEditing && !isMessageViewer
+          && (<TopBarMessageList
+            title={title} collapsed={collapsed} sideBarToggle={sideBarToggle}
+            onDeleteClick={() => this.onDelete(props.deleteMessages)}
+            selectedMessagesAllUnread={selectedMessagesAllUnread}
+            onMarkReadClick={() => props.setMessagesSeen(true)}
+            onMarkUnreadClick={() => props.setMessagesSeen(false)}
+          />)
+        }
+        {!isEditing && isMessageViewer
+          && (<TopBarMessageViewer
+            collapsed={collapsed} sideBarToggle={sideBarToggle} clearSelectedMessage={props.clearSelectedMessage}
+            outboxEmpty={outbox === null}
+            onReplyMessageClick={props.replyMessage} onForwardMessageClick={props.forwardMessage}
+            onDeleteClick={() => this.onDelete(props.deleteMessage)} onMarkUnreadClick={toggleMessageSeen}/>)
+        }
+        {isEditing
+          && (<TopBarMessageEditor
+            title={title} collapsed={collapsed} sideBarToggle={sideBarToggle}
+          />)
+        }
         <ConfirmDeleteFromTrashDialog
           visible={this.state.deletingFromTrash}
           deleteAction={this.state.deletingFromTrashConfirm}
           cancelAction={() => this.setState({deletingFromTrash: false})}
         />
       </header>
-    );
-  }
-
-  renderMessageViewerActions() {
-    const {outbox, toggleMessageSeen} = this.props;
-    return (
-      <Fragment>
-        {outbox === null &&
-          <button
-            onClick={this.props.replyMessage}
-            className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-            reply_all
-          </button>}
-        {outbox === null &&
-        <button
-          onClick={this.props.forwardMessage}
-          className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-          forward
-        </button>}
-        <button
-          onClick={() => this.onDelete(this.props.deleteMessage)}
-          className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-          delete
-        </button>
-        <button
-          onClick={toggleMessageSeen}
-          className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-          markunread
-        </button>
-      </Fragment>
-    );
-  }
-
-  renderMessageListActions() {
-    return (
-      this.props.selectedMessages.length > 0 &&
-        <Fragment>
-          <button
-            onClick={() => this.onDelete(this.props.deleteMessages)}
-            className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-            delete
-          </button>
-          {this.props.selectedMessagesAllUnread ?
-            <button
-              onClick={() => this.props.setMessagesSeen(true)}
-              className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-              drafts
-            </button> :
-            <button
-              onClick={() => this.props.setMessagesSeen(false)}
-              className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-              markunread
-            </button>
-          }
-        </Fragment>
     );
   }
 

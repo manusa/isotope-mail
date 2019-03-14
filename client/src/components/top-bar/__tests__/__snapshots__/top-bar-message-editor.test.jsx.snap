@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TopBarMessageEditor component test suite Snapshot render, should render top bar message editor 1`] = `
+<div
+  className="mdc-top-app-bar__row"
+>
+  <section
+    className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
+  >
+    <ButtonCollapse
+      collapsed={true}
+      sideBarToggle={[MockFunction]}
+    />
+    <span
+      className="mdc-top-app-bar__title"
+    >
+      sideshow bob
+    </span>
+  </section>
+</div>
+`;
