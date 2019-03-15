@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ButtonCollapse from './button-collapse';
-import ButtonDelete from './button-delete';
-import ButtonMarkRead from './button-mark-read';
-import ButtonMarkUnread from './button-mark-unread';
+import TopBarButton from './top-bar-button';
 import mainCss from '../../styles/main.scss';
 
 const TopBarMessageList = (
@@ -18,10 +16,10 @@ const TopBarMessageList = (
       <span className={mainCss['mdc-top-app-bar__title']}>{title}</span>
     </section>
     <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-end']}`}>
-      <ButtonDelete onClick={onDeleteClick}/>
+      <TopBarButton onClick={onDeleteClick}>delete</TopBarButton>
       {selectedMessagesAllUnread ?
-        <ButtonMarkRead onClick={onMarkReadClick} /> :
-        <ButtonMarkUnread onClick={onMarkUnreadClick} />
+        <TopBarButton onClick={onMarkReadClick}>drafts</TopBarButton> :
+        <TopBarButton onClick={onMarkUnreadClick}>markunread</TopBarButton>
       }
     </section>
   </div>

@@ -19,13 +19,4 @@ describe('ButtonReply component test suite', () => {
     // Then
     expect(button).toMatchSnapshot();
   });
-  test('click, should trigger function', () => {
-    // Given
-    const props = {outboxEmpty: true, replyMessage: jest.fn()};
-    const button = shallow(<ButtonReply {...props}/>);
-    // When
-    button.find('button').simulate('click');
-    // Then
-    expect(props.replyMessage).toHaveBeenCalledTimes(1);
-  });
 });

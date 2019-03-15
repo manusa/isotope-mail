@@ -20,12 +20,16 @@ exports[`TopBarMessageList component test suite Snapshot render, should render t
   <section
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
   >
-    <ButtonDelete
+    <TopBarButton
       onClick={[MockFunction]}
-    />
-    <ButtonMarkRead
+    >
+      delete
+    </TopBarButton>
+    <TopBarButton
       onClick={[MockFunction]}
-    />
+    >
+      drafts
+    </TopBarButton>
   </section>
 </div>
 `;

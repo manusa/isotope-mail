@@ -1,13 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import mainCss from '../../styles/main.scss';
+import TopBarButton from './top-bar-button';
 
 const ButtonCollapse = ({collapsed, sideBarToggle}) => (
   collapsed && (
-    <button onClick={sideBarToggle}
-      className={`material-icons ${mainCss['mdc-top-app-bar__navigation-icon']}`}>
-        menu
-    </button>)
+    <TopBarButton onClick={sideBarToggle}>menu </TopBarButton>)
 );
 
 ButtonCollapse.propTypes = {

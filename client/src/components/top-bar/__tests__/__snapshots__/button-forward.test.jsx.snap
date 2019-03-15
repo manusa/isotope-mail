@@ -3,10 +3,9 @@
 exports[`ButtonForward component test suite Snapshot render, not outboxEmpty, should NOT render button 1`] = `""`;
 
 exports[`ButtonForward component test suite Snapshot render, outboxEmpty, should render button 1`] = `
-<button
-  className="material-icons mdc-top-app-bar__action-item"
+<TopBarButton
   onClick={[MockFunction]}
 >
   forward
-</button>
+</TopBarButton>
 `;

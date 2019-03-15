@@ -19,14 +19,4 @@ describe('ButtonCollapse component test suite', () => {
     // Then
     expect(button).toMatchSnapshot();
   });
-  test('click, should trigger function', () => {
-    // Given
-    const sideBarToggle = jest.fn();
-    const props = {collapsed: true, sideBarToggle};
-    const button = shallow(<ButtonCollapse {...props}/>);
-    // When
-    button.find('button').simulate('click');
-    // Then
-    expect(sideBarToggle).toHaveBeenCalledTimes(1);
-  });
 });

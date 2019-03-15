@@ -1,12 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ButtonCollapse component test suite Snapshot render, collapsed, should render button 1`] = `
-<button
-  className="material-icons mdc-top-app-bar__navigation-icon"
+<TopBarButton
   onClick={[MockFunction]}
 >
-  menu
-</button>
+  menu 
+</TopBarButton>
 `;
 
 exports[`ButtonCollapse component test suite Snapshot render, not collapsed, should NOT render button 1`] = `""`;

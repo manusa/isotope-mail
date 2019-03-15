@@ -1,14 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import mainCss from '../../styles/main.scss';
+import TopBarButton from './top-bar-button';
 
 const ButtonForward = ({outboxEmpty, forwardMessage}) => (
   outboxEmpty && (
-    <button
-      onClick={forwardMessage}
-      className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-      forward
-    </button>)
+    <TopBarButton onClick={forwardMessage}>forward</TopBarButton>)
 );
 
 ButtonForward.propTypes = {

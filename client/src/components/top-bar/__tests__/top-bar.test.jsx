@@ -135,44 +135,136 @@ describe('TopBar component test suite', () => {
         expect(messgeService.deleteMessages).not.toHaveBeenCalled();
         expect(applicationService.clearSelectedMessage).toHaveBeenCalledTimes(1);
       });
+      test('Selected message and selected folder (== trash), messageService deleteMessages function invoked', () => {
+        // Given
+        const initialState = {...INITIAL_STATE,
+          application: {...INITIAL_STATE.application}, folders: {...INITIAL_STATE.folders}};
+        initialState.application.selectedMessage = {};
+        initialState.application.selectedFolderId = '1337';
+        initialState.folders.explodedItems = {1337: {type: FolderTypes.TRASH}};
+        applicationService.clearSelectedMessage = jest.fn();
+        messgeService.moveMessages = jest.fn();
+        messgeService.deleteMessages = jest.fn();
+        const props = {sideBarToggle: () => {}, sideBarCollapsed: false};
+        const topBar = shallow(<TopBarConnected store={createMockStore(initialState)} {...props}/>);
+
+        // When
+        topBar.props().deleteMessage();
+
+        // Then
+        expect(messgeService.deleteMessages).toHaveBeenCalledTimes(1);
+        expect(messgeService.moveMessages).not.toHaveBeenCalled();
+        expect(applicationService.clearSelectedMessage).toHaveBeenCalledTimes(1);
+      });
+      test('NO selected message, no function invoked', () => {
+        // Given
+        const initialState = {...INITIAL_STATE};
+        applicationService.clearSelectedMessage = jest.fn();
+        messgeService.moveMessages = jest.fn();
+        messgeService.deleteMessages = jest.fn();
+        const props = {sideBarToggle: () => {}, sideBarCollapsed: false};
+        const topBar = shallow(<TopBarConnected store={createMockStore(initialState)} {...props}/>);
+
+        // When
+        topBar.props().deleteMessage();
+
+        // Then
+        expect(messgeService.deleteMessages).not.toHaveBeenCalled();
+        expect(messgeService.moveMessages).not.toHaveBeenCalled();
+        expect(applicationService.clearSelectedMessage).not.toHaveBeenCalled();
+      });
     });
-    test('Selected message and selected folder (== trash), messageService deleteMessages function invoked', () => {
+    test('toggleMessageSeen, messageService setMessagesSeen function invoked', () => {
       // Given
-      const initialState = {...INITIAL_STATE,
-        application: {...INITIAL_STATE.application}, folders: {...INITIAL_STATE.folders}};
-      initialState.application.selectedMessage = {};
-      initialState.application.selectedFolderId = '1337';
-      initialState.folders.explodedItems = {1337: {type: FolderTypes.TRASH}};
+      const initialState = {...INITIAL_STATE, application: {...INITIAL_STATE.application}};
+      initialState.application.selectedMessage = {seen: false};
       applicationService.clearSelectedMessage = jest.fn();
-      messgeService.moveMessages = jest.fn();
-      messgeService.deleteMessages = jest.fn();
+      messgeService.setMessagesSeen = jest.fn();
       const props = {sideBarToggle: () => {}, sideBarCollapsed: false};
       const topBar = shallow(<TopBarConnected store={createMockStore(initialState)} {...props}/>);
 
       // When
-      topBar.props().deleteMessage();
+      topBar.props().toggleMessageSeen();
 
       // Then
-      expect(messgeService.deleteMessages).toHaveBeenCalledTimes(1);
-      expect(messgeService.moveMessages).not.toHaveBeenCalled();
+      expect(messgeService.setMessagesSeen).toHaveBeenCalledTimes(1);
       expect(applicationService.clearSelectedMessage).toHaveBeenCalledTimes(1);
     });
-  });
-  test('NO selected message, no function invoked', () => {
-    // Given
-    const initialState = {...INITIAL_STATE};
-    applicationService.clearSelectedMessage = jest.fn();
-    messgeService.moveMessages = jest.fn();
-    messgeService.deleteMessages = jest.fn();
-    const props = {sideBarToggle: () => {}, sideBarCollapsed: false};
-    const topBar = shallow(<TopBarConnected store={createMockStore(initialState)} {...props}/>);
+    describe('deleteMessages', () => {
+      test('Selected messages and selected folder (!== trash), messageService moveMessages function invoked', () => {
+        // Given
+        const initialState = {...INITIAL_STATE, application: {...INITIAL_STATE.application},
+          folders: {...INITIAL_STATE.folders}, messages: {...INITIAL_STATE.messages}};
+        initialState.application.selectedFolderId = '1337';
+        initialState.folders.explodedItems = {1337: {}, trash: {type: FolderTypes.TRASH}};
+        initialState.messages.cache['1337'] = new Map([{uid: 1}, {uid: 3}].map(m => [m.uid, m]));
+        initialState.messages.selected = [1];
+        messgeService.moveMessages = jest.fn();
+        messgeService.deleteMessages = jest.fn();
+        const props = {sideBarToggle: () => {}, sideBarCollapsed: false};
+        const topBar = shallow(<TopBarConnected store={createMockStore(initialState)} {...props}/>);
 
-    // When
-    topBar.props().deleteMessage();
+        // When
+        topBar.props().deleteMessages();
 
-    // Then
-    expect(messgeService.deleteMessages).not.toHaveBeenCalled();
-    expect(messgeService.moveMessages).not.toHaveBeenCalled();
-    expect(applicationService.clearSelectedMessage).not.toHaveBeenCalled();
+        // Then
+        expect(messgeService.moveMessages).toHaveBeenCalledTimes(1);
+        expect(messgeService.deleteMessages).not.toHaveBeenCalled();
+      });
+      test('Selected message and selected folder (== trash), messageService deleteMessages function invoked', () => {
+        // Given
+        const initialState = {...INITIAL_STATE, application: {...INITIAL_STATE.application},
+          folders: {...INITIAL_STATE.folders}, messages: {...INITIAL_STATE.messages}};
+        initialState.application.selectedFolderId = '1337';
+        initialState.folders.explodedItems = {1337: {type: FolderTypes.TRASH}};
+        initialState.messages.cache['1337'] = new Map([{uid: 1}, {uid: 3}].map(m => [m.uid, m]));
+        initialState.messages.selected = [1];
+        messgeService.moveMessages = jest.fn();
+        messgeService.deleteMessages = jest.fn();
+        const props = {sideBarToggle: () => {}, sideBarCollapsed: false};
+        const topBar = shallow(<TopBarConnected store={createMockStore(initialState)} {...props}/>);
+
+        // When
+        topBar.props().deleteMessages();
+
+        // Then
+        expect(messgeService.deleteMessages).toHaveBeenCalledTimes(1);
+        expect(messgeService.moveMessages).not.toHaveBeenCalled();
+      });
+      test('NO selected message, no function invoked', () => {
+        // Given
+        const initialState = {...INITIAL_STATE};
+        messgeService.moveMessages = jest.fn();
+        messgeService.deleteMessages = jest.fn();
+        const props = {sideBarToggle: () => {}, sideBarCollapsed: false};
+        const topBar = shallow(<TopBarConnected store={createMockStore(initialState)} {...props}/>);
+
+        // When
+        topBar.props().deleteMessages();
+
+        // Then
+        expect(messgeService.deleteMessages).not.toHaveBeenCalled();
+        expect(messgeService.moveMessages).not.toHaveBeenCalled();
+      });
+    });
+    test('setMessagesSeen,' +
+      'with selected messages and selected folder, messageService setMessagesSeen function invoked', () => {
+      // Given
+      const initialState = {...INITIAL_STATE, application: {...INITIAL_STATE.application},
+        folders: {...INITIAL_STATE.folders}, messages: {...INITIAL_STATE.messages}};
+      initialState.application.selectedFolderId = '1337';
+      initialState.folders.explodedItems = {1337: {type: FolderTypes.TRASH}};
+      initialState.messages.cache['1337'] = new Map([{uid: 1}, {uid: 3}].map(m => [m.uid, m]));
+      initialState.messages.selected = [1];
+      messgeService.setMessagesSeen = jest.fn();
+      const props = {sideBarToggle: () => {}, sideBarCollapsed: false};
+      const topBar = shallow(<TopBarConnected store={createMockStore(initialState)} {...props}/>);
+
+      // When
+      topBar.props().setMessagesSeen();
+
+      // Then
+      expect(messgeService.setMessagesSeen).toHaveBeenCalledTimes(1);
+    });
   });
 });

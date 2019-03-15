@@ -29,12 +29,16 @@ exports[`TopBarMessageViewer component test suite Snapshot render, should render
       forwardMessage={[MockFunction]}
       outboxEmpty={true}
     />
-    <ButtonDelete
+    <TopBarButton
       onClick={[MockFunction]}
-    />
-    <ButtonMarkUnread
+    >
+      delete
+    </TopBarButton>
+    <TopBarButton
       onClick={[MockFunction]}
-    />
+    >
+      markunread
+    </TopBarButton>
   </section>
 </div>
 `;

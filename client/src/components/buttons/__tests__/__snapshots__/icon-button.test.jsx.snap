@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`IconButton component test suite Snapshot render, should render icon-button 1`] = `
+<button
+  className="material-icons higher-class"
+  disabled={false}
+  onClick={[MockFunction]}
+>
+  material_icon_name
+</button>
+`;

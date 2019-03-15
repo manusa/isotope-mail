@@ -1,14 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import mainCss from '../../styles/main.scss';
+import TopBarButton from './top-bar-button';
 
 const ButtonReply = ({outboxEmpty, replyMessage}) => (
   outboxEmpty && (
-    <button
-      onClick={replyMessage}
-      className={`material-icons ${mainCss['mdc-top-app-bar__action-item']}`}>
-      reply_all
-    </button>)
+    <TopBarButton onClick={replyMessage}>reply_all</TopBarButton>)
 );
 
 ButtonReply.propTypes = {

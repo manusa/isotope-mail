@@ -19,13 +19,4 @@ describe('ButtonForward component test suite', () => {
     // Then
     expect(button).toMatchSnapshot();
   });
-  test('click, should trigger function', () => {
-    // Given
-    const props = {outboxEmpty: true, forwardMessage: jest.fn()};
-    const button = shallow(<ButtonForward {...props}/>);
-    // When
-    button.find('button').simulate('click');
-    // Then
-    expect(props.forwardMessage).toHaveBeenCalledTimes(1);
-  });
 });

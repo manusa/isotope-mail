@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TopBarButton component test suite Snapshot render, should render top-bar-button 1`] = `
+<IconButton
+  className="material-icons mdc-top-app-bar__action-item"
+  disabled={false}
+  onClick={[MockFunction]}
+>
+  icon_name
+</IconButton>
+`;

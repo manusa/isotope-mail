@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ButtonCollapse from './button-collapse';
-import ButtonDelete from './button-delete';
+import TopBarButton from './top-bar-button';
 import ButtonReply from './button-reply';
 import ButtonForward from './button-forward';
-import ButtonMarkUnread from './button-mark-unread';
 import mainCss from '../../styles/main.scss';
 
 const TopBarMessageViewer = (
@@ -26,8 +25,8 @@ const TopBarMessageViewer = (
     <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-end']}`}>
       <ButtonReply outboxEmpty={outboxEmpty} replyMessage={onReplyMessageClick}/>
       <ButtonForward outboxEmpty={outboxEmpty} forwardMessage={onForwardMessageClick}/>
-      <ButtonDelete onClick={onDeleteClick}/>
-      <ButtonMarkUnread onClick={onMarkUnreadClick}/>
+      <TopBarButton onClick={onDeleteClick}>delete</TopBarButton>
+      <TopBarButton onClick={onMarkUnreadClick}>markunread</TopBarButton>
     </section>
   </div>
 );
