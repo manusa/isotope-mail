@@ -30,6 +30,13 @@ exports[`TopBar component test suite Snapshot render TopBar with selected folder
     onDeleteClick={[Function]}
     onMarkReadClick={[Function]}
     onMarkUnreadClick={[Function]}
+    selectedMessages={
+      Array [
+        Object {
+          "uid": 1,
+        },
+      ]
+    }
     sideBarToggle={[MockFunction]}
     title="SelectedFolder - Isotope Mail Client - TITLE"
   />
@@ -52,6 +59,7 @@ exports[`TopBar component test suite Snapshot render TopBar with selected folder
     onDeleteClick={[Function]}
     onMarkReadClick={[Function]}
     onMarkUnreadClick={[Function]}
+    selectedMessages={Array []}
     sideBarToggle={[MockFunction]}
     title="SelectedFolder - Isotope Mail Client - TITLE"
   />
