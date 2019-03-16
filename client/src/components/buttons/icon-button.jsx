@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import mainCss from '../../styles/main.scss';
 
 const IconButton = ({className, onClick, disabled, children}) =>
   (<button className={`material-icons ${className}`}
