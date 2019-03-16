@@ -1,6 +1,63 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TopBarMessageList component test suite Snapshot render, should render top bar message list 1`] = `
+exports[`TopBarMessageList component test suite Snapshot render, with empty selected messages and not all unread, should render top bar message list 1`] = `
+<div
+  className="mdc-top-app-bar__row"
+>
+  <section
+    className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
+  >
+    <ButtonCollapse
+      collapsed={true}
+      sideBarToggle={[MockFunction]}
+    />
+    <span
+      className="mdc-top-app-bar__title"
+    >
+      sideshow bob
+    </span>
+  </section>
+  <section
+    className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
+  />
+</div>
+`;
+
+exports[`TopBarMessageList component test suite Snapshot render, with selected messages and NOT all unread, should render top bar message list 1`] = `
+<div
+  className="mdc-top-app-bar__row"
+>
+  <section
+    className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
+  >
+    <ButtonCollapse
+      collapsed={true}
+      sideBarToggle={[MockFunction]}
+    />
+    <span
+      className="mdc-top-app-bar__title"
+    >
+      sideshow bob
+    </span>
+  </section>
+  <section
+    className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
+  >
+    <TopBarButton
+      onClick={[MockFunction]}
+    >
+      delete
+    </TopBarButton>
+    <TopBarButton
+      onClick={[MockFunction]}
+    >
+      markunread
+    </TopBarButton>
+  </section>
+</div>
+`;
+
+exports[`TopBarMessageList component test suite Snapshot render, with selected messages and all unread, should render top bar message list 1`] = `
 <div
   className="mdc-top-app-bar__row"
 >

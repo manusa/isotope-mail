@@ -22,7 +22,7 @@ export class TopBar extends Component {
 
   render() {
     const props = this.props;
-    const {sideBarToggle, selectedMessagesAllUnread, outbox, toggleMessageSeen} = props;
+    const {sideBarToggle, selectedMessages, selectedMessagesAllUnread, outbox, toggleMessageSeen} = props;
     const collapsed = props.sideBarCollapsed;
     const isEditing = props.newMessage && Object.keys(props.newMessage).length > 0;
     const isMessageViewer = props.selectedMessage && Object.keys(props.selectedMessage).length > 0;
@@ -38,6 +38,7 @@ export class TopBar extends Component {
         {!isEditing && !isMessageViewer
           && (<TopBarMessageList
             title={title} collapsed={collapsed} sideBarToggle={sideBarToggle}
+            selectedMessages={selectedMessages}
             onDeleteClick={() => this.onDelete(props.deleteMessages)}
             selectedMessagesAllUnread={selectedMessagesAllUnread}
             onMarkReadClick={() => props.setMessagesSeen(true)}
