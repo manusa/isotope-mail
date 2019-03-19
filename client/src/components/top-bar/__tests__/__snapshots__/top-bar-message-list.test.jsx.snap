@@ -19,7 +19,9 @@ exports[`TopBarMessageList component test suite Snapshot render, with empty sele
   </section>
   <section
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
-  />
+  >
+    <Connect(ButtonFilter) />
+  </section>
 </div>
 `;
 
@@ -44,15 +46,18 @@ exports[`TopBarMessageList component test suite Snapshot render, with selected m
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
   >
     <TopBarButton
+      className=""
       onClick={[MockFunction]}
     >
       delete
     </TopBarButton>
     <TopBarButton
+      className=""
       onClick={[MockFunction]}
     >
       markunread
     </TopBarButton>
+    <Connect(ButtonFilter) />
   </section>
 </div>
 `;
@@ -78,15 +83,18 @@ exports[`TopBarMessageList component test suite Snapshot render, with selected m
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
   >
     <TopBarButton
+      className=""
       onClick={[MockFunction]}
     >
       delete
     </TopBarButton>
     <TopBarButton
+      className=""
       onClick={[MockFunction]}
     >
       drafts
     </TopBarButton>
+    <Connect(ButtonFilter) />
   </section>
 </div>
 `;

@@ -33,7 +33,13 @@
     }
   },
   "messageList": {
-    "moveEmails": "Moving {{emailCount}} e-mails"
+    "moveEmails": "Moving {{emailCount}} e-mails",
+    "filters": {
+      "All": "All",
+      "Read": "Read",
+      "Unread": "Unread",
+      "Flagged": "Flagged"
+    }
   },
   "messageViewer": {
     "to": "to",

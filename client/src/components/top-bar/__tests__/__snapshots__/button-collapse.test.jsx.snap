@@ -2,6 +2,7 @@
 
 exports[`ButtonCollapse component test suite Snapshot render, collapsed, should render button 1`] = `
 <TopBarButton
+  className=""
   onClick={[MockFunction]}
 >
   menu 

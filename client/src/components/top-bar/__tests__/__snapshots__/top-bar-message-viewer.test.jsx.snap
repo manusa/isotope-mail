@@ -30,11 +30,13 @@ exports[`TopBarMessageViewer component test suite Snapshot render, should render
       outboxEmpty={true}
     />
     <TopBarButton
+      className=""
       onClick={[MockFunction]}
     >
       delete
     </TopBarButton>
     <TopBarButton
+      className=""
       onClick={[MockFunction]}
     >
       markunread

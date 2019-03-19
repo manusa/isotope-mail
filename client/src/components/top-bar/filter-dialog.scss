@@ -1,0 +1,20 @@
+@import '../../styles/partials/variables';
+
+.filter-dialog {
+  right: 0px;
+  min-width: 150px;
+  z-index: map-get($z-index, thermosphere);
+
+  &__item{
+    .check {
+      font-size: 18px;
+      padding-right: 1rem;
+      opacity: 0.2;
+
+      &--active {
+        color: $mdc-theme-secondary;
+        opacity: 1;
+      }
+    }
+  }
+}

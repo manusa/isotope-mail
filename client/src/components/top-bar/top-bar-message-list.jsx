@@ -2,6 +2,7 @@ import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import ButtonCollapse from './button-collapse';
 import TopBarButton from './top-bar-button';
+import ButtonFilter from './button-filter';
 import mainCss from '../../styles/main.scss';
 
 const TopBarMessageList = (
@@ -25,7 +26,7 @@ const TopBarMessageList = (
           }
         </Fragment>
       }
-
+      <ButtonFilter/>
     </section>
   </div>
 );

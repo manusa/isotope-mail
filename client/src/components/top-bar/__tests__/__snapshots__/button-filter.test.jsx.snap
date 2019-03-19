@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ButtonFilter component test suite Snapshot render Snapshot render, activeMessageFilter=ALL, should render deactivated button-filter 1`] = `
+<span
+  className="button-filter mdc-menu-surface--anchor"
+>
+  <TopBarButton
+    className="button-filter--button "
+    onClick={[Function]}
+  >
+    filter_list
+  </TopBarButton>
+  <Connect(Translate(FilterDialog))
+    visible={false}
+  />
+</span>
+`;
+
+exports[`ButtonFilter component test suite Snapshot render Snapshot render, activeMessageFilter=READ, should render activated button-filter 1`] = `
+<span
+  className="button-filter mdc-menu-surface--anchor"
+>
+  <TopBarButton
+    className="button-filter--button active"
+    onClick={[Function]}
+  >
+    filter_list
+  </TopBarButton>
+  <Connect(Translate(FilterDialog))
+    visible={false}
+  />
+</span>
+`;

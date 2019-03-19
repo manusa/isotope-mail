@@ -4,6 +4,7 @@ exports[`ButtonForward component test suite Snapshot render, not outboxEmpty, sh
 
 exports[`ButtonForward component test suite Snapshot render, outboxEmpty, should render button 1`] = `
 <TopBarButton
+  className=""
   onClick={[MockFunction]}
 >
   forward

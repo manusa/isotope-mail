@@ -8,6 +8,7 @@ describe('Application reducer test suite', () => {
     expect(applicationDefaultState).toHaveProperty('title', 'Isotope Mail Client');
     expect(applicationDefaultState).toHaveProperty('user', {});
     expect(applicationDefaultState).toHaveProperty('newMessage', null);
+    expect(applicationDefaultState).toHaveProperty('messageFilterKey', null);
     expect(applicationDefaultState).toHaveProperty('selectedFolderId', {});
     expect(applicationDefaultState).toHaveProperty('createFolderParentId', null);
     expect(applicationDefaultState).toHaveProperty('renameFolderId', null);

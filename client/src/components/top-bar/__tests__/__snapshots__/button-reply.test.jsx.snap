@@ -4,6 +4,7 @@ exports[`ButtonReply component test suite Snapshot render, not outboxEmpty, shou
 
 exports[`ButtonReply component test suite Snapshot render, outboxEmpty, should render button 1`] = `
 <TopBarButton
+  className=""
   onClick={[MockFunction]}
 >
   reply_all

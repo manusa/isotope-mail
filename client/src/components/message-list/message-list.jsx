@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import {AutoSizer, List} from 'react-virtualized';
 import Checkbox from '../form/checkbox/checkbox';
 import Spinner from '../spinner/spinner';
+import {getSelectedFolderMessageList} from '../../selectors/messages';
 import {prettyDate, prettySize} from '../../services/prettify';
 import {selectMessage} from '../../actions/application';
 import {setSelected} from '../../actions/messages';
@@ -197,17 +198,7 @@ const mapStateToProps = state => ({
   credentials: state.application.user.credentials,
   selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || {},
   activeRequests: state.messages.activeRequests,
-  messages: state.application.selectedFolderId
-    && state.messages.cache[state.application.selectedFolderId] ?
-    Array.from(state.messages.cache[state.application.selectedFolderId].values())
-      .sort((a, b) => {
-        if (a.receivedDate > b.receivedDate) {
-          return -1;
-        } else if (a.receivedDate < b.receivedDate) {
-          return 1;
-        }
-        return 0;
-      }) : [],
+  messages: getSelectedFolderMessageList(state),
   selectedMessages: state.messages.selected,
   downloadedMessages: state.application.downloadedMessages
 });

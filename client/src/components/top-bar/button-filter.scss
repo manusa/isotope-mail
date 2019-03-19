@@ -1,0 +1,12 @@
+@import '../../styles/partials/variables';
+
+.button-filter {
+  /* !keep selector */
+  button.button-filter--button {
+    color: transparentize($mdc-theme-on-primary, 0.5);
+
+    &.active {
+      color: $mdc-theme-on-primary;
+    }
+  }
+}

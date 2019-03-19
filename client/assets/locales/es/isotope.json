@@ -33,7 +33,13 @@
     }
   },
   "messageList": {
-    "moveEmails": "Moviendo {{emailCount}} e-mails"
+    "moveEmails": "Moviendo {{emailCount}} e-mails",
+    "filters": {
+      "All": "Todos",
+      "Read": "Leídos",
+      "Unread": "No Leídos",
+      "Flagged": "Marcados"
+    }
   },
   "messageViewer": {
     "to": "para",

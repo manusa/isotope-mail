@@ -27,7 +27,8 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
     case ActionTypes.APPLICATION_FOLDER_SELECT:
       return {
         ...state,
-        selectedFolderId: action.payload.folderId
+        selectedFolderId: action.payload.folderId,
+        messageFilterKey: null
       };
     case ActionTypes.APPLICATION_FOLDER_CREATE: {
       return {
@@ -47,6 +48,9 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
         newState.selectedFolderId = action.payload.newFolderId;
       }
       return newState;
+    }
+    case ActionTypes.APPLICATION_MESSAGE_FILTER_SET: {
+      return {...state, messageFilterKey: action.payload};
     }
     case ActionTypes.APPLICATION_MESSAGE_SELECT:
       return {...state, selectedMessage: {...action.payload}};
