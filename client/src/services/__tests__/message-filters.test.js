@@ -18,6 +18,15 @@ describe('MessageFilters service test suite', () => {
     });
   });
   describe('getFromKey', () => {
+    test('no arguments, should return ALL Message Filter, selector returns unmodified input array', () => {
+      // Given
+      const messages = [{}];
+      // When
+      const messageFilter = getFromKey();
+      // Then
+      expect(messageFilter).toBe(MessageFilters.ALL);
+      expect(messageFilter.selector(messages)).toBe(messages);
+    });
     test('null key, should return ALL Message Filter, selector returns unmodified input array', () => {
       // Given
       const key = null;
