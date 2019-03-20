@@ -50,7 +50,7 @@ describe('FolderItem component test suite', () => {
       const onClick = jest.fn();
       const onDragStart = jest.fn();
       const onDrop = jest.fn();
-      const folderItem = shallow(<FolderItem label={''} selected={false}
+      const folderItem = shallow(<FolderItem label={''} selected={false} draggable={true}
         onClick={onClick} onDragStart={onDragStart} onDrop={onDrop}/>);
 
       // When

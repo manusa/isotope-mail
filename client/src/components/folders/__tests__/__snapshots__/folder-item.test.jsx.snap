@@ -6,6 +6,7 @@ exports[`FolderItem component test suite Snapshot render Context Menu Visible, S
         mdc-list-item--selected
         "
   draggable={true}
+  href="#"
   onDragLeave={[Function]}
   onDragOver={[Function]}
   onDragStart={[Function]}
@@ -53,6 +54,7 @@ exports[`FolderItem component test suite Snapshot render Defaults with actions, 
         mdc-list-item--selected
         "
   draggable={true}
+  href="#"
   onDragLeave={[Function]}
   onDragOver={[Function]}
   onDragStart={[Function]}
@@ -106,6 +108,7 @@ exports[`FolderItem component test suite Snapshot render Defaults, Should render
         mdc-list-item--selected
         "
   draggable={true}
+  href="#"
   onDragLeave={[Function]}
   onDragOver={[Function]}
   onDragStart={[Function]}

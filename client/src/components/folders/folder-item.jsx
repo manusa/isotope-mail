@@ -25,13 +25,20 @@ class FolderItem extends Component {
     const {dragOver} = this.state;
     const labelWithCount = `${label} ${unreadMessageCount > 0 ? `(${unreadMessageCount})` : ''}`;
     const hasContextMenu = onDelete !== null || onAddChild !== null || onRename !== null;
+    const conditionalDraggableAttributes = {};
+    if (draggable) {
+      conditionalDraggableAttributes.draggable = true;
+      // Support for MS Edge DnD requires link to have a href attribute
+      conditionalDraggableAttributes.href = '#';
+      conditionalDraggableAttributes.onDragStart = this.handleOnDragStart;
+    }
     return (
       <a className={`${className} ${mainCss['mdc-list-item']} ${styles.listItem}
         ${selected ? mainCss['mdc-list-item--selected'] : ''}
         ${dragOver ? mainCss['mdc-list-item--activated'] : ''}`}
       title={labelWithCount}
       onClick={onClick}
-      draggable={draggable} onDragStart={this.handleOnDragStart}
+      {...conditionalDraggableAttributes}
       onDrop={this.handleOnDrop} onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave}
       onMouseLeave={event => this.hideContextMenu(event)}
       >
