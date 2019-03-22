@@ -1,0 +1,15 @@
+@import 'variables';
+@import '@material/checkbox/mdc-checkbox';
+
+$primary-checkbox-color: $mdc-theme-primary;
+
+.mdc-checkbox.mdc-checkbox--primary {
+  @include mdc-checkbox-focus-indicator-color($primary-checkbox-color);
+  @include mdc-checkbox-container-colors(
+          $unmarked-stroke-color: $mdc-checkbox-border-color,
+          $unmarked-fill-color: transparent,
+          $marked-stroke-color: $primary-checkbox-color,
+          $marked-fill-color: $primary-checkbox-color,
+          $generate-keyframes: true
+  );
+}

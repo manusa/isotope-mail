@@ -34,8 +34,8 @@ class FolderItem extends Component {
     }
     return (
       <a className={`${className} ${mainCss['mdc-list-item']} ${styles.listItem}
-        ${selected ? mainCss['mdc-list-item--selected'] : ''}
-        ${dragOver ? mainCss['mdc-list-item--activated'] : ''}`}
+        ${selected ? mainCss['mdc-list-item--activated'] : ''}
+        ${dragOver ? mainCss['mdc-list-item--selected'] : ''}`}
       title={labelWithCount}
       onClick={onClick}
       {...conditionalDraggableAttributes}

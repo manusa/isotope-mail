@@ -11,7 +11,7 @@ class Checkbox extends Component {
 
   render() {
     return (
-      <div className={`${mainCss['mdc-checkbox']}
+      <div className={`${mainCss['mdc-checkbox']} ${mainCss['mdc-checkbox--primary']}
         ${this.props.fieldClass}`}>
         <input type='checkbox' ref={this.inputRef} id={this.props.id}
           className={`${mainCss['mdc-checkbox__native-control']} ${this.props.inputClass}`}

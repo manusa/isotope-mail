@@ -2,15 +2,17 @@
 @import '@material/chips/variables';
 @import '@material/chips/mixins';
 
+$editor-color: #333333 !default;
+$editor-container-padding: 8px !default;
+$editor-background-color: white !default;
+$editor-outline-color: $editor-color !default;
+$editor-border-color: lighten($editor-outline-color, 50%) !default;
 $header-field-spacing: $default-spacing / 2 !default;
 $header-label-color: lighten($base-color, 25%) !default;
 $header-chip-fill-color: white !default;
-$header-chip-outline-color: transparentize($mdc-theme-primary, 0.75) !default;
+$header-chip-outline-color: transparentize($editor-outline-color, 0.75) !default;
 $header-chip-margin: 2px 6px 2px 0;
 $header-chip-height: 21px;
-$editor-container-padding: 8px !default;
-$editor-background-color: white !default;
-$editor-border-color: lighten($mdc-theme-primary, 50%) !default;
 
 .message-editor {
   position: relative;
@@ -185,9 +187,22 @@ $editor-border-color: lighten($mdc-theme-primary, 50%) !default;
 
       .button {
         min-width: auto;
+        color: $editor-color;
+
+        &:not(:first-child):not(:last-child) {
+          border-radius: 0px;
+        }
+        &:first-child {
+          border-top-right-radius: 0px;
+          border-bottom-right-radius: 0px;
+        }
+        &:last-child {
+          border-top-left-radius: 0px;
+          border-bottom-left-radius: 0px;
+        }
 
         &.active {
-          background-color: lighten($mdc-theme-primary, 60%);
+          background-color: transparentize($editor-color, 0.93);
         }
 
         i.buttonIcon {

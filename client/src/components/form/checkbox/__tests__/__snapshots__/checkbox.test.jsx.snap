@@ -2,7 +2,7 @@
 
 exports[`Checkbox component test suite Snapshot render, should render checkbox 1`] = `
 <div
-  className="mdc-checkbox
+  className="mdc-checkbox mdc-checkbox--primary
         field-class"
 >
   <input

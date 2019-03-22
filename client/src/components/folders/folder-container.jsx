@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import Spinner from '../spinner/spinner';
+import IconButton from '../buttons/icon-button';
 import FolderList from './folder-list';
 import FolderCreateDialog from './folder-create-dialog';
 import FolderRenameDialog from './folder-rename-dialog';
@@ -17,10 +18,10 @@ export const FolderContainer = ({activeRequests, folderTree, folders, createFold
         canvasClassName={styles.spinnerCanvas} />
       <FolderList folderTree={folderTree} folders={folders}/>
       {!initialListLoading &&
-      (<button
-        className={`material-icons ${mainCss['mdc-icon-button']} ${styles.addButton}`}onClick={createFolder}>
+      (<IconButton
+        className={`${mainCss['mdc-icon-button']} ${styles.addButton}`} onClick={createFolder}>
         add_circle
-      </button>)}
+      </IconButton>)}
       <FolderCreateDialog />
       <FolderRenameDialog />
     </nav>

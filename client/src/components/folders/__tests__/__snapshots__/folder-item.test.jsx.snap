@@ -3,7 +3,7 @@
 exports[`FolderItem component test suite Snapshot render Context Menu Visible, Should render FolderItem with menu 1`] = `
 <a
   className="the-one-percent mdc-list-item listItem
-        mdc-list-item--selected
+        mdc-list-item--activated
         "
   draggable={true}
   href="#"
@@ -51,7 +51,7 @@ exports[`FolderItem component test suite Snapshot render Context Menu Visible, S
 exports[`FolderItem component test suite Snapshot render Defaults with actions, Should render FolderItem with hidden menu and actions 1`] = `
 <a
   className="the-one-percent mdc-list-item listItem
-        mdc-list-item--selected
+        mdc-list-item--activated
         "
   draggable={true}
   href="#"
@@ -105,7 +105,7 @@ exports[`FolderItem component test suite Snapshot render Defaults with actions, 
 exports[`FolderItem component test suite Snapshot render Defaults, Should render FolderItem with no menu and no actions 1`] = `
 <a
   className="the-one-percent mdc-list-item listItem
-        mdc-list-item--selected
+        mdc-list-item--activated
         "
   draggable={true}
   href="#"

@@ -21,11 +21,13 @@ exports[`FolderContainer component test suite Snapshot render, should render Fol
     }
     folders={Object {}}
   />
-  <button
-    className="material-icons mdc-icon-button addButton"
+  <IconButton
+    className="mdc-icon-button addButton"
+    disabled={false}
+    onClick={[Function]}
   >
     add_circle
-  </button>
+  </IconButton>
   <Connect(Translate(FolderCreateDialog)) />
   <Connect(Translate(FolderRenameDialog)) />
 </nav>
