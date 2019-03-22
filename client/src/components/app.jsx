@@ -32,7 +32,9 @@ class App extends Component {
     const {sideBar} = this.state;
     return (
       <div className={styles.app}>
-        <Spinner visible={this.props.application.activeRequests > 0} className={styles.spinner}/>
+        <Spinner
+          visible={this.props.application.activeRequests > 0}
+          className={styles.spinner} pathClassName={styles.spinnerPath}/>
         <TopBar sideBarCollapsed={sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
         <SideBar collapsed={sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
         <div className={`${mainCss['mdc-top-app-bar--fixed-adjust']} ${styles['content-wrapper']}

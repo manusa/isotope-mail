@@ -1,5 +1,7 @@
 @import '../styles/partials/variables';
 
+$global-spinner-color: #333333;
+
 .app {
   display: flex;
   height: 100vh;
@@ -10,8 +12,12 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba($global-spinner-color, 0.5);
     z-index: map-get($z-index, thermosphere);
+
+    .spinnerPath {
+      stroke: $global-spinner-color;
+    }
   }
   .content-wrapper {
     flex-grow: 1;

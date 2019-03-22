@@ -47,7 +47,9 @@ export class Login extends Component {
     }
     return (
       <div className={styles.login}>
-        <Spinner visible={this.props.application.activeRequests > 0} className={styles.spinner}/>
+        <Spinner
+          visible={this.props.application.activeRequests > 0}
+          className={styles.spinner} pathClassName={styles.spinnerPath}/>
         <div className={`${mainCss['mdc-card']} ${styles.card}`}>
           <header>
             <h1 className={styles.title}>{this.props.application.title}</h1>

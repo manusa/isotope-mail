@@ -1,5 +1,6 @@
 @import '../../styles/partials/variables';
 
+$spinner-color: #333333;
 $card-width-break: 480px;
 $port-field-width: 180px;
 
@@ -18,8 +19,12 @@ $port-field-width: 180px;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba($spinner-color,0.5);
     z-index: map-get($z-index, thermosphere);
+
+    .spinnerPath {
+      stroke: $spinner-color;
+    }
   }
   .card {
     padding: $default-spacing;

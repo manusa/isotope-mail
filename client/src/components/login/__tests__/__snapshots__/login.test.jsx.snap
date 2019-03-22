@@ -14,7 +14,7 @@ exports[`LoginSnackbar component test suite Snapshot render User not logged in, 
   <Spinner
     canvasClassName=""
     className="spinner"
-    pathClassName=""
+    pathClassName="spinnerPath"
     visible={false}
   />
   <div
