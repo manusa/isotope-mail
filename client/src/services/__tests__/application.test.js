@@ -1,8 +1,45 @@
 import * as applicationService from '../application';
 import * as fetchService from '../fetch';
 import {ActionTypes} from '../../actions/action-types';
+import {URLS} from '../url';
 
 describe('Application service test suite', () => {
+  describe('login', () => {
+    test('Response NOT OK, should set authentication error', done => {
+      // Given
+      global.fetch = jest.fn((url, options) => {
+        expect(url).toEqual(URLS.LOGIN);
+        return Promise.resolve({ok: false, url, options,
+          text: () => Promise.resolve('Authentication error')});
+      });
+      let dispatchCount = 0;
+      const dispatch = jest.fn(action => {
+        switch (action.type) {
+          case ActionTypes.APPLICATION_BE_REQUEST:
+          case ActionTypes.APPLICATION_BE_REQUEST_COMPLETED:
+          case ActionTypes.LOGIN_FORM_VALUES_SET:
+            dispatchCount++;
+            break;
+          case ActionTypes.APPLICATION_ERROR_SET:
+            dispatchCount++;
+            if (action.payload.value === 'Authentication error') {
+              expect(dispatchCount).toEqual(5);
+              done();
+            }
+            break;
+          default:
+        }
+      });
+      const credentials = {
+        serverHost: 'server.host',
+        serverPort: 1337
+      };
+      // When
+      applicationService.login(dispatch, credentials);
+      // Then
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
   describe('editNewMessage', () => {
     test('editNewMessage with valid message, should dispatch editMessage', () => {
       // Given

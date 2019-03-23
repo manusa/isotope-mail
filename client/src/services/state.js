@@ -29,6 +29,7 @@ export async function loadState() {
       state.folders.items = [...dbState.folders.items];
       state.folders.explodedItems = {...dbState.folders.explodedItems};
       processFolders(Object.values(state.folders.explodedItems));
+      state.login = {...dbState.login};
       state.messages.cache = {...dbState.messages.cache};
     }
   }

@@ -22,6 +22,7 @@ describe('State service test suite', () => {
       indexedDb.recoverState = jest.fn(() => Promise.resolve({
         application: {object: 1},
         folders: {items: [], explodedItems: {1337: {folderId: '1337', name: 'INBOX', children: []}}},
+        login: {formValues: {serverHost: 'server.host'}},
         messages: {cache: {object: 2}}
       }));
 
@@ -36,6 +37,7 @@ describe('State service test suite', () => {
         expect(state.folders.explodedItems[1337])
           .toEqual(expect.objectContaining({folderId: '1337', name: 'INBOX', children: []}));
         expect(state.folders.explodedItems[1337].type).toBe(FolderTypes.INBOX);
+        expect(state.login.formValues).toEqual({serverHost: 'server.host'});
         done();
       });
     });

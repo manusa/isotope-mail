@@ -185,6 +185,8 @@ export async function persistState(dispatch, state) {
     newState.folders = {...state.folders};
     newState.folders.items = [...state.folders.items];
 
+    newState.login = {...state.login};
+
     // Don't persist message related states (Own IndexedDB entry for message cache @see persistMessageCache)
     newState.messages = {};
     // Object.entries(state.messages.cache).forEach(e => {

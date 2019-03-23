@@ -17,23 +17,37 @@ import Spinner from '../spinner/spinner';
 import mainCss from '../../styles/main.scss';
 import styles from './login.scss';
 
+/**
+ * Returns a Login component valid state from the current URL params
+ *
+ * @param {URLSearchParams} params
+ * @returns {{values: {serverHost: string, serverPort: number, user: string, password: string, imapSsl: boolean, smtpHost: string, smtpPort: number, smtpSsl: boolean}, advanced: boolean}}
+ */
+const stateFromParams = params => ({
+  values: {
+    serverHost: params.has('serverHost') ? params.get('serverHost') : '',
+    serverPort: params.has('serverPort') ? params.get('serverPort').replace(/[^0-9]*/g, '') : DEFAULT_IMAP_PORT,
+    user: params.has('user') ? params.get('user') : '',
+    password: '',
+    imapSsl: params.has('imapSsl') ? params.get('imapSsl') === 'true' : DEFAULT_IMAP_SSL,
+    smtpHost: params.has('smtpHost') ? params.get('smtpHost') : '',
+    smtpPort: params.has('smtpPort') ? params.get('smtpPort').replace(/[^0-9]*/g, '') : DEFAULT_SMTP_PORT,
+    smtpSsl: params.has('smtpSsl') ? params.get('smtpSsl') === 'true' : DEFAULT_SMTP_SSL
+  },
+  advanced: false
+});
+
+const stateFromFormValues = formValues => ({
+  values: {...formValues, password: ''}, advanced: false
+});
+
 export class Login extends Component {
   constructor(props) {
     super(props);
-    const params = new URLSearchParams(this.props.location.search);
-    this.state = {
-      values: {
-        serverHost: params.has('serverHost') ? params.get('serverHost') : '',
-        serverPort: params.has('serverPort') ? params.get('serverPort').replace(/[^0-9]*/g, '') : DEFAULT_IMAP_PORT,
-        user: params.has('user') ? params.get('user') : '',
-        password: '',
-        imapSsl: params.has('imapSsl') ? params.get('imapSsl') === 'true' : DEFAULT_IMAP_SSL,
-        smtpHost: params.has('smtpHost') ? params.get('smtpHost') : '',
-        smtpPort: params.has('smtpPort') ? params.get('smtpPort').replace(/[^0-9]*/g, '') : DEFAULT_SMTP_PORT,
-        smtpSsl: params.has('smtpSsl') ? params.get('smtpSsl') === 'true' : DEFAULT_SMTP_SSL
-      },
-      advanced: false
-    };
+    this.state = stateFromParams(new URLSearchParams(this.props.location.search));
+    if (this.props.formValues && Object.keys(this.props.formValues).length > 0) {
+      this.state = stateFromFormValues(this.props.formValues);
+    }
     this.onFieldChange = this.onFieldChange.bind(this);
     this.login = this.login.bind(this);
   }
@@ -75,7 +89,7 @@ export class Login extends Component {
               icon={advanced ? 'unfold_less' : 'unfold_more'}
               onClick={e => this.toggleAdvanced(e)}
             />
-            {advanced ?
+            {advanced &&
               <div className={styles.advancedContainer}>
                 <Switch id='imapSsl' checked={imapSsl} label={t('login.ImapSSL')}
                   onToggle={() => this.onToggle('imapSsl')}/>
@@ -92,7 +106,6 @@ export class Login extends Component {
                 <Switch id='smtpSsl' checked={smtpSsl} label={t('login.SmtpSSL')}
                   onToggle={() => this.onToggle('smtpSsl')}/>
               </div>
-              : null
             }
             <Button type={'submit'}
               className={`${styles.loginButton} ${mainCss['mdc-button--unelevated']} ${styles.fullWidth}`}
@@ -144,7 +157,8 @@ Login.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  application: state.application
+  application: state.application,
+  formValues: state.login.formValues
 });
 
 const mapDispatchToProps = dispatch => ({

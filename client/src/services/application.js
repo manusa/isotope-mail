@@ -16,6 +16,7 @@ import {setFolders} from '../actions/folders';
 import {setCache} from '../actions/messages';
 import {resetFolderMessagesCache} from './message';
 import sanitize from './sanitize';
+import {setFormValues} from '../actions/login';
 
 export const DEFAULT_IMAP_PORT = 993;
 export const DEFAULT_IMAP_SSL = true;
@@ -47,6 +48,7 @@ const LOGIN_SNACKBAR_DURATION = 4000;
  */
 export async function login(dispatch, credentials) {
   dispatch(backendRequest());
+  dispatch(setFormValues(credentials));
   dispatch(setError('authentication', null));
   const url = URLS.LOGIN;
   // Will be used as the key in the IndexedDB
