@@ -60,59 +60,61 @@ export class Login extends Component {
       return <Redirect to="/"/>;
     }
     return (
-      <div className={styles.login}>
-        <Spinner
-          visible={this.props.application.activeRequests > 0}
-          className={styles.spinner} pathClassName={styles.spinnerPath}/>
-        <div className={`${mainCss['mdc-card']} ${styles.card}`}>
-          <header>
-            <h1 className={styles.title}>{this.props.application.title}</h1>
-            <h2 className={styles.subtitle}>{t('login.Login')}</h2>
-          </header>
-          <form onSubmit={this.login}>
-            <div className={styles.server}>
-              <TextField id='serverHost' fieldClass={`${styles.formField} ${styles.serverHost}`}
-                value={serverHost} onChange={this.onFieldChange}
-                focused={this.isFocused('serverHost')} required={true} autoComplete='on' label={t('login.Host')}/>
-              <TextField key='serverPort' id='serverPort' fieldClass={`${styles.formField} ${styles.serverPort}`}
-                type='number' min='0'
-                value={serverPort} onChange={this.onFieldChange}
-                focused={this.isFocused('serverPort')} required={true} autoComplete='on' label={t('login.Port')}/>
-            </div>
-            <TextField id='user' fieldClass={`${styles.formField} ${styles.fullWidth}`}
-              value={user} onChange={this.onFieldChange}
-              focused={this.isFocused('user')} required={true} autoComplete='on' label={t('login.User')}/>
-            <TextField id='password' type={'password'} fieldClass={`${styles.formField} ${styles.fullWidth}`}
-              value={password} onChange={this.onFieldChange}
-              focused={this.isFocused('password')} required={true} label={t('login.Password')}/>
-            <Button className={styles.advancedButton} label={t('login.Advanced')}
-              icon={advanced ? 'unfold_less' : 'unfold_more'}
-              onClick={e => this.toggleAdvanced(e)}
-            />
-            {advanced &&
-              <div className={styles.advancedContainer}>
-                <Switch id='imapSsl' checked={imapSsl} label={t('login.ImapSSL')}
-                  onToggle={() => this.onToggle('imapSsl')}/>
-                <h3 className={styles.section}>{t('login.SMTP')}</h3>
-                <div className={styles.server}>
-                  <TextField id='smtpHost' fieldClass={`${styles.formField} ${styles.fullWidth} ${styles.serverHost}`}
-                    value={smtpHost} onChange={this.onFieldChange}
-                    focused={this.isFocused('smtpHost')} label={t('login.Host')}/>
-                  <TextField id='smtpPort' fieldClass={`${styles.formField} ${styles.fullWidth} ${styles.serverPort}`}
-                    type='number' min='0' required={true}
-                    value={smtpPort} onChange={this.onFieldChange}
-                    focused={this.isFocused('smtpPort')} label={t('login.Port')}/>
-                </div>
-                <Switch id='smtpSsl' checked={smtpSsl} label={t('login.SmtpSSL')}
-                  onToggle={() => this.onToggle('smtpSsl')}/>
+      <div className={styles['login--background']}>
+        <div className={styles['login--container']}>
+          <Spinner
+            visible={this.props.application.activeRequests > 0}
+            className={styles.spinner} pathClassName={styles.spinnerPath}/>
+          <div className={`${mainCss['mdc-card']} ${styles.card}`}>
+            <header>
+              <h1 className={styles.title}>{this.props.application.title}</h1>
+              <h2 className={styles.subtitle}>{t('login.Login')}</h2>
+            </header>
+            <form onSubmit={this.login}>
+              <div className={styles.server}>
+                <TextField id='serverHost' fieldClass={`${styles.formField} ${styles.serverHost}`}
+                  value={serverHost} onChange={this.onFieldChange}
+                  focused={this.isFocused('serverHost')} required={true} autoComplete='on' label={t('login.Host')}/>
+                <TextField key='serverPort' id='serverPort' fieldClass={`${styles.formField} ${styles.serverPort}`}
+                  type='number' min='0'
+                  value={serverPort} onChange={this.onFieldChange}
+                  focused={this.isFocused('serverPort')} required={true} autoComplete='on' label={t('login.Port')}/>
               </div>
-            }
-            <Button type={'submit'}
-              className={`${styles.loginButton} ${mainCss['mdc-button--unelevated']} ${styles.fullWidth}`}
-              label={t('login.actions.Login')} />
-          </form>
+              <TextField id='user' fieldClass={`${styles.formField} ${styles.fullWidth}`}
+                value={user} onChange={this.onFieldChange}
+                focused={this.isFocused('user')} required={true} autoComplete='on' label={t('login.User')}/>
+              <TextField id='password' type={'password'} fieldClass={`${styles.formField} ${styles.fullWidth}`}
+                value={password} onChange={this.onFieldChange}
+                focused={this.isFocused('password')} required={true} label={t('login.Password')}/>
+              <Button className={styles.advancedButton} label={t('login.Advanced')}
+                icon={advanced ? 'unfold_less' : 'unfold_more'}
+                onClick={e => this.toggleAdvanced(e)}
+              />
+              {advanced &&
+                <div className={styles.advancedContainer}>
+                  <Switch id='imapSsl' checked={imapSsl} label={t('login.ImapSSL')}
+                    onToggle={() => this.onToggle('imapSsl')}/>
+                  <h3 className={styles.section}>{t('login.SMTP')}</h3>
+                  <div className={styles.server}>
+                    <TextField id='smtpHost' fieldClass={`${styles.formField} ${styles.fullWidth} ${styles.serverHost}`}
+                      value={smtpHost} onChange={this.onFieldChange}
+                      focused={this.isFocused('smtpHost')} label={t('login.Host')}/>
+                    <TextField id='smtpPort' fieldClass={`${styles.formField} ${styles.fullWidth} ${styles.serverPort}`}
+                      type='number' min='0' required={true}
+                      value={smtpPort} onChange={this.onFieldChange}
+                      focused={this.isFocused('smtpPort')} label={t('login.Port')}/>
+                  </div>
+                  <Switch id='smtpSsl' checked={smtpSsl} label={t('login.SmtpSSL')}
+                    onToggle={() => this.onToggle('smtpSsl')}/>
+                </div>
+              }
+              <Button type={'submit'}
+                className={`${styles.loginButton} ${mainCss['mdc-button--unelevated']} ${styles.fullWidth}`}
+                label={t('login.actions.Login')} />
+            </form>
+          </div>
+          <LoginSnackbar />
         </div>
-        <LoginSnackbar />
       </div>
     );
   }

@@ -1,91 +1,109 @@
 @import '../../styles/partials/variables';
 
 $spinner-color: #333333;
+$card-max-width: 800px;
 $card-width-break: 480px;
 $port-field-width: 180px;
 
+.login--background {
+  background: url('https://source.unsplash.com/collection/4509660/1920x1080') no-repeat $base-background-color;
+  background-size: cover;
 
-.login {
-  width: 100%;
-  min-height: 100vh;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .spinner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba($spinner-color,0.5);
-    z-index: map-get($z-index, thermosphere);
-
-    .spinnerPath {
-      stroke: $spinner-color;
-    }
+  @media screen and (max-width: 1280px) {
+    background-image: url('https://source.unsplash.com/collection/4509660/1280x720');
   }
-  .card {
-    padding: $default-spacing;
-    width: 60%;
-    min-width: $card-width-break;
-    @media screen and (max-width: $card-width-break) {
+  @media screen and (max-width: $card-width-break) {
+    background: none;
+  }
+
+  .login--container {
+    background-color: rgba(0, 0, 0, 0.5);
+
+    width: 100%;
+    min-height: 100vh;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .spinner {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      min-width: auto;
-    }
+      background-color: rgba($spinner-color,0.5);
+      z-index: map-get($z-index, thermosphere);
 
-    .title {
-      font-size: $font-size-body * 1.8;
-      text-align: center;
-    }
-
-    .subtitle {
-      margin-top: $default-spacing / 2;
-      font-size: $font-size-body * 1.5;
-      color: lighten($base-color, 25%);
-      text-align: center;
-    }
-
-    .section {
-      margin: $default-spacing 0;
-      font-size: $font-size-body * 1.2;
-      color: lighten($base-color, 25%);
-    }
-
-    .advancedButton {
-      padding: 0 4px 0 0;
-    }
-
-    .advancedContainer {
-      margin-top: $default-spacing;
-    }
-
-    .fullWidth {
-      width: 100%;
-    }
-
-    .formField {
-      margin-bottom: $default-spacing;
-    }
-
-    .server {
-      width: 100%;
-      display: flex;
-
-      .serverHost {
-        margin-right: $default-spacing;
-        flex-grow: 1;
-      }
-
-      .serverPort {
-        width: $port-field-width;
+      .spinnerPath {
+        stroke: $spinner-color;
       }
     }
+    .card {
+      padding: $default-spacing;
+      width: 60%;
+      max-width: $card-max-width;
+      min-width: $card-width-break;
+      @media screen and (max-width: $card-width-break) {
+        width: 100%;
+        height: 100vh;
+        min-width: auto;
+        border-radius: 0;
+        overflow-y: scroll;
+      }
 
-    .loginButton {
-      margin-top: $default-spacing;
+      .title {
+        font-size: $font-size-body * 1.8;
+        text-align: center;
+      }
+
+      .subtitle {
+        margin-top: $default-spacing / 2;
+        font-size: $font-size-body * 1.5;
+        color: lighten($base-color, 25%);
+        text-align: center;
+      }
+
+      .section {
+        margin: $default-spacing 0;
+        font-size: $font-size-body * 1.2;
+        color: lighten($base-color, 25%);
+      }
+
+      .advancedButton {
+        padding: 0 4px 0 0;
+      }
+
+      .advancedContainer {
+        margin-top: $default-spacing;
+      }
+
+      .fullWidth {
+        width: 100%;
+      }
+
+      .formField {
+        margin-bottom: $default-spacing;
+      }
+
+      .server {
+        width: 100%;
+        display: flex;
+
+        .serverHost {
+          margin-right: $default-spacing;
+          flex-grow: 1;
+        }
+
+        .serverPort {
+          width: $port-field-width;
+        }
+      }
+
+      .loginButton {
+        margin-top: $default-spacing;
+      }
     }
   }
 }
+

@@ -9,148 +9,44 @@ exports[`LoginSnackbar component test suite Snapshot render User logged in, shou
 
 exports[`LoginSnackbar component test suite Snapshot render User not logged in with advanced toggled on, should render Login with advanced view 1`] = `
 <div
-  className="login"
+  className="login--background"
 >
-  <Spinner
-    canvasClassName=""
-    className="spinner"
-    pathClassName="spinnerPath"
-    visible={false}
-  />
   <div
-    className="mdc-card card"
+    className="login--container"
   >
-    <header>
-      <h1
-        className="title"
-      >
-        Isotope Mail Client
-      </h1>
-      <h2
-        className="subtitle"
-      >
-        login.Login
-      </h2>
-    </header>
-    <form
-      onSubmit={[Function]}
+    <Spinner
+      canvasClassName=""
+      className="spinner"
+      pathClassName="spinnerPath"
+      visible={false}
+    />
+    <div
+      className="mdc-card card"
     >
-      <div
-        className="server"
-      >
-        <TextField
-          autoComplete="on"
-          disabled={false}
-          fieldClass="formField serverHost"
-          focused={false}
-          id="serverHost"
-          inputClass=""
-          label="login.Host"
-          labelClass=""
-          lineRippleClass=""
-          min=""
-          minLength={null}
-          onChange={[Function]}
-          onKeyDown={null}
-          onKeyPress={null}
-          required={true}
-          type="text"
-          value=""
-        />
-        <TextField
-          autoComplete="on"
-          disabled={false}
-          fieldClass="formField serverPort"
-          focused={false}
-          id="serverPort"
-          inputClass=""
-          key="serverPort"
-          label="login.Port"
-          labelClass=""
-          lineRippleClass=""
-          min="0"
-          minLength={null}
-          onChange={[Function]}
-          onKeyDown={null}
-          onKeyPress={null}
-          required={true}
-          type="number"
-          value={993}
-        />
-      </div>
-      <TextField
-        autoComplete="on"
-        disabled={false}
-        fieldClass="formField fullWidth"
-        focused={false}
-        id="user"
-        inputClass=""
-        label="login.User"
-        labelClass=""
-        lineRippleClass=""
-        min=""
-        minLength={null}
-        onChange={[Function]}
-        onKeyDown={null}
-        onKeyPress={null}
-        required={true}
-        type="text"
-        value=""
-      />
-      <TextField
-        autoComplete="off"
-        disabled={false}
-        fieldClass="formField fullWidth"
-        focused={false}
-        id="password"
-        inputClass=""
-        label="login.Password"
-        labelClass=""
-        lineRippleClass=""
-        min=""
-        minLength={null}
-        onChange={[Function]}
-        onKeyDown={null}
-        onKeyPress={null}
-        required={true}
-        type="password"
-        value=""
-      />
-      <Button
-        className="advancedButton"
-        disabled={false}
-        icon="unfold_less"
-        iconClassName=""
-        label="login.Advanced"
-        onClick={[Function]}
-        type="button"
-      />
-      <div
-        className="advancedContainer"
-      >
-        <Switch
-          checked={true}
-          id="imapSsl"
-          inputClass=""
-          label="login.ImapSSL"
-          onToggle={[Function]}
-          required={false}
-          switchClass=""
-        />
-        <h3
-          className="section"
+      <header>
+        <h1
+          className="title"
         >
-          login.SMTP
-        </h3>
+          Isotope Mail Client
+        </h1>
+        <h2
+          className="subtitle"
+        >
+          login.Login
+        </h2>
+      </header>
+      <form
+        onSubmit={[Function]}
+      >
         <div
           className="server"
         >
           <TextField
-            autoComplete="off"
+            autoComplete="on"
             disabled={false}
-            fieldClass="formField fullWidth serverHost"
+            fieldClass="formField serverHost"
             focused={false}
-            id="smtpHost"
+            id="serverHost"
             inputClass=""
             label="login.Host"
             labelClass=""
@@ -160,17 +56,18 @@ exports[`LoginSnackbar component test suite Snapshot render User not logged in w
             onChange={[Function]}
             onKeyDown={null}
             onKeyPress={null}
-            required={false}
+            required={true}
             type="text"
             value=""
           />
           <TextField
-            autoComplete="off"
+            autoComplete="on"
             disabled={false}
-            fieldClass="formField fullWidth serverPort"
+            fieldClass="formField serverPort"
             focused={false}
-            id="smtpPort"
+            id="serverPort"
             inputClass=""
+            key="serverPort"
             label="login.Port"
             labelClass=""
             lineRippleClass=""
@@ -181,73 +78,17 @@ exports[`LoginSnackbar component test suite Snapshot render User not logged in w
             onKeyPress={null}
             required={true}
             type="number"
-            value={465}
+            value={993}
           />
         </div>
-        <Switch
-          checked={true}
-          id="smtpSsl"
-          inputClass=""
-          label="login.SmtpSSL"
-          onToggle={[Function]}
-          required={false}
-          switchClass=""
-        />
-      </div>
-      <Button
-        className="loginButton mdc-button--unelevated fullWidth"
-        disabled={false}
-        icon=""
-        iconClassName=""
-        label="login.actions.Login"
-        onClick={[Function]}
-        type="submit"
-      />
-    </form>
-  </div>
-  <Connect(Translate(LoginSnackbar)) />
-</div>
-`;
-
-exports[`LoginSnackbar component test suite Snapshot render User not logged in, should render Login 1`] = `
-<div
-  className="login"
->
-  <Spinner
-    canvasClassName=""
-    className="spinner"
-    pathClassName="spinnerPath"
-    visible={false}
-  />
-  <div
-    className="mdc-card card"
-  >
-    <header>
-      <h1
-        className="title"
-      >
-        Isotope Mail Client
-      </h1>
-      <h2
-        className="subtitle"
-      >
-        login.Login
-      </h2>
-    </header>
-    <form
-      onSubmit={[Function]}
-    >
-      <div
-        className="server"
-      >
         <TextField
           autoComplete="on"
           disabled={false}
-          fieldClass="formField serverHost"
+          fieldClass="formField fullWidth"
           focused={false}
-          id="serverHost"
+          id="user"
           inputClass=""
-          label="login.Host"
+          label="login.User"
           labelClass=""
           lineRippleClass=""
           min=""
@@ -260,84 +101,251 @@ exports[`LoginSnackbar component test suite Snapshot render User not logged in, 
           value=""
         />
         <TextField
-          autoComplete="on"
+          autoComplete="off"
           disabled={false}
-          fieldClass="formField serverPort"
+          fieldClass="formField fullWidth"
           focused={false}
-          id="serverPort"
+          id="password"
           inputClass=""
-          key="serverPort"
-          label="login.Port"
+          label="login.Password"
           labelClass=""
           lineRippleClass=""
-          min="0"
+          min=""
           minLength={null}
           onChange={[Function]}
           onKeyDown={null}
           onKeyPress={null}
           required={true}
-          type="number"
-          value={993}
+          type="password"
+          value=""
         />
-      </div>
-      <TextField
-        autoComplete="on"
-        disabled={false}
-        fieldClass="formField fullWidth"
-        focused={false}
-        id="user"
-        inputClass=""
-        label="login.User"
-        labelClass=""
-        lineRippleClass=""
-        min=""
-        minLength={null}
-        onChange={[Function]}
-        onKeyDown={null}
-        onKeyPress={null}
-        required={true}
-        type="text"
-        value=""
-      />
-      <TextField
-        autoComplete="off"
-        disabled={false}
-        fieldClass="formField fullWidth"
-        focused={false}
-        id="password"
-        inputClass=""
-        label="login.Password"
-        labelClass=""
-        lineRippleClass=""
-        min=""
-        minLength={null}
-        onChange={[Function]}
-        onKeyDown={null}
-        onKeyPress={null}
-        required={true}
-        type="password"
-        value=""
-      />
-      <Button
-        className="advancedButton"
-        disabled={false}
-        icon="unfold_more"
-        iconClassName=""
-        label="login.Advanced"
-        onClick={[Function]}
-        type="button"
-      />
-      <Button
-        className="loginButton mdc-button--unelevated fullWidth"
-        disabled={false}
-        icon=""
-        iconClassName=""
-        label="login.actions.Login"
-        onClick={[Function]}
-        type="submit"
-      />
-    </form>
+        <Button
+          className="advancedButton"
+          disabled={false}
+          icon="unfold_less"
+          iconClassName=""
+          label="login.Advanced"
+          onClick={[Function]}
+          type="button"
+        />
+        <div
+          className="advancedContainer"
+        >
+          <Switch
+            checked={true}
+            id="imapSsl"
+            inputClass=""
+            label="login.ImapSSL"
+            onToggle={[Function]}
+            required={false}
+            switchClass=""
+          />
+          <h3
+            className="section"
+          >
+            login.SMTP
+          </h3>
+          <div
+            className="server"
+          >
+            <TextField
+              autoComplete="off"
+              disabled={false}
+              fieldClass="formField fullWidth serverHost"
+              focused={false}
+              id="smtpHost"
+              inputClass=""
+              label="login.Host"
+              labelClass=""
+              lineRippleClass=""
+              min=""
+              minLength={null}
+              onChange={[Function]}
+              onKeyDown={null}
+              onKeyPress={null}
+              required={false}
+              type="text"
+              value=""
+            />
+            <TextField
+              autoComplete="off"
+              disabled={false}
+              fieldClass="formField fullWidth serverPort"
+              focused={false}
+              id="smtpPort"
+              inputClass=""
+              label="login.Port"
+              labelClass=""
+              lineRippleClass=""
+              min="0"
+              minLength={null}
+              onChange={[Function]}
+              onKeyDown={null}
+              onKeyPress={null}
+              required={true}
+              type="number"
+              value={465}
+            />
+          </div>
+          <Switch
+            checked={true}
+            id="smtpSsl"
+            inputClass=""
+            label="login.SmtpSSL"
+            onToggle={[Function]}
+            required={false}
+            switchClass=""
+          />
+        </div>
+        <Button
+          className="loginButton mdc-button--unelevated fullWidth"
+          disabled={false}
+          icon=""
+          iconClassName=""
+          label="login.actions.Login"
+          onClick={[Function]}
+          type="submit"
+        />
+      </form>
+    </div>
+    <Connect(Translate(LoginSnackbar)) />
   </div>
-  <Connect(Translate(LoginSnackbar)) />
+</div>
+`;
+
+exports[`LoginSnackbar component test suite Snapshot render User not logged in, should render Login 1`] = `
+<div
+  className="login--background"
+>
+  <div
+    className="login--container"
+  >
+    <Spinner
+      canvasClassName=""
+      className="spinner"
+      pathClassName="spinnerPath"
+      visible={false}
+    />
+    <div
+      className="mdc-card card"
+    >
+      <header>
+        <h1
+          className="title"
+        >
+          Isotope Mail Client
+        </h1>
+        <h2
+          className="subtitle"
+        >
+          login.Login
+        </h2>
+      </header>
+      <form
+        onSubmit={[Function]}
+      >
+        <div
+          className="server"
+        >
+          <TextField
+            autoComplete="on"
+            disabled={false}
+            fieldClass="formField serverHost"
+            focused={false}
+            id="serverHost"
+            inputClass=""
+            label="login.Host"
+            labelClass=""
+            lineRippleClass=""
+            min=""
+            minLength={null}
+            onChange={[Function]}
+            onKeyDown={null}
+            onKeyPress={null}
+            required={true}
+            type="text"
+            value=""
+          />
+          <TextField
+            autoComplete="on"
+            disabled={false}
+            fieldClass="formField serverPort"
+            focused={false}
+            id="serverPort"
+            inputClass=""
+            key="serverPort"
+            label="login.Port"
+            labelClass=""
+            lineRippleClass=""
+            min="0"
+            minLength={null}
+            onChange={[Function]}
+            onKeyDown={null}
+            onKeyPress={null}
+            required={true}
+            type="number"
+            value={993}
+          />
+        </div>
+        <TextField
+          autoComplete="on"
+          disabled={false}
+          fieldClass="formField fullWidth"
+          focused={false}
+          id="user"
+          inputClass=""
+          label="login.User"
+          labelClass=""
+          lineRippleClass=""
+          min=""
+          minLength={null}
+          onChange={[Function]}
+          onKeyDown={null}
+          onKeyPress={null}
+          required={true}
+          type="text"
+          value=""
+        />
+        <TextField
+          autoComplete="off"
+          disabled={false}
+          fieldClass="formField fullWidth"
+          focused={false}
+          id="password"
+          inputClass=""
+          label="login.Password"
+          labelClass=""
+          lineRippleClass=""
+          min=""
+          minLength={null}
+          onChange={[Function]}
+          onKeyDown={null}
+          onKeyPress={null}
+          required={true}
+          type="password"
+          value=""
+        />
+        <Button
+          className="advancedButton"
+          disabled={false}
+          icon="unfold_more"
+          iconClassName=""
+          label="login.Advanced"
+          onClick={[Function]}
+          type="button"
+        />
+        <Button
+          className="loginButton mdc-button--unelevated fullWidth"
+          disabled={false}
+          icon=""
+          iconClassName=""
+          label="login.actions.Login"
+          onClick={[Function]}
+          type="submit"
+        />
+      </form>
+    </div>
+    <Connect(Translate(LoginSnackbar)) />
+  </div>
 </div>
 `;
