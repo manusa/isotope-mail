@@ -3,10 +3,16 @@
 exports[`ButtonReply component test suite Snapshot render, not outboxEmpty, should NOT render button 1`] = `""`;
 
 exports[`ButtonReply component test suite Snapshot render, outboxEmpty, should render button 1`] = `
-<TopBarButton
-  className=""
-  onClick={[MockFunction]}
+<span
+  isotip="topBar.replyAll"
+  isotip-position="bottom"
+  isotip-size="small"
 >
-  reply_all
-</TopBarButton>
+  <TopBarButton
+    className=""
+    onClick={[MockFunction]}
+  >
+    reply_all
+  </TopBarButton>
+</span>
 `;

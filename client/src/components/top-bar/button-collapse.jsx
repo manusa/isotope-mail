@@ -1,10 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {translate} from 'react-i18next';
 import TopBarButton from './top-bar-button';
 
-const ButtonCollapse = ({collapsed, sideBarToggle}) => (
+export const ButtonCollapse = ({t, collapsed, sideBarToggle}) => (
   collapsed && (
-    <TopBarButton onClick={sideBarToggle}>menu </TopBarButton>)
+    <span isotip={t('topBar.showSideBar')} isotip-position='bottom-start' isotip-size='small'>
+      <TopBarButton onClick={sideBarToggle}>menu</TopBarButton>
+    </span>)
 );
 
 ButtonCollapse.propTypes = {
@@ -12,4 +15,4 @@ ButtonCollapse.propTypes = {
   sideBarToggle: PropTypes.func.isRequired
 };
 
-export default ButtonCollapse;
+export default translate()(ButtonCollapse);

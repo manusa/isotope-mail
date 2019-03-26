@@ -2,7 +2,7 @@
 
 exports[`IconButton component test suite Snapshot render, should render icon-button 1`] = `
 <button
-  className="material-icons higher-class"
+  className="material-icons mdc-icon-button higher-class"
   disabled={false}
   onClick={[MockFunction]}
 >

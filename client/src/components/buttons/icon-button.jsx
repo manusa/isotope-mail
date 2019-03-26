@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import mainCss from '../../styles/main.scss';
 
-const IconButton = ({className, onClick, disabled, children}) =>
-  (<button className={`material-icons ${className}`}
-    disabled={disabled} onClick={onClick}>
+const IconButton = ({className, onClick, disabled, children, ...otherProps}) =>
+  (<button className={`material-icons ${mainCss['mdc-icon-button']} ${className}`}
+    disabled={disabled} onClick={onClick} {...otherProps}>
     {children}
   </button>);
 

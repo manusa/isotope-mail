@@ -7,7 +7,7 @@ describe('ButtonFilter component test suite', () => {
   describe('Snapshot render', () => {
     test('Snapshot render, activeMessageFilter=ALL, should render deactivated button-filter', () => {
       // Given
-      const props = {activeMessageFilter: MessageFilters.ALL};
+      const props = {t: jest.fn(arg => arg), activeMessageFilter: MessageFilters.ALL};
       // When
       const filterDialog = shallow(<ButtonFilter {...props}/>);
       // Then
@@ -15,7 +15,7 @@ describe('ButtonFilter component test suite', () => {
     });
     test('Snapshot render, activeMessageFilter=READ, should render activated button-filter', () => {
       // Given
-      const props = {activeMessageFilter: MessageFilters.READ};
+      const props = {t: jest.fn(arg => arg), activeMessageFilter: MessageFilters.READ};
       // When
       const filterDialog = shallow(<ButtonFilter {...props}/>);
       // Then
@@ -29,7 +29,7 @@ describe('ButtonFilter component test suite', () => {
       const originalRemoveEventListener = window.removeEventListener;
       window.addEventListener = jest.fn(() => originalAddEventListener.apply(null, arguments));
       window.removeEventListener = jest.fn(() => originalRemoveEventListener.apply(null, arguments));
-      const props = {activeMessageFilter: MessageFilters.READ};
+      const props = {t: jest.fn(arg => arg), activeMessageFilter: MessageFilters.READ};
       const filterDialog = shallow(<ButtonFilter {...props}/>);
       // When
       filterDialog.unmount();
@@ -39,7 +39,7 @@ describe('ButtonFilter component test suite', () => {
     });
     test('onToggleDialog, state is changed', () => {
       // Given
-      const props = {activeMessageFilter: MessageFilters.READ};
+      const props = {t: jest.fn(arg => arg), activeMessageFilter: MessageFilters.READ};
       const filterDialog = shallow(<ButtonFilter {...props}/>);
       const event = {stopPropagation: jest.fn()};
       // When
@@ -50,7 +50,7 @@ describe('ButtonFilter component test suite', () => {
     });
     test('onCloseDialog, state.dialogVisible is false', () => {
       // Given
-      const props = {activeMessageFilter: MessageFilters.READ};
+      const props = {t: jest.fn(arg => arg), activeMessageFilter: MessageFilters.READ};
       const filterDialog = shallow(<ButtonFilter {...props}/>);
       filterDialog.state().dialogVisible = true;
       // When

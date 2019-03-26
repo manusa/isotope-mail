@@ -3,10 +3,11 @@ import {connect} from 'react-redux';
 import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
 import FolderContainer from '../folders/folder-container';
+import {DroppablePayloadTypes} from '../folders/folder-list';
+import IconButton from '../buttons/icon-button';
+import {moveFolder} from '../../services/folder';
 import mainCss from '../../styles/main.scss';
 import styles from './side-bar.scss';
-import {moveFolder} from '../../services/folder';
-import {DroppablePayloadTypes} from '../folders/folder-list';
 
 
 class SideBar extends Component {
@@ -33,20 +34,21 @@ class SideBar extends Component {
           ${dragOver ? styles.dropZone : ''}`}
       >
         <div className={`${mainCss['mdc-drawer__header']} ${styles['top-container']}`}>
-          {(location.protocol !== 'https:' ?
+          {(location.protocol !== 'https:' &&
             <span className='material-icons' isotip={t('sideBar.errors.noSSL')}
               isotip-position='bottom-start' isotip-size='small'>
             lock_open
-            </span> : null)}
-          {(this.props.errors.diskQuotaExceeded ?
+            </span>)}
+          {(this.props.errors.diskQuotaExceeded &&
             <span className='material-icons' isotip={t('sideBar.errors.diskQuotaExceeded')}
               isotip-position='bottom-start' isotip-size='small'>
             disc_full
-            </span> : null)}
-          <button onClick={this.props.sideBarToggle}
-            className={`material-icons ${mainCss['mdc-icon-button']} ${styles.toggle}`}>
-            keyboard_arrow_left
-          </button>
+            </span>)}
+          <span className={styles.toggle} isotip={t('sideBar.hide')} isotip-position='bottom-end' isotip-size='small'>
+            <IconButton onClick={this.props.sideBarToggle} >
+              keyboard_arrow_left
+            </IconButton>
+          </span>
         </div>
         <div className={`${mainCss['mdc-drawer__content']} ${styles['drawer-content']}`}>
           <FolderContainer />

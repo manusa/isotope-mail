@@ -25,7 +25,7 @@ exports[`TopBar component test suite Snapshot render TopBar with selected folder
       with-side-bar
       mdc-top-app-bar mdc-top-app-bar--fixed"
 >
-  <TopBarMessageList
+  <Translate(TopBarMessageList)
     collapsed={false}
     onDeleteClick={[Function]}
     onMarkReadClick={[Function]}
@@ -54,7 +54,7 @@ exports[`TopBar component test suite Snapshot render TopBar with selected folder
       with-side-bar
       mdc-top-app-bar mdc-top-app-bar--fixed"
 >
-  <TopBarMessageList
+  <Translate(TopBarMessageList)
     collapsed={false}
     onDeleteClick={[Function]}
     onMarkReadClick={[Function]}
@@ -77,7 +77,7 @@ exports[`TopBar component test suite Snapshot render TopBar with selected messag
       with-side-bar
       mdc-top-app-bar mdc-top-app-bar--fixed"
 >
-  <TopBarMessageViewer
+  <Translate(TopBarMessageViewer)
     collapsed={false}
     onDeleteClick={[Function]}
     outboxEmpty={true}

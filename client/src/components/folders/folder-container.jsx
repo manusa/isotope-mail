@@ -19,7 +19,7 @@ export const FolderContainer = ({activeRequests, folderTree, folders, createFold
       <FolderList folderTree={folderTree} folders={folders}/>
       {!initialListLoading &&
       (<IconButton
-        className={`${mainCss['mdc-icon-button']} ${styles.addButton}`} onClick={createFolder}>
+        className={`${styles.addButton}`} onClick={createFolder}>
         add_circle
       </IconButton>)}
       <FolderCreateDialog />

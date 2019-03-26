@@ -7,7 +7,7 @@ exports[`TopBarMessageEditor component test suite Snapshot render, should render
   <section
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
   >
-    <ButtonCollapse
+    <Translate(ButtonCollapse)
       collapsed={true}
       sideBarToggle={[MockFunction]}
     />

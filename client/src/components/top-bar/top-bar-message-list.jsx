@@ -1,13 +1,14 @@
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
+import {translate} from 'react-i18next';
 import ButtonCollapse from './button-collapse';
 import TopBarButton from './top-bar-button';
 import ButtonFilter from './button-filter';
 import mainCss from '../../styles/main.scss';
 
-const TopBarMessageList = (
+export const TopBarMessageList = (
   {
-    collapsed, sideBarToggle, title,
+    t, collapsed, sideBarToggle, title,
     selectedMessages, onDeleteClick,
     selectedMessagesAllUnread, onMarkReadClick, onMarkUnreadClick
   }) => (
@@ -19,10 +20,16 @@ const TopBarMessageList = (
     <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-end']}`}>
       {selectedMessages.length > 0 &&
         <Fragment>
-          <TopBarButton onClick={onDeleteClick}>delete</TopBarButton>
+          <span isotip={t('topBar.delete')} isotip-position='bottom' isotip-size='small'>
+            <TopBarButton onClick={onDeleteClick}>delete</TopBarButton>
+          </span>
           {selectedMessages.length > 0 && selectedMessagesAllUnread ?
-            <TopBarButton onClick={onMarkReadClick}>drafts</TopBarButton> :
-            <TopBarButton onClick={onMarkUnreadClick}>markunread</TopBarButton>
+            <span isotip={t('topBar.markRead')} isotip-position='bottom' isotip-size='small'>
+              <TopBarButton onClick={onMarkReadClick}>drafts</TopBarButton>
+            </span>:
+            <span isotip={t('topBar.markUnread')} isotip-position='bottom' isotip-size='small'>
+              <TopBarButton onClick={onMarkUnreadClick}>markunread</TopBarButton>
+            </span>
           }
         </Fragment>
       }
@@ -42,4 +49,4 @@ TopBarMessageList.propTypes = {
   onMarkUnreadClick: PropTypes.func.isRequired
 };
 
-export default TopBarMessageList;
+export default translate()(TopBarMessageList);

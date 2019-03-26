@@ -22,7 +22,7 @@ exports[`FolderContainer component test suite Snapshot render, should render Fol
     folders={Object {}}
   />
   <IconButton
-    className="mdc-icon-button addButton"
+    className="addButton"
     disabled={false}
     onClick={[Function]}
   >

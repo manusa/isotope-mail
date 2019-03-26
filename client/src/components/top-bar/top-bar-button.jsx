@@ -6,7 +6,7 @@ import mainCss from '../../styles/main.scss';
 const TopBarButton = ({onClick, className, children}) => (
   <IconButton
     onClick={onClick}
-    className={`material-icons ${className} ${mainCss['mdc-top-app-bar__action-item']}`}>
+    className={`${className} ${mainCss['mdc-top-app-bar__action-item']}`}>
     {children}
   </IconButton>
 );

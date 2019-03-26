@@ -19,12 +19,21 @@
     }
   },
   "sideBar": {
+    "hide": "Hide sidebar",
     "errors": {
       "noSSL": "Connection to server is not secure",
       "diskQuotaExceeded": "Disk quota exceeded (IndexedDB)"
     }
   },
   "topBar": {
+    "showSideBar": "Show sidebar",
+    "backToList": "Back to list",
+    "quickFilter": "Quick filter",
+    "replyAll": "Reply all",
+    "forward": "Forward",
+    "delete": "Delete",
+    "markUnread": "Mark unread",
+    "markRead": "Mark read",
     "deleteFromTrashDialog": {
       "title": "Confirm deletion",
       "message": "This will permanently delete messages from Trash. Are you sure you want to continue?",

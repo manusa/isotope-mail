@@ -7,40 +7,58 @@ exports[`TopBarMessageViewer component test suite Snapshot render, should render
   <section
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
   >
-    <ButtonCollapse
+    <Translate(ButtonCollapse)
       collapsed={true}
       sideBarToggle={[MockFunction]}
     />
-    <button
-      className="material-icons mdc-top-app-bar__navigation-icon"
-      onClick={[MockFunction]}
+    <span
+      isotip="topBar.backToList"
+      isotip-position="bottom-start"
+      isotip-size="small"
     >
-      arrow_back
-    </button>
+      <TopBarButton
+        className="mdc-top-app-bar__navigation-icon"
+        onClick={[MockFunction]}
+      >
+        arrow_back
+      </TopBarButton>
+    </span>
   </section>
   <section
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
   >
-    <ButtonReply
+    <Translate(ButtonReply)
       outboxEmpty={true}
       replyMessage={[MockFunction]}
     />
-    <ButtonForward
+    <Translate(ButtonForward)
       forwardMessage={[MockFunction]}
       outboxEmpty={true}
     />
-    <TopBarButton
-      className=""
-      onClick={[MockFunction]}
+    <span
+      isotip="topBar.delete"
+      isotip-position="bottom"
+      isotip-size="small"
     >
-      delete
-    </TopBarButton>
-    <TopBarButton
-      className=""
-      onClick={[MockFunction]}
+      <TopBarButton
+        className=""
+        onClick={[MockFunction]}
+      >
+        delete
+      </TopBarButton>
+    </span>
+    <span
+      isotip="topBar.markUnread"
+      isotip-position="bottom-end"
+      isotip-size="small"
     >
-      markunread
-    </TopBarButton>
+      <TopBarButton
+        className=""
+        onClick={[MockFunction]}
+      >
+        markunread
+      </TopBarButton>
+    </span>
   </section>
 </div>
 `;

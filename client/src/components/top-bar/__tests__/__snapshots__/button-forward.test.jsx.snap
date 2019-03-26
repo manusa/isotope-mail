@@ -3,10 +3,16 @@
 exports[`ButtonForward component test suite Snapshot render, not outboxEmpty, should NOT render button 1`] = `""`;
 
 exports[`ButtonForward component test suite Snapshot render, outboxEmpty, should render button 1`] = `
-<TopBarButton
-  className=""
-  onClick={[MockFunction]}
+<span
+  isotip="topBar.forward"
+  isotip-position="bottom"
+  isotip-size="small"
 >
-  forward
-</TopBarButton>
+  <TopBarButton
+    className=""
+    onClick={[MockFunction]}
+  >
+    forward
+  </TopBarButton>
+</span>
 `;

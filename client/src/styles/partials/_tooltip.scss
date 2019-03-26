@@ -40,7 +40,6 @@ $isotip-large-width: 250px !default;
     background: $isotip-background-color;
   }
 
-
   &:hover::before,
   &:focus::before {
     visibility: visible;
@@ -49,6 +48,11 @@ $isotip-large-width: 250px !default;
     // Animation -> Fade In
     opacity: 1;
     transition: all $isotip-transition-in-time;
+  }
+
+  &[isotip-hidden='true']::before {
+    visibility: hidden;
+    transition: none;
   }
 
   &[isotip-size='small']::before {

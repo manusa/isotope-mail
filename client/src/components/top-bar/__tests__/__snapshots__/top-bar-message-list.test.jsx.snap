@@ -7,7 +7,7 @@ exports[`TopBarMessageList component test suite Snapshot render, with empty sele
   <section
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
   >
-    <ButtonCollapse
+    <Translate(ButtonCollapse)
       collapsed={true}
       sideBarToggle={[MockFunction]}
     />
@@ -20,7 +20,7 @@ exports[`TopBarMessageList component test suite Snapshot render, with empty sele
   <section
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
   >
-    <Connect(ButtonFilter) />
+    <Connect(Translate(ButtonFilter)) />
   </section>
 </div>
 `;
@@ -32,7 +32,7 @@ exports[`TopBarMessageList component test suite Snapshot render, with selected m
   <section
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
   >
-    <ButtonCollapse
+    <Translate(ButtonCollapse)
       collapsed={true}
       sideBarToggle={[MockFunction]}
     />
@@ -45,19 +45,31 @@ exports[`TopBarMessageList component test suite Snapshot render, with selected m
   <section
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
   >
-    <TopBarButton
-      className=""
-      onClick={[MockFunction]}
+    <span
+      isotip="topBar.delete"
+      isotip-position="bottom"
+      isotip-size="small"
     >
-      delete
-    </TopBarButton>
-    <TopBarButton
-      className=""
-      onClick={[MockFunction]}
+      <TopBarButton
+        className=""
+        onClick={[MockFunction]}
+      >
+        delete
+      </TopBarButton>
+    </span>
+    <span
+      isotip="topBar.markUnread"
+      isotip-position="bottom"
+      isotip-size="small"
     >
-      markunread
-    </TopBarButton>
-    <Connect(ButtonFilter) />
+      <TopBarButton
+        className=""
+        onClick={[MockFunction]}
+      >
+        markunread
+      </TopBarButton>
+    </span>
+    <Connect(Translate(ButtonFilter)) />
   </section>
 </div>
 `;
@@ -69,7 +81,7 @@ exports[`TopBarMessageList component test suite Snapshot render, with selected m
   <section
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-start"
   >
-    <ButtonCollapse
+    <Translate(ButtonCollapse)
       collapsed={true}
       sideBarToggle={[MockFunction]}
     />
@@ -82,19 +94,31 @@ exports[`TopBarMessageList component test suite Snapshot render, with selected m
   <section
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
   >
-    <TopBarButton
-      className=""
-      onClick={[MockFunction]}
+    <span
+      isotip="topBar.delete"
+      isotip-position="bottom"
+      isotip-size="small"
     >
-      delete
-    </TopBarButton>
-    <TopBarButton
-      className=""
-      onClick={[MockFunction]}
+      <TopBarButton
+        className=""
+        onClick={[MockFunction]}
+      >
+        delete
+      </TopBarButton>
+    </span>
+    <span
+      isotip="topBar.markRead"
+      isotip-position="bottom"
+      isotip-size="small"
     >
-      drafts
-    </TopBarButton>
-    <Connect(ButtonFilter) />
+      <TopBarButton
+        className=""
+        onClick={[MockFunction]}
+      >
+        drafts
+      </TopBarButton>
+    </span>
+    <Connect(Translate(ButtonFilter)) />
   </section>
 </div>
 `;

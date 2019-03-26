@@ -3,6 +3,10 @@
 exports[`ButtonFilter component test suite Snapshot render Snapshot render, activeMessageFilter=ALL, should render deactivated button-filter 1`] = `
 <span
   className="button-filter mdc-menu-surface--anchor"
+  isotip="topBar.quickFilter"
+  isotip-hidden="false"
+  isotip-position="bottom-end"
+  isotip-size="small"
 >
   <TopBarButton
     className="button-filter--button "
@@ -19,6 +23,10 @@ exports[`ButtonFilter component test suite Snapshot render Snapshot render, acti
 exports[`ButtonFilter component test suite Snapshot render Snapshot render, activeMessageFilter=READ, should render activated button-filter 1`] = `
 <span
   className="button-filter mdc-menu-surface--anchor"
+  isotip="topBar.quickFilter"
+  isotip-hidden="false"
+  isotip-position="bottom-end"
+  isotip-size="small"
 >
   <TopBarButton
     className="button-filter--button active"

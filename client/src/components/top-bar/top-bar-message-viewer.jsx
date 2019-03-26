@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {translate} from 'react-i18next';
 import ButtonCollapse from './button-collapse';
 import TopBarButton from './top-bar-button';
 import ButtonReply from './button-reply';
 import ButtonForward from './button-forward';
 import mainCss from '../../styles/main.scss';
 
-const TopBarMessageViewer = (
+export const TopBarMessageViewer = (
   {
-    collapsed, sideBarToggle, clearSelectedMessage,
+    t, collapsed, sideBarToggle, clearSelectedMessage,
     outboxEmpty, onReplyMessageClick, onForwardMessageClick,
     onDeleteClick,
     onMarkUnreadClick
@@ -16,17 +17,23 @@ const TopBarMessageViewer = (
   <div className={mainCss['mdc-top-app-bar__row']}>
     <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-start']}`}>
       <ButtonCollapse collapsed={collapsed} sideBarToggle={sideBarToggle} />
-      <button
-        className={`material-icons ${mainCss['mdc-top-app-bar__navigation-icon']}`}
-        onClick={clearSelectedMessage}>
-        arrow_back
-      </button>
+      <span isotip={t('topBar.backToList')} isotip-position='bottom-start' isotip-size='small'>
+        <TopBarButton
+          className={`${mainCss['mdc-top-app-bar__navigation-icon']}`}
+          onClick={clearSelectedMessage}>
+          arrow_back
+        </TopBarButton>
+      </span>
     </section>
     <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-end']}`}>
       <ButtonReply outboxEmpty={outboxEmpty} replyMessage={onReplyMessageClick}/>
       <ButtonForward outboxEmpty={outboxEmpty} forwardMessage={onForwardMessageClick}/>
-      <TopBarButton onClick={onDeleteClick}>delete</TopBarButton>
-      <TopBarButton onClick={onMarkUnreadClick}>markunread</TopBarButton>
+      <span isotip={t('topBar.delete')} isotip-position='bottom' isotip-size='small'>
+        <TopBarButton onClick={onDeleteClick}>delete</TopBarButton>
+      </span>
+      <span isotip={t('topBar.markUnread')} isotip-position='bottom-end' isotip-size='small'>
+        <TopBarButton onClick={onMarkUnreadClick}>markunread</TopBarButton>
+      </span>
     </section>
   </div>
 );
@@ -42,4 +49,4 @@ TopBarMessageViewer.propTypes = {
   onMarkUnreadClick: PropTypes.func.isRequired
 };
 
-export default TopBarMessageViewer;
+export default translate()(TopBarMessageViewer);

@@ -1,10 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {translate} from 'react-i18next';
 import TopBarButton from './top-bar-button';
 
-const ButtonForward = ({outboxEmpty, forwardMessage}) => (
+export const ButtonForward = ({t, outboxEmpty, forwardMessage}) => (
   outboxEmpty && (
-    <TopBarButton onClick={forwardMessage}>forward</TopBarButton>)
+    <span isotip={t('topBar.forward')} isotip-position='bottom' isotip-size='small'>
+      <TopBarButton onClick={forwardMessage}>forward</TopBarButton>
+    </span>)
 );
 
 ButtonForward.propTypes = {
@@ -12,4 +15,4 @@ ButtonForward.propTypes = {
   forwardMessage: PropTypes.func.isRequired
 };
 
-export default ButtonForward;
+export default translate()(ButtonForward);

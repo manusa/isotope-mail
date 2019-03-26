@@ -19,12 +19,21 @@
     }
   },
   "sideBar": {
+    "hide": "Ocultar barra lateral",
     "errors": {
       "noSSL": "La conexión al servidor no es segura",
       "diskQuotaExceeded": "Cuota de disco sobrepasada (IndexedDB)"
     }
   },
   "topBar": {
+    "showSideBar": "Mostrar barra lateral",
+    "backToList": "Volver a la lista",
+    "quickFilter": "Filtrar",
+    "replyAll": "Responder a todos",
+    "forward": "Reenviar",
+    "delete": "Borrar",
+    "markUnread": "Marcar como no leído",
+    "markRead": "Marcar como leído",
     "deleteFromTrashDialog": {
       "title": "Confirmar borrado",
       "message": "Esta acción eliminará permenentemente los mensajes de la basura. ¿Seguro que quieres continuar?",
