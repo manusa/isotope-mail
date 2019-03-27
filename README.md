@@ -47,3 +47,13 @@ You can send e-mails to the demo account (isotope@isotope) by setting the SMTP s
 ## License
 
 Isotope is [Apache 2.0 Licensed](./LICENSE).
+
+## Acknowledgements
+
+Isotope Mail team wants to recognize the following third parties for providing software,
+support or services free of charge.
+
+<img width=200 src="https://p14.zdusercontent.com/attachment/1015988/jnfTAsRFuKVzfvJMDJ8Ui45p8?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..H0_YyxaE762GtXQvUnHoYw.R3tCI87tR-lehrK_zjT7GmEI--69EORCPWqTPY_iVa2Pt7468NrQBRAvoO5k1-H0W5YJGw45Fnz6ArGGOX796PWiCdTujuUv0_OTnRKnXU1Zjw3ytoLLFdZH1NTOxAvJUqt8RA3-Dj3mKJ-IGy7l-oqxN5zDXppNQA5xumK9uYu6VNp2JzjMg1ZnPzcOxub5jy7dqMmsxSN9mzpRgjjsNBUKI8a9I4jVzDm13tPLBjKl2bRdxVS14IapUYBpW8NRDrhw8f4mfYYtKR8CSFlCNiFkKtZd-CpZYGLgH7Y23CU.RqsF1R4_vpfkA7VhBRgsZQ" />
+
+Thanks to [BrowserStack](https://www.browserstack.com) for providing a free open source account
+to use their products for testing in real devices and browsers.
