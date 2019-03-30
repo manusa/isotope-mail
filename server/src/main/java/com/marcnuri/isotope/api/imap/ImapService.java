@@ -433,6 +433,24 @@ public class ImapService {
        setMessagesFlag(folderId, Flags.Flag.FLAGGED, flagged, uids);
     }
 
+    /**
+     * Flag deleted and expunge all messages from the provided folderId (Clear/Empty folder)
+     *
+     * @param folderId of the folder from which to delete all messages
+     * @return updated folder after deleting all messages
+     */
+    public Folder deleteAllFolderMessages(@NonNull URLName folderId) {
+        try {
+            final IMAPFolder folder = getFolder(folderId);
+            folder.open(READ_WRITE);
+            folder.setFlags(folder.getMessages(), new Flags(Flags.Flag.DELETED), true);
+            folder.expunge();
+            return Folder.from(folder, true);
+        } catch (MessagingException ex) {
+            throw new IsotopeException(ex.getMessage(), ex);
+        }
+    }
+
     public Folder deleteMessages(@NonNull URLName folderId, @NonNull List<Long> uids) {
         try {
             final IMAPFolder folder = getFolder(folderId);
