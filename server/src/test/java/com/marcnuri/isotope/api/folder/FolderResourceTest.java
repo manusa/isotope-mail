@@ -317,6 +317,27 @@ public class FolderResourceTest {
     }
 
     @Test
+    public void deleteAllFolderMessages_validFolderAndValidIds_shouldReturnOk() throws Exception {
+        // Given
+        final String folderId = "1337";
+        final Folder folder = new Folder();
+        folder.setChildren(new Folder[0]);
+        folder.setFolderId(folderId);
+        doReturn(folder).when(imapService).deleteAllFolderMessages(Mockito.eq(new URLName("1337")));
+
+        // When
+        final ResultActions result = mockMvc.perform(
+                delete("/v1/folders/MTMzNw==/messages")
+                        .accept(MediaTypes.HAL_JSON_VALUE));
+
+        // Then
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.folderId").value(folderId));
+        result.andExpect(jsonPath("$._links").exists());
+        result.andExpect(jsonPath("$._links", aMapWithSize(11)));
+    }
+
+    @Test
     public void deleteMessages_validFolderAndValidIds_shouldReturnOk() throws Exception {
         // Given
         final String folderId = "1337";
