@@ -37,11 +37,18 @@
     "deleteFromTrashDialog": {
       "title": "Confirmar borrado",
       "message": "Esta acción eliminará permenentemente los mensajes de la basura. ¿Seguro que quieres continuar?",
-      "delete": "Delete",
-      "cancel": "Cancel"
+      "delete": "Borrar",
+      "cancel": "Cancelar"
     }
   },
   "messageList": {
+    "emptyFolder": "Vaciar carpeta",
+    "clearFolderDialog": {
+      "title": "Vaciar carpeta",
+      "message": "¿Seguro que desea eliminar todos los elementos de la papelera?",
+      "deleteAll": "Eliminar todo",
+      "cancel": "Cancelar"
+    },
     "moveEmails": "Moviendo {{emailCount}} e-mails",
     "filters": {
       "All": "Todos",

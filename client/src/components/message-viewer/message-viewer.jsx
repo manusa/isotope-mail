@@ -5,10 +5,11 @@ import Spinner from '../spinner/spinner';
 import HeaderTo from './header-to';
 import AttachmentCard from '../attachment/attachment-card';
 import {selectFolder} from '../../actions/application';
+import {clearSelectedMessage} from '../../services/application';
+import {getSelectedFolder} from '../../selectors/folders';
 import sanitize from '../../services/sanitize';
 import mainCss from '../../styles/main.scss';
 import styles from './message-viewer.scss';
-import {clearSelectedMessage} from '../../services/application';
 
 export function addressGroups(address) {
   const ret = {
@@ -79,7 +80,7 @@ MessageViewer.defaultProps = {
 
 const mapStateToProps = state => ({
   refreshMessageActiveRequests: state.application.refreshMessageActiveRequests,
-  currentFolder: state.folders.explodedItems[state.application.selectedFolderId] || {},
+  currentFolder: getSelectedFolder(state) || {},
   selectedMessage: state.application.selectedMessage
 });
 

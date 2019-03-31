@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ConfirmClearFolderDialog component test suite Snapshot render Defaults, Should render ConfirmClearFolderDialog 1`] = `
+<Dialog
+  actions={
+    Array [
+      Object {
+        "action": [MockFunction],
+        "label": "messageList.clearFolderDialog.cancel",
+      },
+      Object {
+        "action": [MockFunction],
+        "label": "messageList.clearFolderDialog.deleteAll",
+      },
+    ]
+  }
+  className=""
+  containerClassName=""
+  contentClassName=""
+  scrimClick={[Function]}
+  title="messageList.clearFolderDialog.title"
+  visible={true}
+>
+  <p>
+    messageList.clearFolderDialog.message
+  </p>
+</Dialog>
+`;

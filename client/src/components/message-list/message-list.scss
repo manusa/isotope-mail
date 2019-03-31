@@ -10,6 +10,15 @@ $flag-size: 18px;
   flex-direction: column;
   justify-content: center;
 
+  .clearFolderListItem {
+    display: flex;
+
+    .emptyFolder {
+      margin: 0 auto;
+      font-size: $font-size-body-2;
+    }
+  }
+
   .list {
     flex: 1;
     padding: 0;

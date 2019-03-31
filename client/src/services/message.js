@@ -1,8 +1,12 @@
-import {preDownloadMessages} from '../actions/application';
+import {
+  backendRequest as applicationBackendRequest,
+  backendRequestCompleted as applicationBackendRequestCompleted,
+  preDownloadMessages
+} from '../actions/application';
 import {
   backendRequest,
   backendRequestCompleted,
-  deleteFromCache, lockMessages,
+  deleteFromCache, lockMessages, setFolderCache,
   setSelected, unlockMessages,
   updateCache, updateCacheIfExist
 } from '../actions/messages';
@@ -260,6 +264,24 @@ export function setMessageFlagged(dispatch, credentials, folder, message, flagge
         dispatch(updateCacheIfExist(folder, [message]));
       }
     });
+}
+
+export async function deleteAllFolderMessages(dispatch, credentials, folder) {
+  // Abort any operations that can affect operation result
+  _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
+  abortFetch(abortControllerWrappers.getFoldersAbortController);
+  dispatch(applicationBackendRequest());
+  try {
+    const updatedFolder = await fetch(folder._links.messages.href, {
+      method: 'DELETE',
+      headers: credentialsHeaders(credentials)
+    }).then(toJson);
+    dispatch(updateFolder(updatedFolder));
+    dispatch(setFolderCache(updatedFolder, []));
+    dispatch(applicationBackendRequestCompleted());
+  } catch (e) {
+    dispatch(applicationBackendRequestCompleted());
+  }
 }
 
 export function deleteMessages(dispatch, credentials, folder, messages) {

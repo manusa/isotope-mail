@@ -1,10 +1,14 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
 import {translate} from 'react-i18next';
 import PropTypes from 'prop-types';
 import {AutoSizer, List} from 'react-virtualized';
 import Checkbox from '../form/checkbox/checkbox';
 import Spinner from '../spinner/spinner';
+import ClearFolderListItem from './clear-folder-list-item';
+import {DroppablePayloadTypes} from '../folders/folder-list';
+import {getCredentials} from '../../selectors/application';
+import {getSelectedFolder} from '../../selectors/folders';
 import {getSelectedFolderMessageList} from '../../selectors/messages';
 import {prettyDate, prettySize} from '../../services/prettify';
 import {selectMessage} from '../../actions/application';
@@ -13,7 +17,6 @@ import {preloadMessages, setMessageFlagged} from '../../services/message';
 import {readMessage} from '../../services/message-read';
 import mainCss from '../../styles/main.scss';
 import styles from './message-list.scss';
-import {DroppablePayloadTypes} from '../folders/folder-list';
 
 function parseFrom(from) {
   const firstFrom = from && from.length > 0 ? from[0] : '';
@@ -45,20 +48,23 @@ class MessageList extends Component {
       <div className={`${styles.messageList} ${this.props.className}`}>
         <Spinner visible={this.props.activeRequests > 0 && this.props.messages.length === 0} />
         {this.props.messages.length === 0 ? null :
-          <ul className={`${mainCss['mdc-list']} ${styles.list}`}>
-            <AutoSizer defaultHeight={100}>
-              {({height, width}) => (
-                <List
-                  className={styles.virtualList}
-                  height={height}
-                  width={width}
-                  rowRenderer={this.renderItem.bind(this)}
-                  rowCount={this.props.messages.length}
-                  rowHeight={32}
-                />
-              )}
-            </AutoSizer>
-          </ul>
+          <Fragment>
+            <ClearFolderListItem />
+            <ul className={`${mainCss['mdc-list']} ${styles.list}`}>
+              <AutoSizer defaultHeight={100}>
+                {({height, width}) => (
+                  <List
+                    className={styles.virtualList}
+                    height={height}
+                    width={width}
+                    rowRenderer={this.renderItem.bind(this)}
+                    rowCount={this.props.messages.length}
+                    rowHeight={32}
+                  />
+                )}
+              </AutoSizer>
+            </ul>
+          </Fragment>
         }
         {this.props.activeRequests > 0 && this.props.messages.length > 0 ?
           (<Spinner className={styles.listSpinner} canvasClassName={styles.listSpinnerCanvas} />) :
@@ -195,8 +201,8 @@ MessageList.defaultProps = {
 };
 
 const mapStateToProps = state => ({
-  credentials: state.application.user.credentials,
-  selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || {},
+  credentials: getCredentials(state),
+  selectedFolder: getSelectedFolder(state) || {},
   activeRequests: state.messages.activeRequests,
   messages: getSelectedFolderMessageList(state),
   selectedMessages: state.messages.selected,

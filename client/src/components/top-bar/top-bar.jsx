@@ -2,14 +2,16 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import ConfirmDeleteFromTrashDialog from './confirm-delete-from-trash-dialog';
+import TopBarMessageList from './top-bar-message-list';
+import TopBarMessageViewer from './top-bar-message-viewer';
+import TopBarMessageEditor from './top-bar-message-editor';
+import {getSelectedFolder} from '../../selectors/folders';
+import {getCredentials} from '../../selectors/application';
 import {findTrashFolder, FolderTypes} from '../../services/folder';
 import {forwardMessage, replyMessage, clearSelectedMessage} from '../../services/application';
 import {deleteMessages, moveMessages, setMessagesSeen} from '../../services/message';
 import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
-import TopBarMessageList from './top-bar-message-list';
-import TopBarMessageViewer from './top-bar-message-viewer';
-import TopBarMessageEditor from './top-bar-message-editor';
 
 export class TopBar extends Component {
   constructor(props) {
@@ -104,12 +106,12 @@ const mapStateToProps = state => {
     title: state.application.title,
     newMessage: state.application.newMessage,
     outbox: state.application.outbox,
-    selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || null,
+    selectedFolder: getSelectedFolder(state) || null,
     selectedMessagesIds: selectedMessagesIds,
     selectedMessages: selectedMessages,
     selectedMessage: state.application.selectedMessage,
     selectedMessagesAllUnread: selectedMessagesAllUnread,
-    credentials: state.application.user.credentials,
+    credentials: getCredentials(state),
     folders: state.folders,
     messages: messages
   });

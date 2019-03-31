@@ -26,7 +26,7 @@ export const TopBarMessageList = (
           {selectedMessages.length > 0 && selectedMessagesAllUnread ?
             <span isotip={t('topBar.markRead')} isotip-position='bottom' isotip-size='small'>
               <TopBarButton onClick={onMarkReadClick}>drafts</TopBarButton>
-            </span>:
+            </span> :
             <span isotip={t('topBar.markUnread')} isotip-position='bottom' isotip-size='small'>
               <TopBarButton onClick={onMarkUnreadClick}>markunread</TopBarButton>
             </span>

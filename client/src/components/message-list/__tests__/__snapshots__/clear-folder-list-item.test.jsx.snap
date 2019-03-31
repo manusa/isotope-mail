@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ClearFolderListItem component test suite Snapshot render Selected folder NOT trash, should not render 1`] = `""`;
+
+exports[`ClearFolderListItem component test suite Snapshot render Selected folder is trash, should render 1`] = `
+<div
+  className="clearFolderListItem"
+>
+  <Button
+    className="emptyFolder"
+    disabled={false}
+    icon="delete"
+    iconClassName=""
+    label="messageList.emptyFolder"
+    onClick={[Function]}
+    type="button"
+  />
+  <Translate(ConfirmClearFolderDialog)
+    cancelAction={[Function]}
+    deleteAction={[Function]}
+    visible={false}
+  />
+</div>
+`;
