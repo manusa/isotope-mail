@@ -133,6 +133,59 @@ describe('Message service test suite', () => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
     });
   });
+  describe('deleteAllFolderMessages', () => {
+    test('deleteAllFolderMessages with valid folder, should fetch and dispatch results', done => {
+      // Given
+      global.fetch = jest.fn((url, options) => Promise.resolve(
+        {ok: true, url, options, json: () => Promise.resolve({fromServer: true})})
+      );
+      fetch.abortFetch = jest.fn();
+      let dispatchCount = 0;
+      const dispatch = jest.fn(action => {
+        switch (action.type) {
+          case ActionTypes.APPLICATION_BE_REQUEST:
+          case ActionTypes.FOLDERS_UPDATE:
+          case ActionTypes.MESSAGES_SET_FOLDER_CACHE: {
+            dispatchCount++;
+            break;
+          }
+          case ActionTypes.APPLICATION_BE_REQUEST_COMPLETED: {
+            expect(dispatchCount).toEqual(3);
+            done();
+            break;
+          }
+          default:
+        }
+      });
+      const credentials = {};
+      const folder = {_links: {messages: {href: 'http://test.url'}}};
+      // When
+      messageService.deleteAllFolderMessages(dispatch, credentials, folder);
+      // Then
+      expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+    test('deleteAllFolderMessages with valid folder, fetch error, should abort and do nothing', done => {
+      // Given
+      global.fetch = jest.fn(() => Promise.resolve({ok: true}));
+      fetch.abortFetch = jest.fn();
+      let dispatchCount = 0;
+      const dispatch = jest.fn(action => {
+        dispatchCount++;
+        if (action.type === ActionTypes.APPLICATION_BE_REQUEST_COMPLETED) {
+          expect(dispatchCount).toEqual(2);
+          done();
+        }
+      });
+      const credentials = {};
+      const folder = {_links: {messages: {href: 'http://test.url'}}};
+      // When
+      messageService.deleteAllFolderMessages(dispatch, credentials, folder);
+      // Then
+      expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
   describe('deleteMessages', () => {
     test('deleteMessages with valid message array, should fetch and dispatch results', done => {
       // Given

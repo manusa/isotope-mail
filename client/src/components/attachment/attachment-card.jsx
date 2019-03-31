@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import {getCredentials} from '../../selectors/application';
 import {downloadAttachment} from '../../services/message';
 import {prettySize} from '../../services/prettify';
 import Spinner from '../spinner/spinner';
@@ -56,7 +57,7 @@ AttachmentCard.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  credentials: state.application.user.credentials
+  credentials: getCredentials(state)
 });
 
 export default connect(mapStateToProps)(AttachmentCard);

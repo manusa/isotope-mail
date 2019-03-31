@@ -5,17 +5,18 @@ import PropTypes from 'prop-types';
 import {Editor} from '@tinymce/tinymce-react';
 import EDITOR_BUTTONS from './editor-buttons';
 import EDITOR_CONFIG from './editor-config';
+import Button from '../buttons/button';
 import HeaderAddress from './header-address';
 import MceButton from './mce-button';
 import InsertLinkDialog from './insert-link-dialog';
+import {getCredentials} from '../../selectors/application';
 import {editMessage} from '../../actions/application';
 import {sendMessage} from '../../services/smtp';
 import {prettySize} from '../../services/prettify';
-import Button from '../buttons/button';
+import {getAddresses} from '../../services/message-addresses';
 import {persistApplicationNewMessageContent} from '../../services/indexed-db';
 import styles from './message-editor.scss';
 import mainCss from '../../styles/main.scss';
-import {getAddresses} from '../../services/message-addresses';
 
 const EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED = 50;
 
@@ -374,7 +375,7 @@ MessageEditor.defaultProps = {
 
 const mapStateToProps = state => ({
   application: state.application,
-  credentials: state.application.user.credentials,
+  credentials: getCredentials(state),
   editedMessage: state.application.newMessage,
   to: state.application.newMessage.to,
   cc: state.application.newMessage.cc,

@@ -42,6 +42,13 @@
     }
   },
   "messageList": {
+    "emptyFolder": "Empty folder",
+    "clearFolderDialog": {
+      "title": "Empty folder",
+      "message": "Are you sure you want to permanently delete all the items in the trash folder?",
+      "deleteAll": "Delete all",
+      "cancel": "Cancel"
+    },
     "moveEmails": "Moving {{emailCount}} e-mails",
     "filters": {
       "All": "All",

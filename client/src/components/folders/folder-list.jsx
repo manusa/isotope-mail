@@ -7,6 +7,7 @@ import {clearSelected} from '../../actions/messages';
 import {clearSelectedMessage} from '../../services/application';
 import {deleteFolder, findTrashFolder, FolderTypes, moveFolder} from '../../services/folder';
 import {moveMessages, resetFolderMessagesCache} from '../../services/message';
+import {getSelectedFolder} from '../../selectors/folders';
 import styles from './folder-list.scss';
 import mainCss from '../../styles/main.scss';
 
@@ -117,7 +118,7 @@ FolderListClass.defaultProps = {
 
 const mapStateToProps = state => ({
   application: state.application,
-  selectedFolder: state.folders.explodedItems[state.application.selectedFolderId] || {},
+  selectedFolder: getSelectedFolder(state) || {},
   foldersState: state.folders,
   messages: state.messages
 });
