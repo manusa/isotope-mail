@@ -21,13 +21,19 @@ exports[`FolderContainer component test suite Snapshot render, should render Fol
     }
     folders={Object {}}
   />
-  <IconButton
-    className="addButton"
-    disabled={false}
-    onClick={[Function]}
+  <div
+    isotip="sideBar.newFolder"
+    isotip-position="top"
+    isotip-size="small"
   >
-    add_circle
-  </IconButton>
+    <IconButton
+      className="addButton"
+      disabled={false}
+      onClick={[Function]}
+    >
+      add_circle
+    </IconButton>
+  </div>
   <Connect(Translate(FolderCreateDialog)) />
   <Connect(Translate(FolderRenameDialog)) />
 </nav>

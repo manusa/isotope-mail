@@ -1,0 +1,39 @@
+@import '@material/list/mdc-list';
+@import './variables';
+
+.mdc-list {
+  /**
+    Special use case for application side-bar showing list of folders
+   */
+  .mdc-list-item__folder-item {
+    overflow: visible;
+    position: relative;
+    margin: 0;
+
+    &::before {
+      display: none;
+    }
+    &::after {
+      display: none;
+    }
+    &:hover {
+      transition: background 75ms linear;
+      background-color: rgba(#000, 0.04);
+      z-index: map-get($z-index, troposhere);
+    }
+    &:active {
+      transition: background 75ms linear;
+      background-color: rgba(#000, 0.16);
+    }
+    &.mdc-list-item--activated {
+      background-color: rgba($mdc-theme-primary, 0.12);
+    }
+    &.mdc-list-item--selected {
+      background-color: rgba($mdc-theme-primary, 0.09);
+
+      .mdc-list-item__graphic {
+        color: $mdc-theme-primary;
+      }
+    }
+  }
+}

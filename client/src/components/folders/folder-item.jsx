@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import {translate} from 'react-i18next';
 import {FolderTypes} from '../../services/folder';
 import styles from './folder-item.scss';
 import mainCss from '../../styles/main.scss';
 
-class FolderItem extends Component {
+export class FolderItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -19,7 +20,7 @@ class FolderItem extends Component {
 
   render() {
     const {
-      className, selected, draggable, graphic, label, newMessageCount, unreadMessageCount, onClick,
+      t, className, selected, draggable, graphic, label, newMessageCount, unreadMessageCount, onClick,
       onRename, onAddChild, onDelete
     } = this.props;
     const {dragOver} = this.state;
@@ -33,14 +34,14 @@ class FolderItem extends Component {
       conditionalDraggableAttributes.onDragStart = this.handleOnDragStart;
     }
     return (
-      <a className={`${className} ${mainCss['mdc-list-item']} ${styles.listItem}
+      <a className={`${className} ${mainCss['mdc-list-item']} ${mainCss['mdc-list-item__folder-item']}
+        ${styles.listItem}
         ${selected ? mainCss['mdc-list-item--activated'] : ''}
         ${dragOver ? mainCss['mdc-list-item--selected'] : ''}`}
       title={labelWithCount}
       onClick={onClick}
       {...conditionalDraggableAttributes}
       onDrop={this.handleOnDrop} onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave}
-      onMouseLeave={event => this.hideContextMenu(event)}
       >
         <span className={`material-icons ${mainCss['mdc-list-item__graphic']} ${styles.graphic}`}>
           {graphic}
@@ -49,14 +50,23 @@ class FolderItem extends Component {
           ${newMessageCount > 0 ? styles.hasNewMessages : ''}`}>
           {labelWithCount}
         </span>
-        <span className={styles.actions}>
+        <span className={styles.actions} onMouseLeave={event => this.hideContextMenu(event)}>
           <span className={`${styles.contextMenu} ${this.state.contextMenuVisible ? styles.visible : ''}`}>
-            {onDelete !== null && <i className={'material-icons'} onClick={onDelete}>delete</i>}
-            {onAddChild !== null && <i className={'material-icons'} onClick={onAddChild}>add</i>}
-            {onRename !== null && <i className={'material-icons'} onClick={onRename}>edit</i>}
+            {onDelete !== null && <i
+              isotip={t('sideBar.folderList.delete')} isotip-position='bottom-end' isotip-size='small'
+              className={'material-icons'} onClick={onDelete}>delete</i>}
+            {onAddChild !== null && <i
+              isotip={t('sideBar.folderList.newSubFolder')} isotip-position='bottom-end' isotip-size='small'
+              className={'material-icons'} onClick={onAddChild}>add</i>}
+            {onRename !== null && <i
+              isotip={t('sideBar.folderList.rename')} isotip-position='bottom-end' isotip-size='small'
+              className={'material-icons'} onClick={onRename}>edit</i>}
           </span>
-          {hasContextMenu && !this.state.contextMenuVisible
-            && <i className={'material-icons'} onClick={event => this.showContextMenu(event)}>more_vert</i>}
+          {hasContextMenu && !this.state.contextMenuVisible &&
+            <i
+              className={'material-icons'}
+              isotip={t('sideBar.folderList.folderActions')} isotip-position='bottom-end' isotip-size='small'
+              onClick={event => this.showContextMenu(event)}>more_vert</i>}
         </span>
       </a>
     );
@@ -129,4 +139,4 @@ FolderItem.defaultProps = {
   onDelete: null
 };
 
-export default FolderItem;
+export default translate()(FolderItem);
