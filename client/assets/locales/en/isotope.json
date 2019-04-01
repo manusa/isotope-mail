@@ -20,6 +20,13 @@
   },
   "sideBar": {
     "hide": "Hide sidebar",
+    "newFolder": "New folder",
+    "folderList": {
+      "folderActions": "Folder actions",
+      "delete": "Delete",
+      "newSubFolder": "New subfolder",
+      "rename": "Rename"
+    },
     "errors": {
       "noSSL": "Connection to server is not secure",
       "diskQuotaExceeded": "Disk quota exceeded (IndexedDB)"

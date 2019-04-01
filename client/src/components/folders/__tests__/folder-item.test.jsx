@@ -1,12 +1,13 @@
 import React from 'react';
 import {shallow} from 'enzyme/build/index';
-import FolderItem from '../folder-item';
+import {FolderItem} from '../folder-item';
 
 describe('FolderItem component test suite', () => {
   describe('Snapshot render', () => {
     test('Defaults, Should render FolderItem with no menu and no actions', () => {
       // Given
       const props = {
+        t: key => key,
         className: 'the-one-percent', graphic: 'Andy Warhol', label: 'Red Label',
         selected: true, draggable: true, unreadMessageCount: 13, newMessageCount: 37};
 
@@ -19,6 +20,7 @@ describe('FolderItem component test suite', () => {
     test('Defaults with actions, Should render FolderItem with hidden menu and actions', () => {
       // Given
       const props = {
+        t: key => key,
         className: 'the-one-percent', graphic: 'Andy Warhol', label: 'Red Label',
         selected: true, draggable: true, unreadMessageCount: 13, newMessageCount: 37,
         onRename: () => {}, onDelete: () => {}};
@@ -32,6 +34,7 @@ describe('FolderItem component test suite', () => {
     test('Context Menu Visible, Should render FolderItem with menu', () => {
       // Given
       const props = {
+        t: key => key,
         className: 'the-one-percent', graphic: 'Andy Warhol', label: 'Red Label',
         selected: true, draggable: true, unreadMessageCount: 13, newMessageCount: 37,
         onRename: () => {}, onDelete: () => {}};
@@ -91,6 +94,7 @@ describe('FolderItem component test suite', () => {
     test('Menu clicked, should show menu', () => {
       // Given
       const props = {
+        t: key => key,
         label: 'My menu is hidden', selected: true, onRename: () => {}, onDelete: () => {}};
       const folderItem = shallow(<FolderItem {...props} />);
 
@@ -104,12 +108,13 @@ describe('FolderItem component test suite', () => {
     test('Mouse Leave, menu visible, should hide menu', () => {
       // Given
       const props = {
+        t: key => key,
         label: 'Menu will hide', selected: true, onRename: () => {}, onDelete: () => {}};
       const folderItem = shallow(<FolderItem {...props} />);
       folderItem.setState({contextMenuVisible: true});
 
       // When
-      folderItem.find('.listItem').simulate('mouseLeave');
+      folderItem.find('.listItem .actions').simulate('mouseLeave');
 
       // Then
       expect(folderItem.state('contextMenuVisible')).toEqual(false);

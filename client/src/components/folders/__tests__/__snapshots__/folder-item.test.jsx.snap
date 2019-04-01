@@ -2,7 +2,8 @@
 
 exports[`FolderItem component test suite Snapshot render Context Menu Visible, Should render FolderItem with menu 1`] = `
 <a
-  className="the-one-percent mdc-list-item listItem
+  className="the-one-percent mdc-list-item mdc-list-item__folder-item
+        listItem
         mdc-list-item--activated
         "
   draggable={true}
@@ -11,7 +12,6 @@ exports[`FolderItem component test suite Snapshot render Context Menu Visible, S
   onDragOver={[Function]}
   onDragStart={[Function]}
   onDrop={[Function]}
-  onMouseLeave={[Function]}
   title="Red Label (13)"
 >
   <span
@@ -27,18 +27,25 @@ exports[`FolderItem component test suite Snapshot render Context Menu Visible, S
   </span>
   <span
     className="actions"
+    onMouseLeave={[Function]}
   >
     <span
       className="contextMenu visible"
     >
       <i
         className="material-icons"
+        isotip="sideBar.folderList.delete"
+        isotip-position="bottom-end"
+        isotip-size="small"
         onClick={[Function]}
       >
         delete
       </i>
       <i
         className="material-icons"
+        isotip="sideBar.folderList.rename"
+        isotip-position="bottom-end"
+        isotip-size="small"
         onClick={[Function]}
       >
         edit
@@ -50,7 +57,8 @@ exports[`FolderItem component test suite Snapshot render Context Menu Visible, S
 
 exports[`FolderItem component test suite Snapshot render Defaults with actions, Should render FolderItem with hidden menu and actions 1`] = `
 <a
-  className="the-one-percent mdc-list-item listItem
+  className="the-one-percent mdc-list-item mdc-list-item__folder-item
+        listItem
         mdc-list-item--activated
         "
   draggable={true}
@@ -59,7 +67,6 @@ exports[`FolderItem component test suite Snapshot render Defaults with actions, 
   onDragOver={[Function]}
   onDragStart={[Function]}
   onDrop={[Function]}
-  onMouseLeave={[Function]}
   title="Red Label (13)"
 >
   <span
@@ -75,18 +82,25 @@ exports[`FolderItem component test suite Snapshot render Defaults with actions, 
   </span>
   <span
     className="actions"
+    onMouseLeave={[Function]}
   >
     <span
       className="contextMenu "
     >
       <i
         className="material-icons"
+        isotip="sideBar.folderList.delete"
+        isotip-position="bottom-end"
+        isotip-size="small"
         onClick={[Function]}
       >
         delete
       </i>
       <i
         className="material-icons"
+        isotip="sideBar.folderList.rename"
+        isotip-position="bottom-end"
+        isotip-size="small"
         onClick={[Function]}
       >
         edit
@@ -94,6 +108,9 @@ exports[`FolderItem component test suite Snapshot render Defaults with actions, 
     </span>
     <i
       className="material-icons"
+      isotip="sideBar.folderList.folderActions"
+      isotip-position="bottom-end"
+      isotip-size="small"
       onClick={[Function]}
     >
       more_vert
@@ -104,7 +121,8 @@ exports[`FolderItem component test suite Snapshot render Defaults with actions, 
 
 exports[`FolderItem component test suite Snapshot render Defaults, Should render FolderItem with no menu and no actions 1`] = `
 <a
-  className="the-one-percent mdc-list-item listItem
+  className="the-one-percent mdc-list-item mdc-list-item__folder-item
+        listItem
         mdc-list-item--activated
         "
   draggable={true}
@@ -113,7 +131,6 @@ exports[`FolderItem component test suite Snapshot render Defaults, Should render
   onDragOver={[Function]}
   onDragStart={[Function]}
   onDrop={[Function]}
-  onMouseLeave={[Function]}
   title="Red Label (13)"
 >
   <span
@@ -129,6 +146,7 @@ exports[`FolderItem component test suite Snapshot render Defaults, Should render
   </span>
   <span
     className="actions"
+    onMouseLeave={[Function]}
   >
     <span
       className="contextMenu "

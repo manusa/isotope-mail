@@ -5,7 +5,7 @@ Array [
   <div
     className="itemContainer"
   >
-    <FolderItem
+    <Translate(FolderItem)
       className="item"
       draggable={false}
       graphic="inbox"
@@ -24,7 +24,7 @@ Array [
   <div
     className="itemContainer"
   >
-    <FolderItem
+    <Translate(FolderItem)
       className="item"
       draggable={true}
       graphic="folder"
@@ -43,7 +43,7 @@ Array [
   <div
     className="itemContainer"
   >
-    <FolderItem
+    <Translate(FolderItem)
       className="item"
       draggable={true}
       graphic="folder"

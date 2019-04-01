@@ -20,6 +20,13 @@
   },
   "sideBar": {
     "hide": "Ocultar barra lateral",
+    "newFolder": "Nueva carpeta",
+    "folderList": {
+      "folderActions": "Acciones",
+      "delete": "Borrar",
+      "newSubFolder": "Nueva subcarpeta",
+      "rename": "Cambiar nombre"
+    },
     "errors": {
       "noSSL": "La conexión al servidor no es segura",
       "diskQuotaExceeded": "Cuota de disco sobrepasada (IndexedDB)"

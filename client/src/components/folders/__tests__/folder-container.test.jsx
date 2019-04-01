@@ -6,6 +6,7 @@ describe('FolderContainer component test suite', () => {
   test('Snapshot render, should render FolderContainer', () => {
     // Given
     const props = {
+      t: key => key,
       activeRequests: 0,
       folders: {},
       folderTree: [{folders: {}, folderTree: []}],
