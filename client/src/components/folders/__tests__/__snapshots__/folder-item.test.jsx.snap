@@ -26,11 +26,11 @@ exports[`FolderItem component test suite Snapshot render Context Menu Visible, S
     Red Label (13)
   </span>
   <span
-    className="actions"
+    className="actions visible "
     onMouseLeave={[Function]}
   >
     <span
-      className="contextMenu visible"
+      className="contextMenu"
     >
       <i
         className="material-icons"
@@ -49,6 +49,19 @@ exports[`FolderItem component test suite Snapshot render Context Menu Visible, S
         onClick={[Function]}
       >
         edit
+      </i>
+    </span>
+    <span
+      className="menuButton"
+    >
+      <i
+        className="material-icons"
+        isotip="sideBar.folderList.folderActions"
+        isotip-position="bottom-end"
+        isotip-size="small"
+        onClick={[Function]}
+      >
+        more_vert
       </i>
     </span>
   </span>
@@ -81,11 +94,11 @@ exports[`FolderItem component test suite Snapshot render Defaults with actions, 
     Red Label (13)
   </span>
   <span
-    className="actions"
+    className="actions  "
     onMouseLeave={[Function]}
   >
     <span
-      className="contextMenu "
+      className="contextMenu"
     >
       <i
         className="material-icons"
@@ -106,15 +119,19 @@ exports[`FolderItem component test suite Snapshot render Defaults with actions, 
         edit
       </i>
     </span>
-    <i
-      className="material-icons"
-      isotip="sideBar.folderList.folderActions"
-      isotip-position="bottom-end"
-      isotip-size="small"
-      onClick={[Function]}
+    <span
+      className="menuButton"
     >
-      more_vert
-    </i>
+      <i
+        className="material-icons"
+        isotip="sideBar.folderList.folderActions"
+        isotip-position="bottom-end"
+        isotip-size="small"
+        onClick={[Function]}
+      >
+        more_vert
+      </i>
+    </span>
   </span>
 </a>
 `;
@@ -145,11 +162,11 @@ exports[`FolderItem component test suite Snapshot render Defaults, Should render
     Red Label (13)
   </span>
   <span
-    className="actions"
+    className="actions  "
     onMouseLeave={[Function]}
   >
     <span
-      className="contextMenu "
+      className="contextMenu"
     />
   </span>
 </a>
