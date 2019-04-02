@@ -31,28 +31,37 @@
       transform: translateX(100%);
       margin: 0;
       padding: 0;
-
-      &.visible {
-        display: block;
-        transform: translateX(0%);
-        animation: slide-in 0.5s forwards;
-      }
-      @keyframes slide-in {
-        0% { transform: translateX(100%);}
-        100% { transform: translateX(0%);}
-      }
     }
 
+    &.animating {
+      overflow: hidden;
+    }
+
+    &.visible {
+      $actions-menu-animation-duration: 0.5s; // Must match with component setTimeout for animation
+
+      .menuButton {
+        display: none;
+      }
+      .contextMenu {
+        display: block;
+        margin: -16px 0 -16px -16px;
+        padding: 16px 0 16px 16px;
+        max-height: 100%;
+
+        transform: translateX(0%);
+        animation: slide-in $actions-menu-animation-duration forwards;
+        @keyframes slide-in {
+          0% { transform: translateX(100%); }
+          99% { transform: translateX(0%); }
+        }
+      }
+    }
   }
 
   &:hover {
     .actions {
       display: block;
-
-      .contextMenu {
-        margin: -16px 0 -16px -16px;
-        padding: 16px 0 16px 16px;
-      }
     }
   }
 }

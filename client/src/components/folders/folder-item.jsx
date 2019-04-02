@@ -5,11 +5,14 @@ import {FolderTypes} from '../../services/folder';
 import styles from './folder-item.scss';
 import mainCss from '../../styles/main.scss';
 
+const ACTIONS_MENU_ANIMATION_DURATION_MS = 500;
+
 export class FolderItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
       dragOver: false,
+      contextMenuAnimation: false,
       contextMenuVisible: false
     };
     this.handleOnDragStart = this.onDragStart.bind(this);
@@ -23,7 +26,7 @@ export class FolderItem extends Component {
       t, className, selected, draggable, graphic, label, newMessageCount, unreadMessageCount, onClick,
       onRename, onAddChild, onDelete
     } = this.props;
-    const {dragOver} = this.state;
+    const {contextMenuVisible, contextMenuAnimation, dragOver} = this.state;
     const labelWithCount = `${label} ${unreadMessageCount > 0 ? `(${unreadMessageCount})` : ''}`;
     const hasContextMenu = onDelete !== null || onAddChild !== null || onRename !== null;
     const conditionalDraggableAttributes = {};
@@ -50,8 +53,9 @@ export class FolderItem extends Component {
           ${newMessageCount > 0 ? styles.hasNewMessages : ''}`}>
           {labelWithCount}
         </span>
-        <span className={styles.actions} onMouseLeave={event => this.hideContextMenu(event)}>
-          <span className={`${styles.contextMenu} ${this.state.contextMenuVisible ? styles.visible : ''}`}>
+        <span className={`${styles.actions} ${contextMenuVisible ? styles.visible : ''} ${contextMenuAnimation ? styles.animating : ''}`}
+          onMouseLeave={event => this.hideContextMenu(event)}>
+          <span className={`${styles.contextMenu}`}>
             {onDelete !== null && <i
               isotip={t('sideBar.folderList.delete')} isotip-position='bottom-end' isotip-size='small'
               className={'material-icons'} onClick={onDelete}>delete</i>}
@@ -62,11 +66,13 @@ export class FolderItem extends Component {
               isotip={t('sideBar.folderList.rename')} isotip-position='bottom-end' isotip-size='small'
               className={'material-icons'} onClick={onRename}>edit</i>}
           </span>
-          {hasContextMenu && !this.state.contextMenuVisible &&
-            <i
-              className={'material-icons'}
+          {hasContextMenu &&
+          <span className={styles.menuButton}>
+            <i className={'material-icons'}
               isotip={t('sideBar.folderList.folderActions')} isotip-position='bottom-end' isotip-size='small'
-              onClick={event => this.showContextMenu(event)}>more_vert</i>}
+              onClick={event => this.showContextMenu(event)}>more_vert</i>
+          </span>
+          }
         </span>
       </a>
     );
@@ -101,11 +107,12 @@ export class FolderItem extends Component {
   showContextMenu(event) {
     event.preventDefault();
     event.stopPropagation();
-    this.setState({contextMenuVisible: true});
+    this.setState({contextMenuVisible: true, contextMenuAnimation: true});
+    setTimeout(() => this.setState({contextMenuAnimation: false}), ACTIONS_MENU_ANIMATION_DURATION_MS);
   }
 
   hideContextMenu() {
-    this.setState({contextMenuVisible: false});
+    this.setState({contextMenuVisible: false, contextMenuAnimation: false});
   }
 }
 
