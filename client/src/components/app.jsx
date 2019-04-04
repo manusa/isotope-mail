@@ -9,6 +9,7 @@ import MessageEditor from './message-editor/message-editor';
 import MessageList from './message-list/message-list';
 import MessageViewer from './message-viewer/message-viewer';
 import MessageSnackbar from './message-snackbar/message-snackbar';
+import ComposeFabButton from './buttons/compose-fab-button';
 import {clearUserCredentials} from '../actions/application';
 import {AuthenticationException} from '../services/fetch';
 import {editNewMessage} from '../services/application';
@@ -58,9 +59,7 @@ class App extends Component {
         <MessageList className={styles['message-grid']} />
         <div className={styles['fab-container']}>
           {outbox === null ?
-            <button className={`${mainCss['mdc-fab']}`} onClick={this.props.newMessage.bind(this)}>
-              <span className={`material-icons ${mainCss['mdc-fab__icon']}`}>edit</span>
-            </button>
+            <ComposeFabButton onClick={() => this.props.newMessage()}/>
             : null}
         </div>
       </Fragment>

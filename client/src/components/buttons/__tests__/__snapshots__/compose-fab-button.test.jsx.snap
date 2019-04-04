@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ComposeFabButton component test suite Snapshot render, should render compose-fab-button 1`] = `
+<button
+  className="mdc-fab compose-fab-button"
+  onClick={[MockFunction]}
+>
+  <span
+    className="material-icons mdc-fab__icon"
+  >
+    edit
+  </span>
+  <span
+    className="compose-fab-button__label"
+  >
+    composeButton.compose
+  </span>
+</button>
+`;

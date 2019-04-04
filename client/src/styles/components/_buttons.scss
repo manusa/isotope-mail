@@ -1,0 +1,33 @@
+@import '@material/fab/mdc-fab';
+
+$animation-duration: 0.3s;
+$max-width--extended: 200px;
+
+.compose-fab-button {
+  max-width: $mdc-fab-height;
+
+  .compose-fab-button__label {
+    @include mdc-fab--label_;
+    display: none;
+    transform: translateX(100%);
+    text-overflow: clip;
+  }
+
+  &:hover {
+    @include mdc-fab--extended_;
+    height: $mdc-fab-height;
+    max-width: $max-width--extended;
+    transition: max-width $animation-duration linear;
+
+    .compose-fab-button__label {
+      display: inline;
+      transform: translateX(0%);
+      text-overflow: ellipsis;
+      animation: slide-in $animation-duration forwards;
+    }
+  }
+  @keyframes slide-in {
+    0% { transform: translateX(100%); display: inline; text-overflow: clip; }
+    100% { transform: translateX(0%); display: inline; text-overflow: clip; }
+  }
+}

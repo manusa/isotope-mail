@@ -48,6 +48,9 @@
       "cancel": "Cancel"
     }
   },
+  "composeButton": {
+    "compose": "Compose"
+  },
   "messageList": {
     "emptyFolder": "Empty folder",
     "clearFolderDialog": {

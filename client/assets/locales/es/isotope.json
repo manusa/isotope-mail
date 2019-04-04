@@ -48,6 +48,9 @@
       "cancel": "Cancelar"
     }
   },
+  "composeButton": {
+    "compose": "Nuevo mensaje"
+  },
   "messageList": {
     "emptyFolder": "Vaciar carpeta",
     "clearFolderDialog": {

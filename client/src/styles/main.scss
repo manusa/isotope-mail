@@ -7,9 +7,9 @@
 @import 'partials/mdc-snackbar-extended';
 @import 'partials/mdc-switch-extended';
 @import 'partials/mdc-textfield-extended';
-@import 'partials/spinner';
 @import 'partials/tinymce';
 @import 'partials/tooltip';
+
 
 // Third-party
 @import '@material/button/mdc-button';
@@ -24,3 +24,7 @@
 @import '@material/menu/mdc-menu';
 @import '@material/menu-surface/mdc-menu-surface';
 @import '@material/top-app-bar/mdc-top-app-bar';
+
+// Components
+@import 'components/buttons';
+@import 'components/spinner';
