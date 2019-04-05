@@ -5,29 +5,29 @@ $max-width--extended: 200px;
 
 .compose-fab-button {
   max-width: $mdc-fab-height;
+  min-width: $mdc-fab-height;
+  width: auto;
 
   .compose-fab-button__label {
     @include mdc-fab--label_;
-    display: none;
-    transform: translateX(100%);
-    text-overflow: clip;
+    flex: 0;
+    animation: slide-out $animation-duration forwards;
   }
 
   &:hover {
     @include mdc-fab--extended_;
-    height: $mdc-fab-height;
+    margin-bottom: ($mdc-fab-height - $mdc-fab-extended-height)/2;
     max-width: $max-width--extended;
+    width: auto;
     transition: max-width $animation-duration linear;
 
     .compose-fab-button__label {
-      display: inline;
-      transform: translateX(0%);
-      text-overflow: ellipsis;
-      animation: slide-in $animation-duration forwards;
+      flex: 1;
+      animation: none;
     }
   }
-  @keyframes slide-in {
-    0% { transform: translateX(100%); display: inline; text-overflow: clip; }
-    100% { transform: translateX(0%); display: inline; text-overflow: clip; }
+  @keyframes slide-out {
+    0% { flex: 1; }
+    100% { flex: 0; }
   }
 }
