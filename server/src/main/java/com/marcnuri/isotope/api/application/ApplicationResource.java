@@ -20,8 +20,11 @@
  */
 package com.marcnuri.isotope.api.application;
 
+import com.marcnuri.isotope.api.configuration.IsotopeApiConfiguration;
 import com.marcnuri.isotope.api.credentials.Credentials;
+import com.marcnuri.isotope.api.folder.FolderResource;
 import com.marcnuri.isotope.api.imap.ImapService;
+import com.marcnuri.isotope.api.smtp.SmtpResource;
 import com.marcnuri.isotope.api.smtp.SmtpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +33,14 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2018-08-15.
@@ -44,13 +51,25 @@ public class ApplicationResource {
 
     private static final Logger log = LoggerFactory.getLogger(ApplicationResource.class);
 
+    private static final String REL_APPLICATION_LOGIN = "application.login";
+    private static final String REL_FOLDERS = "folders";
+    private static final String REL_SMTP = "smtp";
+
+    private final IsotopeApiConfiguration configuration;
     private final ImapService imapService;
     private final SmtpService smtpService;
 
     @Autowired
-    public ApplicationResource(ImapService imapService, SmtpService smtpService) {
+    public ApplicationResource(IsotopeApiConfiguration configuration, ImapService imapService, SmtpService smtpService) {
+        this.configuration = configuration;
         this.imapService = imapService;
         this.smtpService = smtpService;
+    }
+
+    @GetMapping(path = "/configuration", produces = MediaTypes.HAL_JSON_VALUE)
+    public ResponseEntity<ConfigurationDto> getConfiguration() {
+        log.info("User retrieving application configuration");
+        return ResponseEntity.ok(toDto(configuration));
     }
 
     @PostMapping(path = "/login", produces = MediaTypes.HAL_JSON_VALUE)
@@ -62,6 +81,14 @@ public class ApplicationResource {
         smtpService.checkCredentials(credentials);
         SecurityContextHolder.getContext().setAuthentication(encryptedCredentials);
         return ResponseEntity.ok(encryptedCredentials);
+    }
+
+    private ConfigurationDto toDto(IsotopeApiConfiguration configuration) {
+        final ConfigurationDto ret = new ConfigurationDto();
+        ret.add(linkTo(methodOn(ApplicationResource.class).login(null)).withRel(REL_APPLICATION_LOGIN));
+        ret.add(linkTo(FolderResource.class).withRel(REL_FOLDERS));
+        ret.add(linkTo(methodOn(SmtpResource.class).sendMessage(null, null)).withRel(REL_SMTP));
+        return ret;
     }
 
 }
