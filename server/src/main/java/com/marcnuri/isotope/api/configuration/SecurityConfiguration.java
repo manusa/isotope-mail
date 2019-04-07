@@ -31,7 +31,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * Created by Marc Nuri <marc@marcnuri.com> on 2019-02-23.
@@ -40,6 +42,7 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+    private static final String CONFIGURATION_REGEX = ".*v1/application/configuration";
     private static final String LOGIN_REGEX = ".*v1/application/login";
     private final CredentialsService credentialsService;
 
@@ -50,14 +53,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
+        final RequestMatcher negatedPublicMatchers =  new NegatedRequestMatcher(new OrRequestMatcher(
+                new RegexRequestMatcher(CONFIGURATION_REGEX, "GET"),
+                new RegexRequestMatcher(LOGIN_REGEX, "POST")
+        ));
         httpSecurity
                 .csrf().disable()
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                 .authorizeRequests()
-                    .regexMatchers(LOGIN_REGEX).permitAll()
-                    .anyRequest().authenticated()
+                      .requestMatchers(negatedPublicMatchers).authenticated()
                     .and()
                 .cors()
                     .and()
@@ -65,8 +71,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .permitAll()
                     .and()
                 .addFilterAfter(new CredentialsAuthenticationFilter(
-                        new NegatedRequestMatcher(new RegexRequestMatcher(LOGIN_REGEX, "POST")),
-                        credentialsService), BasicAuthenticationFilter.class)
+                        negatedPublicMatchers, credentialsService), BasicAuthenticationFilter.class)
                 .addFilterAfter(new CredentialsRefreshFilter(credentialsService), CredentialsAuthenticationFilter.class);
     }
 }
