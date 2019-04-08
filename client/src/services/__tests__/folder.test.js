@@ -57,6 +57,7 @@ describe('Folder service test suite', () => {
       fetch.abortFetch = jest.fn();
       fetch.refreshCredentials = jest.fn();
       notification.notifyNewMail = jest.fn();
+      window.isotopeConfiguration = {_links: {folders: {href: '/folders'}}};
       global.fetch = jest.fn((url, options) => {
         expect(url.search).toBe('?loadChildren=true');
         return Promise.resolve({
@@ -282,6 +283,7 @@ describe('Folder service test suite', () => {
     test('createRootFolder, valid newName, OK response, should return list of root folders and update state', done => {
       // Given
       fetch.abortFetch = jest.fn();
+      window.isotopeConfiguration = {_links: {folders: {href: '/folders'}}};
       global.fetch = jest.fn((url, options) => {
         expect(options.body).toMatch('new-folder-name');
         return Promise.resolve({ok: true, url, options,
@@ -313,6 +315,7 @@ describe('Folder service test suite', () => {
     test('createRootFolder, valid newName, NOT OK response, should complete and not update state', done => {
       // Given
       fetch.abortFetch = jest.fn();
+      window.isotopeConfiguration = {_links: {folders: {href: '/folders'}}};
       global.fetch = jest.fn((url, options) => {
         expect(options.body).toMatch('new-folder-name');
         return Promise.resolve({ok: false, url, options});

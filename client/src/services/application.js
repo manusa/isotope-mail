@@ -1,5 +1,4 @@
 import sjcl from 'sjcl';
-import {URLS} from './url';
 import {
   backendRequest,
   backendRequestCompleted,
@@ -13,10 +12,11 @@ import {FolderTypes, getFolders} from './folder';
 import i18n from './i18n';
 import {recoverState} from './indexed-db';
 import {setFolders} from '../actions/folders';
+import {setFormValues} from '../actions/login';
 import {setCache} from '../actions/messages';
 import {resetFolderMessagesCache} from './message';
 import sanitize from './sanitize';
-import {setFormValues} from '../actions/login';
+import {getIsotopeConfiguration} from '../selectors/globals';
 
 export const DEFAULT_IMAP_PORT = 993;
 export const DEFAULT_IMAP_SSL = true;
@@ -50,7 +50,7 @@ export async function login(dispatch, credentials) {
   dispatch(backendRequest());
   dispatch(setFormValues(credentials));
   dispatch(setError('authentication', null));
-  const url = URLS.LOGIN;
+  const url = getIsotopeConfiguration()._links['application.login'].href;
   // Will be used as the key in the IndexedDB
   const userId = sjcl.codec.hex.fromBits(
     sjcl.hash.sha256.hash(`${credentials.serverHost}|${credentials.user}`));

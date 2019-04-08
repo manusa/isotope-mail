@@ -18,6 +18,11 @@
       "SMTP": "Credenciales SMTP inválidas"
     }
   },
+  "configurationNotFound": {
+    "Sorry": "Lo sentimos",
+    "message": "No hemos podido cargar la configuración desde el servidor. Por favor, inténtalo de nuevo.",
+    "Retry": "Reintentar"
+  },
   "sideBar": {
     "hide": "Ocultar barra lateral",
     "newFolder": "Nueva carpeta",

@@ -1,17 +1,17 @@
 import * as applicationService from '../application';
 import * as fetchService from '../fetch';
 import {ActionTypes} from '../../actions/action-types';
-import {URLS} from '../url';
 
 describe('Application service test suite', () => {
   describe('login', () => {
     test('Response NOT OK, should set authentication error', done => {
       // Given
       global.fetch = jest.fn((url, options) => {
-        expect(url).toEqual(URLS.LOGIN);
+        expect(url).toEqual('/login');
         return Promise.resolve({ok: false, url, options,
           text: () => Promise.resolve('Authentication error')});
       });
+      window.isotopeConfiguration = {_links: {'application.login': {href: '/login'}}};
       let dispatchCount = 0;
       const dispatch = jest.fn(action => {
         switch (action.type) {

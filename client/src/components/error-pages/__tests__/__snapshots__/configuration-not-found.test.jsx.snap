@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ConfigurationNotFound component test suite Snapshot render, should render ConfigurationNotFound 1`] = `
+<div
+  className="isotope-error-page"
+>
+  <div
+    className="isotope-error-page__overlay"
+  >
+    <div
+      className="isotope-error-page__container"
+    >
+      <h1>
+        configurationNotFound.Sorry
+      </h1>
+      <p>
+        configurationNotFound.message
+      </p>
+      <a
+        className="mdc-button mdc-button--outlined isotope-error-page__button"
+        href="/"
+      >
+        configurationNotFound.Retry
+      </a>
+    </div>
+  </div>
+</div>
+`;

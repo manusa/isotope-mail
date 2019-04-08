@@ -3,11 +3,12 @@ import ReactDOM from 'react-dom';
 import {createStore} from 'redux';
 import {Provider} from 'react-redux';
 import {I18nextProvider} from 'react-i18next';
+import {fetchConfiguration} from './services/configuration';
+import debounce from './services/debounce';
 import i18n from './services/i18n';
+import {loadState, saveState} from './services/state';
 import Routes from './routes/routes';
 import rootReducer from './reducers';
-import {loadState, saveState} from './services/state';
-import debounce from './services/debounce';
 
 const SAVE_STATE_DEBOUNCE_PERIOD_IN_MILLIS = 500;
 
@@ -17,7 +18,8 @@ const SAVE_STATE_DEBOUNCE_PERIOD_IN_MILLIS = 500;
  * @returns {Promise<void>}
  */
 async function init () {
-  const previousState = await loadState();
+  const [previousState, configuration] = await Promise.all([loadState(), fetchConfiguration()]);
+  window.isotopeConfiguration = configuration;
   let enhancer;
   if (process.env.NODE_ENV === 'development' && window.__REDUX_DEVTOOLS_EXTENSION__) {
     enhancer = window.__REDUX_DEVTOOLS_EXTENSION__();
