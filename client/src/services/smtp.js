@@ -1,6 +1,5 @@
 import sanitize from './sanitize';
 import {HttpHeaders, isSuccessful} from './fetch';
-import {URLS} from './url';
 import {round} from '../services/prettify';
 import {
   outboxMessageProcessed,
@@ -10,6 +9,7 @@ import {
   outboxSetError
 }
   from '../actions/application';
+import {getIsotopeConfiguration} from '../selectors/globals';
 
 const SNACKBAR_DURATION = 4000;
 
@@ -28,7 +28,7 @@ export function sendMessage(
     content: sanitize.sanitize(content)
   };
   const postMessageRequest = new XMLHttpRequest();
-  postMessageRequest.open('POST', URLS.SMTP);
+  postMessageRequest.open('POST', getIsotopeConfiguration()._links.smtp.href);
   postMessageRequest.setRequestHeader(HttpHeaders.ISOTOPE_CREDENTIALS, credentials.encrypted);
   postMessageRequest.setRequestHeader(HttpHeaders.ISOTOPE_SALT, credentials.salt);
   postMessageRequest.setRequestHeader(HttpHeaders.CONTENT_TYPE, `application/json; charset=${document.characterSet}`);

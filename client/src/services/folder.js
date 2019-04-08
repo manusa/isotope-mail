@@ -1,15 +1,15 @@
-import {URLS} from './url';
 import {
   backendRequest as applicationBackendRequest,
   backendRequestCompleted as applicationBackendRequestCompleted, createFolder,
   renameFolder as renameFolderAction, renameFolderOk
 } from '../actions/application';
-import {unicodeUrlAtob as atob, unicodeUrlBtoa as btoa} from './base64';
 import {backendRequest, setFolders, updateFolder} from '../actions/folders';
+import {renameCache} from '../actions/messages';
+import {unicodeUrlAtob as atob, unicodeUrlBtoa as btoa} from './base64';
 import {deleteMessageCache, renameMessageCache} from './indexed-db';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, refreshCredentials, toJson} from './fetch';
 import {notifyNewMail} from './notification';
-import {renameCache} from '../actions/messages';
+import {getIsotopeConfiguration} from '../selectors/globals';
 
 export const FolderTypes = Object.freeze({
   INBOX: {serverName: 'INBOX', icon: 'inbox', position: 0},
@@ -155,7 +155,7 @@ export async function getFolders(dispatch, credentials, loadChildren) {
   abortControllerWrappers.getFoldersAbortController = new AbortController();
   const signal = abortControllerWrappers.getFoldersAbortController.signal;
 
-  const url = new URL(URLS.FOLDERS, window.location.origin);
+  const url = new URL(getIsotopeConfiguration()._links.folders.href, window.location.origin);
   if (loadChildren) {
     url.search = new URLSearchParams({loadChildren: true}).toString();
   }
@@ -282,7 +282,7 @@ export function deleteFolder(dispatch, user, folderToDelete) {
 export function createRootFolder(dispatch, user, newFolderName) {
   abortFetch(abortControllerWrappers.getFoldersAbortController);
   dispatch(applicationBackendRequest());
-  fetch(URLS.FOLDERS, {
+  fetch(getIsotopeConfiguration()._links.folders.href, {
     method: 'POST',
     headers: credentialsHeaders(user.credentials),
     body: newFolderName

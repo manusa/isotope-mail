@@ -18,6 +18,11 @@
       "SMTP": "Invalid SMTP credentials"
     }
   },
+  "configurationNotFound": {
+    "Sorry": "Sorry",
+    "message": "We were unable to retrieve the application configuration from the server. Please try again.",
+    "Retry": "Retry"
+  },
   "sideBar": {
     "hide": "Hide sidebar",
     "newFolder": "New folder",
