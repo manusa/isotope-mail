@@ -303,6 +303,20 @@ public class ImapService {
         }
     }
 
+    public void downloadMessage(URLName folderId, Long uid, HttpServletResponse response)
+            throws MessagingException, IOException {
+
+        final IMAPFolder folder = getFolder(folderId);
+        if (!folder.isOpen()) {
+            folder.open(READ_ONLY);
+        }
+        final IMAPMessage imapMessage = (IMAPMessage)folder.getMessageByUID(uid);
+        response.setHeader("Content-Disposition",
+                String.format("attachment; filename=%s", imapMessage.getSubject()));
+        imapMessage.writeTo(response.getOutputStream());
+        folder.close();
+    }
+
     public List<Message> preloadMessages(@NonNull URLName folderId, @NonNull List<Long> uids) {
 
         try {
