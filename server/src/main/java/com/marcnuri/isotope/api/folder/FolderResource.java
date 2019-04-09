@@ -46,8 +46,10 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
+import javax.mail.MessagingException;
 import javax.mail.URLName;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -188,6 +190,16 @@ public class FolderResource implements ApplicationContextAware {
         addLinks(message.getFolder());
         addLinks(folderId, message);
         return ResponseEntity.ok(message);
+    }
+
+    @GetMapping(path = "/{folderId}/messages/{messageId}", produces = "message/rfc822")
+    public ResponseEntity<Void> downloadMessage(
+            @PathVariable("folderId") String folderId, @PathVariable("messageId") Long messageId,
+            HttpServletResponse response) throws MessagingException, IOException {
+
+        log.debug("Downloading message {} from folder {} as .eml", messageId, folderId);
+        imapServiceFactory.getObject().downloadMessage(Folder.toId(folderId), messageId, response);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping(path = "/{folderId}/messages/{messageId}/attachments/{id}")
