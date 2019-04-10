@@ -382,6 +382,21 @@ public class FolderResourceTest {
     }
 
     @Test
+    public void downloadMessage_validFolderAndMessageIds_shouldReturnOk() throws Exception {
+        // Given
+        doNothing().when(imapService)
+                .downloadMessage(Mockito.eq(new URLName("1337")), Mockito.eq(1337L), Mockito.any());
+
+        // When
+        final ResultActions result = mockMvc.perform(
+                get("/v1/folders/MTMzNw==/messages/1337")
+                        .accept("message/rfc822"));
+
+        // Then
+        result.andExpect(status().isOk());
+    }
+
+    @Test
     public void setMessageSeen_validFolderAndMessage_shouldReturnNoContent() throws Exception {
         // Given
         doNothing().when(imapService).setMessagesSeen( Mockito.any(), Mockito.anyBoolean(), Mockito.any(long[].class));

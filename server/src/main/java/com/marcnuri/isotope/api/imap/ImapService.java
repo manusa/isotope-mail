@@ -312,7 +312,7 @@ public class ImapService {
         }
         final IMAPMessage imapMessage = (IMAPMessage)folder.getMessageByUID(uid);
         response.setHeader("Content-Disposition",
-                String.format("attachment; filename=%s", imapMessage.getSubject()));
+                String.format("attachment; filename=%s.eml", imapMessage.getSubject()));
         imapMessage.writeTo(response.getOutputStream());
         folder.close();
     }
