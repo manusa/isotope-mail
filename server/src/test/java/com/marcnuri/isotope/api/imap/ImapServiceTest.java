@@ -28,6 +28,7 @@ import com.marcnuri.isotope.api.exception.NotFoundException;
 import com.marcnuri.isotope.api.folder.Folder;
 import com.marcnuri.isotope.api.folder.FolderUtils;
 import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPMessage;
 import com.sun.mail.imap.IMAPStore;
 import com.sun.mail.util.MailSSLSocketFactory;
 import org.junit.After;
@@ -40,6 +41,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.mail.Flags;
@@ -47,6 +49,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.URLName;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.List;
 
@@ -55,6 +58,7 @@ import static com.marcnuri.isotope.api.configuration.WithMockCredentials.SERVER_
 import static com.marcnuri.isotope.api.configuration.WithMockCredentials.SERVER_PORT;
 import static com.marcnuri.isotope.api.configuration.WithMockCredentials.USER;
 import static org.hamcrest.Matchers.arrayWithSize;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -283,6 +287,26 @@ public class ImapServiceTest {
                 Mockito.eq(SERVER_HOST), Mockito.eq(SERVER_PORT),
                 Mockito.eq(USER), Mockito.eq(PASSWORD));
         verify(folder, times(1)).delete(Mockito.eq(true));
+    }
+
+    @Test
+    @WithMockCredentials
+    public void downloadMessage_validParameters_shouldWriteMessageToResponse() throws Exception {
+        // Given
+        final IMAPFolder folder = Mockito.mock(IMAPFolder.class);
+        doReturn(folder).when(imapStore).getFolder(Mockito.eq("/1337"));
+        doReturn(true).when(folder).exists();
+        doReturn("/1337").when(folder).getFullName();
+        doReturn("1337").when(folder).getName();
+        final IMAPMessage message = Mockito.mock(IMAPMessage.class);
+        doReturn(message).when(folder).getMessageByUID(Mockito.eq(1337L));
+        doReturn("Alex").when(message).getSubject();
+        final HttpServletResponse response = new MockHttpServletResponse();
+        // When
+        imapService.downloadMessage(new URLName("/1337"), 1337L, response);
+        // Then
+        assertThat(response.getHeader("Content-Disposition"), equalTo("attachment; filename=Alex.eml"));
+        verify(message, times(1)).writeTo(Mockito.any());
     }
 
     @Test
