@@ -262,4 +262,56 @@ describe('Message service test suite', () => {
       expect(global.fetch).toHaveBeenCalledTimes(0);
     });
   });
+  describe('downloadMessage', () => {
+    test('valid arguments, fetch OK, should perform ajax download', done => {
+      // Given
+      global.fetch = jest.fn((url, options) => {
+        expect(url.toLocaleString()).toMatch('http://test.url/folder/1337');
+        expect(options.headers.Accept).toBe('message/rfc822');
+        return Promise.resolve({ok: true, blob: jest.fn(() => new Blob([''], {type: 'message/rfc822'})),
+          headers: {get: jest.fn(() => 'attachment; filename=1337.eml')}
+        });
+      });
+      global.URL = {
+        createObjectURL: jest.fn(blob => {
+          expect(blob.type).toBe('message/rfc822');
+        }),
+        revokeObjectURL: jest.fn(() => {
+          expect(global.URL.createObjectURL).toHaveBeenCalledTimes(1);
+          done();
+        })
+      };
+      const folder = {_links: {message: {href: 'http://test.url/folder/{messageId}'}}};
+      const message = {uid: 1337};
+
+      // When
+      messageService.downloadMessage({}, {}, folder, message);
+
+      // Then
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+    test('valid arguments, fetch OK, navigator.msSaveBlob, should perform msSaveBlob', done => {
+      // Given
+      global.fetch = jest.fn((url, options) => {
+        expect(url.toLocaleString()).toMatch('http://test.url/folder/1337');
+        expect(options.headers.Accept).toBe('message/rfc822');
+        return Promise.resolve({ok: true, blob: jest.fn(() => new Blob([''], {type: 'message/rfc822'})),
+          headers: {get: jest.fn(() => 'attachment; filename=1337.eml')}
+        });
+      });
+      navigator.msSaveBlob = jest.fn((blob, fileName) => {
+        expect(blob.type).toBe('message/rfc822');
+        expect(fileName).toBe('1337.eml');
+        done();
+      });
+      const folder = {_links: {message: {href: 'http://test.url/folder/{messageId}'}}};
+      const message = {uid: 1337};
+
+      // When
+      messageService.downloadMessage({}, {}, folder, message);
+
+      // Then
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
 });

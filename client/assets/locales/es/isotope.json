@@ -46,6 +46,10 @@
     "delete": "Borrar",
     "markUnread": "Marcar como no leído",
     "markRead": "Marcar como leído",
+    "more": "Más",
+    "messageViewerMenu": {
+      "download": "Descargar (.eml)"
+    },
     "deleteFromTrashDialog": {
       "title": "Confirmar borrado",
       "message": "Esta acción eliminará permenentemente los mensajes de la basura. ¿Seguro que quieres continuar?",

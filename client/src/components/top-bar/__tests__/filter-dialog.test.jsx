@@ -1,5 +1,5 @@
 import React from 'react';
-import {shallow} from 'enzyme/build/index';
+import {shallow} from 'enzyme';
 import {createMockStore} from '../../../__testutils__/store';
 import {INITIAL_STATE} from '../../../reducers';
 import MessageFilters from '../../../services/message-filters';

@@ -2,9 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {translate} from 'react-i18next';
 import ButtonCollapse from './button-collapse';
-import TopBarButton from './top-bar-button';
-import ButtonReply from './button-reply';
 import ButtonForward from './button-forward';
+import ButtonMore from './button-more';
+import ButtonReply from './button-reply';
+import MessageViewerMenu from './message-viewer-menu';
+import TopBarButton from './top-bar-button';
 import mainCss from '../../styles/main.scss';
 
 export const TopBarMessageViewer = (
@@ -34,6 +36,7 @@ export const TopBarMessageViewer = (
       <span isotip={t('topBar.markUnread')} isotip-position='bottom-end' isotip-size='small'>
         <TopBarButton onClick={onMarkUnreadClick}>markunread</TopBarButton>
       </span>
+      <ButtonMore><MessageViewerMenu /></ButtonMore>
     </section>
   </div>
 );
