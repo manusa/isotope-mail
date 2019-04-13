@@ -8,6 +8,12 @@ $spacing : 32px;
 .isotope-error-page {
   background: url('https://source.unsplash.com/collection/4509660/1920x1080') no-repeat white;
   background-size: cover;
+  animation: fade-in .5s linear backwards;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
 
   .isotope-error-page__overlay {
     background: $background-overlay;

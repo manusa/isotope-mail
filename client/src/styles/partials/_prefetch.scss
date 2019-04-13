@@ -1,0 +1,14 @@
+@import 'variables';
+/*
+  Pre-fetches images or assets used through the application
+ */
+body {
+  ::after {
+    position:absolute;
+    width:0;
+    height:0;
+    overflow:hidden;
+    z-index: map-get($z-index, inner-core);
+    content: url('https://source.unsplash.com/collection/4509660/1920x1080');
+  }
+}

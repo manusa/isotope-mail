@@ -8,12 +8,15 @@ $port-field-width: 180px;
 .login--background {
   background: url('https://source.unsplash.com/collection/4509660/1920x1080') no-repeat $base-background-color;
   background-size: cover;
+  animation: fade-in .5s linear backwards;
 
-  @media screen and (max-width: 1280px) {
-    background-image: url('https://source.unsplash.com/collection/4509660/1280x720');
-  }
   @media screen and (max-width: $card-width-break) {
     background: none;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
 
   .login--container {
