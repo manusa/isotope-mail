@@ -327,3 +327,25 @@ export function deleteMessages(dispatch, credentials, folder, messages) {
       dispatch(updateFolder(folder));
     });
 }
+
+export async function downloadMessage(dispatch, credentials, folder, message) {
+  const response = await fetch(folder._links.message.href.replace('{messageId}', message.uid), {
+    method: 'GET',
+    headers: credentialsHeaders(credentials, {Accept: 'message/rfc822'})
+  });
+  const blob = await response.blob();
+  const fileName = response.headers.get('Content-disposition').match(/filename=(.*)$/)[1]
+  if (navigator.msSaveBlob) {
+    navigator.msSaveBlob(blob, fileName);
+  } else {
+    const url = URL.createObjectURL(blob);
+    const tempLink = document.createElement('a');
+    tempLink.href = url;
+    tempLink.download = fileName;
+    document.body.appendChild(tempLink);
+    // tempLink.click();
+    tempLink.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true, view: window}));
+    document.body.removeChild(tempLink);
+    URL.revokeObjectURL(url);
+  }
+}

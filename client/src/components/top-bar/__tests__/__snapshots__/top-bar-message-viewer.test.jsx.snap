@@ -59,6 +59,9 @@ exports[`TopBarMessageViewer component test suite Snapshot render, should render
         markunread
       </TopBarButton>
     </span>
+    <Translate(ButtonMore)>
+      <Connect(Translate(MessageViewerMenu)) />
+    </Translate(ButtonMore)>
   </section>
 </div>
 `;

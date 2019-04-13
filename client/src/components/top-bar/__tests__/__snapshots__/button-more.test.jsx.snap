@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ButtonMore component test suite Snapshot render should render button-more 1`] = `
+<span
+  className="mdc-menu-surface--anchor"
+  isotip="topBar.more"
+  isotip-hidden="false"
+  isotip-position="bottom-end"
+  isotip-size="small"
+>
+  <TopBarButton
+    className=""
+    onClick={[Function]}
+  >
+    more_vert
+  </TopBarButton>
+  <div
+    visible={false}
+  >
+    Child
+  </div>
+</span>
+`;

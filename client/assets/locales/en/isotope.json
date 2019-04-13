@@ -46,6 +46,10 @@
     "delete": "Delete",
     "markUnread": "Mark unread",
     "markRead": "Mark read",
+    "more": "More",
+    "messageViewerMenu": {
+      "download": "Download (.eml)"
+    },
     "deleteFromTrashDialog": {
       "title": "Confirm deletion",
       "message": "This will permanently delete messages from Trash. Are you sure you want to continue?",

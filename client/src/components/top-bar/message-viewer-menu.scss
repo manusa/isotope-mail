@@ -1,0 +1,7 @@
+@import '../../styles/partials/variables';
+
+.message-viewer-menu {
+  right: 0;
+  min-width: 150px;
+  z-index: map-get($z-index, thermosphere);
+}
