@@ -3,7 +3,7 @@
   Pre-fetches images or assets used through the application
  */
 body {
-  ::after {
+  &::after {
     position:absolute;
     width:0;
     height:0;
