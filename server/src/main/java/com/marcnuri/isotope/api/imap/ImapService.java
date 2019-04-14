@@ -63,6 +63,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -311,8 +312,8 @@ public class ImapService {
             folder.open(READ_ONLY);
         }
         final IMAPMessage imapMessage = (IMAPMessage)folder.getMessageByUID(uid);
-        response.setHeader("Content-Disposition",
-                String.format("attachment; filename=%s.eml", imapMessage.getSubject()));
+        response.setHeader("Content-Disposition", String.format("attachment; filename=%s.eml",
+                URLEncoder.encode(imapMessage.getSubject(), "UTF-8")));
         imapMessage.writeTo(response.getOutputStream());
         folder.close();
     }

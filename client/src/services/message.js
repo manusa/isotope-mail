@@ -334,7 +334,8 @@ export async function downloadMessage(credentials, folder, message) {
     headers: credentialsHeaders(credentials, {Accept: 'message/rfc822'})
   });
   const blob = await response.blob();
-  const fileName = response.headers.get('Content-disposition').match(/filename=(.*)$/)[1];
+  const fileName = decodeURIComponent(response.headers.get('Content-disposition').match(/filename=(.*)$/)[1])
+    .replace(/\+/g, ' ');
   if (navigator.msSaveBlob) {
     navigator.msSaveBlob(blob, fileName);
   } else {
