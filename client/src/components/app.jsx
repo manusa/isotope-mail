@@ -101,6 +101,7 @@ class App extends Component {
       const messagePromise = this.props.reloadMessageCache(selectedFolder);
       await Promise.all([folderPromise, messagePromise]);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log(`Error in refresh poll: ${e}`);
       if (e instanceof AuthenticationException) {
         keepPolling = false;

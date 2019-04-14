@@ -159,6 +159,7 @@ export async function persistState(dispatch, state) {
           dispatch(setError('diskQuotaExceeded', false));
         }
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error(`${e} ${e.name}`);
         if (e.name === 'QuotaExceededError' && !state.application.errors.diskQuotaExceeded) {
           dispatch(setError('diskQuotaExceeded', true));

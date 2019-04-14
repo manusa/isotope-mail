@@ -86,9 +86,9 @@
     };
     cursorRequest.onerror = function(event) {
       ret.onerror(event);
-    }
+    };
     return ret;
-  }
+  };
 
   if (!window.IDBIndex.prototype.getAllKeys) {
     window.IDBIndex.prototype.getAllKeys = _getAllKeys;
