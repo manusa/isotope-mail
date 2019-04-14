@@ -285,7 +285,7 @@ describe('Message service test suite', () => {
       const message = {uid: 1337};
 
       // When
-      messageService.downloadMessage({}, {}, folder, message);
+      messageService.downloadMessage({}, folder, message);
 
       // Then
       expect(global.fetch).toHaveBeenCalledTimes(1);
@@ -308,7 +308,7 @@ describe('Message service test suite', () => {
       const message = {uid: 1337};
 
       // When
-      messageService.downloadMessage({}, {}, folder, message);
+      messageService.downloadMessage({}, folder, message);
 
       // Then
       expect(global.fetch).toHaveBeenCalledTimes(1);

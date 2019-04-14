@@ -328,7 +328,7 @@ export function deleteMessages(dispatch, credentials, folder, messages) {
     });
 }
 
-export async function downloadMessage(dispatch, credentials, folder, message) {
+export async function downloadMessage(credentials, folder, message) {
   const response = await fetch(folder._links.message.href.replace('{messageId}', message.uid), {
     method: 'GET',
     headers: credentialsHeaders(credentials, {Accept: 'message/rfc822'})
