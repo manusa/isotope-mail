@@ -7,7 +7,6 @@ import {getCredentials} from '../../selectors/application';
 import {downloadMessage as downloadMessageService} from '../../services/message';
 import styles from './message-viewer-menu.scss';
 import mainCss from '../../styles/main.scss';
-import Spinner from '../spinner/spinner';
 
 export const DownloadListItem = ({t, downloadMessage}) => {
   const [downloading, setDownloading] = useState(false);
