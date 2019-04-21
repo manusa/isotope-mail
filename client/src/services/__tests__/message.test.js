@@ -27,10 +27,9 @@ describe('Message service test suite', () => {
           done();
         }
       });
-      const folder = {
-        type: FolderTypes.INBOX,
-        _links: {messages: {href: 'http://test.url/api/v1/folders/1337/messages'}}
-      };
+      window.isotopeConfiguration = {_links: {'folders.messages':
+            {href: 'http://test.url/api/v1/folders/{folderId}/messages'}}};
+      const folder = {folderId: '1337', type: FolderTypes.INBOX};
 
       // When
       messageService.preloadMessages(dispatch, {}, folder, [1337, 1338]);
@@ -51,10 +50,9 @@ describe('Message service test suite', () => {
           done();
         }
       });
-      const folder = {
-        type: FolderTypes.FOLDER,
-        _links: {messages: {href: 'http://test.url/api/v1/folders/1337/messages'}}
-      };
+      window.isotopeConfiguration = {_links: {'folders.messages':
+            {href: 'http://test.url/api/v1/folders/{folderId}/messages'}}};
+      const folder = {folderId: '1337'};
 
       // When
       messageService.preloadMessages(dispatch, {}, folder, [1337, 1338]);
@@ -85,7 +83,9 @@ describe('Message service test suite', () => {
           default:
         }
       });
-      const folder = {_links: {'message.seen.bulk': {href: 'http://test.url/folder1337/messages/seen/{seen}'}}};
+      window.isotopeConfiguration = {_links: {'folders.message.seen.bulk':
+            {href: 'http://test.url/{folderId}/messages/seen/{seen}'}}};
+      const folder = {folderId: 'folder1337'};
       const messages = [
         {uid: 1},
         {uid: 1337}
@@ -121,7 +121,9 @@ describe('Message service test suite', () => {
           default:
         }
       });
-      const folder = {_links: {'message.flagged': {href: 'http://test.url/folder1337/messages/{messageId}/flagged'}}};
+      window.isotopeConfiguration = {_links: {'folders.message.flagged':
+            {href: 'http://test.url/{folderId}/messages/{messageId}/flagged'}}};
+      const folder = {folderId: 'folder1337'};
       const message = {uid: 1};
 
       // When
@@ -158,7 +160,9 @@ describe('Message service test suite', () => {
         }
       });
       const credentials = {};
-      const folder = {_links: {messages: {href: 'http://test.url'}}};
+      window.isotopeConfiguration = {_links: {'folders.messages':
+            {href: 'http://test.url/api/v1/folders/{folderId}/messages'}}};
+      const folder = {folderId: '1337'};
       // When
       messageService.deleteAllFolderMessages(dispatch, credentials, folder);
       // Then
@@ -178,7 +182,9 @@ describe('Message service test suite', () => {
         }
       });
       const credentials = {};
-      const folder = {_links: {messages: {href: 'http://test.url'}}};
+      window.isotopeConfiguration = {_links: {'folders.messages':
+            {href: 'http://test.url/api/v1/folders/{folderId}/messages'}}};
+      const folder = {folderId: '1337'};
       // When
       messageService.deleteAllFolderMessages(dispatch, credentials, folder);
       // Then
@@ -190,7 +196,7 @@ describe('Message service test suite', () => {
     test('deleteMessages with valid message array, should fetch and dispatch results', done => {
       // Given
       global.fetch = jest.fn((url, options) => {
-        expect(url.toLocaleString()).toMatch('http://test.url/?id=1&id=1337');
+        expect(url.toLocaleString()).toMatch('http://test.url/api/v1/folders/1337/messages?id=1&id=1337');
         return Promise.resolve({ok: true, url, options, json: () => Promise.resolve({fromServer: true})});
       });
       fetch.abortFetch = jest.fn();
@@ -215,7 +221,9 @@ describe('Message service test suite', () => {
         }
       });
       const credentials = {};
-      const folder = {_links: {messages: {href: 'http://test.url'}}};
+      window.isotopeConfiguration = {_links: {'folders.messages':
+            {href: 'http://test.url/api/v1/folders/{folderId}/messages'}}};
+      const folder = {folderId: '1337'};
       const messages = [{uid: 1}, {uid: 1337}];
 
       // When
@@ -228,7 +236,7 @@ describe('Message service test suite', () => {
     test('deleteMessages with valid message array, fetch has error, should dispatch previous folder/messages', done => {
       // Given
       global.fetch = jest.fn(url => {
-        expect(url.toLocaleString()).toMatch('http://test.url.witherror/?id=1&id=1337');
+        expect(url.toLocaleString()).toMatch('http://test.url.with.error/api/v1/folders/1337/messages?id=1&id=1337');
         return Promise.resolve({ok: true});
       });
       fetch.abortFetch = jest.fn();
@@ -238,7 +246,9 @@ describe('Message service test suite', () => {
           done();
         }
       });
-      const folder = {_links: {messages: {href: 'http://test.url.witherror'}}, originalFolder: true};
+      window.isotopeConfiguration = {_links: {'folders.messages':
+            {href: 'http://test.url.with.error/api/v1/folders/{folderId}/messages'}}};
+      const folder = {folderId: '1337', originalFolder: true};
       const messages = [{uid: 1}, {uid: 1337}];
 
       // When
@@ -266,7 +276,7 @@ describe('Message service test suite', () => {
     test('valid arguments, fetch OK, should perform ajax download', done => {
       // Given
       global.fetch = jest.fn((url, options) => {
-        expect(url.toLocaleString()).toMatch('http://test.url/folder/1337');
+        expect(url.toLocaleString()).toMatch('http://test.url/api/v1/folders/313373/messages/1337');
         expect(options.headers.Accept).toBe('message/rfc822');
         return Promise.resolve({ok: true, blob: jest.fn(() => new Blob([''], {type: 'message/rfc822'})),
           headers: {get: jest.fn(() => 'attachment; filename=1337.eml')}
@@ -281,7 +291,9 @@ describe('Message service test suite', () => {
           done();
         })
       };
-      const folder = {_links: {message: {href: 'http://test.url/folder/{messageId}'}}};
+      window.isotopeConfiguration = {_links: {'folders.message':
+            {href: 'http://test.url/api/v1/folders/{folderId}/messages/{messageId}'}}};
+      const folder = {folderId: '313373'};
       const message = {uid: 1337};
 
       // When
@@ -293,7 +305,7 @@ describe('Message service test suite', () => {
     test('valid arguments, fetch OK, navigator.msSaveBlob, should perform msSaveBlob', done => {
       // Given
       global.fetch = jest.fn((url, options) => {
-        expect(url.toLocaleString()).toMatch('http://test.url/folder/1337');
+        expect(url.toLocaleString()).toMatch('http://test.url/api/v1/folders/313373/messages/1337');
         expect(options.headers.Accept).toBe('message/rfc822');
         return Promise.resolve({ok: true, blob: jest.fn(() => new Blob([''], {type: 'message/rfc822'})),
           headers: {get: jest.fn(() => 'attachment; filename=1337.eml')}
@@ -304,7 +316,9 @@ describe('Message service test suite', () => {
         expect(fileName).toBe('1337.eml');
         done();
       });
-      const folder = {_links: {message: {href: 'http://test.url/folder/{messageId}'}}};
+      window.isotopeConfiguration = {_links: {'folders.message':
+            {href: 'http://test.url/api/v1/folders/{folderId}/messages/{messageId}'}}};
+      const folder = {folderId: '313373'};
       const message = {uid: 1337};
 
       // When

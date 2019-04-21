@@ -11,6 +11,7 @@ import {
   updateCache, updateCacheIfExist
 } from '../actions/messages';
 import {updateFolder} from '../actions/folders';
+import {getIsotopeConfiguration} from '../selectors/globals';
 import {abortControllerWrappers, abortFetch, AuthenticationException, credentialsHeaders, toJson} from './fetch';
 import {persistMessageCache} from './indexed-db';
 import {notifyNewMail} from './notification';
@@ -48,11 +49,11 @@ export function closeResetFolderMessagesCacheEventSource(dispatch) {
  */
 export async function resetFolderMessagesCache(dispatch, user, folder) {
   _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
-  if (folder && folder._links) {
+  if (folder) {
     const allMessages = [];
     // Prefer EventSourcePolyfill instead of EventSource to allow sending HTTP headers in all browsers
-    const es = new window.EventSourcePolyfill(folder._links.messages.href,
-      {
+    const es = new window.EventSourcePolyfill(
+      getIsotopeConfiguration()._links['folders.messages'].href.replace('{folderId}', folder.folderId), {
         headers: credentialsHeaders(user.credentials)
       });
     _eventSourceWrappers.resetFolderMessagesCache = es;
@@ -118,7 +119,7 @@ export function preloadMessages(dispatch, credentials, folder, messageUids) {
   if (messageUids.length === 0) {
     return;
   }
-  const url = new URL(folder._links.messages.href);
+  const url = new URL(getIsotopeConfiguration()._links['folders.messages'].href.replace('{folderId}', folder.folderId));
   messageUids.forEach(messageUid => url.searchParams.append('id', messageUid));
   fetch(url, {
     method: 'GET',
@@ -189,7 +190,10 @@ export function moveMessages(dispatch, credentials, fromFolder, toFolder, messag
   dispatch(deleteFromCache(fromFolder, messages));
   dispatch(updateFolder(fromFolderUpdated));
   dispatch(lockMessages(messages));
-  fetch(fromFolder._links['message.move.bulk'].href.replace('{toFolderId}', toFolder.folderId), {
+  const url = getIsotopeConfiguration()._links['folders.message.move.bulk'].href
+    .replace('{folderId}', fromFolder.folderId)
+    .replace('{toFolderId}', toFolder.folderId);
+  fetch(url, {
     method: 'PUT',
     headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
     body: JSON.stringify(messages.map(m => m.uid))
@@ -229,8 +233,10 @@ export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
   dispatch(updateCacheIfExist(folder, messagesToUpdate, true));
   dispatch(updateFolder(expectedUpdatedFolder));
   dispatch(lockMessages(messagesToUpdate));
-
-  fetch(folder._links['message.seen.bulk'].href.replace('{seen}', seen.toString()), {
+  const url = getIsotopeConfiguration()._links['folders.message.seen.bulk'].href
+    .replace('{folderId}', folder.folderId)
+    .replace('{seen}', seen.toString());
+  fetch(url, {
     method: 'PUT',
     headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
     body: JSON.stringify(messagesToUpdate.map(m => m.uid))
@@ -252,7 +258,10 @@ export function setMessageFlagged(dispatch, credentials, folder, message, flagge
 
   dispatch(updateCacheIfExist(folder, [{...message, flagged}], true));
   dispatch(lockMessages([message]));
-  fetch(folder._links['message.flagged'].href.replace('{messageId}', message.uid), {
+  const url = getIsotopeConfiguration()._links['folders.message.flagged'].href
+    .replace('{folderId}', folder.folderId)
+    .replace('{messageId}', message.uid);
+  fetch(url, {
     method: 'PUT',
     headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
     body: JSON.stringify(flagged)
@@ -272,7 +281,8 @@ export async function deleteAllFolderMessages(dispatch, credentials, folder) {
   abortFetch(abortControllerWrappers.getFoldersAbortController);
   dispatch(applicationBackendRequest());
   try {
-    const updatedFolder = await fetch(folder._links.messages.href, {
+    const url = getIsotopeConfiguration()._links['folders.messages'].href.replace('{folderId}', folder.folderId);
+    const updatedFolder = await fetch(url, {
       method: 'DELETE',
       headers: credentialsHeaders(credentials)
     }).then(toJson);
@@ -292,7 +302,7 @@ export function deleteMessages(dispatch, credentials, folder, messages) {
   _closeEventSource(dispatch, _eventSourceWrappers.resetFolderMessagesCache);
   abortFetch(abortControllerWrappers.getFoldersAbortController);
 
-  const url = new URL(folder._links.messages.href);
+  const url = new URL(getIsotopeConfiguration()._links['folders.messages'].href.replace('{folderId}', folder.folderId));
   const messagesToDelete = [];
   // Update state with expected response from server
   const expectedUpdatedFolder = {...folder};
@@ -329,7 +339,10 @@ export function deleteMessages(dispatch, credentials, folder, messages) {
 }
 
 export async function downloadMessage(credentials, folder, message) {
-  const response = await fetch(folder._links.message.href.replace('{messageId}', message.uid), {
+  const downloadUrl = getIsotopeConfiguration()._links['folders.message'].href
+    .replace('{folderId}', folder.folderId)
+    .replace('{messageId}', message.uid);
+  const response = await fetch(downloadUrl, {
     method: 'GET',
     headers: credentialsHeaders(credentials, {Accept: 'message/rfc822'})
   });

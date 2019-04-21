@@ -4,9 +4,10 @@ import {
   replaceMessageEmbeddedImages
 } from '../actions/application';
 import {updateCacheIfExist} from '../actions/messages';
-import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 import {updateFolder} from '../actions/folders';
 import {refreshMessage} from '../actions/application';
+import {getIsotopeConfiguration} from '../selectors/globals';
+import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
 import {closeResetFolderMessagesCacheEventSource} from './message';
 
 /**
@@ -51,7 +52,10 @@ function _readMessageRequest(dispatch, credentials, folder, message) {
 
   return () => {
     dispatch(refreshMessageBackendRequest());
-    return fetch(folder._links.message.href.replace('{messageId}', message.uid), {
+    const url = getIsotopeConfiguration()._links['folders.message'].href
+      .replace('{folderId}', folder.folderId)
+      .replace('{messageId}', message.uid);
+    return fetch(url, {
       method: 'GET',
       headers: credentialsHeaders(credentials),
       signal: signal
@@ -77,7 +81,10 @@ function _readMessageRequest(dispatch, credentials, folder, message) {
  * @private
  */
 function _messageSeenRequest(credentials, folder, message) {
-  return fetch(folder._links['message.seen'].href.replace('{messageId}', message.uid), {
+  const url = getIsotopeConfiguration()._links['folders.message.seen'].href
+    .replace('{folderId}', folder.folderId)
+    .replace('{messageId}', message.uid);
+  return fetch(url, {
     method: 'PUT',
     headers: credentialsHeaders(credentials, {'Content-Type': 'application/json'}),
     body: JSON.stringify(true)

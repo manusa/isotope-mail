@@ -50,7 +50,6 @@ import java.util.regex.Pattern;
 
 import static com.marcnuri.isotope.api.configuration.WebConfiguration.IMAP_SERVICE_PROTOTYPE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -105,22 +104,6 @@ public class FolderResourceTest {
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$").isArray());
         result.andExpect(jsonPath("[0].folderId").value(folderId));
-        result.andExpect(jsonPath("[0]._links").exists());
-        result.andExpect(jsonPath("[0]._links", aMapWithSize(11)));
-        result.andExpect(jsonPath("[0]._links.self.href", endsWith("/v1/folders/1337")));
-        result.andExpect(jsonPath("[0]._links.messages.href", endsWith("/v1/folders/1337/messages")));
-        result.andExpect(jsonPath("[0]._links['message'].href",
-                endsWith("/v1/folders/1337/messages/{messageId}")));
-        result.andExpect(jsonPath("[0]._links['message.flagged'].href",
-                endsWith("/v1/folders/1337/messages/{messageId}/flagged")));
-        result.andExpect(jsonPath("[0]._links['message.move'].href",
-                endsWith("/v1/folders/1337/messages/{messageId}/folder/{toFolderId}")));
-        result.andExpect(jsonPath("[0]._links['message.move.bulk'].href",
-                endsWith("/v1/folders/1337/messages/folder/{toFolderId}")));
-        result.andExpect(jsonPath("[0]._links['message.seen'].href",
-                endsWith("/v1/folders/1337/messages/{messageId}/seen")));
-        result.andExpect(jsonPath("[0]._links['message.seen.bulk'].href",
-                endsWith("/v1/folders/1337/messages/seen/{seen}")));
     }
 
     @Test
@@ -185,8 +168,6 @@ public class FolderResourceTest {
         // Then
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.folderId").value(folderId));
-        result.andExpect(jsonPath("$._links").exists());
-        result.andExpect(jsonPath("$._links", aMapWithSize(11)));
     }
 
     @Test
@@ -211,8 +192,6 @@ public class FolderResourceTest {
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.folderId").value(folderId));
         result.andExpect(jsonPath("$.name").value("31337"));
-        result.andExpect(jsonPath("$._links").exists());
-        result.andExpect(jsonPath("$._links", aMapWithSize(11)));
     }
     @Test
     public void moveFolder_validFolderAndNewName_shouldReturnOk() throws Exception {
@@ -234,8 +213,6 @@ public class FolderResourceTest {
         // Then
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.folderId").value(folderId));
-        result.andExpect(jsonPath("$._links").exists());
-        result.andExpect(jsonPath("$._links", aMapWithSize(11)));
     }
 
     @Test
@@ -257,8 +234,6 @@ public class FolderResourceTest {
         // Then
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.folderId").value(folderId));
-        result.andExpect(jsonPath("$._links").exists());
-        result.andExpect(jsonPath("$._links", aMapWithSize(11)));
     }
 
     @Test
@@ -333,8 +308,6 @@ public class FolderResourceTest {
         // Then
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.folderId").value(folderId));
-        result.andExpect(jsonPath("$._links").exists());
-        result.andExpect(jsonPath("$._links", aMapWithSize(11)));
     }
 
     @Test
@@ -354,8 +327,6 @@ public class FolderResourceTest {
         // Then
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$.folderId").value(folderId));
-        result.andExpect(jsonPath("$._links").exists());
-        result.andExpect(jsonPath("$._links", aMapWithSize(11)));
     }
 
     @Test

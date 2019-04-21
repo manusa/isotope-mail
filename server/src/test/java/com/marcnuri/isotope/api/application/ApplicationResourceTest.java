@@ -87,10 +87,26 @@ public class ApplicationResourceTest {
         // Then
         result.andExpect(status().isOk());
         result.andExpect(jsonPath("$._links").exists());
-        result.andExpect(jsonPath("$._links", aMapWithSize(3)));
+        result.andExpect(jsonPath("$._links", aMapWithSize(14)));
         result.andExpect(jsonPath("$._links['application.login'].href", endsWith("/v1/application/login")));
         result.andExpect(jsonPath("$._links['folders'].href", endsWith("/v1/folders")));
-        result.andExpect(jsonPath("$._links['smtp'].href", endsWith("/v1/smtp")));
+        result.andExpect(jsonPath("$._links.['folders.self'].href",
+                endsWith("/v1/folders/{folderId}")));
+        result.andExpect(jsonPath("$._links['folders.messages'].href",
+                endsWith("/v1/folders/{folderId}/messages")));
+        result.andExpect(jsonPath("$._links['folders.message'].href",
+                endsWith("/v1/folders/{folderId}/messages/{messageId}")));
+        result.andExpect(jsonPath("$._links['folders.message.flagged'].href",
+                endsWith("/v1/folders/{folderId}/messages/{messageId}/flagged")));
+        result.andExpect(jsonPath("$._links['folders.message.move'].href",
+                endsWith("/v1/folders/{folderId}/messages/{messageId}/folder/{toFolderId}")));
+        result.andExpect(jsonPath("$._links['folders.message.move.bulk'].href",
+                endsWith("/v1/folders/{folderId}/messages/folder/{toFolderId}")));
+        result.andExpect(jsonPath("$._links['folders.message.seen'].href",
+                endsWith("/v1/folders/{folderId}/messages/{messageId}/seen")));
+        result.andExpect(jsonPath("$._links['folders.message.seen.bulk'].href",
+                endsWith("/v1/folders/{folderId}/messages/seen/{seen}")));
+        result.andExpect(jsonPath("$._links.smtp.href", endsWith("/v1/smtp")));
     }
 
     @Test

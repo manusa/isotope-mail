@@ -69,17 +69,7 @@ public class FolderResource implements ApplicationContextAware {
 
     private static final Logger log = LoggerFactory.getLogger(FolderResource.class);
 
-    private static final String REL_MESSAGES = "messages";
     public static final String REL_DOWNLOAD = "download";
-    private static final String REL_DELETE = "delete";
-    private static final String REL_RENAME = "rename";
-    private static final String REL_MOVE = "move";
-    private static final String REL_MESSAGE = "message";
-    private static final String REL_MESSAGE_FLAGGED = "message.flagged";
-    private static final String REL_MESSAGE_MOVE= "message.move";
-    private static final String REL_MESSAGE_MOVE_BULK= "message.move.bulk";
-    private static final String REL_MESSAGE_SEEN = "message.seen";
-    private static final String REL_MESSAGE_SEEN_BULK = "message.seen.bulk";
 
     private final ObjectFactory<ImapService> imapServiceFactory;
 
@@ -95,13 +85,13 @@ public class FolderResource implements ApplicationContextAware {
             @RequestParam(value = "loadChildren", required = false) Boolean loadChildren) {
 
         log.debug("Loading list of folders [children:{}]", loadChildren);
-        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().getFolders(loadChildren)));
+        return ResponseEntity.ok(imapServiceFactory.getObject().getFolders(loadChildren));
     }
 
     @PostMapping(path = "", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<List<Folder>> createRootFolder(@RequestBody() String newFolderName) {
         log.debug("Creating new 1st level folder with name {}", newFolderName);
-        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().createRootFolder(newFolderName)));
+        return ResponseEntity.ok(imapServiceFactory.getObject().createRootFolder(newFolderName));
     }
 
     @PostMapping(path= "/{folderId}", produces = MediaTypes.HAL_JSON_VALUE)
@@ -109,21 +99,21 @@ public class FolderResource implements ApplicationContextAware {
             @NonNull @PathVariable("folderId") String folderId, @RequestBody() String newFolderName) {
 
         log.debug("Creating new folder with name {} under {} folder", newFolderName, folderId);
-        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject()
-                .createChildFolder(Folder.toId(folderId), newFolderName)));
+        return ResponseEntity.ok(imapServiceFactory.getObject()
+                .createChildFolder(Folder.toId(folderId), newFolderName));
     }
 
     @DeleteMapping(path= "/{folderId}", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Folder> deleteFolder(@NonNull @PathVariable("folderId") String folderId) {
         log.debug("Deleting folder with id {}", folderId);
-        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().deleteFolder(Folder.toId(folderId))));
+        return ResponseEntity.ok(imapServiceFactory.getObject().deleteFolder(Folder.toId(folderId)));
     }
 
     @PutMapping(path= "/{folderId}/name", produces = MediaTypes.HAL_JSON_VALUE)
     public ResponseEntity<Folder> renameFolder(
             @NonNull @PathVariable("folderId") String folderId, @RequestBody String newName) {
         log.debug("Renaming folder with id {} to {}", folderId, newName);
-        return ResponseEntity.ok(addLinks(imapServiceFactory.getObject().renameFolder(Folder.toId(folderId), newName)));
+        return ResponseEntity.ok(imapServiceFactory.getObject().renameFolder(Folder.toId(folderId), newName));
     }
 
     /**
@@ -140,7 +130,7 @@ public class FolderResource implements ApplicationContextAware {
 
         final URLName targetFolderUrlName = targetFolderId == null ? null : Folder.toId(targetFolderId);
         return ResponseEntity.ok(
-                addLinks(imapServiceFactory.getObject().moveFolder(Folder.toId(folderId), targetFolderUrlName)));
+                imapServiceFactory.getObject().moveFolder(Folder.toId(folderId), targetFolderUrlName));
     }
 
     @GetMapping(path = "/{folderId}/messages", produces = TEXT_EVENT_STREAM_VALUE)
@@ -166,9 +156,7 @@ public class FolderResource implements ApplicationContextAware {
     @DeleteMapping(path = "/{folderId}/messages")
     public ResponseEntity<Folder> deleteAllFolderMessages(@PathVariable("folderId") String folderId) {
         log.debug("Deleting ALL messages for folder {} ", folderId);
-        final Folder folder = imapServiceFactory.getObject().deleteAllFolderMessages(Folder.toId(folderId));
-        addLinks(folder);
-        return ResponseEntity.ok(folder);
+        return ResponseEntity.ok(imapServiceFactory.getObject().deleteAllFolderMessages(Folder.toId(folderId)));
     }
 
     @DeleteMapping(path = "/{folderId}/messages", params = {"id"})
@@ -176,9 +164,7 @@ public class FolderResource implements ApplicationContextAware {
             @PathVariable("folderId") String folderId, @RequestParam("id") List<Long> messageIds) {
 
         log.debug("Deleting {} messages for folder {} ", messageIds.size(), folderId);
-        final Folder folder = imapServiceFactory.getObject().deleteMessages(Folder.toId(folderId), messageIds);
-        addLinks(folder);
-        return ResponseEntity.ok(folder);
+        return ResponseEntity.ok(imapServiceFactory.getObject().deleteMessages(Folder.toId(folderId), messageIds));
     }
 
     @GetMapping(path = "/{folderId}/messages/{messageId}")
@@ -187,7 +173,6 @@ public class FolderResource implements ApplicationContextAware {
 
         log.debug("Loading message {} from folder {}", messageId, folderId);
         final MessageWithFolder message = imapServiceFactory.getObject().getMessage(Folder.toId(folderId), messageId);
-        addLinks(message.getFolder());
         addLinks(folderId, message);
         return ResponseEntity.ok(message);
     }
@@ -213,27 +198,25 @@ public class FolderResource implements ApplicationContextAware {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(path = "/{fromFolderId}/messages/folder/{toFolderId}")
+    @PutMapping(path = "/{folderId}/messages/folder/{toFolderId}")
     public ResponseEntity<List<MessageWithFolder>> moveMessages(
-            @PathVariable("fromFolderId") String fromFolderId,
+            @PathVariable("folderId") String fromFolderId,
             @PathVariable("toFolderId") String toFolderId, @NonNull @RequestBody List<Long> messageIds) {
 
         log.debug("Moving {} messages from folder {} to folder {}", messageIds.size(), fromFolderId, toFolderId);
         final List<MessageWithFolder> movedMessages = imapServiceFactory.getObject().moveMessages(
                 Folder.toId(fromFolderId), Folder.toId(toFolderId), messageIds);
-        movedMessages.forEach(mwf -> addLinks(mwf.getFolder()));
         return ResponseEntity.ok(movedMessages);
     }
 
-    @PutMapping(path = "/{fromFolderId}/messages/{messageId}/folder/{toFolderId}")
+    @PutMapping(path = "/{folderId}/messages/{messageId}/folder/{toFolderId}")
     public ResponseEntity<List<MessageWithFolder>> moveMessage(
-            @PathVariable("fromFolderId") String fromFolderId,
+            @PathVariable("folderId") String fromFolderId,
             @PathVariable("messageId") Long messageId, @PathVariable("toFolderId") String toFolderId) {
 
         log.debug("Moving message {} from folder {} to folder {}", messageId, fromFolderId, toFolderId);
         final List<MessageWithFolder> movedMessages = imapServiceFactory.getObject().moveMessages(
                 Folder.toId(fromFolderId), Folder.toId(toFolderId), Collections.singletonList(messageId));
-        movedMessages.forEach(mwf -> addLinks(mwf.getFolder()));
         return ResponseEntity.ok(movedMessages);
     }
 
@@ -266,54 +249,6 @@ public class FolderResource implements ApplicationContextAware {
         log.debug("Setting message flagged attribute to {} in message {} from folder {}", flagged, messageId, folderId);
         imapServiceFactory.getObject().setMessagesFlagged(Folder.toId(folderId), flagged, messageId);
         return ResponseEntity.noContent().build();
-    }
-
-    private static Folder[] addLinks(Folder... folders) {
-        Stream.of(folders).forEach(FolderResource::addLinks);
-        return folders;
-    }
-
-    private static List<Folder> addLinks(List<Folder> folders) {
-        folders.forEach(FolderResource::addLinks);
-        return folders;
-    }
-
-    private static Folder addLinks(Folder folder) {
-        folder.add(linkTo(methodOn(FolderResource.class)
-                .createChildFolder(folder.getFolderId(), null))
-                .withSelfRel());
-        folder.add(linkTo(methodOn(FolderResource.class)
-                .getMessages( folder.getFolderId(), null))
-                .withRel(REL_MESSAGES).expand());
-        folder.add(linkTo(methodOn(FolderResource.class)
-                .deleteFolder(folder.getFolderId()))
-                .withRel(REL_DELETE));
-        folder.add(linkTo(methodOn(FolderResource.class)
-                .renameFolder(folder.getFolderId(), null))
-                .withRel(REL_RENAME));
-        folder.add(linkTo(methodOn(FolderResource.class)
-                .moveFolder(folder.getFolderId(), null))
-                .withRel(REL_MOVE));
-        folder.add(linkTo(methodOn(FolderResource.class)
-                .getMessage(folder.getFolderId(), null))
-                .withRel(REL_MESSAGE));
-        folder.add(linkTo(methodOn(FolderResource.class)
-                .setMessageFlagged(folder.getFolderId(), null, false))
-                .withRel(REL_MESSAGE_FLAGGED));
-        folder.add(linkTo(methodOn(FolderResource.class)
-                .moveMessage(folder.getFolderId(), null, null))
-                .withRel(REL_MESSAGE_MOVE));
-        folder.add(linkTo(methodOn(FolderResource.class)
-                .moveMessages(folder.getFolderId(), null, Collections.emptyList()))
-                .withRel(REL_MESSAGE_MOVE_BULK));
-        folder.add(linkTo(methodOn(FolderResource.class)
-                .setMessageSeen(folder.getFolderId(), null, false))
-                .withRel(REL_MESSAGE_SEEN));
-        folder.add(linkTo(methodOn(FolderResource.class)
-                .setMessagesSeen(folder.getFolderId(), null, Collections.emptyList()))
-                .withRel(REL_MESSAGE_SEEN_BULK));
-        addLinks(folder.getChildren());
-        return folder;
     }
 
     private static Attachment[] addLinks(String folderId, Message message, Attachment... attachments) {
