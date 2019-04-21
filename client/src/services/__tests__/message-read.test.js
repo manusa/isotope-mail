@@ -30,14 +30,16 @@ describe('MessageRead service test suite', () => {
       });
       const credentials = {};
       const downloadedMessages = {};
+      window.isotopeConfiguration = {_links: {
+        'folders.message': {href: 'http://test.url/api/v1/folders/{folderId}/messages/{messageId}'},
+        'folders.message.seen': {href: 'http://test.url/api/v1/folders/{folderId}/messages/{messageId}/seen'}
+      }};
       const folder = {
         unreadMessageCount: 1338,
-        _links: {
-          message: {href: 'http://test.com/folderId/messages/{messageId}'},
-          'message.seen': {href: 'http://test.com/folderId/messages/{messageId}/seen'}
-        }
+        folderId: '313373'
       };
       const message = {
+        uid: 1337,
         messageId: '1337@1337-server.com',
         folder,
         seen: false,

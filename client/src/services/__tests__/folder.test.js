@@ -87,7 +87,6 @@ describe('Folder service test suite', () => {
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
       expect(global.fetch).toHaveBeenCalledTimes(1);
-
     });
   });
   describe('moveFolder', () => {
@@ -122,9 +121,11 @@ describe('Folder service test suite', () => {
           default:
         }
       });
+      window.isotopeConfiguration = {_links: {'folders.move':
+            {href: 'http://test.url/api/v1/folders/{folderId}/parent'}}};
       const folder = {
-        type: FolderTypes.FOLDER,
-        _links: {move: {href: 'http://test.url/api/v1/folders/1337/parent'}}
+        folderId: 'Zm9sZGVyLjEzMzc=',
+        type: FolderTypes.FOLDER
       };
 
       // When
@@ -165,9 +166,11 @@ describe('Folder service test suite', () => {
           default:
         }
       });
+      window.isotopeConfiguration = {_links: {'folders.move':
+            {href: 'http://test.url/api/v1/folders/{folderId}/parent'}}};
       const folder = {
-        type: FolderTypes.FOLDER,
-        _links: {move: {href: 'http://test.url/api/v1/folders/Zm9sZGVyLjEzMzc=/parent'}}
+        folderId: 'Zm9sZGVyLjEzMzc=',
+        type: FolderTypes.FOLDER
       };
 
       // When
@@ -195,9 +198,11 @@ describe('Folder service test suite', () => {
           done();
         }
       });
+      window.isotopeConfiguration = {_links: {'folders.move':
+            {href: 'http://test.url/api/v1/folders/{folderId}/parent'}}};
       const folder = {
-        type: FolderTypes.FOLDER,
-        _links: {move: {href: 'http://test.url/api/v1/folders/1337/parent'}}
+        folderId: 'Zm9sZGVyLjEzMzc=',
+        type: FolderTypes.FOLDER
       };
 
       // When
@@ -238,11 +243,11 @@ describe('Folder service test suite', () => {
           default:
         }
       });
+      window.isotopeConfiguration = {_links: {'folders.delete': {href: 'http://test.url/api/v1/folders/{folderId}'}}};
       const folder = {
         type: FolderTypes.FOLDER,
         folderId: 'parent',
-        children: [{folderId: 'child1', children: []}, {folderId: 'child2'}, {folderId: 'child3'}],
-        _links: {delete: {href: 'http://test.url/api/v1/folders/1337'}}
+        children: [{folderId: 'child1', children: []}, {folderId: 'child2'}, {folderId: 'child3'}]
       };
 
       // When
@@ -266,9 +271,10 @@ describe('Folder service test suite', () => {
           done();
         }
       });
+      window.isotopeConfiguration = {_links: {'folders.delete': {href: 'http://test.url/api/v1/folders/{folderId}'}}};
       const folder = {
-        type: FolderTypes.FOLDER,
-        _links: {delete: {href: 'http://test.url/api/v1/folders/1337'}}
+        folderId: '1337',
+        type: FolderTypes.FOLDER
       };
 
       // When
@@ -368,9 +374,10 @@ describe('Folder service test suite', () => {
           default:
         }
       });
+      window.isotopeConfiguration = {_links: {'folders.self': {href: '://url/parent'}}};
 
       // When
-      folderService.createChildFolder(dispatch, {credentials: {}}, {_links: {self: {href: '://url/parent'}}}, 'new-folder-name');
+      folderService.createChildFolder(dispatch, {credentials: {}}, {}, 'new-folder-name');
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
@@ -398,9 +405,10 @@ describe('Folder service test suite', () => {
           default:
         }
       });
+      window.isotopeConfiguration = {_links: {'folders.self': {href: '://url/parent'}}};
 
       // When
-      folderService.createChildFolder(dispatch, {credentials: {}}, {_links: {self: {href: '://url/parent'}}}, 'new-folder-name');
+      folderService.createChildFolder(dispatch, {credentials: {}}, {}, 'new-folder-name');
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);

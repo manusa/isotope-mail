@@ -178,7 +178,7 @@ export async function getFolders(dispatch, credentials, loadChildren) {
 export function renameFolder(dispatch, user, folderToRename, newName) {
   abortFetch(abortControllerWrappers.getFoldersAbortController);
   dispatch(applicationBackendRequest());
-  fetch(folderToRename._links.rename.href, {
+  fetch(getIsotopeConfiguration()._links['folders.rename'].href.replace('{folderId}', folderToRename.folderId), {
     method: 'PUT',
     headers: credentialsHeaders(user.credentials, {'Content-Type': 'application/json'}),
     body: newName
@@ -219,7 +219,7 @@ export function moveFolder(dispatch, user, folderToMove, targetFolder) {
   abortFetch(abortControllerWrappers.getFoldersAbortController);
   dispatch(applicationBackendRequest());
   const targetFolderId = targetFolder ? targetFolder.folderId : null;
-  fetch(folderToMove._links.move.href, {
+  fetch(getIsotopeConfiguration()._links['folders.move'].href.replace('{folderId}', folderToMove.folderId), {
     method: 'PUT',
     headers: credentialsHeaders(user.credentials, {'Content-Type': 'application/json'}),
     body: targetFolderId
@@ -256,7 +256,7 @@ export function moveFolder(dispatch, user, folderToMove, targetFolder) {
 export function deleteFolder(dispatch, user, folderToDelete) {
   abortFetch(abortControllerWrappers.getFoldersAbortController);
   dispatch(applicationBackendRequest());
-  fetch(folderToDelete._links.delete.href, {
+  fetch(getIsotopeConfiguration()._links['folders.delete'].href.replace('{folderId}', folderToDelete.folderId), {
     method: 'DELETE',
     headers: credentialsHeaders(user.credentials)
   })
@@ -276,7 +276,7 @@ export function deleteFolder(dispatch, user, folderToDelete) {
  * Creates a new 1st/root level folder.
  *
  * @param dispatch {Dispatch & function}
- * @param credentials {Credentials}
+ * @param user
  * @param newFolderName name for the folder to be created
  */
 export function createRootFolder(dispatch, user, newFolderName) {
@@ -303,14 +303,14 @@ export function createRootFolder(dispatch, user, newFolderName) {
  * Creates a new folder under the specified parentFolder.
  *
  * @param dispatch {Dispatch & function}
- * @param credentials {Credentials}
+ * @param user
  * @param parentFolder {object} folder to add new child folder
  * @param newFolderName name for the folder to be created
  */
 export function createChildFolder(dispatch, user, parentFolder, newFolderName) {
   abortFetch(abortControllerWrappers.getFoldersAbortController);
   dispatch(applicationBackendRequest());
-  fetch(parentFolder._links.self.href, {
+  fetch(getIsotopeConfiguration()._links['folders.self'].href.replace('{folderId}', parentFolder.folderId), {
     method: 'POST',
     headers: credentialsHeaders(user.credentials),
     body: newFolderName

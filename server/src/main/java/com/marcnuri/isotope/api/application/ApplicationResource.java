@@ -39,6 +39,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
+
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -53,6 +55,17 @@ public class ApplicationResource {
 
     private static final String REL_APPLICATION_LOGIN = "application.login";
     private static final String REL_FOLDERS = "folders";
+    private static final String REL_FOLDERS_SELF = "folders.self";
+    private static final String REL_FOLDERS_MESSAGES = "folders.messages";
+    private static final String REL_FOLDERS_DELETE = "folders.delete";
+    private static final String REL_FOLDERS_RENAME = "folders.rename";
+    private static final String REL_FOLDERS_MOVE = "folders.move";
+    private static final String REL_FOLDERS_MESSAGE = "folders.message";
+    private static final String REL_FOLDERS_MESSAGE_FLAGGED = "folders.message.flagged";
+    private static final String REL_FOLDERS_MESSAGE_MOVE= "folders.message.move";
+    private static final String REL_FOLDERS_MESSAGE_MOVE_BULK= "folders.message.move.bulk";
+    private static final String REL_FOLDERS_MESSAGE_SEEN = "folders.message.seen";
+    private static final String REL_FOLDERS_MESSAGE_SEEN_BULK = "folders.message.seen.bulk";
     private static final String REL_SMTP = "smtp";
 
     private final IsotopeApiConfiguration configuration;
@@ -83,11 +96,53 @@ public class ApplicationResource {
         return ResponseEntity.ok(encryptedCredentials);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private ConfigurationDto toDto(IsotopeApiConfiguration configuration) {
         final ConfigurationDto ret = new ConfigurationDto();
-        ret.add(linkTo(methodOn(ApplicationResource.class).login(null)).withRel(REL_APPLICATION_LOGIN));
-        ret.add(linkTo(FolderResource.class).withRel(REL_FOLDERS));
-        ret.add(linkTo(methodOn(SmtpResource.class).sendMessage(null, null)).withRel(REL_SMTP));
+        ret.add(linkTo(methodOn(ApplicationResource.class)
+                .login(null))
+                .withRel(REL_APPLICATION_LOGIN));
+        ret.add(linkTo(FolderResource.class)
+                .withRel(REL_FOLDERS));
+        ret.add(linkTo(methodOn(FolderResource.class)
+                .createChildFolder(null, null))
+                .withRel(REL_FOLDERS_SELF));
+        ret.add(linkTo(methodOn(FolderResource.class)
+                .getMessages(null, null))
+                .withRel(REL_FOLDERS_MESSAGES));
+        ret.add(linkTo(methodOn(FolderResource.class)
+                .getMessages(null, null))
+                .withRel(REL_FOLDERS_MESSAGES));
+        ret.add(linkTo(methodOn(FolderResource.class)
+                .deleteFolder(null))
+                .withRel(REL_FOLDERS_DELETE));
+        ret.add(linkTo(methodOn(FolderResource.class)
+                .renameFolder(null, null))
+                .withRel(REL_FOLDERS_RENAME));
+        ret.add(linkTo(methodOn(FolderResource.class)
+                .moveFolder(null, null))
+                .withRel(REL_FOLDERS_MOVE));
+        ret.add(linkTo(methodOn(FolderResource.class)
+                .getMessage(null, null))
+                .withRel(REL_FOLDERS_MESSAGE));
+        ret.add(linkTo(methodOn(FolderResource.class)
+                .setMessageFlagged(null, null, false))
+                .withRel(REL_FOLDERS_MESSAGE_FLAGGED));
+        ret.add(linkTo(methodOn(FolderResource.class)
+                .moveMessage(null, null, null))
+                .withRel(REL_FOLDERS_MESSAGE_MOVE));
+        ret.add(linkTo(methodOn(FolderResource.class)
+                .moveMessages(null, null, Collections.emptyList()))
+                .withRel(REL_FOLDERS_MESSAGE_MOVE_BULK));
+        ret.add(linkTo(methodOn(FolderResource.class)
+                .setMessageSeen(null, null, false))
+                .withRel(REL_FOLDERS_MESSAGE_SEEN));
+        ret.add(linkTo(methodOn(FolderResource.class)
+                .setMessagesSeen(null, null, Collections.emptyList()))
+                .withRel(REL_FOLDERS_MESSAGE_SEEN_BULK));
+        ret.add(linkTo(methodOn(SmtpResource.class)
+                .sendMessage(null, null))
+                .withRel(REL_SMTP));
         return ret;
     }
 
