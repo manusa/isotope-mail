@@ -11,14 +11,17 @@ import MceButton from './mce-button';
 import InsertLinkDialog from './insert-link-dialog';
 import {getCredentials} from '../../selectors/application';
 import {editMessage} from '../../actions/application';
-import {sendMessage} from '../../services/smtp';
-import {prettySize} from '../../services/prettify';
+import debounce from '../../services/debounce';
+import {compressImage} from '../../services/image';
 import {getAddresses} from '../../services/message-addresses';
+import {prettySize} from '../../services/prettify';
+import {sendMessage} from '../../services/smtp';
 import {persistApplicationNewMessageContent} from '../../services/indexed-db';
 import styles from './message-editor.scss';
 import mainCss from '../../styles/main.scss';
 
-const EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED = 50;
+const SAVE_EDITOR_DEBOUNCE_PERIOD_IN_MILLIS = 500;
+const PASTED_IMAGE_COMPRESS_SIZE_THRESHOLD = 1024 * 1024;
 
 class MessageEditor extends Component {
   constructor(props) {
@@ -47,7 +50,7 @@ class MessageEditor extends Component {
     // Subject events
     this.handleOnSubjectChange = this.onSubjectChange.bind(this);
     // Editor events
-    this.handleEditorChange = this.editorChange.bind(this);
+    this.handleEditorChange = debounce(this.editorChange.bind(this), SAVE_EDITOR_DEBOUNCE_PERIOD_IN_MILLIS);
     this.handleEditorBlur = this.editorBlur.bind(this);
     this.handleSelectionChange = this.selectionChange.bind(this);
     this.handleEditorInsertLink = this.editorInsertLink.bind(this);
@@ -279,12 +282,9 @@ class MessageEditor extends Component {
    * @param content
    */
   editorChange(content) {
-    // Commit changes every 50 keystrokes
-    if (Math.abs(this.props.content.length - content.length) > EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED) {
-      this.props.editMessage({...this.props.editedMessage, content});
-      // noinspection JSIgnoredPromiseFromCall
-      persistApplicationNewMessageContent(this.props.application, content);
-    }
+    this.props.editMessage({...this.props.editedMessage, content});
+    // noinspection JSIgnoredPromiseFromCall
+    persistApplicationNewMessageContent(this.props.application, content);
   }
 
   /**
@@ -302,8 +302,12 @@ class MessageEditor extends Component {
       const editor = this.getEditor();
       const items = pasteEvent.clipboardData.items;
 
-      const insertBlob = (type, e) => {
-        const objectUrl = URL.createObjectURL(new Blob([e.target.result], {type}));
+      const insertBlob = async (type, e) => {
+        let imageBlob = new Blob([e.target.result], {type});
+        if (imageBlob.size > PASTED_IMAGE_COMPRESS_SIZE_THRESHOLD) {
+          imageBlob = await compressImage(imageBlob);
+        }
+        const objectUrl = URL.createObjectURL(imageBlob);
         editor.execCommand('mceInsertContent', false, `<img alt="" src="${objectUrl}"/>`);
       };
 
