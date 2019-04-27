@@ -101,6 +101,9 @@
       "\\.(scss|less)$": "identity-obj-proxy",
       "worker-loader?.*$": "identity-obj-proxy"
     },
+    "testEnvironmentOptions": {
+      "resources": "usable"
+    },
     "setupFilesAfterEnv": [
       "<rootDir>/jest-setup.js"
     ],
