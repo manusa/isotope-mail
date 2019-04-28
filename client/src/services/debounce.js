@@ -7,7 +7,7 @@
  */
 function debounce(func, period = 100) {
   let funcTimeout;
-  return function() {
+  function debounced() {
     const funcContext = this;
     const funcArguments = arguments;
     const runDebounced = () => {
@@ -16,7 +16,11 @@ function debounce(func, period = 100) {
     };
     clearTimeout(funcTimeout);
     funcTimeout = setTimeout(runDebounced, period);
+  }
+  debounced.cancel = function () {
+    clearTimeout(funcTimeout);
   };
+  return debounced;
 }
 
 

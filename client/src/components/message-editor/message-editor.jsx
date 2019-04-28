@@ -39,6 +39,7 @@ class MessageEditor extends Component {
     this.editorRef = React.createRef();
     this.handleSetState = patchedState => this.setState(patchedState);
     this.handleSubmit = this.submit.bind(this);
+    this.handleCloseEditor = this.closeEditor.bind(this);
     // Global events
     this.handleOnDrop = this.onDrop.bind(this);
     this.handleOnDragOver = this.onDragOver.bind(this);
@@ -51,13 +52,12 @@ class MessageEditor extends Component {
     this.handleOnSubjectChange = this.onSubjectChange.bind(this);
     // Editor events
     this.handleEditorChange = debounce(this.editorChange.bind(this), SAVE_EDITOR_DEBOUNCE_PERIOD_IN_MILLIS);
-    this.handleEditorBlur = this.editorBlur.bind(this);
     this.handleSelectionChange = this.selectionChange.bind(this);
     this.handleEditorInsertLink = this.editorInsertLink.bind(this);
   }
 
   render() {
-    const {t, className, close, application, to, cc, bcc, attachments, subject, content} = this.props;
+    const {t, className, to, cc, bcc, attachments, subject, content} = this.props;
     return (
       <div
         className={`${className} ${styles['message-editor']}`}
@@ -105,7 +105,6 @@ class MessageEditor extends Component {
               onSelectionChange={this.handleSelectionChange}
               // Force initial content (reply messages) to be persisted in IndexedDB with base64/datauri embedded images
               onInit={() => this.getEditor().uploadImages().then(() => this.getEditor().fire('Change'))}
-              onBlur={this.handleEditorBlur}
               onPaste={event => this.editorPaste(event)}
               inline={true}
               init={EDITOR_CONFIG}
@@ -130,7 +129,7 @@ class MessageEditor extends Component {
             {t('messageEditor.send')}
           </button>
           <button className={`material-icons ${mainCss['mdc-icon-button']} ${styles['action-button']} ${styles.cancel}`}
-            onClick={() => close(application)}>
+            onClick={this.handleCloseEditor}>
             delete
           </button>
         </div>
@@ -169,6 +168,13 @@ class MessageEditor extends Component {
       this.props.close(this.props.application);
     }
   }
+
+  closeEditor() {
+    // Prevent debounced function from triggering after editor is closed
+    this.handleEditorChange.cancel();
+    this.props.close();
+  }
+
   /**
    * Adds an address to the list matching the id.
    *
@@ -277,21 +283,9 @@ class MessageEditor extends Component {
   /**
    * Every change in the editor will trigger this method.
    *
-   * For performance reasons, we'll only persist the editor content every EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED
-   *
-   * @param content
+   * @param content modified in editor
    */
   editorChange(content) {
-    this.props.editMessage({...this.props.editedMessage, content});
-    // noinspection JSIgnoredPromiseFromCall
-    persistApplicationNewMessageContent(this.props.application, content);
-  }
-
-  /**
-   * Persist whatever is in the editor as changes are only persisted every EDITOR_PERSISTED_AFTER_CHARACTERS_ADDED
-   */
-  editorBlur() {
-    const content = this.getEditor().getContent();
     this.props.editMessage({...this.props.editedMessage, content});
     // noinspection JSIgnoredPromiseFromCall
     persistApplicationNewMessageContent(this.props.application, content);
@@ -309,6 +303,9 @@ class MessageEditor extends Component {
         }
         const objectUrl = URL.createObjectURL(imageBlob);
         editor.execCommand('mceInsertContent', false, `<img alt="" src="${objectUrl}"/>`);
+        // Force pastes images to be persisted in IndexedDB with base64/datauri embedded images
+        await editor.uploadImages();
+        editor.fire('Change');
       };
 
       for (let i = 0; i < items.length; i++) {
@@ -394,7 +391,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   close: application => {
     dispatch(editMessage(null));
-    // Clear content (editorBlur may be half way through -> force a message in the service worker to clear content after)
+    // Clear content (previous persist may be half way through -> force a message in the service worker to clear content after)
     // noinspection JSIgnoredPromiseFromCall
     persistApplicationNewMessageContent(application, '');
   },
@@ -405,4 +402,8 @@ const mapDispatchToProps = dispatch => ({
     sendMessage(dispatch, credentials, {inReplyTo, references, to, cc, bcc, attachments, subject, content})
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(translate()(MessageEditor));
+const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
+  close: () => dispatchProps.close(stateProps.application)
+}));
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(translate()(MessageEditor));
