@@ -59,7 +59,7 @@ class MessageList extends Component {
                     autoWidth={true}
                     autoContainerWidth={true}
                     width={99999}
-                    rowRenderer={this.renderItem.bind(this)}
+                    rowRenderer={row => this.renderItem(row)}
                     rowCount={this.props.messages.length}
                     rowHeight={32}
                   />
