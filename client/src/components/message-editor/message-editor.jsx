@@ -165,7 +165,9 @@ class MessageEditor extends Component {
       const content = this.getEditor().getContent();
       const {credentials, to, cc, bcc, subject} = this.props;
       this.props.sendMessage(credentials, {...this.props.editedMessage, to, cc, bcc, subject, content});
-      this.props.close(this.props.application);
+      // Prevent debounced function from triggering after editor is closed
+      this.handleEditorChange.cancel();
+      this.props.close();
     }
   }
 
