@@ -51,12 +51,14 @@ class MessageList extends Component {
           <Fragment>
             <ClearFolderListItem />
             <ul className={`${mainCss['mdc-list']} ${styles.list}`}>
-              <AutoSizer defaultHeight={100}>
-                {({height, width}) => (
+              <AutoSizer defaultHeight={100} disableWidth={true}>
+                {({height}) => (
                   <List
                     className={styles.virtualList}
                     height={height}
-                    width={width}
+                    autoWidth={true}
+                    autoContainerWidth={true}
+                    width={99999}
                     rowRenderer={this.renderItem.bind(this)}
                     rowCount={this.props.messages.length}
                     rowHeight={32}
