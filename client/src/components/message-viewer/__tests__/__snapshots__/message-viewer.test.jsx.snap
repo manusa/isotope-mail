@@ -2,53 +2,65 @@
 
 exports[`MessageViewer component test suite Snapshot render Should render MessageViewer 1`] = `
 <div
-  className=" messageViewer"
+  className=" message-viewer"
 >
   <div
-    className="header"
+    className="message-viewer__header"
   >
-    <h1
-      className="subject"
-    >
-      News from 1337
-      <div
-        className="folder mdc-chip"
-        onClick={[Function]}
-      >
-        <div
-          className="mdc-chip__text"
-        >
-          Folder 1337
-        </div>
-      </div>
-    </h1>
     <div
-      className="fromDate"
+      className="message-viewer__subject-container"
     >
       <div
-        className="from"
+        className="message-viewer__gravatar"
+      >
+        <img
+          className="message-viewer__gravatar-image"
+          src="https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e?d=retro&"
+        />
+      </div>
+      <h1
+        className="message-viewer__subject"
+      >
+        News from 1337
+        <div
+          className="message-viewer__folder mdc-chip"
+          onClick={[Function]}
+        >
+          <div
+            className="mdc-chip__text"
+          >
+            Folder 1337
+          </div>
+        </div>
+      </h1>
+    </div>
+    <div
+      className="message-viewer__from-date-container"
+    >
+      <div
+        className="message-viewer__from"
       >
         <span
-          className="fromName"
+          className="message-viewer__name"
         >
           "
         </span>
         <span
-          className="email"
+          className="message-viewer__email"
         />
       </div>
       <div
-        className="date"
+        className="message-viewer__date"
       >
         06/23/1912, 12:13:37 AM
       </div>
     </div>
     <Translate(HeaderTo)
-      className="to"
+      className="message-viewer__to"
     />
   </div>
   <div
-    className="body"
+    className="message-viewer__body"
   >
     <Spinner
       canvasClassName=""
@@ -57,7 +69,7 @@ exports[`MessageViewer component test suite Snapshot render Should render Messag
       visible={false}
     />
     <div
-      className="attachments"
+      className="message-viewer__attachments"
     >
       <Connect(AttachmentCard)
         attachment={

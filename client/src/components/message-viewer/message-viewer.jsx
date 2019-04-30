@@ -5,11 +5,11 @@ import Spinner from '../spinner/spinner';
 import HeaderTo from './header-to';
 import AttachmentCard from '../attachment/attachment-card';
 import {selectFolder} from '../../actions/application';
-import {clearSelectedMessage} from '../../services/application';
 import {getSelectedFolder} from '../../selectors/folders';
+import {clearSelectedMessage} from '../../services/application';
+import {imageUrl} from '../../services/gravatar';
 import sanitize from '../../services/sanitize';
 import mainCss from '../../styles/main.scss';
-import styles from './message-viewer.scss';
 
 export function addressGroups(address) {
   const ret = {
@@ -29,31 +29,39 @@ export class MessageViewer extends Component {
     const firstFrom = addressGroups(message.from && message.from.length > 0 ? message.from[0] : '');
     const attachments = message.attachments ? message.attachments.filter(a => !a.contentId) : [];
     return (
-      <div className={`${this.props.className} ${styles.messageViewer}`}>
-        <div className={styles.header}>
-          <h1 className={styles.subject}>
-            {this.props.selectedMessage.subject}
-            <div className={`${styles.folder} ${mainCss['mdc-chip']}`} onClick={() => this.onFolderClick(folder)}>
-              <div className={mainCss['mdc-chip__text']}>{folder.name}</div>
+      <div className={`${this.props.className} ${mainCss['message-viewer']}`}>
+        <div className={mainCss['message-viewer__header']}>
+          <div className={mainCss['message-viewer__subject-container']}>
+            <div className={mainCss['message-viewer__gravatar']}>
+              <img
+                className={mainCss['message-viewer__gravatar-image']}
+                src={imageUrl(firstFrom.email, {defaultImage: 'retro'})}
+              />
             </div>
-          </h1>
-          <div className={styles.fromDate}>
-            <div className={styles.from}>
-              <span className={styles.fromName}>{firstFrom.name}</span>
-              <span className={styles.email}>{firstFrom.email}</span>
+            <h1 className={mainCss['message-viewer__subject']}>
+              {this.props.selectedMessage.subject}
+              <div className={`${mainCss['message-viewer__folder']} ${mainCss['mdc-chip']}`} onClick={() => this.onFolderClick(folder)}>
+                <div className={mainCss['mdc-chip__text']}>{folder.name}</div>
+              </div>
+            </h1>
+          </div>
+          <div className={mainCss['message-viewer__from-date-container']}>
+            <div className={mainCss['message-viewer__from']}>
+              <span className={mainCss['message-viewer__name']}>{firstFrom.name}</span>
+              <span className={mainCss['message-viewer__email']}>{firstFrom.email}</span>
             </div>
-            <div className={styles.date}>
+            <div className={mainCss['message-viewer__date']}>
               {new Date(message.receivedDate).toLocaleString(navigator.language, {
                 year: 'numeric', month: '2-digit', day: '2-digit',
                 hour: '2-digit', minute: '2-digit', second: '2-digit'
               })}
             </div>
           </div>
-          <HeaderTo className={styles.to} recipients={message.recipients} />
+          <HeaderTo className={mainCss['message-viewer__to']} recipients={message.recipients} />
         </div>
-        <div className={styles.body}>
+        <div className={mainCss['message-viewer__body']}>
           <Spinner visible={this.props.refreshMessageActiveRequests > 0 && !message.content}/>
-          <div className={styles.attachments}>
+          <div className={mainCss['message-viewer__attachments']}>
             {attachments.map((a, index) => <AttachmentCard key={index} attachment={a} />)}
           </div>
           <div dangerouslySetInnerHTML={{__html: sanitize.sanitize(message.content)}}>
