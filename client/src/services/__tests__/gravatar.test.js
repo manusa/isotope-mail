@@ -8,7 +8,7 @@ describe('gravatar service test suite', () => {
       // When
       const result = imageUrl(email);
       // Then
-      expect(result).toBe('https://www.gravatar.com/avatar/db0ae606e556df390f743c73e69ad436?');
+      expect(result).toBe('https://www.gravatar.com/avatar/db0ae606e556df390f743c73e69ad436');
     });
     test('e-mail and options with default image, should return Gravatar URL', () => {
       // Given
@@ -16,7 +16,7 @@ describe('gravatar service test suite', () => {
       // When
       const result = imageUrl(email, {defaultImage: 'retro'});
       // Then
-      expect(result).toBe('https://www.gravatar.com/avatar/db0ae606e556df390f743c73e69ad436?d=retro&');
+      expect(result).toBe('https://www.gravatar.com/avatar/db0ae606e556df390f743c73e69ad436?d=retro');
     });
   });
 });

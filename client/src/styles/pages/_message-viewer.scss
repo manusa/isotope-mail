@@ -1,6 +1,7 @@
 @import '../../styles/partials/variables';
 
-$gravater-size: 40px;
+$gravatar-size: 40px;
+$gravatar-margin: 6px;
 
 .message-viewer {
   position: relative;
@@ -12,22 +13,26 @@ $gravater-size: 40px;
 
     .message-viewer__subject-container {
       display: flex;
+      align-items: center;
+      margin-bottom: $gravatar-margin;
 
       .message-viewer__gravatar {
-        width: $gravater-size;
-        height: $gravater-size;
-        margin: 0 6px 6px 0;
+        align-self: flex-start;
+        width: $gravatar-size;
+        height: $gravatar-size;
+        margin: 0 $gravatar-margin 0 0;
 
         .message-viewer__gravatar-image {
           border-radius: 50%;
           width: 100%;
           height: 100%;
+          pointer-events: none;
         }
       }
       .message-viewer__subject {
         flex: 1;
         min-width: 0;
-        margin-top: 0;
+        margin: 0;
         font-size: 1.25 * $font-size-body;
         font-weight: $font-weight-normal * 1.25;
 

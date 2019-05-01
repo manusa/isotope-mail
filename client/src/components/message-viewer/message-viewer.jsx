@@ -35,7 +35,7 @@ export class MessageViewer extends Component {
             <div className={mainCss['message-viewer__gravatar']}>
               <img
                 className={mainCss['message-viewer__gravatar-image']}
-                src={imageUrl(firstFrom.email, {defaultImage: 'retro'})}
+                src={imageUrl(firstFrom.email.length > 0 ? firstFrom.email : firstFrom.name, {defaultImage: 'retro'})}
               />
             </div>
             <h1 className={mainCss['message-viewer__subject']}>
