@@ -15,7 +15,7 @@ exports[`MessageViewer component test suite Snapshot render Should render Messag
       >
         <img
           className="message-viewer__gravatar-image"
-          src="https://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e?d=retro&"
+          src="https://www.gravatar.com/avatar/b15835f133ff2e27c7cb28117bfae8f4?d=retro"
         />
       </div>
       <h1
