@@ -237,6 +237,7 @@ public class FolderResource implements ApplicationContextAware {
 
         log.debug("Setting {} messages in folder {} seen attribute to {}" , messageIds.size(), folderId, seen);
         imapServiceFactory.getObject().setMessagesSeen(
+                // lgtm[java/dereferenced-value-may-be-null]
                 Folder.toId(folderId), seen, messageIds.stream().mapToLong(Long::longValue).toArray());
         return ResponseEntity.noContent().build();
     }
