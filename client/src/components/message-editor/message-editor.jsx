@@ -135,7 +135,7 @@ class MessageEditor extends Component {
         </div>
         <InsertLinkDialog
           visible={this.state.linkDialogVisible}
-          closeDialog={() => this.setState({linkDialogVisible: false, linkDialogInitialUrl: ''})}
+          closeDialog={() => this.setState({linkDialogVisible: false, linkDialogUrl: ''})}
           onChange={e => this.setState({linkDialogUrl: e.target.value})}
           url={this.state.linkDialogUrl} insertLink={this.handleEditorInsertLink}
         />

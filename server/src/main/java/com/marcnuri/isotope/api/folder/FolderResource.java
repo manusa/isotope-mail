@@ -232,8 +232,8 @@ public class FolderResource implements ApplicationContextAware {
 
     @PutMapping(path = "/{folderId}/messages/seen/{seen}")
     public ResponseEntity<Void> setMessagesSeen(
-            @PathVariable("folderId") String folderId,
-            @PathVariable("seen") Boolean seen, @RequestBody List<Long> messageIds) {
+            @PathVariable("folderId") @NonNull String folderId,
+            @PathVariable("seen") @NonNull Boolean seen, @RequestBody List<Long> messageIds) {
 
         log.debug("Setting {} messages in folder {} seen attribute to {}" , messageIds.size(), folderId, seen);
         imapServiceFactory.getObject().setMessagesSeen(

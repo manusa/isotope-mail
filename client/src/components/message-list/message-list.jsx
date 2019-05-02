@@ -216,7 +216,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(selectMessage(message));
     readMessage(dispatch, credentials, downloadedMessages, folder, message);
   },
-  messageSelected: (messages, selected, shiftKey) => dispatch(setSelected(messages, selected, shiftKey)),
+  messageSelected: (messages, selected) => dispatch(setSelected(messages, selected)),
   preloadMessages: (credentials, folder, messageUids) => preloadMessages(dispatch, credentials, folder, messageUids),
   toggleMessageFlagged: (credentials, folder, message) =>
     setMessageFlagged(dispatch, credentials, folder, message, !message.flagged)
