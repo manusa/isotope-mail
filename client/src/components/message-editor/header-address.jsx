@@ -90,7 +90,8 @@ export class HeaderAddress extends Component {
   }
 
   onSuggestionsFetchRequested({value}) {
-    this.setState({suggestions: this.props.getAddresses(value)});
+    const suggestions = this.props.getAddresses(value);
+    this.setState({suggestions});
   }
 
   onSuggestionsClearRequested() {

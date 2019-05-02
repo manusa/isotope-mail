@@ -3,7 +3,7 @@ import {ActionTypes} from '../actions/action-types';
 import {explodeFolders, FolderTypes, gatherFolderIds, removeAttributesFromFolders} from '../services/folder';
 
 function _updateFolder(folderToReplace, folders) {
-  if (!folders || !folders.length > 0) {
+  if (!folders || folders.length === 0) {
     return [];
   }
   return folders.map(f => {

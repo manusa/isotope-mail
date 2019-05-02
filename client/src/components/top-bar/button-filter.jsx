@@ -41,7 +41,7 @@ export class ButtonFilter extends React.Component {
   }
 
   onToggleDialog(event) {
-    this.setState({dialogVisible: !this.state.dialogVisible});
+    this.setState(previousState => ({dialogVisible: !previousState.dialogVisible}));
     event.stopPropagation();
   }
 
