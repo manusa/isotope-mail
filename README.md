@@ -50,7 +50,7 @@ You can send e-mails to the demo account (isotope@isotope) by setting the SMTP s
 
 ## Focus on Code Quality
  [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=manusa_isotope-mail&metric=ncloc)](https://sonarcloud.io/dashboard?id=manusa_isotope-mail) 
- [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/manusa/isotope-mail.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/manusa/isotope-mail/context:javascript)  
+ [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/manusa/isotope-mail.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/manusa/isotope-mail/context:javascript) 
  [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/manusa/isotope-mail.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/manusa/isotope-mail/context:java) 
  [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=manusa_isotope-mail&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=manusa_isotope-mail) 
  [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=manusa_isotope-mail&metric=security_rating)](https://sonarcloud.io/dashboard?id=manusa_isotope-mail) 
