@@ -34,6 +34,32 @@ describe('MessageViewer component test suite', () => {
       expect(messageViewer).toMatchSnapshot();
     });
   });
+  describe('component events', () => {
+    test('componentDidMount', () => {
+      // Given
+      const originalAddEventListener = window.addEventListener;
+      window.addEventListener = jest.fn(() => originalAddEventListener.apply(null, arguments));
+      // When
+      shallow(<MessageViewer {...props}/>);
+      // Then
+      expect(window.addEventListener).toHaveBeenCalledTimes(1);
+    });
+    test('componentWillUnmount', () => {
+      // Given
+      const messageViewer = shallow(<MessageViewer {...props}/>);
+      const originalRemoveEventListener = window.removeEventListener;
+      window.removeEventListener = jest.fn((type, listener) => {
+        if (type === 'click') {
+          expect(listener).toBe(messageViewer.instance().handleWindowOnClick);
+        }
+        return originalRemoveEventListener.apply(null, arguments);
+      });
+      // When
+      messageViewer.unmount();
+      // Then
+      expect(window.removeEventListener).toHaveBeenCalledTimes(1);
+    });
+  });
   describe('addressGroups', () => {
     test('addressGroups, formattedAddress, should return name and e-mail', () => {
       // Given
