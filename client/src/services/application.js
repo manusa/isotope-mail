@@ -101,6 +101,25 @@ export function editNewMessage(dispatch) {
   dispatch(editMessage({to: [], cc: [], bcc: [], attachments: [], subject: '', content: ''}));
 }
 
+export function mailto(dispatch, to, headers = {}) {
+  const lowerCasedHeaders = Object.entries(headers)
+    .reduce((acc, [k, v]) => {
+      acc[k.toLowerCase()] = v;
+      return acc;
+    }, {});
+  dispatch(editMessage({
+    to: [
+      ...(to ? [to] : []),
+      ...(lowerCasedHeaders.to ? lowerCasedHeaders.to.split(',').map(addr => addr.trim()) : [])
+    ],
+    cc: lowerCasedHeaders.cc ? lowerCasedHeaders.cc.split(',').map(addr => addr.trim()) : [],
+    bcc: lowerCasedHeaders.bcc ? lowerCasedHeaders.bcc.split(',').map(addr => addr.trim()) : [],
+    attachments: [],
+    subject: lowerCasedHeaders.subject || '',
+    content: lowerCasedHeaders.body || ''
+  }));
+}
+
 export function editMessageAsNew(dispatch, message) {
   const recipientMapper = r => r.address;
   const to = message.recipients.filter(r => r.type === 'To').map(recipientMapper);

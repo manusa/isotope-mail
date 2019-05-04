@@ -61,6 +61,88 @@ describe('Application service test suite', () => {
       expect(dispatch).toHaveBeenCalledTimes(1);
     });
   });
+  describe('mailto', () => {
+    test('no to, no headers, should dispatch editMessage', () => {
+      // Given
+      const dispatch = jest.fn(action => {
+        expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
+        const editedMessage = action.payload;
+        expect(editedMessage.to).toHaveLength(0);
+        expect(editedMessage.cc).toHaveLength(0);
+        expect(editedMessage.bcc).toHaveLength(0);
+        expect(editedMessage.attachments).toHaveLength(0);
+        expect(editedMessage.subject).toEqual('');
+        expect(editedMessage.content).toEqual('');
+      });
+      // When
+      applicationService.mailto(dispatch);
+      // Then
+      expect(dispatch).toHaveBeenCalledTimes(1);
+    });
+    test('valid to, no headers, should dispatch editMessage', () => {
+      // Given
+      const dispatch = jest.fn(action => {
+        expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
+        const editedMessage = action.payload;
+        expect(editedMessage.to).toEqual(['to@be.com']);
+        expect(editedMessage.cc).toHaveLength(0);
+        expect(editedMessage.bcc).toHaveLength(0);
+        expect(editedMessage.attachments).toHaveLength(0);
+        expect(editedMessage.subject).toEqual('');
+        expect(editedMessage.content).toEqual('');
+      });
+      const to = 'to@be.com';
+      // When
+      applicationService.mailto(dispatch, to);
+      // Then
+      expect(dispatch).toHaveBeenCalledTimes(1);
+    });
+    test('no to, valid headers, should dispatch editMessage', () => {
+      // Given
+      const dispatch = jest.fn(action => {
+        expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
+        const editedMessage = action.payload;
+        expect(editedMessage.to).toEqual(['to@be.com']);
+        expect(editedMessage.cc).toHaveLength(0);
+        expect(editedMessage.bcc).toHaveLength(0);
+        expect(editedMessage.attachments).toHaveLength(0);
+        expect(editedMessage.subject).toEqual('');
+        expect(editedMessage.content).toEqual('');
+      });
+      const to = null;
+      const headers = {
+        to: 'to@be.com'
+      };
+      // When
+      applicationService.mailto(dispatch, to, headers);
+      // Then
+      expect(dispatch).toHaveBeenCalledTimes(1);
+    });
+    test('valid to, valid headers, should dispatch editMessage', () => {
+      // Given
+      const dispatch = jest.fn(action => {
+        expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
+        const editedMessage = action.payload;
+        expect(editedMessage.to).toEqual(['to@be.com']);
+        expect(editedMessage.cc).toEqual(['cc@be.com', 'othercc@be.com']);
+        expect(editedMessage.bcc).toEqual(['bcc@be.com']);
+        expect(editedMessage.attachments).toHaveLength(0);
+        expect(editedMessage.subject).toEqual('Hence it is a subject of inquiry which can on no account be neglected');
+        expect(editedMessage.content).toEqual('Strange body');
+      });
+      const to = 'to@be.com';
+      const headers = {
+        Cc: 'cc@be.com ,  othercc@be.com',
+        bcc: 'bcc@be.com',
+        subJect: 'Hence it is a subject of inquiry which can on no account be neglected',
+        body: 'Strange body'
+      };
+      // When
+      applicationService.mailto(dispatch, to, headers);
+      // Then
+      expect(dispatch).toHaveBeenCalledTimes(1);
+    });
+  });
   describe('editMessageAsNew', () => {
     test('editMessageAsNew with valid message, should dispatch editMessage', () => {
       // Given
