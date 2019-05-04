@@ -6,7 +6,7 @@ import HeaderTo from './header-to';
 import AttachmentCard from '../attachment/attachment-card';
 import {selectFolder} from '../../actions/application';
 import {getSelectedFolder} from '../../selectors/folders';
-import {clearSelectedMessage} from '../../services/application';
+import {clearSelectedMessage, mailto} from '../../services/application';
 import {imageUrl} from '../../services/gravatar';
 import sanitize from '../../services/sanitize';
 import mainCss from '../../styles/main.scss';
@@ -23,6 +23,11 @@ export function addressGroups(address) {
 }
 
 export class MessageViewer extends Component {
+  constructor(props) {
+    super(props);
+    this.handleWindowOnClick = this.windowOnClick.bind(this);
+  }
+
   render() {
     const folder = this.props.currentFolder;
     const message = this.props.selectedMessage;
@@ -71,8 +76,31 @@ export class MessageViewer extends Component {
     );
   }
 
+  componentDidMount() {
+    window.addEventListener('click', this.handleWindowOnClick);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('click', this.handleWindowOnClick);
+  }
+
   onFolderClick(folder) {
     this.props.showFolder(folder);
+  }
+
+  windowOnClick(event) {
+    const {target} = event;
+    const link = target.tagName === 'A' ? target : target.closest('A');
+    if (link && link.href && link.href.indexOf('mailto:') === 0) {
+      event.preventDefault();
+      const mailtoUrl = new URL(link.href);
+      const headers = Array.from(mailtoUrl.searchParams.entries()).reduce(
+        (acc, [k, v]) => {
+          acc[k] = v;
+          return acc;
+        }, {});
+      this.props.mailto(mailtoUrl.pathname, headers);
+    }
   }
 }
 
@@ -96,7 +124,8 @@ const mapDispatchToProps = dispatch => ({
   showFolder: folder => {
     clearSelectedMessage(dispatch);
     dispatch(selectFolder(folder));
-  }
+  },
+  mailto: (to, headers) => mailto(dispatch, to, headers)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MessageViewer);
