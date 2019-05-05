@@ -48,7 +48,8 @@
     "markRead": "Mark read",
     "more": "More",
     "messageViewerMenu": {
-      "download": "Download (.eml)"
+      "download": "Download (.eml)",
+      "listUnsubscribe": "Unsubscribe from this list"
     },
     "deleteFromTrashDialog": {
       "title": "Confirm deletion",

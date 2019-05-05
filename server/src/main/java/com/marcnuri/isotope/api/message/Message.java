@@ -46,6 +46,7 @@ public class Message extends IsotopeResource implements Serializable {
     private static final String CET_ZONE_ID = "CET";
     public static final String HEADER_IN_REPLY_TO = "In-Reply-To";
     public static final String HEADER_REFERENCES = "References";
+    public static final String HEADER_LIST_UNSUBSCRIBE = "List-Unsubscribe";
 
     private Long uid;
     private String messageId;
@@ -65,6 +66,7 @@ public class Message extends IsotopeResource implements Serializable {
     private List<Attachment> attachments;
     private List<String> references;
     private List<String> inReplyTo;
+    private List<String> listUnsubscribe;
 
     public Long getUid() {
         return uid;
@@ -202,6 +204,14 @@ public class Message extends IsotopeResource implements Serializable {
         this.inReplyTo = inReplyTo;
     }
 
+    public List<String> getListUnsubscribe() {
+        return listUnsubscribe;
+    }
+
+    public void setListUnsubscribe(List<String> listUnsubscribe) {
+        this.listUnsubscribe = listUnsubscribe;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -224,13 +234,14 @@ public class Message extends IsotopeResource implements Serializable {
                 Objects.equals(content, message.content) &&
                 Objects.equals(attachments, message.attachments) &&
                 Objects.equals(references, message.references) &&
-                Objects.equals(inReplyTo, message.inReplyTo);
+                Objects.equals(inReplyTo, message.inReplyTo) &&
+                Objects.equals(listUnsubscribe, message.listUnsubscribe);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), uid, messageId, modseq, from, replyTo, recipients, subject, receivedDate, size, flagged, seen, recent, deleted, content, attachments, references, inReplyTo);
+        return Objects.hash(super.hashCode(), uid, messageId, modseq, from, replyTo, recipients, subject, receivedDate, size, flagged, seen, recent, deleted, content, attachments, references, inReplyTo, listUnsubscribe);
     }
 
     /**
@@ -270,6 +281,8 @@ public class Message extends IsotopeResource implements Serializable {
                         Optional.ofNullable(imapMessage.getHeader(HEADER_IN_REPLY_TO)).orElse(new String[0])));
                 ret.setReferences(Arrays.asList(
                         Optional.ofNullable(imapMessage.getHeader(HEADER_REFERENCES)).orElse(new String[0])));
+                ret.setListUnsubscribe(Arrays.asList(
+                        Optional.ofNullable(imapMessage.getHeader(HEADER_LIST_UNSUBSCRIBE)).orElse(new String[0])));
                 final Flags flags = imapMessage.getFlags();
                 ret.setFlagged(flags.contains(Flags.Flag.FLAGGED));
                 ret.setSeen(flags.contains(Flags.Flag.SEEN));
