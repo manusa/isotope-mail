@@ -48,7 +48,8 @@
     "markRead": "Marcar como leído",
     "more": "Más",
     "messageViewerMenu": {
-      "download": "Descargar (.eml)"
+      "download": "Descargar (.eml)",
+      "listUnsubscribe": "Cancelar la suscripción a esta lista"
     },
     "deleteFromTrashDialog": {
       "title": "Confirmar borrado",

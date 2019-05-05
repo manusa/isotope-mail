@@ -9,6 +9,22 @@ exports[`MessageViewerMenu component test suite Snapshot render DownloadListItem
 </li>
 `;
 
+exports[`MessageViewerMenu component test suite Snapshot render ListUnsubscribeListItem Snapshot render, listUnsubscribe with invalid entry, should render empty ListUnsubscribeListItem 1`] = `""`;
+
+exports[`MessageViewerMenu component test suite Snapshot render ListUnsubscribeListItem Snapshot render, listUnsubscribe with valid entries, should render ListUnsubscribeListItem 1`] = `
+<li>
+  <a
+    className="mdc-list-item"
+    href="mailto:unsubscribe@list.com"
+    target="_blank"
+  >
+    topBar.messageViewerMenu.listUnsubscribe
+  </a>
+</li>
+`;
+
+exports[`MessageViewerMenu component test suite Snapshot render ListUnsubscribeListItem Snapshot render, no listUnsubscribe, should render empty ListUnsubscribeListItem 1`] = `""`;
+
 exports[`MessageViewerMenu component test suite Snapshot render MessageViewerMenu Snapshot render, visible, should render message-viewer-menu 1`] = `
 <div
   aria-hidden={false}
@@ -19,6 +35,10 @@ exports[`MessageViewerMenu component test suite Snapshot render MessageViewerMen
     className="mdc-list mdc-list--dense"
   >
     <DownloadListItem
+      t={[MockFunction]}
+    />
+    <ListUnsubscribeListItem
+      message={Object {}}
       t={[MockFunction]}
     />
   </ul>
@@ -35,6 +55,10 @@ exports[`MessageViewerMenu component test suite Snapshot render MessageViewerMen
     className="mdc-list mdc-list--dense"
   >
     <DownloadListItem
+      t={[MockFunction]}
+    />
+    <ListUnsubscribeListItem
+      message={Object {}}
       t={[MockFunction]}
     />
   </ul>

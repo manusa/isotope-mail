@@ -3,6 +3,16 @@
 $gravatar-size: 40px;
 $gravatar-margin: 6px;
 
+.message-viewer-menu {
+  right: 0;
+  min-width: 150px;
+  z-index: map-get($z-index, thermosphere);
+
+  .mdc-list-item {
+    white-space: nowrap;
+  }
+}
+
 .message-viewer {
   position: relative;
   padding: $default-spacing;
