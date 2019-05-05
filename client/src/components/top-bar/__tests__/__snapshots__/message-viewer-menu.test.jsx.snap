@@ -16,6 +16,7 @@ exports[`MessageViewerMenu component test suite Snapshot render ListUnsubscribeL
   <a
     className="mdc-list-item"
     href="mailto:unsubscribe@list.com"
+    rel="noopener noreferrer"
     target="_blank"
   >
     topBar.messageViewerMenu.listUnsubscribe

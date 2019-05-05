@@ -33,7 +33,8 @@ export const ListUnsubscribeListItem = ({t, message}) => {
         <li>
           <a
             className={mainCss['mdc-list-item']}
-            href={entries[1]} target="_blank"
+            href={entries[1]}
+            target="_blank" rel="noopener noreferrer"
           >
             {t('topBar.messageViewerMenu.listUnsubscribe')}
           </a>
