@@ -1,0 +1,134 @@
+{
+    "login": {
+      "Login": "Login",
+      "Host": "Host",
+      "Port": "Port",
+      "User": "Benutzer",
+      "Password": "Passwort",
+      "Advanced": "Erweitert",
+      "ImapSSL": "IMAP SSL",
+      "SMTP": "SMTP",
+      "SmtpSSL": "SMTP SSL",
+      "actions": {
+        "Login": "Login"
+      },
+      "errors": {
+        "BLACKLISTED": "Dieser Host ist nicht in der Whitelist",
+        "IMAP": "IMAP Zugangsdaten sind inkorrekt",
+        "SMTP": "SMTP Zugangsdaten sind inkorrekt"
+      }
+    },
+    "configurationNotFound": {
+      "Sorry": "Entschuldigung",
+      "message": "Die Serverkonfiguration konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
+      "Retry": "Erneut versuchen"
+    },
+    "sideBar": {
+      "hide": "Seitenleiste ausblenden",
+      "newFolder": "Neuer Ordner",
+      "folderList": {
+        "folderActions": "Ordneraktionen",
+        "delete": "Löschen",
+        "newSubFolder": "Neuer Unterordner",
+        "rename": "Umbenennen"
+      },
+      "errors": {
+        "noSSL": "Die Verbindung zum Server ist nicht sicher",
+        "diskQuotaExceeded": "Speicherplatz überschritten (IndexedDB)"
+      }
+    },
+    "topBar": {
+      "showSideBar": "Seitenleiste einblenden",
+      "backToList": "Zurück zur Übersicht",
+      "quickFilter": "Schnellfilter",
+      "replyAll": "Allen antworten",
+      "forward": "Weiterleiten",
+      "delete": "Löschen",
+      "markUnread": "Als ungelesen markieren",
+      "markRead": "Als gelesen markieren",
+      "more": "Mehr",
+      "messageViewerMenu": {
+        "download": "Download (.eml)",
+        "listUnsubscribe": "Von der Liste abmelden"
+      },
+      "deleteFromTrashDialog": {
+        "title": "Löschen bestätigen",
+        "message": "Die Datei wird unwiderruflich gelöscht. Wollen Sie diese Datei wirklich löschen?",
+        "delete": "Löschen",
+        "cancel": "Abbrechen"
+      }
+    },
+    "composeButton": {
+      "compose": "Verfassen"
+    },
+    "messageList": {
+      "emptyFolder": "Ordner leeren",
+      "clearFolderDialog": {
+        "title": "Ordner leeren",
+        "message": "Sind Sie sicher alle Dateien in diesem Ordner unwiderruflich zu löschen?",
+        "deleteAll": "Alle löschen",
+        "cancel": "Abbrechen"
+      },
+      "moveEmails": "Verschiebe {{emailCount}} E-Mails",
+      "filters": {
+        "All": "Alle",
+        "Read": "Gelesen",
+        "Unread": "Ungelesen",
+        "Flagged": "Markiert"
+      }
+    },
+    "messageViewer": {
+      "to": "to",
+      "cc": "cc",
+      "bcc": "bcc"
+    },
+    "messageEditor": {
+      "to": "An",
+      "cc": "CC",
+      "bcc": "BCC",
+      "subject": "Betreff",
+      "send": "Senden",
+      "dropZoneMessage": "Dateien hier ablegen",
+      "insertLinkDialog": {
+        "title": "Link einfügen",
+        "cancel": "Abbrechen",
+        "ok": "Ok"
+      }
+    },
+    "forwardAction": {
+      "From": "Von",
+      "To": "An",
+      "Cc": "CC",
+      "Date": "Datum",
+      "Subject": "Betreff"
+    },
+    "replyAction": {
+      "From": "Von",
+      "Date": "Datum",
+      "Subject": "Betreff"
+    },
+    "messageSnackbar": {
+      "sendingMessage" : "Nachricht wird gesendet ({{progress}}%)",
+      "messageSent" : "Nachricht gesendet",
+      "messageError" : "Senden der Nachricht fehlgeschlagen",
+      "retry" : "Erneut versuchen"
+    },
+    "createFolderDialog": {
+      "title": "Ordner erstellen",
+      "message": "Bitte geben Sie den Namen des zu erstellenden Ordners an",
+      "folderNameLabel": "Ordner Name",
+      "cancel": "Abbrechen",
+      "create": "Erstellen"
+    },
+    "renameFolderDialog": {
+      "title": "Ordner umbenennen",
+      "message": "Bitte geben Sie einen neuen Namen für den Ordner {{folderName}} an",
+      "folderNameLabel": "Neuer Ordner Name",
+      "cancel": "Abbrechen",
+      "rename": "Umbenennen"
+    },
+    "notifications": {
+      "newMail": "Neue Nachrichten erhalten"
+    }
+  }
+  
