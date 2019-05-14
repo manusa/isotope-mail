@@ -33,7 +33,7 @@
         "rename": "Umbenennen"
       },
       "errors": {
-        "noSSL": "Die Verbindung zum Server ist nicht sicher",
+        "noSSL": "Die Verbindung zum Server ist nicht gesichert",
         "diskQuotaExceeded": "Speicherplatz überschritten (IndexedDB)"
       }
     },
@@ -65,7 +65,7 @@
       "emptyFolder": "Ordner leeren",
       "clearFolderDialog": {
         "title": "Ordner leeren",
-        "message": "Sind Sie sicher alle Dateien in diesem Ordner unwiderruflich zu löschen?",
+        "message": "Sind Sie sicher alle Dateien in diesem Ordner unwiderruflich löschen zu wollen?",
         "deleteAll": "Alle löschen",
         "cancel": "Abbrechen"
       },
@@ -78,9 +78,9 @@
       }
     },
     "messageViewer": {
-      "to": "to",
-      "cc": "cc",
-      "bcc": "bcc"
+      "to": "An",
+      "cc": "CC",
+      "bcc": "BCC"
     },
     "messageEditor": {
       "to": "An",
