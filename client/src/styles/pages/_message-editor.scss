@@ -1,4 +1,4 @@
-@import '../../styles/partials/variables';
+@import '../partials/variables';
 @import '@material/chips/variables';
 @import '@material/chips/mixins';
 
@@ -21,17 +21,17 @@ $header-chip-height: 21px;
   padding: $default-spacing;
   background-color: $editor-background-color;
 
-  .dropZone {
+  .message-editor__drop-zone {
     pointer-events: none;
     position: absolute;
     z-index: 2;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     height: 100%;
     width: 100%;
     background-color: rgba(0, 0, 0, 0.05);
 
-    .dropZoneMessage {
+    .message-editor__drop-zone-message {
       pointer-events: none;
       position: absolute;
       left: $default-spacing;
@@ -54,7 +54,7 @@ $header-chip-height: 21px;
     }
   }
 
-  .header {
+  .message-editor__header {
 
     input,
     input:focus {
@@ -69,13 +69,13 @@ $header-chip-height: 21px;
       }
     }
 
-    .address {
+    .message-editor__header-address {
       display: flex;
       flex-wrap: wrap;
       padding: $header-field-spacing 0;
       border-bottom: 1px solid $editor-border-color;
 
-      .chip {
+      .message-editor__header-chip {
         @include mdc-chip-fill-color($header-chip-fill-color);
         @include mdc-chip-outline(1px, solid, $header-chip-outline-color);
         @include mdc-chip-height($header-chip-height);
@@ -98,11 +98,11 @@ $header-chip-height: 21px;
         line-height: $header-chip-height;
       }
 
-      .autoSuggest {
+      .message-editor__header-auto-suggest {
         display: flex;
         flex: 1;
 
-        .autoSuggestMenu {
+        .message-editor__header-auto-suggest-menu {
           left: 0;
           top: 100%;
           max-width: 100%;
@@ -115,7 +115,7 @@ $header-chip-height: 21px;
       }
     }
 
-    .subject {
+    .message-editor__header-subject {
       input {
         padding: $header-field-spacing 0;
         width: 100%;
@@ -123,7 +123,7 @@ $header-chip-height: 21px;
     }
   }
 
-  .editor-wrapper {
+  .message-editor__wrapper {
     flex: 1;
     height: 1px;
     min-height: 1px;
@@ -132,7 +132,7 @@ $header-chip-height: 21px;
     flex-direction: column;
     border: 1px solid $editor-border-color;
 
-    .editor-container {
+    .message-editor__container {
       flex: 1;
 
       display: flex;
@@ -143,10 +143,10 @@ $header-chip-height: 21px;
       padding: $editor-container-padding;
       margin-bottom: $editor-container-padding;
 
-      .attachments {
+      .message-editor__attachments {
         margin-top: auto;
 
-        .attachment {
+        .message-editor__attachment {
           position: relative;
           margin: 0 0 9px;
           padding: 4px;
@@ -157,16 +157,16 @@ $header-chip-height: 21px;
           display: flex;
           align-items: center;
 
-          .fileName {
+          .message-editor__file-name {
             font-weight: $font-weight-bold;
           }
 
-          .size {
+          .message-editor__size {
             margin-left: 4px;
             font-size: $font-size-body-2 * 0.8;
           }
 
-          .delete {
+          .message-editor__delete {
             margin-left: auto;
             min-width: auto;
             height: 18px;
@@ -180,12 +180,12 @@ $header-chip-height: 21px;
       }
     }
 
-    .button-container {
+    .message-editor__button-container {
       margin: auto $editor-container-padding $editor-container-padding $editor-container-padding;
       display: flex;
       flex-direction: row;
 
-      .button {
+      .message-editor__button {
         min-width: auto;
         color: $editor-color;
 
@@ -201,29 +201,29 @@ $header-chip-height: 21px;
           border-bottom-left-radius: 0px;
         }
 
-        &.active {
+        &--active {
           background-color: transparentize($editor-color, 0.93);
         }
 
-        i.buttonIcon {
+        i.message-editor__button-icon {
           margin: 0;
         }
       }
     }
   }
 
-  .action-buttons {
+  .message-editor__action-buttons {
     display: flex;
     align-items: center;
     justify-content: flex-start;
 
-    .action-button {
+    .message-editor__action-button {
 
-      &.send {
+      &.message-editor__send {
         margin-left: 0;
       }
 
-      &.cancel {
+      &.message-editor__cancel {
         margin-left: auto;
       }
     }

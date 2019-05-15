@@ -16,9 +16,7 @@ class MceButton extends Component {
       <button className={`mdc-button ${className} ${active ? activeClassName : ''}`}
         onMouseDown={this.handleOnToggle}
       >
-        {icon ?
-          <i className={`material-icons mdc-button__icon ${iconClassName}`} aria-hidden="true">{icon}</i> : null
-        }
+        {icon && <i className={`material-icons mdc-button__icon ${iconClassName}`} aria-hidden="true">{icon}</i>}
         {label}
       </button>
     );

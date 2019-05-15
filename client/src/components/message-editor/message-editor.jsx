@@ -6,8 +6,9 @@ import {Editor} from '@tinymce/tinymce-react';
 import EDITOR_BUTTONS from './editor-buttons';
 import EDITOR_CONFIG from './editor-config';
 import Button from '../buttons/button';
+import IconButton from '../buttons/icon-button';
 import HeaderAddress from './header-address';
-import MceButton from './mce-button';
+import MessageEditorButtons from './message-editor-buttons';
 import InsertLinkDialog from './insert-link-dialog';
 import {getCredentials} from '../../selectors/application';
 import {editMessage} from '../../actions/application';
@@ -17,7 +18,6 @@ import {getAddresses} from '../../services/message-addresses';
 import {prettySize} from '../../services/prettify';
 import {sendMessage} from '../../services/smtp';
 import {persistApplicationNewMessageContent} from '../../services/indexed-db';
-import styles from './message-editor.scss';
 import mainCss from '../../styles/main.scss';
 
 const SAVE_EDITOR_DEBOUNCE_PERIOD_IN_MILLIS = 500;
@@ -39,6 +39,7 @@ class MessageEditor extends Component {
     this.editorRef = React.createRef();
     this.handleSetState = patchedState => this.setState(patchedState);
     this.handleSubmit = this.submit.bind(this);
+    this.handleOpenFileDialog = this.openFileDialog.bind(this);
     this.handleCloseEditor = this.closeEditor.bind(this);
     // Global events
     this.handleOnDrop = this.onDrop.bind(this);
@@ -60,44 +61,38 @@ class MessageEditor extends Component {
     const {t, className, to, cc, bcc, attachments, subject, content} = this.props;
     return (
       <div
-        className={`${className} ${styles['message-editor']}`}
+        className={`${className} ${mainCss['message-editor']}`}
         onDrop={this.handleOnDrop} onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave}>
         {this.state.dropZoneActive ?
-          <div className={styles.dropZone}>
-            <div className={styles.dropZoneMessage}>
+          <div className={mainCss['message-editor__drop-zone']}>
+            <div className={mainCss['message-editor__drop-zone-message']}>
               <i className={'material-icons'}>attach_file</i>
               {t('messageEditor.dropZoneMessage')}
             </div>
           </div>
           : null}
-        <div className={styles.header}>
+        <div className={mainCss['message-editor__header']}>
           <form ref={this.headerFormRef}>
             <HeaderAddress id={'to'} addresses={to} onAddressAdd={this.handleAddAddress}
               onAddressRemove={this.handleRemoveAddress}
               onAddressMove={this.handleMoveAddress}
-              className={styles.address} chipClassName={styles.chip}
-              autoSuggestClassName={styles.autoSuggest} autoSuggestMenuClassName={styles.autoSuggestMenu}
               getAddresses={this.props.getAddresses} label={t('messageEditor.to')} />
             <HeaderAddress id={'cc'} addresses={cc} onAddressAdd={this.handleAddAddress}
               onAddressRemove={this.handleRemoveAddress}
               onAddressMove={this.handleMoveAddress}
-              className={styles.address} chipClassName={styles.chip}
-              autoSuggestClassName={styles.autoSuggest} autoSuggestMenuClassName={styles.autoSuggestMenu}
               getAddresses={this.props.getAddresses} label={t('messageEditor.cc')} />
             <HeaderAddress id={'bcc'} addresses={bcc} onAddressAdd={this.handleAddAddress}
               onAddressRemove={this.handleRemoveAddress}
               onAddressMove={this.handleMoveAddress}
-              className={styles.address} chipClassName={styles.chip}
-              autoSuggestClassName={styles.autoSuggest} autoSuggestMenuClassName={styles.autoSuggestMenu}
               getAddresses={this.props.getAddresses} label={t('messageEditor.bcc')} />
-            <div className={styles.subject}>
+            <div className={mainCss['message-editor__header-subject']}>
               <input type={'text'} placeholder={t('messageEditor.subject')}
                 value={subject} onChange={this.handleOnSubjectChange} />
             </div>
           </form>
         </div>
-        <div className={styles['editor-wrapper']} onClick={() => this.editorWrapperClick()}>
-          <div className={styles['editor-container']}>
+        <div className={mainCss['message-editor__wrapper']} onClick={() => this.editorWrapperClick()}>
+          <div className={mainCss['message-editor__container']}>
             <Editor
               ref={this.editorRef}
               initialValue={content}
@@ -109,29 +104,37 @@ class MessageEditor extends Component {
               inline={true}
               init={EDITOR_CONFIG}
             />
-            <div className={styles.attachments}>
+            <div className={mainCss['message-editor__attachments']}>
               {attachments.map((a, index) =>
-                <div key={index} className={styles.attachment}>
-                  <span className={styles.fileName}>{a.fileName}</span>
-                  <span className={styles.size}>({prettySize(a.size, 0)})</span>
-                  <Button className={styles.delete} icon={'delete'} onClick={() => this.removeAttachment(a)}/>
+                <div key={index} className={mainCss['message-editor__attachment']}>
+                  <span className={mainCss['message-editor__file-name']}>{a.fileName}</span>
+                  <span className={mainCss['message-editor__size']}>({prettySize(a.size, 0)})</span>
+                  <Button className={mainCss['message-editor__delete']}
+                    icon={'delete'} onClick={() => this.removeAttachment(a)}/>
                 </div>
               )}
             </div>
           </div>
-          {this.renderEditorButtons()}
+          <MessageEditorButtons
+            editor={this.getEditor()} editorState={this.state.editorState} parentSetState={this.handleSetState}/>
         </div>
-        <div className={styles['action-buttons']}>
+        <div className={mainCss['message-editor__action-buttons']}>
           <button
             className={`${mainCss['mdc-button']} ${mainCss['mdc-button--unelevated']}
-            ${styles['action-button']} ${styles.send}`}
+            ${mainCss['message-editor__action-button']} ${mainCss['message-editor__send']}`}
             disabled={to.length + cc.length + bcc.length === 0} onClick={this.handleSubmit}>
             {t('messageEditor.send')}
           </button>
-          <button className={`material-icons ${mainCss['mdc-icon-button']} ${styles['action-button']} ${styles.cancel}`}
+          <IconButton
+            className={`${mainCss['message-editor__action-button']}`}
+            onClick={this.handleOpenFileDialog}>
+            attach_file
+          </IconButton>
+          <IconButton
+            className={`${mainCss['message-editor__action-button']} ${mainCss['message-editor__cancel']}`}
             onClick={this.handleCloseEditor}>
             delete
-          </button>
+          </IconButton>
         </div>
         <InsertLinkDialog
           visible={this.state.linkDialogVisible}
@@ -141,22 +144,6 @@ class MessageEditor extends Component {
         />
       </div>
     );
-  }
-
-  renderEditorButtons() {
-    return <div className={`${mainCss['mdc-card']} ${styles['button-container']}`}>
-      {Object.entries(EDITOR_BUTTONS).map(([k, b]) => (
-        <MceButton
-          key={k}
-          className={styles.button}
-          activeClassName={styles.active}
-          iconClassName={styles.buttonIcon}
-          active={this.state.editorState && this.state.editorState[k] === true}
-          label={b.label}
-          icon={b.icon}
-          onToggle={() => b.toggleFunction(this.getEditor(), b, this.handleSetState)}
-        />))}
-    </div>;
   }
 
   submit() {
@@ -221,16 +208,7 @@ class MessageEditor extends Component {
     this.props.editMessage(updatedMessage);
   }
 
-  onSubjectChange(event) {
-    const target = event.target;
-    const updatedMessage = {...this.props.editedMessage};
-    this.props.editMessage({...updatedMessage, subject: target.value});
-  }
-
-  onDrop(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.setState({dropZoneActive: false});
+  addAttachments(files) {
     const addAttachment = (file, dataUrl) => {
       const newAttachment = {
         fileName: file.name,
@@ -243,11 +221,24 @@ class MessageEditor extends Component {
         [...updatedMessage.attachments, newAttachment] : [newAttachment];
       this.props.editMessage(updatedMessage);
     };
-    Array.from(event.dataTransfer.files).forEach(file => {
+    Array.from(files).forEach(file => {
       const fileReader = new FileReader();
       fileReader.onload = addAttachment.bind(this, file);
       fileReader.readAsDataURL(file);
     });
+  }
+
+  onSubjectChange(event) {
+    const target = event.target;
+    const updatedMessage = {...this.props.editedMessage};
+    this.props.editMessage({...updatedMessage, subject: target.value});
+  }
+
+  onDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.setState({dropZoneActive: false});
+    this.addAttachments(event.dataTransfer.files);
     return true;
   }
 
@@ -364,6 +355,17 @@ class MessageEditor extends Component {
         break;
       }
     }
+  }
+
+  openFileDialog() {
+    const fileDialog = document.createElement('input');
+    fileDialog.setAttribute('type', 'file');
+    fileDialog.setAttribute('multiple', 'multiple');
+    fileDialog.style.display = 'none';
+    fileDialog.addEventListener('change', event => {
+      this.addAttachments(event.target.files);
+    });
+    fileDialog.click();
   }
 }
 
