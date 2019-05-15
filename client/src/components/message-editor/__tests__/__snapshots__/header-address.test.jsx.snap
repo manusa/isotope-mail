@@ -2,7 +2,7 @@
 
 exports[`HeaderAddress component test suite Snapshot render, should render HeaderAddress 1`] = `
 <div
-  className="Business mdc-menu-surface--anchor"
+  className="message-editor__header-address mdc-menu-surface--anchor"
   onClick={[Function]}
   onDragOver={[Function]}
   onDrop={[Function]}
@@ -12,7 +12,7 @@ exports[`HeaderAddress component test suite Snapshot render, should render Heade
     :
   </label>
   <div
-    className="FirstClassChips mdc-chip"
+    className="message-editor__header-chip mdc-chip"
     draggable={true}
     key="0"
     onDragStart={[Function]}
@@ -31,7 +31,7 @@ exports[`HeaderAddress component test suite Snapshot render, should render Heade
     </i>
   </div>
   <div
-    className="FirstClassChips mdc-chip"
+    className="message-editor__header-chip mdc-chip"
     draggable={true}
     key="1"
     onDragStart={[Function]}
@@ -75,10 +75,10 @@ exports[`HeaderAddress component test suite Snapshot render, should render Heade
     suggestions={Array []}
     theme={
       Object {
-        "container": " ",
+        "container": "message-editor__header-auto-suggest ",
         "suggestion": "mdc-list-item",
         "suggestionHighlighted": "mdc-list-item--activated",
-        "suggestionsContainer": "mdc-menu mdc-menu-surface ",
+        "suggestionsContainer": "mdc-menu mdc-menu-surface message-editor__header-auto-suggest-menu",
         "suggestionsContainerOpen": "mdc-menu-surface--open",
         "suggestionsList": "mdc-list mdc-list--dense",
       }

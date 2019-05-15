@@ -37,6 +37,7 @@ const CSS_LOADER = {
   options: {
     modules: true,
     sourceMap: devMode,
+    camelCase: true,
     importLoaders: 1,
     localIdentName: '[local]___[hash:base64:5]',
     /**

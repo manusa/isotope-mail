@@ -25,16 +25,16 @@ export class HeaderAddress extends Component {
   render() {
     const {
       id,
-      className, chipClassName, autoSuggestClassName, autoSuggestMenuClassName,
       label, addresses, onAddressRemove
     } = this.props;
     const {suggestions, value} = this.state;
     return (
-      <div className={`${className} ${mainCss['mdc-menu-surface--anchor']}`} onClick={() => this.fieldClick()}
+      <div className={`${mainCss['message-editor__header-address']} ${mainCss['mdc-menu-surface--anchor']}`}
+        onClick={() => this.fieldClick()}
         onDragOver={e => e.preventDefault()} onDrop={e => this.onDrop(e, id)}>
         <label>{label}:</label>
         {addresses.map((address, index) => (
-          <div key={index} className={`${chipClassName} ${mainCss['mdc-chip']}`}
+          <div key={index} className={`${mainCss['message-editor__header-chip']} ${mainCss['mdc-chip']}`}
             draggable={true}
             onDragStart={event => HeaderAddress.onAddressDragStart(event, id, address)}>
             <div className={mainCss['mdc-chip__text']}>{address}</div>
@@ -60,8 +60,9 @@ export class HeaderAddress extends Component {
           onSuggestionsClearRequested={this.handleOnSuggestionsClearRequested}
           onSuggestionSelected={this.handleOnSuggestionSelected}
           theme={{
-            container: `${autoSuggestClassName} `,
-            suggestionsContainer: `${mainCss['mdc-menu']} ${mainCss['mdc-menu-surface']} ${autoSuggestMenuClassName}`,
+            container: `${mainCss['message-editor__header-auto-suggest']} `,
+            suggestionsContainer:
+              `${mainCss['mdc-menu']} ${mainCss['mdc-menu-surface']} ${mainCss['message-editor__header-auto-suggest-menu']}`,
             suggestionsContainerOpen: `${mainCss['mdc-menu-surface--open']}`,
             suggestionsList: `${mainCss['mdc-list']} ${mainCss['mdc-list--dense']}`,
             suggestion: mainCss['mdc-list-item'],
@@ -185,10 +186,6 @@ export class HeaderAddress extends Component {
 HeaderAddress.propTypes = {
   t: PropTypes.func,
   id: PropTypes.string.isRequired,
-  className: PropTypes.string,
-  chipClassName: PropTypes.string,
-  autoSuggestClassName: PropTypes.string,
-  autoSuggestMenuClassName: PropTypes.string,
   addresses: PropTypes.arrayOf(PropTypes.string),
   label: PropTypes.string,
   getAddresses: PropTypes.func,
@@ -198,10 +195,6 @@ HeaderAddress.propTypes = {
 };
 
 HeaderAddress.defaultProps = {
-  className: '',
-  chipClassName: '',
-  autoSuggestClassName: '',
-  autoSuggestMenuClassName: '',
   addresses: [],
   label: '',
   onAddressAdd: () => {},
