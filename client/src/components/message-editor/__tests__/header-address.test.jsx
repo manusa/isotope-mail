@@ -186,5 +186,77 @@ describe('HeaderAddress component test suite', () => {
         setTimeout(() => expect(reportValidity).toHaveBeenCalledTimes(1));
       });
     });
+    describe('DragAndDrop', () => {
+      test('addressOnDragStart', () => {
+        // Given
+        const props = {
+          id: 'to',
+          addresses: ['name@email.com', 'other@e-mail.mail']
+        };
+        const event = {
+          stopPropagation: jest.fn(),
+          target: {
+            classList: {
+              add: jest.fn(className => {
+                expect(className).toEqual('message-editor__header-chip--dragging');
+              })
+            }
+          },
+          dataTransfer: {
+            setDragImage: jest.fn(),
+            setData: jest.fn()
+          }
+        };
+        const headerAddress = shallow(<HeaderAddress {...props}/>);
+        // When
+        headerAddress.find('.message-editor__header-chip').first().props().onDragStart(event);
+        // Then
+        expect(event.stopPropagation).toHaveBeenCalledTimes(1);
+        expect(event.target.classList.add).toHaveBeenCalledTimes(1);
+        expect(event.dataTransfer.setDragImage).toHaveBeenCalledTimes(1);
+        expect(event.dataTransfer.setData).toHaveBeenCalledTimes(1);
+      });
+      test('addressOnDragEnd', () => {
+        // Given
+        const props = {
+          id: 'to',
+          addresses: ['name@email.com', 'other@e-mail.mail']
+        };
+        const event = {
+          stopPropagation: jest.fn(),
+          target: {
+            classList: {
+              remove: jest.fn(className => {
+                expect(className).toEqual('message-editor__header-chip--dragging');
+              })
+            }
+          }
+        };
+        const headerAddress = shallow(<HeaderAddress {...props}/>);
+        // When
+        headerAddress.find('.message-editor__header-chip').first().props().onDragEnd(event);
+        // Then
+        expect(event.stopPropagation).toHaveBeenCalledTimes(1);
+        expect(event.target.classList.remove).toHaveBeenCalledTimes(1);
+      });
+      test('HeaderOnDrop', () => {
+        // Given
+        const props = {
+          id: 'to'
+        };
+        const event = {
+          preventDefault: jest.fn(),
+          dataTransfer: {
+            types: ['application/json'],
+            getData: jest.fn(() => '""')
+          }
+        };
+        const headerAddress = shallow(<HeaderAddress {...props}/>);
+        // When
+        headerAddress.props().onDrop(event);
+        // Then
+        expect(event.preventDefault).toHaveBeenCalledTimes(1);
+      });
+    });
   });
 });
