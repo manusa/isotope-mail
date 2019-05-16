@@ -15,6 +15,7 @@ exports[`HeaderAddress component test suite Snapshot render, should render Heade
     className="message-editor__header-chip mdc-chip"
     draggable={true}
     key="0"
+    onDragEnd={[Function]}
     onDragStart={[Function]}
   >
     <div
@@ -34,6 +35,7 @@ exports[`HeaderAddress component test suite Snapshot render, should render Heade
     className="message-editor__header-chip mdc-chip"
     draggable={true}
     key="1"
+    onDragEnd={[Function]}
     onDragStart={[Function]}
   >
     <div
