@@ -36,7 +36,9 @@ export class HeaderAddress extends Component {
         {addresses.map((address, index) => (
           <div key={index} className={`${mainCss['message-editor__header-chip']} ${mainCss['mdc-chip']}`}
             draggable={true}
-            onDragStart={event => HeaderAddress.onAddressDragStart(event, id, address)}>
+            onDragStart={event => HeaderAddress.onAddressDragStart(event, id, address)}
+            onDragEnd={HeaderAddress.onAddressDragEnd}
+          >
             <div className={mainCss['mdc-chip__text']}>{address}</div>
             <i onClick={() => onAddressRemove(id, address)} className={`material-icons ${mainCss['mdc-chip__icon']}
                ${mainCss['mdc-chip__icon--trailing']}`}>cancel</i>
@@ -163,10 +165,31 @@ export class HeaderAddress extends Component {
     }
   }
 
+  /**
+   * Adds class to indicate element is being dragged to target DOM element.
+   * Adds payload with address information.
+   *
+   * @param event drag start
+   * @param id of current header addess (to, cc, bcc)
+   * @param address to be moved
+   */
   static onAddressDragStart(event, id, address) {
     event.stopPropagation();
+    event.target.classList.add(mainCss['message-editor__header-chip--dragging']);
     const payload = {id, address};
+    if (event.dataTransfer.setDragImage) {
+      event.dataTransfer.setDragImage(event.target, 15, 15);
+    }
     event.dataTransfer.setData('application/json', JSON.stringify(payload));
+  }
+
+  /**
+   * Removes class to indicate element is being dragged from target DOM element
+   * @param event drag end
+   */
+  static onAddressDragEnd(event) {
+    event.stopPropagation();
+    event.target.classList.remove(mainCss['message-editor__header-chip--dragging']);
   }
 
   onDrop(event, id) {

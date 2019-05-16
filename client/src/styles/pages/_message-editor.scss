@@ -81,13 +81,20 @@ $header-chip-height: 21px;
         @include mdc-chip-height($header-chip-height);
         margin: $header-chip-margin;
 
-        i {
+        .mdc-chip__icon {
           font-size: 15px;
           height: 15px;
           width: 15px;
 
           &:hover {
             color: darken($mdc-chip-ink-color-default, 30%);
+          }
+        }
+
+        &.message-editor__header-chip--dragging {
+          &::before,
+          &::after {
+            display:none;
           }
         }
       }
