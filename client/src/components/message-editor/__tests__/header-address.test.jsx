@@ -242,7 +242,8 @@ describe('HeaderAddress component test suite', () => {
       test('HeaderOnDrop', () => {
         // Given
         const props = {
-          id: 'to'
+          id: 'to',
+          onAddressMove: jest.fn()
         };
         const event = {
           preventDefault: jest.fn(),
@@ -256,6 +257,7 @@ describe('HeaderAddress component test suite', () => {
         headerAddress.props().onDrop(event);
         // Then
         expect(event.preventDefault).toHaveBeenCalledTimes(1);
+        expect(props.onAddressMove).toHaveBeenCalledTimes(1);
       });
     });
   });
