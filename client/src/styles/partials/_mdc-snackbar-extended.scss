@@ -3,10 +3,4 @@
 
 .mdc-snackbar {
   z-index: map-get($z-index, exosphere);
-
-  &.mdc-snackbar__no_action .mdc-snackbar__text {
-    margin-left: auto;
-    margin-right: auto;
-    padding-right: 0;
-  }
 }
