@@ -54,6 +54,10 @@ $header-chip-height: 21px;
     }
   }
 
+  .message-editor__file-dialog-input {
+    display: none;
+  }
+
   .message-editor__header {
 
     input,

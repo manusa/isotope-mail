@@ -39,12 +39,15 @@ class MessageEditor extends Component {
     this.editorRef = React.createRef();
     this.handleSetState = patchedState => this.setState(patchedState);
     this.handleSubmit = this.submit.bind(this);
-    this.handleOpenFileDialog = this.openFileDialog.bind(this);
     this.handleCloseEditor = this.closeEditor.bind(this);
     // Global events
     this.handleOnDrop = this.onDrop.bind(this);
     this.handleOnDragOver = this.onDragOver.bind(this);
     this.handleOnDragLeave = this.onDragLeave.bind(this);
+    // File dialog related
+    this.fileDialogRef = React.createRef();
+    this.handleOpenFileDialog = this.openFileDialog.bind(this);
+    this.handleOnFileDialogChange = this.onFileDialogChange.bind(this);
     // Header Address Events
     this.handleAddAddress = this.addAddress.bind(this);
     this.handleRemoveAddress = this.removeAddress.bind(this);
@@ -63,14 +66,17 @@ class MessageEditor extends Component {
       <div
         className={`${className} ${mainCss['message-editor']}`}
         onDrop={this.handleOnDrop} onDragOver={this.handleOnDragOver} onDragLeave={this.handleOnDragLeave}>
-        {this.state.dropZoneActive ?
+        {this.state.dropZoneActive &&
           <div className={mainCss['message-editor__drop-zone']}>
             <div className={mainCss['message-editor__drop-zone-message']}>
               <i className={'material-icons'}>attach_file</i>
               {t('messageEditor.dropZoneMessage')}
             </div>
           </div>
-          : null}
+        }
+        <input
+          type="file" multiple="multiple" className={mainCss['message-editor__file-dialog-input']}
+          ref={this.fileDialogRef} onChange={this.handleOnFileDialogChange} />
         <div className={mainCss['message-editor__header']}>
           <form ref={this.headerFormRef}>
             <HeaderAddress id={'to'} addresses={to} onAddressAdd={this.handleAddAddress}
@@ -358,14 +364,11 @@ class MessageEditor extends Component {
   }
 
   openFileDialog() {
-    const fileDialog = document.createElement('input');
-    fileDialog.setAttribute('type', 'file');
-    fileDialog.setAttribute('multiple', 'multiple');
-    fileDialog.style.display = 'none';
-    fileDialog.addEventListener('change', event => {
-      this.addAttachments(event.target.files);
-    });
-    fileDialog.click();
+    this.fileDialogRef.current.click();
+  }
+
+  onFileDialogChange(event) {
+    this.addAttachments(event.target.files);
   }
 }
 
