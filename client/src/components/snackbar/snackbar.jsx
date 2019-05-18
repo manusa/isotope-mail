@@ -9,21 +9,23 @@ const Snackbar = ({show, message, buttonAction, buttonLabel, alignStart}) => {
       aria-live="assertive" aria-atomic="true" aria-hidden={!show}
       className={`${mainCss['mdc-snackbar']}
       ${hasButton ? '' : mainCss['mdc-snackbar__no_action']}
-      ${alignStart ? mainCss['mdc-snackbar--align-start'] : ''}
-      ${show ? mainCss['mdc-snackbar--active'] : ''}`}>
-      <div className={`${mainCss['mdc-snackbar__text']}`}>{message}</div>
-      {hasButton &&
-        <div className={mainCss['mdc-snackbar__action-wrapper']}>
-          <button
-            type='button'
-            onClick={buttonAction}
-            className={`${mainCss['mdc-snackbar__action-button']}`}
-            {...(buttonLabel.length === 0 && {'aria-hidden': true})}
-          >
-            {buttonLabel}
-          </button>
-        </div>
-      }
+      ${alignStart ? mainCss['mdc-snackbar--leading'] : ''}
+      ${show ? mainCss['mdc-snackbar--open'] : ''}`}>
+      <div className={mainCss['mdc-snackbar__surface']}>
+        <div className={`${mainCss['mdc-snackbar__label']}`}>{message}</div>
+        {hasButton &&
+          <div className={mainCss['mdc-snackbar__actions']}>
+            <button
+              type='button'
+              onClick={buttonAction}
+              className={`${mainCss['mdc-button']} ${mainCss['mdc-snackbar__action']}`}
+              {...(buttonLabel.length === 0 && {'aria-hidden': true})}
+            >
+              {buttonLabel}
+            </button>
+          </div>
+        }
+      </div>
     </div>
   );
 };
