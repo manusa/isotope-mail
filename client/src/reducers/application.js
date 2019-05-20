@@ -49,8 +49,11 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
       }
       return newState;
     }
-    case ActionTypes.APPLICATION_MESSAGE_FILTER_SET: {
+    case ActionTypes.APPLICATION_MESSAGE_FILTER_KEY_SET: {
       return {...state, messageFilterKey: action.payload};
+    }
+    case ActionTypes.APPLICATION_MESSAGE_FILTER_TEXT_SET: {
+      return {...state, messageFilterText: action.payload};
     }
     case ActionTypes.APPLICATION_MESSAGE_SELECT:
       return {...state, selectedMessage: {...action.payload}};

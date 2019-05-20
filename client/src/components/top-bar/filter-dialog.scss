@@ -1,11 +1,39 @@
 @import '../../styles/partials/variables';
+@import '@material/list/variables';
+
+$icon-size: 24px;
 
 .filter-dialog {
   right: 0px;
   min-width: 150px;
   z-index: map-get($z-index, thermosphere);
 
-  &__item{
+  &__item-text {
+    position: relative;
+    padding: 0;
+    z-index: 0;
+    .text-field {
+      z-index: 2;
+      outline: 0;
+      border: 0;
+      padding: 0 $mdc-list-side-padding;
+      height: 100%;
+      line-height: 100%;
+      background: transparent;
+    }
+    .icon {
+      position: absolute;
+      z-index: 1;
+      font-size: $icon-size;
+      left: $mdc-list-side-padding;
+      transition: left 200ms ease-out;
+    }
+    .text-field:focus + .icon,
+    &--active .icon {
+      left: calc(100% - #{$icon-size} - #{$mdc-list-side-padding});
+    }
+  }
+  &__item-check{
     .check {
       font-size: 18px;
       padding-right: 1rem;

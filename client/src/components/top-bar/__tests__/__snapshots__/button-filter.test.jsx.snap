@@ -1,5 +1,26 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ButtonFilter component test suite Snapshot render Snapshot render, active, should render activated button-filter 1`] = `
+<span
+  className="button-filter mdc-menu-surface--anchor"
+  isotip="topBar.quickFilter"
+  isotip-hidden="false"
+  isotip-position="bottom-end"
+  isotip-size="small"
+>
+  <TopBarButton
+    className="button-filter--button active"
+    onClick={[Function]}
+  >
+    filter_list
+  </TopBarButton>
+  <Connect(Translate(FilterDialog))
+    closeFilterDialogHandler={[Function]}
+    visible={false}
+  />
+</span>
+`;
+
 exports[`ButtonFilter component test suite Snapshot render Snapshot render, activeMessageFilter=ALL, should render deactivated button-filter 1`] = `
 <span
   className="button-filter mdc-menu-surface--anchor"
@@ -15,6 +36,7 @@ exports[`ButtonFilter component test suite Snapshot render Snapshot render, acti
     filter_list
   </TopBarButton>
   <Connect(Translate(FilterDialog))
+    closeFilterDialogHandler={[Function]}
     visible={false}
   />
 </span>
@@ -35,6 +57,27 @@ exports[`ButtonFilter component test suite Snapshot render Snapshot render, acti
     filter_list
   </TopBarButton>
   <Connect(Translate(FilterDialog))
+    visible={false}
+  />
+</span>
+`;
+
+exports[`ButtonFilter component test suite Snapshot render Snapshot render, not active, should render deactivated button-filter 1`] = `
+<span
+  className="button-filter mdc-menu-surface--anchor"
+  isotip="topBar.quickFilter"
+  isotip-hidden="false"
+  isotip-position="bottom-end"
+  isotip-size="small"
+>
+  <TopBarButton
+    className="button-filter--button "
+    onClick={[Function]}
+  >
+    filter_list
+  </TopBarButton>
+  <Connect(Translate(FilterDialog))
+    closeFilterDialogHandler={[Function]}
     visible={false}
   />
 </span>
