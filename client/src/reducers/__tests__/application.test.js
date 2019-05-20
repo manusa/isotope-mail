@@ -73,17 +73,19 @@ describe('Application reducer test suite', () => {
   });
   test('APPLICATION_FOLDER_SELECT, new folderId should be set', () => {
     // Given
-    const initialState = {...INITIAL_STATE.application};
-
+    const initialState = {...INITIAL_STATE.application, messageFilterKey: 'READ', messageFilterText: '1337'};
     // When
     const updatedState = application(initialState, {
       type: ActionTypes.APPLICATION_FOLDER_SELECT,
       payload: {folderId: '1337'}});
-
     // Then
     expect(initialState).not.toBe(updatedState);
     expect(initialState.selectedFolderId).not.toEqual('1337');
+    expect(initialState.messageFilterKey).not.toBeNull();
+    expect(initialState.messageFilterText).not.toEqual('');
     expect(updatedState.selectedFolderId).toEqual('1337');
+    expect(updatedState.messageFilterKey).toBeNull();
+    expect(updatedState.messageFilterText).toEqual('');
   });
   test('APPLICATION_FOLDER_CREATE, createFolderParentId was null, should change', () => {
     const updatedState = application({...INITIAL_STATE.application, createFolderParentId: null},
