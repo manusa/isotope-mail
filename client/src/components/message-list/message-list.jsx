@@ -9,7 +9,7 @@ import ClearFolderListItem from './clear-folder-list-item';
 import {DroppablePayloadTypes} from '../folders/folder-list';
 import {getCredentials} from '../../selectors/application';
 import {getSelectedFolder} from '../../selectors/folders';
-import {getSelectedFolderMessageList} from '../../selectors/messages';
+import {selectedFolderFilteredMessageList} from '../../selectors/messages';
 import {prettyDate, prettySize} from '../../services/prettify';
 import {selectMessage} from '../../actions/application';
 import {setSelected} from '../../actions/messages';
@@ -206,7 +206,7 @@ const mapStateToProps = state => ({
   credentials: getCredentials(state),
   selectedFolder: getSelectedFolder(state) || {},
   activeRequests: state.messages.activeRequests,
-  messages: getSelectedFolderMessageList(state),
+  messages: selectedFolderFilteredMessageList(state),
   selectedMessages: state.messages.selected,
   downloadedMessages: state.application.downloadedMessages
 });

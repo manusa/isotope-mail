@@ -5,21 +5,21 @@ import MessageFilters from '../../../services/message-filters';
 
 describe('ButtonFilter component test suite', () => {
   describe('Snapshot render', () => {
-    test('Snapshot render, activeMessageFilter=ALL, should render deactivated button-filter', () => {
+    test('Snapshot render, not active, should render deactivated button-filter', () => {
       // Given
-      const props = {t: jest.fn(arg => arg), activeMessageFilter: MessageFilters.ALL};
+      const props = {t: jest.fn(arg => arg), active: false};
       // When
-      const filterDialog = shallow(<ButtonFilter {...props}/>);
+      const buttonFilter = shallow(<ButtonFilter {...props}/>);
       // Then
-      expect(filterDialog).toMatchSnapshot();
+      expect(buttonFilter).toMatchSnapshot();
     });
-    test('Snapshot render, activeMessageFilter=READ, should render activated button-filter', () => {
+    test('Snapshot render, active, should render activated button-filter', () => {
       // Given
-      const props = {t: jest.fn(arg => arg), activeMessageFilter: MessageFilters.READ};
+      const props = {t: jest.fn(arg => arg), active: true};
       // When
-      const filterDialog = shallow(<ButtonFilter {...props}/>);
+      const buttonFilter = shallow(<ButtonFilter {...props}/>);
       // Then
-      expect(filterDialog).toMatchSnapshot();
+      expect(buttonFilter).toMatchSnapshot();
     });
   });
   describe('Events tests', () => {
@@ -30,33 +30,44 @@ describe('ButtonFilter component test suite', () => {
       window.addEventListener = jest.fn(() => originalAddEventListener.apply(null, arguments));
       window.removeEventListener = jest.fn(() => originalRemoveEventListener.apply(null, arguments));
       const props = {t: jest.fn(arg => arg), activeMessageFilter: MessageFilters.READ};
-      const filterDialog = shallow(<ButtonFilter {...props}/>);
+      const buttonFilter = shallow(<ButtonFilter {...props}/>);
       // When
-      filterDialog.unmount();
+      buttonFilter.unmount();
       // Then
       expect(window.addEventListener).toHaveBeenCalledTimes(1);
       expect(window.removeEventListener).toHaveBeenCalledTimes(1);
     });
     test('onToggleDialog, state is changed', () => {
       // Given
-      const props = {t: jest.fn(arg => arg), activeMessageFilter: MessageFilters.READ};
-      const filterDialog = shallow(<ButtonFilter {...props}/>);
+      const props = {t: jest.fn(arg => arg), active: true};
+      const buttonFilter = shallow(<ButtonFilter {...props}/>);
       const event = {stopPropagation: jest.fn()};
       // When
-      filterDialog.find('TopBarButton').props().onClick(event);
+      buttonFilter.find('TopBarButton').props().onClick(event);
       // Then
       expect(event.stopPropagation).toHaveBeenCalledTimes(1);
-      expect(filterDialog.state().dialogVisible).toBe(true);
+      expect(buttonFilter.state().dialogVisible).toBe(true);
     });
-    test('onCloseDialog, state.dialogVisible is false', () => {
+    test('onCloseDialog, dialog is visible and function is NOT disabled, state.dialogVisible is false', () => {
       // Given
-      const props = {t: jest.fn(arg => arg), activeMessageFilter: MessageFilters.READ};
-      const filterDialog = shallow(<ButtonFilter {...props}/>);
-      filterDialog.state().dialogVisible = true;
+      const props = {t: jest.fn(arg => arg), active: true};
+      const buttonFilter = shallow(<ButtonFilter {...props}/>);
+      buttonFilter.state().dialogVisible = true;
       // When
-      filterDialog.instance().handleOnCloseDialog();
+      buttonFilter.instance().handleOnCloseDialog();
       // Then
-      expect(filterDialog.state().dialogVisible).toBe(false);
+      expect(buttonFilter.state().dialogVisible).toBe(false);
+    });
+    test('onCloseDialog, disalog is visible and function is disabled, state.dialogVisible is true', () => {
+      // Given
+      const props = {t: jest.fn(arg => arg), active: true};
+      const buttonFilter = shallow(<ButtonFilter {...props}/>);
+      buttonFilter.state().dialogVisible = true;
+      buttonFilter.find('Connect(Translate(FilterDialog))').props().closeFilterDialogHandler.disabled = true;
+      // When
+      buttonFilter.instance().handleOnCloseDialog();
+      // Then
+      expect(buttonFilter.state().dialogVisible).toBe(true);
     });
   });
 });

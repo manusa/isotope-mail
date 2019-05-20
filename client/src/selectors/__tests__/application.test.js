@@ -1,8 +1,16 @@
-import {getCredentials} from '../application';
+import {
+  activeMessageFilter,
+  getCredentials,
+  messageFilterActive,
+  messageFilterKey,
+  messageFilterText,
+  selectedFolderId
+} from '../application';
+import MessageFilters from '../../services/message-filters';
 
 describe('application selectors test suite', () => {
   describe('getCredentials', () => {
-    test('application.selectedFolderId in folders.explodedFolders, should return folder', () => {
+    test('application.user with valid credentials and other properties, should return credentials', () => {
       // Given
       const state = {
         application: {
@@ -27,6 +35,64 @@ describe('application selectors test suite', () => {
         salt: '3313373',
         name: 'ELITE'
       });
+    });
+  });
+  test('selectedFolderId, application with selectedFolderId, should return selectedFolderId', () => {
+    // Given
+    const state = {application: {selectedFolderId: 1337}};
+    // When
+    const result = selectedFolderId(state);
+    // Then
+    expect(result).toBe(1337);
+  });
+  test('messageFilterKey, application with messageFilterKey, should return messageFilterKey', () => {
+    // Given
+    const state = {application: {messageFilterKey: 'ALL'}};
+    // When
+    const result = messageFilterKey(state);
+    // Then
+    expect(result).toBe('ALL');
+  });
+  test('messageFilterText, application with messageFilterText, should return messageFilterText', () => {
+    // Given
+    const state = {application: {messageFilterText: '1337'}};
+    // When
+    const result = messageFilterText(state);
+    // Then
+    expect(result).toBe('1337');
+  });
+  test('activeMessageFilter, application with messageFilterKey, should return messageFilter instance', () => {
+    // Given
+    const state = {application: {messageFilterKey: 'ALL'}};
+    // When
+    const result = activeMessageFilter(state);
+    // Then
+    expect(result).toBe(MessageFilters.ALL);
+  });
+  describe('messageFilterActive', () => {
+    test('messageFilterKey=ALL and no messageFilterText, should return falsy', () => {
+      // Given
+      const state = {application: {messageFilterKey: 'ALL', messageFilterText: ''}};
+      // When
+      const result = messageFilterActive(state);
+      // Then
+      expect(result).toBeFalsy();
+    });
+    test('messageFilterKey=ALL and messageFilterText, should return falsy', () => {
+      // Given
+      const state = {application: {messageFilterKey: 'ALL', messageFilterText: '1337'}};
+      // When
+      const result = messageFilterActive(state);
+      // Then
+      expect(result).toBeTruthy();
+    });
+    test('messageFilterKey=READ and nomessageFilterText, should return falsy', () => {
+      // Given
+      const state = {application: {messageFilterKey: 'READ', messageFilterText: '1337'}};
+      // When
+      const result = messageFilterActive(state);
+      // Then
+      expect(result).toBeTruthy();
     });
   });
 });

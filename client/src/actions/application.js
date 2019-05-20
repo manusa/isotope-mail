@@ -15,7 +15,9 @@ export const renameFolderOk = (oldFolderId, newFolderId) => ({
   payload: {oldFolderId, newFolderId}
 });
 export const setMessageFilterKey = messageFilterKey =>
-  ({type: ActionTypes.APPLICATION_MESSAGE_FILTER_SET, payload: messageFilterKey});
+  ({type: ActionTypes.APPLICATION_MESSAGE_FILTER_KEY_SET, payload: messageFilterKey});
+export const setMessageFilterText = messageFilterText =>
+  ({type: ActionTypes.APPLICATION_MESSAGE_FILTER_TEXT_SET, payload: messageFilterText});
 export const selectMessage = message => ({type: ActionTypes.APPLICATION_MESSAGE_SELECT, payload: message});
 /**
  * Refreshes the current selectedMessage if it's still the same (same selectedFolder and same selectedMessage)

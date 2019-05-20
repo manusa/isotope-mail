@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {translate} from 'react-i18next';
 import TopBarButton from './top-bar-button';
 import FilterDialog from './filter-dialog';
-import MessageFilters, {getFromKey} from '../../services/message-filters';
+import {messageFilterActive} from '../../selectors/application';
 import mainCss from '../../styles/main.scss';
 import styles from './button-filter.scss';
 
@@ -18,9 +18,8 @@ export class ButtonFilter extends React.Component {
   }
 
   render() {
-    const {t, activeMessageFilter} = this.props;
+    const {t, active} = this.props;
     const {dialogVisible} = this.state;
-    const active = activeMessageFilter.key !== MessageFilters.ALL.key;
     return <span
       className={`${styles['button-filter']} ${mainCss['mdc-menu-surface--anchor']}`}
       isotip={t('topBar.quickFilter')} isotip-position='bottom-end' isotip-size='small'
@@ -28,7 +27,7 @@ export class ButtonFilter extends React.Component {
       <TopBarButton
         className={`${styles['button-filter--button']} ${active ? styles.active : ''}`}
         onClick={this.handleOnToggleDialog}>filter_list</TopBarButton>
-      <FilterDialog visible={dialogVisible} />
+      <FilterDialog visible={dialogVisible} closeFilterDialogHandler={this.handleOnCloseDialog} />
     </span>;
   }
 
@@ -46,12 +45,15 @@ export class ButtonFilter extends React.Component {
   }
 
   onCloseDialog() {
-    this.setState({dialogVisible: false});
+    if (this.handleOnCloseDialog.disabled !== true) {
+      this.setState({dialogVisible: false});
+    }
+    delete this.handleOnCloseDialog.disabled;
   }
 }
 
 const mapStateToProps = state => ({
-  activeMessageFilter: getFromKey(state.application.messageFilterKey)
+  active: messageFilterActive(state)
 });
 
 export default connect(mapStateToProps)(translate()(ButtonFilter));
