@@ -28,7 +28,8 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
       return {
         ...state,
         selectedFolderId: action.payload.folderId,
-        messageFilterKey: null
+        messageFilterKey: null,
+        messageFilterText: ''
       };
     case ActionTypes.APPLICATION_FOLDER_CREATE: {
       return {
