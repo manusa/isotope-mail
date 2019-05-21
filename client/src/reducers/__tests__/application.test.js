@@ -204,4 +204,14 @@ describe('Application reducer test suite', () => {
       expect(updatedState.refreshMessageActiveRequests).toBe(1);
     });
   });
+  test('APPLICATION_MESSAGE_EDIT_SUBJECT', () => {
+    // Given
+    const initialState = {...INITIAL_STATE.application};
+    initialState.newMessage = {subject: '31337'};
+    // When
+    const updatedState = application(initialState,
+      {type: ActionTypes.APPLICATION_MESSAGE_EDIT_SUBJECT, payload: '1337'});
+    // Then
+    expect(updatedState.newMessage.subject).toBe('1337');
+  });
 });
