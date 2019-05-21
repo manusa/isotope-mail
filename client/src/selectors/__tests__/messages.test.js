@@ -1,4 +1,4 @@
-import {selectedFolderMessageList, selectedFolderFilteredMessageList} from '../messages';
+import {cache, selectedMessagesIds, selectedFolderMessageList, selectedFolderMessagesFiltered} from '../messages';
 
 describe('messages selectors test suite', () => {
   let messageArray;
@@ -38,6 +38,22 @@ describe('messages selectors test suite', () => {
         ]
       }
     ];
+  });
+  test('cache', () => {
+    // Given
+    const state = {messages: {cache: {1337: {}}}};
+    // When
+    const result = cache(state);
+    // Then
+    expect(result).toEqual({1337: {}});
+  });
+  test('selectedMessagesIds', () => {
+    // Given
+    const state = {messages: {selected: [1337, 31337]}};
+    // When
+    const result = selectedMessagesIds(state);
+    // Then
+    expect(result).toEqual([1337, 31337]);
   });
   describe('selectedFolderMessageList ', () => {
     test('state.application null, should return empty array', () => {
@@ -88,12 +104,12 @@ describe('messages selectors test suite', () => {
       expect(Array.from(result.values())).toEqual(messageArray);
     });
   });
-  describe('selectedFolderFilteredMessageList', () => {
+  describe('selectedFolderMessagesFiltered', () => {
     test('state.messages.cache not containing selectedFolderId , should return empty array', () => {
       // Given
       const state = {application: {selectedFolderId: '1337'}, messages: {cache: {313373: {}}}};
       // When
-      const result = selectedFolderFilteredMessageList(state);
+      const result = selectedFolderMessagesFiltered(state);
       // Then
       expect(result).toEqual([]);
     });
@@ -104,7 +120,7 @@ describe('messages selectors test suite', () => {
         messages: {cache: {1337: new Map(messageArray.map(m => [m.uid, m]))}}
       };
       // When
-      const result = selectedFolderFilteredMessageList(state);
+      const result = selectedFolderMessagesFiltered(state);
       // Then
       expect(result).toHaveLength(4);
       expect(result).toEqual([messageArray[2], messageArray[3], messageArray[0], messageArray[1]]);
@@ -116,7 +132,7 @@ describe('messages selectors test suite', () => {
         messages: {cache: {1337: new Map(messageArray.map(m => [m.uid, m]))}}
       };
       // When
-      const result = selectedFolderFilteredMessageList(state);
+      const result = selectedFolderMessagesFiltered(state);
       // Then
       expect(result).toHaveLength(1);
       expect(result).toEqual([messageArray[2]]);
@@ -129,7 +145,7 @@ describe('messages selectors test suite', () => {
         messages: {cache: {1337: new Map(messageArray.map(m => [m.uid, m]))}}
       };
       // When
-      const result = selectedFolderFilteredMessageList(state);
+      const result = selectedFolderMessagesFiltered(state);
       // Then
       expect(result).toEqual([]);
     });
@@ -141,7 +157,7 @@ describe('messages selectors test suite', () => {
         messages: {cache: {1337: new Map(messageArray.map(m => [m.uid, m]))}}
       };
       // When
-      const result = selectedFolderFilteredMessageList(state);
+      const result = selectedFolderMessagesFiltered(state);
       // Then
       expect(result).toHaveLength(1);
       expect(result).toEqual([messageArray[3]]);
@@ -154,7 +170,7 @@ describe('messages selectors test suite', () => {
         messages: {cache: {1337: new Map(messageArray.map(m => [m.uid, m]))}}
       };
       // When
-      const result = selectedFolderFilteredMessageList(state);
+      const result = selectedFolderMessagesFiltered(state);
       // Then
       expect(result).toHaveLength(1);
       expect(result).toEqual([messageArray[0]]);
@@ -167,7 +183,7 @@ describe('messages selectors test suite', () => {
         messages: {cache: {1337: new Map(messageArray.map(m => [m.uid, m]))}}
       };
       // When
-      const result = selectedFolderFilteredMessageList(state);
+      const result = selectedFolderMessagesFiltered(state);
       // Then
       expect(result).toHaveLength(1);
       expect(result).toEqual([messageArray[0]]);
@@ -180,7 +196,7 @@ describe('messages selectors test suite', () => {
         messages: {cache: {1337: new Map(messageArray.map(m => [m.uid, m]))}}
       };
       // When
-      const result = selectedFolderFilteredMessageList(state);
+      const result = selectedFolderMessagesFiltered(state);
       // Then
       expect(result).toHaveLength(1);
       expect(result).toEqual([messageArray[2]]);

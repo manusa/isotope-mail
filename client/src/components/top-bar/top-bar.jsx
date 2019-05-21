@@ -5,8 +5,9 @@ import ConfirmDeleteFromTrashDialog from './confirm-delete-from-trash-dialog';
 import TopBarMessageList from './top-bar-message-list';
 import TopBarMessageViewer from './top-bar-message-viewer';
 import TopBarMessageEditor from './top-bar-message-editor';
-import {getSelectedFolder} from '../../selectors/folders';
 import {getCredentials} from '../../selectors/application';
+import {getSelectedFolder} from '../../selectors/folders';
+import {selectedFolderMessagesFilteredAndSelected, selectedMessagesIds} from '../../selectors/messages';
 import {findTrashFolder, FolderTypes} from '../../services/folder';
 import {forwardMessage, replyMessage, clearSelectedMessage} from '../../services/application';
 import {deleteMessages, moveMessages, setMessagesSeen} from '../../services/message';
@@ -97,23 +98,19 @@ TopBar.propTypes = {
 };
 
 const mapStateToProps = state => {
-  const selectedMessagesIds = state.messages.selected;
-  const messages = state.application.selectedFolderId && state.messages.cache[state.application.selectedFolderId] ?
-    Array.from(state.messages.cache[state.application.selectedFolderId].values()) : [];
-  const selectedMessages = messages.filter(m => selectedMessagesIds.indexOf(m.uid) > -1);
+  const selectedMessages = selectedFolderMessagesFilteredAndSelected(state);
   const selectedMessagesAllUnread = selectedMessages.filter(m => m.seen === true).length === 0;
   return ({
     title: state.application.title,
     newMessage: state.application.newMessage,
     outbox: state.application.outbox,
     selectedFolder: getSelectedFolder(state) || null,
-    selectedMessagesIds: selectedMessagesIds,
+    selectedMessagesIds: selectedMessagesIds(state),
     selectedMessages: selectedMessages,
     selectedMessage: state.application.selectedMessage,
     selectedMessagesAllUnread: selectedMessagesAllUnread,
     credentials: getCredentials(state),
-    folders: state.folders,
-    messages: messages
+    folders: state.folders
   });
 };
 
