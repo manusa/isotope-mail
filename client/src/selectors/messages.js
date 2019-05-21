@@ -23,6 +23,7 @@ const messageTextFilter = text => message => {
 };
 
 export const cache = state => get(state, 'messages.cache');
+export const selectedMessagesIds = state => get(state, 'messages.selected');
 
 /**
  * Returns a map containing the selected folder's messages or undefined if not found.
@@ -35,29 +36,41 @@ export const selectedFolderMessageList = createSelector(
   selectedFolderId,
   (resolvedCache, resolvedSelectedFolderId) => get(resolvedCache, resolvedSelectedFolderId)
 );
-
-export const selectedFolderFilteredMessageList = createSelector(
+const selectedFolderMessageListArray = createSelector(
   selectedFolderMessageList,
-  messageFilterKey,
-  messageFilterText,
-  (resolvedSelectedFolderMessageList, resolvedMessageFilterKey, resolvedMessageFilterText) => {
+  resolvedSelectedFolderMessageList => {
     if (resolvedSelectedFolderMessageList) {
-      const messageKeyFilter = getFromKey(resolvedMessageFilterKey);
-      let filteredMessages = messageKeyFilter.selector(Array.from(resolvedSelectedFolderMessageList.values()));
-      if (resolvedMessageFilterText) {
-        filteredMessages = filteredMessages.filter(messageTextFilter(resolvedMessageFilterText));
-      }
-      return filteredMessages
-        .sort((a, b) => {
-          if (a.receivedDate > b.receivedDate) {
-            return -1;
-          } else if (a.receivedDate < b.receivedDate) {
-            return 1;
-          }
-          return 0;
-        });
-      // return orderBy(filteredMessages, 'receivedDate', 'desc');
+      return Array.from(resolvedSelectedFolderMessageList.values());
     }
     return [];
   }
+);
+
+export const selectedFolderMessagesFiltered = createSelector(
+  selectedFolderMessageListArray,
+  messageFilterKey,
+  messageFilterText,
+  (messages, resolvedMessageFilterKey, resolvedMessageFilterText) => {
+    const messageKeyFilter = getFromKey(resolvedMessageFilterKey);
+    let filteredMessages = messageKeyFilter.selector(messages);
+    if (resolvedMessageFilterText) {
+      filteredMessages = filteredMessages.filter(messageTextFilter(resolvedMessageFilterText));
+    }
+    return filteredMessages
+      .sort((a, b) => {
+        if (a.receivedDate > b.receivedDate) {
+          return -1;
+        } else if (a.receivedDate < b.receivedDate) {
+          return 1;
+        }
+        return 0;
+      });
+    // return orderBy(filteredMessages, 'receivedDate', 'desc');
+  }
+);
+
+export const selectedFolderMessagesFilteredAndSelected = createSelector(
+  selectedMessagesIds,
+  selectedFolderMessagesFiltered,
+  (selectedIds, messages) => messages.filter(m => selectedIds.indexOf(m.uid) > -1)
 );
