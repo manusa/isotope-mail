@@ -116,6 +116,12 @@ const application = (state = INITIAL_STATE.application, action = {}) => {
       newState.newMessage = action.payload ? {...action.payload} : null;
       return newState;
     }
+    case ActionTypes.APPLICATION_MESSAGE_EDIT_SUBJECT: {
+      const newState = {...state};
+      newState.newMessage = {...newState.newMessage};
+      newState.newMessage.subject = action.payload;
+      return newState;
+    }
     case ActionTypes.APPLICATION_OUTBOX_SEND: {
       const newState = {...state};
       newState.outbox = {message: action.payload, progress: 0, sent: false};

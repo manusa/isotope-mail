@@ -11,7 +11,8 @@ import HeaderAddress from './header-address';
 import MessageEditorButtons from './message-editor-buttons';
 import InsertLinkDialog from './insert-link-dialog';
 import {getCredentials} from '../../selectors/application';
-import {editMessage} from '../../actions/application';
+import {cache} from '../../selectors/messages';
+import {editMessage, editMessageSubject} from '../../actions/application';
 import debounce from '../../services/debounce';
 import {compressImage} from '../../services/image';
 import {getAddresses} from '../../services/message-addresses';
@@ -235,9 +236,7 @@ class MessageEditor extends Component {
   }
 
   onSubjectChange(event) {
-    const target = event.target;
-    const updatedMessage = {...this.props.editedMessage};
-    this.props.editMessage({...updatedMessage, subject: target.value});
+    this.props.editSubject(event.target.value);
   }
 
   onDrop(event) {
@@ -392,7 +391,7 @@ const mapStateToProps = state => ({
   subject: state.application.newMessage.subject,
   editor: state.application.newMessage.editor,
   content: state.application.newMessage.content,
-  getAddresses: value => getAddresses(value, state.messages.cache)
+  getAddresses: value => getAddresses(value, cache(state))
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -402,9 +401,8 @@ const mapDispatchToProps = dispatch => ({
     // noinspection JSIgnoredPromiseFromCall
     persistApplicationNewMessageContent(application, '');
   },
-  editMessage: message => {
-    dispatch(editMessage(message));
-  },
+  editMessage: message => dispatch(editMessage(message)),
+  editSubject: subject => dispatch(editMessageSubject(subject)),
   sendMessage: (credentials, {inReplyTo, references, to, cc, bcc, attachments, subject, content}) =>
     sendMessage(dispatch, credentials, {inReplyTo, references, to, cc, bcc, attachments, subject, content})
 });

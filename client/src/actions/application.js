@@ -38,6 +38,7 @@ export const replaceMessageEmbeddedImages = (folder, message, attachment, blob) 
 export const setError = (type, value) => ({type: ActionTypes.APPLICATION_ERROR_SET, payload: {type, value}});
 
 export const editMessage = message => ({type: ActionTypes.APPLICATION_MESSAGE_EDIT, payload: message});
+export const editMessageSubject = subject => ({type: ActionTypes.APPLICATION_MESSAGE_EDIT_SUBJECT, payload: subject});
 
 export const outboxSendMessage = message => ({type: ActionTypes.APPLICATION_OUTBOX_SEND, payload: message});
 export const outboxUpdateProgress = progress =>
