@@ -4,7 +4,7 @@ import {
   replaceMessageEmbeddedImages
 } from '../actions/application';
 import {updateCacheIfExist} from '../actions/messages';
-import {updateFolder} from '../actions/folders';
+import {updateFolder, updateFolderProperties} from '../actions/folders';
 import {refreshMessage} from '../actions/application';
 import {getIsotopeConfiguration} from '../selectors/globals';
 import {abortControllerWrappers, abortFetch, credentialsHeaders, toJson} from './fetch';
@@ -137,7 +137,7 @@ export function readMessage(dispatch, credentials, downloadedMessages, folder, m
     dispatch(updateCacheIfExist(folder, [updatedMessage]));
     // Update folder seen counter if applicable
     if (!message.seen) {
-      dispatch(updateFolder({...folder, unreadMessageCount: folder.unreadMessageCount - 1}));
+      dispatch(updateFolderProperties({...folder, unreadMessageCount: folder.unreadMessageCount - 1}));
       // Send request to BE to mark message as read
       _messageSeenRequest(credentials, folder, message);
     }

@@ -122,6 +122,47 @@ describe('Folders reducer test suite', () => {
       expect(Object.keys(updatedState.explodedItems)).toHaveLength(0);
     });
   });
+  describe('FOLDERS_UPDATE_PROPERTIES', () => {
+    test('Initial state containing folder, existing folder with updated folder, should replace folder properties but not children', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.folders,
+        items: [{folderId: '1337', newMessageCount: 15, children: [{folderId: '313373', newMessageCount: 2, children: []}]}],
+        explodedItems: {
+          1337: {folderId: '1337', newMessageCount: 15, children: []},
+          313373: {folderId: '313373', newMessageCount: 2, children: []}
+        }
+      };
+      const payload = {
+        folderId: '1337', newMessageCount: 16, children: []
+      };
+
+      // When
+      const updatedState = folders(initialState, {type: ActionTypes.FOLDERS_UPDATE_PROPERTIES, payload});
+
+      // Then
+      expect(updatedState.items).toHaveLength(1);
+      expect(updatedState.items[0].children[0]).toEqual({folderId: '313373', newMessageCount: 2, children: []});
+      expect(Object.keys(updatedState.explodedItems)).toHaveLength(2);
+      expect(updatedState.explodedItems['1337']).toEqual({folderId: '1337', newMessageCount: 16, children: []});
+    });
+    test('Initial state containing NO folders, payload with folder, state should not change', () => {
+      // Given
+      const initialState = {...INITIAL_STATE.folders,
+        items: [],
+        explodedItems: {}
+      };
+      const payload = {
+        folderId: '313373', newMessageCount: 1
+      };
+
+      // When
+      const updatedState = folders(initialState, {type: ActionTypes.FOLDERS_UPDATE_PROPERTIES, payload});
+
+      // Then
+      expect(updatedState.items).toHaveLength(0);
+      expect(Object.keys(updatedState.explodedItems)).toHaveLength(0);
+    });
+  });
   describe('APPLICATION_FOLDER_RENAME_OK', () => {
     test('Folder renamed no longer exists in current state, should return unchanged state', () => {
       // Given

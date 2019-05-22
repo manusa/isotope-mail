@@ -58,6 +58,21 @@ const folders = (state = INITIAL_STATE.folders, action = {}) => {
       return newUpdateState;
     }
     /**
+     * Will update only properties relative to the folder in the payload (children will be ignored)
+     */
+    case ActionTypes.FOLDERS_UPDATE_PROPERTIES: {
+      const newUpdateState = {...state};
+      const updatedFolder = {...action.payload};
+      delete updatedFolder.childern;
+      if (newUpdateState.explodedItems[updatedFolder.folderId]) {
+        newUpdateState.explodedItems[updatedFolder.folderId] = {
+          ...newUpdateState.explodedItems[updatedFolder.folderId],
+          ...updatedFolder
+        };
+      }
+      return newUpdateState;
+    }
+    /**
      * Once a folder is renamed, previous references to that folder should be removed from the tree and exploded
      * tree state.
      * Other actions will have already taken care of adding the renamed folder to the new position, this action
