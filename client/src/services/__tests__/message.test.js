@@ -76,6 +76,7 @@ describe('Message service test suite', () => {
         switch (action.type) {
           case ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST:
           case ActionTypes.FOLDERS_UPDATE:
+          case ActionTypes.FOLDERS_UPDATE_PROPERTIES:
           case ActionTypes.MESSAGES_LOCK_ADD: {
             dispatchCount++;
             break;
@@ -206,6 +207,7 @@ describe('Message service test suite', () => {
           case ActionTypes.MESSAGES_UPDATE_CACHE_IF_EXIST:
           case ActionTypes.MESSAGES_SET_SELECTED:
           case ActionTypes.FOLDERS_UPDATE:
+          case ActionTypes.FOLDERS_UPDATE_PROPERTIES:
           case ActionTypes.MESSAGES_LOCK_ADD:
           case ActionTypes.MESSAGES_LOCK_REMOVE: {
             dispatchCount++;
@@ -241,7 +243,7 @@ describe('Message service test suite', () => {
       });
       fetch.abortFetch = jest.fn();
       const dispatch = jest.fn(action => {
-        if (action && action.type === ActionTypes.FOLDERS_UPDATE) {
+        if (action && action.type === ActionTypes.FOLDERS_UPDATE_PROPERTIES) {
           expect(action.payload.originalFolder).toEqual(true);
           done();
         }

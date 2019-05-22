@@ -10,7 +10,7 @@ import {
   setSelected, unlockMessages,
   updateCache, updateCacheIfExist
 } from '../actions/messages';
-import {updateFolder} from '../actions/folders';
+import {updateFolder, updateFolderProperties} from '../actions/folders';
 import {getIsotopeConfiguration} from '../selectors/globals';
 import {abortControllerWrappers, abortFetch, AuthenticationException, credentialsHeaders, toJson} from './fetch';
 import {persistMessageCache} from './indexed-db';
@@ -188,7 +188,7 @@ export function moveMessages(dispatch, credentials, fromFolder, toFolder, messag
 
   // Update state with expected response from server
   dispatch(deleteFromCache(fromFolder, messages));
-  dispatch(updateFolder(fromFolderUpdated));
+  dispatch(updateFolderProperties(fromFolderUpdated));
   dispatch(lockMessages(messages));
   const url = getIsotopeConfiguration()._links['folders.message.move.bulk'].href
     .replace('{folderId}', fromFolder.folderId)
@@ -211,7 +211,7 @@ export function moveMessages(dispatch, credentials, fromFolder, toFolder, messag
       dispatch(unlockMessages(messages));
       // Rollback state from dispatched expected responses
       dispatch(updateCache(fromFolder, messages));
-      dispatch(updateFolder(fromFolder));
+      dispatch(updateFolderProperties(fromFolder));
     });
 }
 
@@ -231,7 +231,7 @@ export function setMessagesSeen(dispatch, credentials, folder, messages, seen) {
     }
   });
   dispatch(updateCacheIfExist(folder, messagesToUpdate, true));
-  dispatch(updateFolder(expectedUpdatedFolder));
+  dispatch(updateFolderProperties(expectedUpdatedFolder));
   dispatch(lockMessages(messagesToUpdate));
   const url = getIsotopeConfiguration()._links['folders.message.seen.bulk'].href
     .replace('{folderId}', folder.folderId)
@@ -317,7 +317,7 @@ export function deleteMessages(dispatch, credentials, folder, messages) {
   });
   dispatch(updateCacheIfExist(folder, messagesToDelete, true));
   dispatch(setSelected(messagesToDelete, false));
-  dispatch(updateFolder(expectedUpdatedFolder));
+  dispatch(updateFolderProperties(expectedUpdatedFolder));
   dispatch(lockMessages(messagesToDelete));
 
   fetch(url, {
@@ -334,7 +334,7 @@ export function deleteMessages(dispatch, credentials, folder, messages) {
       dispatch(unlockMessages(messagesToDelete));
       // Rollback state from dispatched expected responses
       dispatch(updateCacheIfExist(folder, messages));
-      dispatch(updateFolder(folder));
+      dispatch(updateFolderProperties(folder));
     });
 }
 
