@@ -5,7 +5,7 @@ import ConfirmDeleteFromTrashDialog from './confirm-delete-from-trash-dialog';
 import TopBarMessageList from './top-bar-message-list';
 import TopBarMessageViewer from './top-bar-message-viewer';
 import TopBarMessageEditor from './top-bar-message-editor';
-import {getCredentials} from '../../selectors/application';
+import {getCredentials, selectedMessage as selectedMessageSelector} from '../../selectors/application';
 import {getSelectedFolder} from '../../selectors/folders';
 import {selectedFolderMessagesFilteredAndSelected, selectedMessagesIds} from '../../selectors/messages';
 import {findTrashFolder, FolderTypes} from '../../services/folder';
@@ -107,7 +107,7 @@ const mapStateToProps = state => {
     selectedFolder: getSelectedFolder(state) || null,
     selectedMessagesIds: selectedMessagesIds(state),
     selectedMessages: selectedMessages,
-    selectedMessage: state.application.selectedMessage,
+    selectedMessage: selectedMessageSelector(state),
     selectedMessagesAllUnread: selectedMessagesAllUnread,
     credentials: getCredentials(state),
     folders: state.folders

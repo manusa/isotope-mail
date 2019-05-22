@@ -2,8 +2,8 @@ import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {translate} from 'react-i18next';
+import {getCredentials, selectedMessage as selectedMessageSelector} from '../../selectors/application';
 import {getSelectedFolder} from '../../selectors/folders';
-import {getCredentials} from '../../selectors/application';
 import {downloadMessage as downloadMessageService} from '../../services/message';
 import mainCss from '../../styles/main.scss';
 
@@ -71,7 +71,7 @@ MessageViewerMenu.propTypes = {
 const mapStateToProps = state => ({
   credentials: getCredentials(state),
   selectedFolder: getSelectedFolder(state) || null,
-  selectedMessage: state.application.selectedMessage
+  selectedMessage: selectedMessageSelector(state)
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {

@@ -4,7 +4,8 @@ import {
   messageFilterActive,
   messageFilterKey,
   messageFilterText,
-  selectedFolderId
+  selectedFolderId,
+  selectedMessage
 } from '../application';
 import MessageFilters from '../../services/message-filters';
 
@@ -60,6 +61,14 @@ describe('application selectors test suite', () => {
     const result = messageFilterText(state);
     // Then
     expect(result).toBe('1337');
+  });
+  test('selectedMessage, application with selectedMessage, should return selectedMessage', () => {
+    // Given
+    const state = {application: {selectedMessage: {uid: 1337}}};
+    // When
+    const result = selectedMessage(state);
+    // Then
+    expect(result).toEqual({uid: 1337});
   });
   test('activeMessageFilter, application with messageFilterKey, should return messageFilter instance', () => {
     // Given
