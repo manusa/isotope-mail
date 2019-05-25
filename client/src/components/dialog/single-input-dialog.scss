@@ -14,7 +14,7 @@ $default-container-width: 550px;
     z-index: 2;
   }
 
-  @media screen and (min-width: 600px) {
+  @media screen and (min-width: $material-responsive-breakpoint-tablet-min) {
     .container {
       max-width: $default-container-width;
     }

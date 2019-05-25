@@ -30,7 +30,7 @@ class SideBar extends Component {
         className={`${styles['side-bar']}
           ${mainCss['mdc-drawer']}
           ${mainCss['mdc-drawer--dismissible']}
-          ${SideBar.getCollapsedClassName(collapsed)}
+          ${collapsed ? '' : mainCss['mdc-drawer--open']}
           ${dragOver ? styles.dropZone : ''}`}
       >
         <div className={`${mainCss['mdc-drawer__header']} ${styles['top-container']}`}>
@@ -79,10 +79,6 @@ class SideBar extends Component {
         this.props.moveFolderToFirstLevel(payload.folder);
       }
     }
-  }
-
-  static getCollapsedClassName(collapsed) {
-    return collapsed ? '' : `${styles.open} ${mainCss['mdc-drawer--open']}`;
   }
 }
 

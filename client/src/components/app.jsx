@@ -16,7 +16,6 @@ import {editNewMessage} from '../services/application';
 import {getFolders} from '../services/folder';
 import {resetFolderMessagesCache} from '../services/message';
 import mainCss from '../styles/main.scss';
-import styles from './app.scss';
 
 class App extends Component {
   constructor(props) {
@@ -32,14 +31,15 @@ class App extends Component {
   render() {
     const {sideBar} = this.state;
     return (
-      <div className={styles.app}>
+      <div className={mainCss['main-layout']}>
         <Spinner
           visible={this.props.application.activeRequests > 0}
-          className={styles.spinner} pathClassName={styles.spinnerPath}/>
+          className={mainCss['main-layout__spinner']} pathClassName={mainCss['spinner-path']}/>
         <TopBar sideBarCollapsed={sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
         <SideBar collapsed={sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
-        <div className={`${mainCss['mdc-top-app-bar--fixed-adjust']} ${styles['content-wrapper']}
-            ${sideBar.collapsed ? '' : styles['with-side-bar']}`}>
+        <div className={mainCss['mdc-drawer-scrim']} onClick={this.toggleSideBar}></div>
+        <div className={`${mainCss['mdc-top-app-bar--fixed-adjust']} ${mainCss['main-layout__content-wrapper']}
+            ${sideBar.collapsed ? '' : mainCss['main-layout__content-wrapper--with-side-bar']}`}>
           {this.renderContent()}
         </div>
         <MessageSnackbar/>
@@ -50,17 +50,15 @@ class App extends Component {
   renderContent() {
     const {application, outbox} = this.props;
     if (application.newMessage && Object.keys(application.newMessage).length > 0) {
-      return <MessageEditor className={styles['message-viewer']} />;
+      return <MessageEditor className={mainCss['main-layout__message-editor']} />;
     } else if (application.selectedMessage && Object.keys(application.selectedMessage).length > 0) {
-      return <MessageViewer className={styles['message-viewer']} />;
+      return <MessageViewer className={mainCss['main-layout__message-viewer']} />;
     }
     return (
       <Fragment>
-        <MessageList className={styles['message-grid']} />
-        <div className={styles['fab-container']}>
-          {outbox === null ?
-            <ComposeFabButton onClick={() => this.props.newMessage()}/>
-            : null}
+        <MessageList className={mainCss['main-layout__message-list']} />
+        <div className={mainCss['main-layout__fab-container']}>
+          {outbox === null && <ComposeFabButton onClick={() => this.props.newMessage()}/>}
         </div>
       </Fragment>
     );

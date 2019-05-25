@@ -1,4 +1,4 @@
-import {get} from 'lodash';
+import get from 'lodash/get';
 import {createSelector} from 'reselect';
 import {getFromKey} from '../services/message-filters';
 import MessageFilters from '../services/message-filters';

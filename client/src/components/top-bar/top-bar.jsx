@@ -11,7 +11,6 @@ import {selectedFolderMessagesFilteredAndSelected, selectedMessagesIds} from '..
 import {findTrashFolder, FolderTypes} from '../../services/folder';
 import {forwardMessage, replyMessage, clearSelectedMessage} from '../../services/application';
 import {deleteMessages, moveMessages, setMessagesSeen} from '../../services/message';
-import styles from './top-bar.scss';
 import mainCss from '../../styles/main.scss';
 
 export class TopBar extends Component {
@@ -35,8 +34,8 @@ export class TopBar extends Component {
       title = `${props.selectedFolder.name} - ${title}`;
     }
     return (
-      <header className={`${styles.topBar} ${styles['with-custom-styles']}
-      ${collapsed ? '' : styles['with-side-bar']}
+      <header className={`
+      ${collapsed ? '' : mainCss['mdc-top-app-bar--with-side-bar']}
       ${mainCss['mdc-top-app-bar']} ${mainCss['mdc-top-app-bar--fixed']}`}>
         {!isEditing && !isMessageViewer
           && (<TopBarMessageList
