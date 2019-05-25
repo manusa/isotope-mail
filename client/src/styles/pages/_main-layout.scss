@@ -1,0 +1,102 @@
+@import '../partials/variables';
+@import '@material/drawer/mdc-drawer';
+@import '@material/top-app-bar/mixins';
+
+$global-spinner-color: #333333;
+
+.main-layout {
+  display: flex;
+  height: 100vh;
+
+  & &__spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($global-spinner-color, 0.5);
+    z-index: map-get($z-index, thermosphere);
+
+    .spinner-path {
+      stroke: $global-spinner-color;
+    }
+  }
+  .mdc-drawer {
+    display: flex;
+    position: fixed;
+    min-height: 100vh;
+    width: 0;
+    border: 0;
+    transition: width $drawerAnimationSpeed;
+    &.mdc-drawer--open {
+      width: $drawerWidth;
+      @include mdc-drawer-border-color($mdc-drawer-divider-color);
+      border-right-width: 1px;
+      border-right-style: solid;
+      @media screen and (max-width: $material-responsive-breakpoint-tablet-min) {
+        @include mdc-elevation($mdc-drawer-modal-elevation);
+      }
+      & + .mdc-drawer-scrim {
+        @media screen and (max-width: $material-responsive-breakpoint-tablet-min) {
+          display: block;
+        }
+      }
+    }
+  }
+  .mdc-drawer-scrim {
+    display: none;
+    $value: rgba(mdc-theme-prop-value($mdc-drawer-modal-scrim-color), $mdc-drawer-modal-scrim-opacity);
+    @include mdc-theme-prop(background-color, $value);
+  }
+  .mdc-top-app-bar {
+    margin-left: 0;
+    width: 100%;
+    transition: margin $drawerAnimationSpeed, width $drawerAnimationSpeed;
+    @include mdc-top-app-bar-fill-color($mdc-theme-secondary);
+    &--with-side-bar {
+      margin-left: $drawerWidth;
+      width: calc(100% - #{$drawerWidth});
+      @media screen and (max-width: $material-responsive-breakpoint-tablet-min) {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+  }
+  & &__content-wrapper {
+    flex-grow: 1;
+    display: flex;
+    margin-left: 0;
+    width: 100%;
+    transition: margin $drawerAnimationSpeed;
+
+    &--with-side-bar {
+      margin-left: $drawerWidth;
+      width: calc(100% - #{$drawerWidth});
+      @media screen and (max-width: $material-responsive-breakpoint-tablet-min) {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+
+    & .main-layout__message-list {
+      background-color: #ffffff;
+      flex-grow: 1;
+      min-width: 0;
+    }
+    & .main-layout__message-viewer,
+    & .main-layout__message-editor {
+      background-color: #ffffff;
+      flex-grow: 1;
+      min-width: 0;
+    }
+
+    & .main-layout__fab-container {
+      position: fixed;
+      right: $default-spacing;
+      bottom: $default-spacing;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+}
