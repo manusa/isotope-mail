@@ -11,6 +11,8 @@ import MessageViewer from './message-viewer/message-viewer';
 import MessageSnackbar from './message-snackbar/message-snackbar';
 import ComposeFabButton from './buttons/compose-fab-button';
 import {clearUserCredentials} from '../actions/application';
+import {getCredentials, outbox as outboxSelector, pollInterval as pollIntervalSelector} from '../selectors/application';
+import {getSelectedFolder} from '../selectors/folders';
 import {AuthenticationException} from '../services/fetch';
 import {editNewMessage} from '../services/application';
 import {getFolders} from '../services/folder';
@@ -79,8 +81,7 @@ class App extends Component {
 
   startPoll() {
     // Start polling when everything is ready
-    if (this.props.application.selectedFolderId && Object.keys(this.props.folders.explodedItems).length > 0
-      && !this.pollStarted) {
+    if (this.props.selectedFolder && !this.pollStarted) {
       this.pollStarted = true;
       this.refreshPoll();
     }
@@ -93,21 +94,21 @@ class App extends Component {
    */
   async refreshPoll() {
     let keepPolling = true;
+    const {pollInterval, reloadFolders, reloadMessageCache, logout} = this.props;
     try {
-      const folderPromise = this.props.reloadFolders();
-      const selectedFolder = this.props.folders.explodedItems[this.props.application.selectedFolderId] || {};
-      const messagePromise = this.props.reloadMessageCache(selectedFolder);
+      const folderPromise = reloadFolders();
+      const messagePromise = reloadMessageCache();
       await Promise.all([folderPromise, messagePromise]);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(`Error in refresh poll: ${e}`);
       if (e instanceof AuthenticationException) {
         keepPolling = false;
-        this.props.logout();
+        logout();
       }
     }
     if (keepPolling) {
-      this.refreshPollTimeout = setTimeout(this.refreshPoll.bind(this), this.props.application.pollInterval);
+      this.refreshPollTimeout = setTimeout(this.refreshPoll.bind(this), pollInterval);
     }
   }
 
@@ -123,18 +124,22 @@ class App extends Component {
 
 App.propTypes = {
   application: PropTypes.object,
+  credentials: PropTypes.object,
+  selectedFolder: PropTypes.object,
   outbox: PropTypes.object,
-  folders: PropTypes.object,
+  pollInterval: PropTypes.number,
   reloadFolders: PropTypes.func,
   reloadMessageCache: PropTypes.func,
-  newMessage: PropTypes.func.isRequired
+  newMessage: PropTypes.func.isRequired,
+  logout: PropTypes.func
 };
 
 const mapStateToProps = state => ({
   application: state.application,
-  outbox: state.application.outbox,
-  folders: state.folders,
-  messages: state.messages
+  credentials: getCredentials(state),
+  selectedFolder: getSelectedFolder(state),
+  outbox: outboxSelector(state),
+  pollInterval: pollIntervalSelector(state)
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -148,8 +153,8 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
-  reloadFolders: () => dispatchProps.reloadFolders(stateProps.application.user.credentials),
-  reloadMessageCache: folder => dispatchProps.reloadMessageCache(stateProps.application.user, folder)
+  reloadFolders: () => dispatchProps.reloadFolders(stateProps.credentials),
+  reloadMessageCache: () => dispatchProps.reloadMessageCache(stateProps.application.user, stateProps.selectedFolder)
 }));
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(App);
