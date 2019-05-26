@@ -1,7 +1,15 @@
-import {getSelectedFolder} from '../folders';
+import {explodedItems, getSelectedFolder} from '../folders';
 
 
 describe('folders selectors test suite', () => {
+  test('explodedItems', () => {
+    // Given
+    const state = {folders: {explodedItems: {1337: {folderId: '1337'}}}};
+    // When
+    const result = explodedItems(state);
+    // Then
+    expect(result).toEqual({1337: {folderId: '1337'}});
+  });
   describe('getSelectedFolder', () => {
     test('application.selectedFolderId null and empty folders.explodedFolders, should return undefined', () => {
       // Given

@@ -8,6 +8,8 @@ export const selectedFolderId = state => get(state, 'application.selectedFolderI
 export const messageFilterKey = state => get(state, 'application.messageFilterKey');
 export const messageFilterText = state => get(state, 'application.messageFilterText');
 export const selectedMessage = state => get(state, 'application.selectedMessage');
+export const outbox = state => get(state, 'application.outbox');
+export const pollInterval = state => get(state, 'application.pollInterval');
 
 export const activeMessageFilter = createSelector(
   messageFilterKey,

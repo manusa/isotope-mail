@@ -4,6 +4,8 @@ import {
   messageFilterActive,
   messageFilterKey,
   messageFilterText,
+  outbox,
+  pollInterval,
   selectedFolderId,
   selectedMessage
 } from '../application';
@@ -69,6 +71,22 @@ describe('application selectors test suite', () => {
     const result = selectedMessage(state);
     // Then
     expect(result).toEqual({uid: 1337});
+  });
+  test('outbox, application with outbox, should return outbox', () => {
+    // Given
+    const state = {application: {outbox: {subject: '1337'}}};
+    // When
+    const result = outbox(state);
+    // Then
+    expect(result).toEqual({subject: '1337'});
+  });
+  test('pollInterval, application with pollInterval, should return pollInterval', () => {
+    // Given
+    const state = {application: {pollInterval: 1337}};
+    // When
+    const result = pollInterval(state);
+    // Then
+    expect(result).toBe(1337);
   });
   test('activeMessageFilter, application with messageFilterKey, should return messageFilter instance', () => {
     // Given
