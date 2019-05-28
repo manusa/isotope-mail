@@ -35,7 +35,6 @@ export class TopBar extends Component {
     }
     return (
       <header className={`
-      ${collapsed ? '' : mainCss['mdc-top-app-bar--with-side-bar']}
       ${mainCss['mdc-top-app-bar']} ${mainCss['mdc-top-app-bar--fixed']}`}>
         {!isEditing && !isMessageViewer
           && (<TopBarMessageList

@@ -33,15 +33,15 @@ class App extends Component {
   render() {
     const {sideBar} = this.state;
     return (
-      <div className={mainCss['main-layout']}>
+      <div className={`${mainCss['main-layout']}
+          ${sideBar.collapsed ? '' : mainCss['main-layout--with-side-bar']}`}>
         <Spinner
           visible={this.props.application.activeRequests > 0}
           className={mainCss['main-layout__spinner']} pathClassName={mainCss['spinner-path']}/>
         <TopBar sideBarCollapsed={sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
         <SideBar collapsed={sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
         <div className={mainCss['mdc-drawer-scrim']} onClick={this.toggleSideBar}></div>
-        <div className={`${mainCss['mdc-top-app-bar--fixed-adjust']} ${mainCss['main-layout__content-wrapper']}
-            ${sideBar.collapsed ? '' : mainCss['main-layout__content-wrapper--with-side-bar']}`}>
+        <div className={`${mainCss['mdc-top-app-bar--fixed-adjust']} ${mainCss['main-layout__content-wrapper']}`}>
           {this.renderContent()}
         </div>
         <MessageSnackbar/>

@@ -5,6 +5,7 @@
 $global-spinner-color: #333333;
 
 .main-layout {
+  $self: &;
   display: flex;
   height: 100vh;
 
@@ -16,7 +17,6 @@ $global-spinner-color: #333333;
     height: 100%;
     background-color: rgba($global-spinner-color, 0.5);
     z-index: map-get($z-index, thermosphere);
-
     .spinner-path {
       stroke: $global-spinner-color;
     }
@@ -49,11 +49,12 @@ $global-spinner-color: #333333;
     @include mdc-theme-prop(background-color, $value);
   }
   .mdc-top-app-bar {
+    $parent: &;
     margin-left: 0;
     width: 100%;
     transition: margin $drawerAnimationSpeed, width $drawerAnimationSpeed;
     @include mdc-top-app-bar-fill-color($mdc-theme-secondary);
-    &--with-side-bar {
+    @at-root #{$self}--with-side-bar#{$parent} {
       margin-left: $drawerWidth;
       width: calc(100% - #{$drawerWidth});
       @media screen and (max-width: $material-responsive-breakpoint-tablet-min) {
@@ -63,13 +64,14 @@ $global-spinner-color: #333333;
     }
   }
   & &__content-wrapper {
+    $parent: &;
     flex-grow: 1;
     display: flex;
     margin-left: 0;
     width: 100%;
     transition: margin $drawerAnimationSpeed;
 
-    &--with-side-bar {
+    @at-root #{$self}--with-side-bar#{$parent} {
       margin-left: $drawerWidth;
       width: calc(100% - #{$drawerWidth});
       @media screen and (max-width: $material-responsive-breakpoint-tablet-min) {
@@ -78,19 +80,19 @@ $global-spinner-color: #333333;
       }
     }
 
-    & .main-layout__message-list {
+    & #{$self}__message-list {
       background-color: #ffffff;
       flex-grow: 1;
       min-width: 0;
     }
-    & .main-layout__message-viewer,
-    & .main-layout__message-editor {
+    & #{$self}__message-viewer,
+    & #{$self}__message-editor {
       background-color: #ffffff;
       flex-grow: 1;
       min-width: 0;
     }
 
-    & .main-layout__fab-container {
+    & #{$self}__fab-container {
       position: fixed;
       right: $default-spacing;
       bottom: $default-spacing;

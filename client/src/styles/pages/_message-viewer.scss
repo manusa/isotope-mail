@@ -4,6 +4,7 @@ $gravatar-size: 40px;
 $gravatar-margin: 6px;
 
 .message-viewer-menu {
+  $self: &;
   right: 0;
   min-width: 150px;
   z-index: map-get($z-index, thermosphere);
@@ -14,39 +15,40 @@ $gravatar-margin: 6px;
 }
 
 .message-viewer {
+  $self: &;
   position: relative;
   padding: $default-spacing;
   display: flex;
   flex-direction: column;
 
-  .message-viewer__header {
+  & &__header {
 
-    .message-viewer__subject-container {
+    & #{$self}__subject-container {
       display: flex;
       align-items: center;
       margin-bottom: $gravatar-margin;
 
-      .message-viewer__gravatar {
+      & #{$self}__gravatar {
         align-self: flex-start;
         width: $gravatar-size;
         height: $gravatar-size;
         margin: 0 $gravatar-margin 0 0;
 
-        .message-viewer__gravatar-image {
+        & #{$self}__gravatar-image {
           border-radius: 50%;
           width: 100%;
           height: 100%;
           pointer-events: none;
         }
       }
-      .message-viewer__subject {
+      & #{$self}__subject {
         flex: 1;
         min-width: 0;
         margin: 0;
         font-size: 1.25 * $font-size-body;
         font-weight: $font-weight-normal * 1.25;
 
-        .message-viewer__folder {
+        & #{$self}__folder {
           margin-left: $default-spacing;
           height: 15px;
           line-height: 15px;
@@ -54,12 +56,12 @@ $gravatar-margin: 6px;
         }
       }
     }
-    .message-viewer__from-date-container  {
+    & #{$self}__from-date-container  {
       display: flex;
       flex-flow: row nowrap;
       min-width: 0;
 
-      .message-viewer__from {
+      & #{$self}__from {
         display: inline-block;
         flex-grow: 1;
         min-width: 0;
@@ -68,32 +70,32 @@ $gravatar-margin: 6px;
         text-overflow: ellipsis;
         white-space: nowrap;
 
-        .message-viewer__name {
+        & #{$self}__name {
           font-size: 1.15 * $font-size-body;
           margin-right: $default-spacing / 2;
         }
-        .message-viewer__email {
+        & #{$self}__email {
           color: lighten($base-color, 45%);
           font-style: italic;
         }
       }
-      .message-viewer__date {
+      & #{$self}__date {
         display: inline-block;
         white-space: nowrap;
       }
     }
-    .message-viewer__to {
+    & #{$self}__to {
       color: lighten($base-color, 45%);
 
-      .message-viewer__name {
+      & #{$self}__name {
         margin-right: $default-spacing / 2;
         color: lighten($base-color, 25%);
       }
     }
   }
-  .message-viewer__body {
+  & #{$self}__body {
     flex: 1;
-    height: 0px;
+    height: 0;
     margin-top: $default-spacing;
     max-width: 100%;
     width: 100%;
@@ -101,7 +103,7 @@ $gravatar-margin: 6px;
     position: relative;
     overflow: auto;
 
-    .message-viewer__attachments {
+    & #{$self}__attachments {
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;

@@ -15,13 +15,14 @@ $header-chip-margin: 2px 6px 2px 0;
 $header-chip-height: 21px;
 
 .message-editor {
+  $self: &;
   position: relative;
   display: flex;
   flex-direction: column;
   padding: $default-spacing;
   background-color: $editor-background-color;
 
-  .message-editor__drop-zone {
+  & &__drop-zone {
     pointer-events: none;
     position: absolute;
     z-index: 2;
@@ -31,7 +32,7 @@ $header-chip-height: 21px;
     width: 100%;
     background-color: rgba(0, 0, 0, 0.05);
 
-    .message-editor__drop-zone-message {
+    & #{$self}__drop-zone-message {
       pointer-events: none;
       position: absolute;
       left: $default-spacing;
@@ -48,17 +49,17 @@ $header-chip-height: 21px;
       font-size: 2.125 * $font-size-body;
       text-align: center;
 
-      i {
+      & #{$self}__drop-zone-icon {
         font-size: 3 * $font-size-body;
       }
     }
   }
 
-  .message-editor__file-dialog-input {
+  & &__file-dialog-input {
     display: none;
   }
 
-  .message-editor__header {
+  & &__header {
 
     input,
     input:focus {
@@ -73,19 +74,20 @@ $header-chip-height: 21px;
       }
     }
 
-    .message-editor__header-address {
+    & #{$self}__header-address {
       display: flex;
       flex-wrap: wrap;
       padding: $header-field-spacing 0;
       border-bottom: 1px solid $editor-border-color;
 
-      .message-editor__header-chip {
+      & #{$self}__header-chip {
+        $parent: &;
         @include mdc-chip-fill-color($header-chip-fill-color);
         @include mdc-chip-outline(1px, solid, $header-chip-outline-color);
         @include mdc-chip-height($header-chip-height);
         margin: $header-chip-margin;
 
-        .mdc-chip__icon {
+        & #{$self}__icon {
           font-size: 15px;
           height: 15px;
           width: 15px;
@@ -95,7 +97,7 @@ $header-chip-height: 21px;
           }
         }
 
-        &.message-editor__header-chip--dragging {
+        @at-root #{$parent}--dragging {
           &::before,
           &::after {
             display:none;
@@ -109,11 +111,11 @@ $header-chip-height: 21px;
         line-height: $header-chip-height;
       }
 
-      .message-editor__header-auto-suggest {
+      & #{$self}__header-auto-suggest {
         display: flex;
         flex: 1;
 
-        .message-editor__header-auto-suggest-menu {
+        & #{$self}__header-auto-suggest-menu {
           left: 0;
           top: 100%;
           max-width: 100%;
@@ -126,7 +128,7 @@ $header-chip-height: 21px;
       }
     }
 
-    .message-editor__header-subject {
+    & #{$self}__header-subject {
       input {
         padding: $header-field-spacing 0;
         width: 100%;
@@ -134,7 +136,7 @@ $header-chip-height: 21px;
     }
   }
 
-  .message-editor__wrapper {
+  & &__wrapper {
     flex: 1;
     height: 1px;
     min-height: 1px;
@@ -143,7 +145,7 @@ $header-chip-height: 21px;
     flex-direction: column;
     border: 1px solid $editor-border-color;
 
-    .message-editor__container {
+    & #{$self}__container {
       flex: 1;
 
       display: flex;
@@ -154,10 +156,10 @@ $header-chip-height: 21px;
       padding: $editor-container-padding;
       margin-bottom: $editor-container-padding;
 
-      .message-editor__attachments {
+      & #{$self}__attachments {
         margin-top: auto;
 
-        .message-editor__attachment {
+        & #{$self}__attachment {
           position: relative;
           margin: 0 0 9px;
           padding: 4px;
@@ -168,73 +170,72 @@ $header-chip-height: 21px;
           display: flex;
           align-items: center;
 
-          .message-editor__file-name {
+          & #{$self}__file-name {
             font-weight: $font-weight-bold;
           }
 
-          .message-editor__size {
+          & #{$self}__size {
             margin-left: 4px;
             font-size: $font-size-body-2 * 0.8;
           }
 
-          .message-editor__delete {
+          & #{$self}__delete {
             margin-left: auto;
             min-width: auto;
             height: 18px;
-            padding-right: 0px;
+            padding-right: 0;
 
-            > i {
-              padding: 0px;
+            & #{$self}__delete-icon {
+              padding: 0;
             }
           }
         }
       }
     }
 
-    .message-editor__button-container {
+    & #{$self}__button-container {
       margin: auto $editor-container-padding $editor-container-padding $editor-container-padding;
       display: flex;
       flex-direction: row;
 
-      .message-editor__button {
+      & #{$self}__button {
         min-width: auto;
         color: $editor-color;
 
         &:not(:first-child):not(:last-child) {
-          border-radius: 0px;
+          border-radius: 0;
         }
         &:first-child {
-          border-top-right-radius: 0px;
-          border-bottom-right-radius: 0px;
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
         }
         &:last-child {
-          border-top-left-radius: 0px;
-          border-bottom-left-radius: 0px;
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
         }
 
         &--active {
           background-color: transparentize($editor-color, 0.93);
         }
 
-        i.message-editor__button-icon {
+        & #{$self}__button-icon {
           margin: 0;
         }
       }
     }
   }
 
-  .message-editor__action-buttons {
+  & &__action-buttons {
     display: flex;
     align-items: center;
     justify-content: flex-start;
 
-    .message-editor__action-button {
-
-      &.message-editor__send {
+    & #{$self}__action-button {
+      $parent: &;
+      @at-root #{$parent}#{$self}__send {
         margin-left: 0;
       }
-
-      &.message-editor__cancel {
+      @at-root #{$parent}#{$self}__cancel {
         margin-left: auto;
       }
     }
