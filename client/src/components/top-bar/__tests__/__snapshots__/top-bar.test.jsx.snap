@@ -3,7 +3,6 @@
 exports[`TopBar component test suite Snapshot render TopBar with new message and no selected message and no selected folder, should render in edit mode without buttons 1`] = `
 <header
   className="
-      mdc-top-app-bar--with-side-bar
       mdc-top-app-bar mdc-top-app-bar--fixed"
 >
   <TopBarMessageEditor
@@ -22,7 +21,6 @@ exports[`TopBar component test suite Snapshot render TopBar with new message and
 exports[`TopBar component test suite Snapshot render TopBar with selected folder (and messageIds) and no new message and no selected message, should render in list mode with delete and mark read buttons 1`] = `
 <header
   className="
-      mdc-top-app-bar--with-side-bar
       mdc-top-app-bar mdc-top-app-bar--fixed"
 >
   <Translate(TopBarMessageList)
@@ -51,7 +49,6 @@ exports[`TopBar component test suite Snapshot render TopBar with selected folder
 exports[`TopBar component test suite Snapshot render TopBar with selected folder and no new message and no selected message, should render in list mode 1`] = `
 <header
   className="
-      mdc-top-app-bar--with-side-bar
       mdc-top-app-bar mdc-top-app-bar--fixed"
 >
   <Translate(TopBarMessageList)
@@ -74,7 +71,6 @@ exports[`TopBar component test suite Snapshot render TopBar with selected folder
 exports[`TopBar component test suite Snapshot render TopBar with selected message and no new message and no selected folder, should render in view mode with buttons 1`] = `
 <header
   className="
-      mdc-top-app-bar--with-side-bar
       mdc-top-app-bar mdc-top-app-bar--fixed"
 >
   <Translate(TopBarMessageViewer)

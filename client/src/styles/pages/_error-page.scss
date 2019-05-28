@@ -6,6 +6,7 @@ $color: white;
 $spacing : 32px;
 
 .isotope-error-page {
+  $self: &;
   background: url('https://source.unsplash.com/collection/4509660/1920x1080') no-repeat white;
   background-size: cover;
   animation: fade-in .5s linear backwards;
@@ -15,7 +16,7 @@ $spacing : 32px;
     to   { opacity: 1; }
   }
 
-  .isotope-error-page__overlay {
+  & &__overlay {
     background: $background-overlay;
     background: radial-gradient(circle, $background-overlay, $background-overlay-outer 100%);
     display: flex;
@@ -25,7 +26,7 @@ $spacing : 32px;
 
     color: $color;
 
-    .isotope-error-page__container {
+    & #{$self}__container {
       padding: $spacing $spacing ($spacing * 4) $spacing;
 
       h1, p {
@@ -33,7 +34,7 @@ $spacing : 32px;
       }
     }
 
-    .isotope-error-page__button {
+    & #{$self}__button {
       @include mdc-button-ink-color($color);
       @include mdc-button-outline-color($color);
     }

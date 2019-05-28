@@ -70,7 +70,7 @@ class MessageEditor extends Component {
         {this.state.dropZoneActive &&
           <div className={mainCss['message-editor__drop-zone']}>
             <div className={mainCss['message-editor__drop-zone-message']}>
-              <i className={'material-icons'}>attach_file</i>
+              <i className={`material-icons ${mainCss['message-editor__drop-zone-icon']}`}>attach_file</i>
               {t('messageEditor.dropZoneMessage')}
             </div>
           </div>
@@ -117,7 +117,8 @@ class MessageEditor extends Component {
                   <span className={mainCss['message-editor__file-name']}>{a.fileName}</span>
                   <span className={mainCss['message-editor__size']}>({prettySize(a.size, 0)})</span>
                   <Button className={mainCss['message-editor__delete']}
-                    icon={'delete'} onClick={() => this.removeAttachment(a)}/>
+                    iconClassName={mainCss['message-editor__delete-icon']} icon={'delete'}
+                    onClick={() => this.removeAttachment(a)}/>
                 </div>
               )}
             </div>
