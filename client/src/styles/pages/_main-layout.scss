@@ -111,7 +111,6 @@ $global-spinner-color: #333333;
     top: 0;
     width: 100%;
     height: 100%;
-    //z-index: map-get($z-index, stratosphere);
     z-index: $mdc-dialog-z-index;
     .message-editor__scrim {
       left: 0;
