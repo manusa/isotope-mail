@@ -16,7 +16,6 @@ $header-chip-height: 21px;
 
 .message-editor {
   $self: &;
-  position: relative;
   display: flex;
   flex-direction: column;
   padding: $default-spacing;
