@@ -12,7 +12,7 @@ $header-label-color: lighten($base-color, 25%) !default;
 $header-chip-fill-color: white !default;
 $header-chip-outline-color: transparentize($editor-outline-color, 0.75) !default;
 $header-chip-margin: 2px 6px 2px 0;
-$header-chip-height: 21px;
+$header-chip-height: 25px;
 
 .message-editor {
   $self: &;
