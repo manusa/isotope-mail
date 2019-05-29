@@ -19,6 +19,14 @@ import {getFolders} from '../services/folder';
 import {resetFolderMessagesCache} from '../services/message';
 import mainCss from '../styles/main.scss';
 
+const MessageEditorWrapper = ({applicationNewMessage}) => (
+  (applicationNewMessage && Object.keys(applicationNewMessage).length > 0) &&
+  <div className={mainCss['main-layout__message-editor-wrapper']}>
+    <div className={mainCss['message-editor__scrim']}></div>
+    <MessageEditor/>
+  </div>
+);
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -31,12 +39,13 @@ class App extends Component {
   }
 
   render() {
+    const {application} = this.props;
     const {sideBar} = this.state;
     return (
       <div className={`${mainCss['main-layout']}
           ${sideBar.collapsed ? '' : mainCss['main-layout--with-side-bar']}`}>
         <Spinner
-          visible={this.props.application.activeRequests > 0}
+          visible={application.activeRequests > 0}
           className={mainCss['main-layout__spinner']} pathClassName={mainCss['spinner-path']}/>
         <TopBar sideBarCollapsed={sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
         <SideBar collapsed={sideBar.collapsed} sideBarToggle={this.toggleSideBar}/>
@@ -44,6 +53,7 @@ class App extends Component {
         <div className={`${mainCss['mdc-top-app-bar--fixed-adjust']} ${mainCss['main-layout__content-wrapper']}`}>
           {this.renderContent()}
         </div>
+        <MessageEditorWrapper {...this.props}/>
         <MessageSnackbar/>
       </div>
     );
@@ -51,9 +61,7 @@ class App extends Component {
 
   renderContent() {
     const {application, outbox} = this.props;
-    if (application.newMessage && Object.keys(application.newMessage).length > 0) {
-      return <MessageEditor className={mainCss['main-layout__message-editor']} />;
-    } else if (application.selectedMessage && Object.keys(application.selectedMessage).length > 0) {
+    if (application.selectedMessage && Object.keys(application.selectedMessage).length > 0) {
       return <MessageViewer className={mainCss['main-layout__message-viewer']} />;
     }
     return (
@@ -137,6 +145,7 @@ App.propTypes = {
 const mapStateToProps = state => ({
   application: state.application,
   credentials: getCredentials(state),
+  applicationNewMessage: state.application.newMessage,
   selectedFolder: getSelectedFolder(state),
   outbox: outboxSelector(state),
   pollInterval: pollIntervalSelector(state)

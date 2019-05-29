@@ -1,4 +1,8 @@
 @import '../partials/variables';
+@import "@material/theme/variables";
+@import "@material/shape/mixins";
+@import "@material/elevation/mixins";
+@import "@material/dialog/variables";
 @import '@material/drawer/mdc-drawer';
 @import '@material/top-app-bar/mixins';
 
@@ -85,8 +89,7 @@ $global-spinner-color: #333333;
       flex-grow: 1;
       min-width: 0;
     }
-    & #{$self}__message-viewer,
-    & #{$self}__message-editor {
+    & #{$self}__message-viewer {
       background-color: #ffffff;
       flex-grow: 1;
       min-width: 0;
@@ -99,6 +102,42 @@ $global-spinner-color: #333333;
       display: flex;
       flex-direction: row;
       justify-content: space-between;
+    }
+  }
+
+  & &__message-editor-wrapper {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: map-get($z-index, stratosphere);
+    .message-editor__scrim {
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background-color: rgba(map-get($mdc-theme-property-values, on-surface), $mdc-dialog-scrim-opacity);
+    }
+    .message-editor {
+      $desktop-margin: 5%;
+      position: absolute;
+      left: $desktop-margin;
+      top: $desktop-margin;
+      right: $desktop-margin;
+      bottom: $desktop-margin;
+      z-index: 2;
+      @media screen and (max-width: $material-responsive-breakpoint-tablet-min) {
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+      }
+      @media screen and (min-width: #{$material-responsive-breakpoint-tablet-min + 1px}) {
+        @include mdc-shape-radius(medium);
+        @include mdc-elevation(24);
+      }
     }
   }
 }
