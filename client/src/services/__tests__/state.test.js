@@ -21,7 +21,7 @@ describe('State service test suite', () => {
       sessionStorage.setItem('KEY_HASH', 'hash');
       indexedDb.recoverState = jest.fn(() => Promise.resolve({
         application: {object: 1},
-        folders: {items: [], explodedItems: {1337: {folderId: '1337', name: 'INBOX', children: []}}},
+        folders: {items: [], explodedItems: {1337: {folderId: '1337', name: 'INBOX', fullName: 'INBOX', children: []}}},
         login: {formValues: {serverHost: 'server.host'}},
         messages: {cache: {object: 2}}
       }));

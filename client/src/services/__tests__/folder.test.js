@@ -7,6 +7,36 @@ import * as fetch from '../fetch';
 import * as notification from '../notification';
 
 describe('Folder service test suite', () => {
+  describe('processFolders', () => {
+    test('no folders, should return null', () => {
+      // Given
+      const inputFolders = null;
+      // When
+      const result = folderService.processFolders(inputFolders);
+      // Then
+      expect(result).toBeNull();
+    });
+    test('folders with all types of folder, should return processed array', () => {
+      // Given
+      const inputFolders = [
+        {folderId: 'nested_inbox', fullName: 'TRASH/INBOX', name: 'INBOX', type: 'LOST'},
+        {folderId: 'inbox', fullName: 'INBOX', name: 'INBOX', type: 'LOST'},
+        {folderId: 'trash', fullName: 'Papelera', name: 'Papelera', attributes: ['\\Trash']},
+        {folderId: 'brouillon', fullName: 'Brouillon', name: 'Brouillon', attributes: ['\\Drafts']},
+        {folderId: 'sent', fullName: 'Sent', name: 'Sent', attributes: ['\\Sent']}
+      ];
+      // When
+      const result = folderService.processFolders(inputFolders);
+      // Then
+      expect(result).toEqual([
+        expect.objectContaining({folderId: 'inbox', fullName: 'INBOX', name: 'INBOX', type: FolderTypes.INBOX}),
+        expect.objectContaining({folderId: 'brouillon', name: 'Brouillon', attributes: ['\\Drafts'], type: FolderTypes.DRAFTS}),
+        expect.objectContaining({folderId: 'sent', name: 'Sent', attributes: ['\\Sent'], type: FolderTypes.SENT}),
+        expect.objectContaining({folderId: 'trash', name: 'Papelera', attributes: ['\\Trash'], type: FolderTypes.TRASH}),
+        expect.objectContaining({folderId: 'nested_inbox', fullName: 'TRASH/INBOX', name: 'INBOX', type: FolderTypes.FOLDER})
+      ]);
+    });
+  });
   describe('findTrashFolder', () => {
     test('findTrashFolder, state with TRASH folder, should return trash folder', () => {
       // Given
@@ -62,7 +92,7 @@ describe('Folder service test suite', () => {
         expect(url.search).toBe('?loadChildren=true');
         return Promise.resolve({
           ok: true, url, options, headers: {get: jest.fn()},
-          json: () => ([{name: 'INBOX', newMessageCount: 1337}])
+          json: () => ([{name: 'INBOX', fullName: 'INBOX', newMessageCount: 1337}])
         });
       });
       let dispatchCount = 0;
