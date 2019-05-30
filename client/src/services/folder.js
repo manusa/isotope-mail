@@ -1,3 +1,4 @@
+import get from 'lodash/get';
 import {
   backendRequest as applicationBackendRequest,
   backendRequestCompleted as applicationBackendRequestCompleted, createFolder,
@@ -91,7 +92,7 @@ export function processFolders(initialFolders) {
   const folders = [];
   const specialFolders = [];
   initialFolders.map(folder => {
-    if (folder.name && folder.name.toUpperCase() === FolderTypes.INBOX.serverName) {
+    if (get(folder, 'fullName', '').toUpperCase() === FolderTypes.INBOX.serverName) {
       folder.type = FolderTypes.INBOX;
       specialFolders[folder.type.position] = folder;
     } else {
