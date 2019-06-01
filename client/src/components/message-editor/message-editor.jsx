@@ -78,53 +78,55 @@ class MessageEditor extends Component {
         <input
           type="file" multiple="multiple" className={mainCss['message-editor__file-dialog-input']}
           ref={this.fileDialogRef} onChange={this.handleOnFileDialogChange} />
-        <div className={mainCss['message-editor__header']}>
-          <form ref={this.headerFormRef}>
-            <HeaderAddress id={'to'} addresses={to} onAddressAdd={this.handleAddAddress}
-              onAddressRemove={this.handleRemoveAddress}
-              onAddressMove={this.handleMoveAddress}
-              getAddresses={this.props.getAddresses} label={t('messageEditor.to')} />
-            <HeaderAddress id={'cc'} addresses={cc} onAddressAdd={this.handleAddAddress}
-              onAddressRemove={this.handleRemoveAddress}
-              onAddressMove={this.handleMoveAddress}
-              getAddresses={this.props.getAddresses} label={t('messageEditor.cc')} />
-            <HeaderAddress id={'bcc'} addresses={bcc} onAddressAdd={this.handleAddAddress}
-              onAddressRemove={this.handleRemoveAddress}
-              onAddressMove={this.handleMoveAddress}
-              getAddresses={this.props.getAddresses} label={t('messageEditor.bcc')} />
-            <div className={mainCss['message-editor__header-subject']}>
-              <input type={'text'} placeholder={t('messageEditor.subject')}
-                value={subject} onChange={this.handleOnSubjectChange} />
-            </div>
-          </form>
-        </div>
-        <div className={mainCss['message-editor__wrapper']} onClick={() => this.editorWrapperClick()}>
-          <div className={mainCss['message-editor__container']}>
-            <Editor
-              ref={this.editorRef}
-              initialValue={content}
-              onEditorChange={this.handleEditorChange}
-              onSelectionChange={this.handleSelectionChange}
-              // Force initial content (reply messages) to be persisted in IndexedDB with base64/datauri embedded images
-              onInit={() => this.getEditor().uploadImages().then(() => this.getEditor().fire('Change'))}
-              onPaste={event => this.editorPaste(event)}
-              inline={true}
-              init={EDITOR_CONFIG}
-            />
-            <div className={mainCss['message-editor__attachments']}>
-              {attachments.map((a, index) =>
-                <div key={index} className={mainCss['message-editor__attachment']}>
-                  <span className={mainCss['message-editor__file-name']}>{a.fileName}</span>
-                  <span className={mainCss['message-editor__size']}>({prettySize(a.size, 0)})</span>
-                  <Button className={mainCss['message-editor__delete']}
-                    iconClassName={mainCss['message-editor__delete-icon']} icon={'delete'}
-                    onClick={() => this.removeAttachment(a)}/>
-                </div>
-              )}
-            </div>
+        <div className={mainCss['message-editor__mobile-wrapper']} onClick={event => this.editorWrapperClick(event)}>
+          <div className={mainCss['message-editor__header']}>
+            <form ref={this.headerFormRef}>
+              <HeaderAddress id={'to'} addresses={to} onAddressAdd={this.handleAddAddress}
+                onAddressRemove={this.handleRemoveAddress}
+                onAddressMove={this.handleMoveAddress}
+                getAddresses={this.props.getAddresses} label={t('messageEditor.to')} />
+              <HeaderAddress id={'cc'} addresses={cc} onAddressAdd={this.handleAddAddress}
+                onAddressRemove={this.handleRemoveAddress}
+                onAddressMove={this.handleMoveAddress}
+                getAddresses={this.props.getAddresses} label={t('messageEditor.cc')} />
+              <HeaderAddress id={'bcc'} addresses={bcc} onAddressAdd={this.handleAddAddress}
+                onAddressRemove={this.handleRemoveAddress}
+                onAddressMove={this.handleMoveAddress}
+                getAddresses={this.props.getAddresses} label={t('messageEditor.bcc')} />
+              <div className={mainCss['message-editor__header-subject']}>
+                <input type={'text'} placeholder={t('messageEditor.subject')}
+                  value={subject} onChange={this.handleOnSubjectChange} />
+              </div>
+            </form>
           </div>
-          <MessageEditorButtons
-            editor={this.getEditor()} editorState={this.state.editorState} parentSetState={this.handleSetState}/>
+          <div className={mainCss['message-editor__wrapper']}>
+            <div className={mainCss['message-editor__container']}>
+              <Editor
+                ref={this.editorRef}
+                initialValue={content}
+                onEditorChange={this.handleEditorChange}
+                onSelectionChange={this.handleSelectionChange}
+                // Force initial content (reply messages) to be persisted in IndexedDB with base64/datauri embedded images
+                onInit={() => this.getEditor().uploadImages().then(() => this.getEditor().fire('Change'))}
+                onPaste={event => this.editorPaste(event)}
+                inline={true}
+                init={EDITOR_CONFIG}
+              />
+              <div className={mainCss['message-editor__attachments']}>
+                {attachments.map((a, index) =>
+                  <div key={index} className={mainCss['message-editor__attachment']}>
+                    <span className={mainCss['message-editor__file-name']}>{a.fileName}</span>
+                    <span className={mainCss['message-editor__size']}>({prettySize(a.size, 0)})</span>
+                    <Button className={mainCss['message-editor__delete']}
+                      iconClassName={mainCss['message-editor__delete-icon']} icon={'delete'}
+                      onClick={() => this.removeAttachment(a)}/>
+                  </div>
+                )}
+              </div>
+            </div>
+            <MessageEditorButtons
+              editor={this.getEditor()} editorState={this.state.editorState} parentSetState={this.handleSetState}/>
+          </div>
         </div>
         <div className={mainCss['message-editor__action-buttons']}>
           <button
@@ -275,8 +277,17 @@ class MessageEditor extends Component {
     return null;
   }
 
-  editorWrapperClick() {
-    this.getEditor().focus();
+  /**
+   * When clicking on editor's white space, content editor gets focus.
+   * @param event
+   */
+  editorWrapperClick(event) {
+    if (event.target === event.currentTarget
+      || event.target.classList.contains(mainCss['message-editor__wrapper'])
+      || event.target.classList.contains(mainCss['message-editor__container'])
+    ) {
+      this.getEditor().focus();
+    }
   }
 
   /**
