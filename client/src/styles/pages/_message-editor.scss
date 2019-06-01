@@ -1,4 +1,5 @@
 @import '../partials/variables';
+@import '@material/button/variables';
 @import '@material/chips/variables';
 @import '@material/chips/mixins';
 
@@ -7,18 +8,16 @@ $editor-container-padding: 8px !default;
 $editor-background-color: white !default;
 $editor-outline-color: $editor-color !default;
 $editor-border-color: lighten($editor-outline-color, 50%) !default;
+$editor-bottom-spacing: $default-spacing / 2;
 $header-field-spacing: $default-spacing / 2 !default;
 $header-label-color: lighten($base-color, 25%) !default;
 $header-chip-fill-color: white !default;
 $header-chip-outline-color: transparentize($editor-outline-color, 0.75) !default;
 $header-chip-margin: 2px 6px 2px 0;
 $header-chip-height: 25px;
-
+$action-buttons-height: 48px;
 .message-editor {
   $self: &;
-  display: flex;
-  flex-direction: column;
-  padding: $default-spacing;
   background-color: $editor-background-color;
 
   & &__drop-zone {
@@ -59,7 +58,10 @@ $header-chip-height: 25px;
   }
 
   & &__header {
-
+    @media screen and (max-width: $material-responsive-breakpoint-tablet-min) {
+      margin-left: $default-spacing;
+      margin-right: $default-spacing;
+    }
     input,
     input:focus {
       border: 0;
@@ -139,10 +141,17 @@ $header-chip-height: 25px;
     flex: 1;
     height: 1px;
     min-height: 1px;
-
     display: flex;
     flex-direction: column;
     border: 1px solid $editor-border-color;
+    @media screen and (max-width: $material-responsive-breakpoint-tablet-min) {
+      height: initial;
+      min-height: initial;
+      margin-left: $default-spacing;
+      margin-right: $default-spacing;
+      border: 0;
+      border-top: 1px solid $editor-border-color;
+    }
 
     & #{$self}__container {
       flex: 1;
@@ -196,7 +205,14 @@ $header-chip-height: 25px;
       margin: auto $editor-container-padding $editor-container-padding $editor-container-padding;
       display: flex;
       flex-direction: row;
-
+      @media screen and (max-width: $material-responsive-breakpoint-tablet-min) {
+        position: fixed;
+        margin: 0;
+        height: $mdc-button-height;
+        bottom: $editor-bottom-spacing + $action-buttons-height;
+        left: 16px;
+        right: 16px;
+      }
       & #{$self}__button {
         min-width: auto;
         color: $editor-color;
@@ -224,7 +240,31 @@ $header-chip-height: 25px;
     }
   }
 
+  &  &__mobile-wrapper {
+    position: absolute;
+    top: $default-spacing;
+    left: $default-spacing;
+    bottom: #{$editor-bottom-spacing + $action-buttons-height};
+    right: $default-spacing;
+    display: flex;
+    flex-direction: column;
+
+    @media screen and (max-width: $material-responsive-breakpoint-tablet-min) {
+      display: block;
+      top: 0;
+      left: 0;
+      bottom: #{$editor-bottom-spacing + $mdc-button-height + $action-buttons-height};
+      right: 0;
+      overflow-y: auto;
+    }
+  }
+
   & &__action-buttons {
+    position: absolute;
+    left: $default-spacing;
+    right: $default-spacing;
+    bottom: $editor-bottom-spacing;
+    height: $action-buttons-height;
     display: flex;
     align-items: center;
     justify-content: flex-start;
