@@ -13,8 +13,9 @@ import ComposeFabButton from './buttons/compose-fab-button';
 import {clearUserCredentials} from '../actions/application';
 import {getCredentials, outbox as outboxSelector, pollInterval as pollIntervalSelector} from '../selectors/application';
 import {getSelectedFolder} from '../selectors/folders';
-import {AuthenticationException} from '../services/fetch';
 import {editNewMessage} from '../services/application';
+import {isDesktop} from '../services/configuration';
+import {AuthenticationException} from '../services/fetch';
 import {getFolders} from '../services/folder';
 import {resetFolderMessagesCache} from '../services/message';
 import mainCss from '../styles/main.scss';
@@ -32,7 +33,7 @@ class App extends Component {
     super(props);
     this.state = {
       sideBar: {
-        collapsed: false
+        collapsed: !isDesktop()
       }
     };
     this.toggleSideBar = this.toggleSideBar.bind(this);
