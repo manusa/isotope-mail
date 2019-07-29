@@ -44,6 +44,7 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -86,6 +87,7 @@ public class ApplicationResourceTest {
                 .accept(MediaTypes.HAL_JSON_VALUE));
         // Then
         result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.googleAnalyticsTrackingId").doesNotExist());
         result.andExpect(jsonPath("$._links").exists());
         result.andExpect(jsonPath("$._links", aMapWithSize(14)));
         result.andExpect(jsonPath("$._links['application.login'].href", endsWith("/v1/application/login")));
@@ -107,6 +109,19 @@ public class ApplicationResourceTest {
         result.andExpect(jsonPath("$._links['folders.message.seen.bulk'].href",
                 endsWith("/v1/folders/{folderId}/messages/seen/{seen}")));
         result.andExpect(jsonPath("$._links.smtp.href", endsWith("/v1/smtp")));
+    }
+
+    @Test
+    public void getConfiguration_optionalEnvVariablesSet_shouldReturnOk() throws Exception {
+        // Given
+        doReturn("UA-1337-33").when(isotopeApiConfiguration).getGoogleAnalyticsTrackingId();
+        // When
+        final ResultActions result = mockMvc.perform(get("/v1/application/configuration")
+                .accept(MediaTypes.HAL_JSON_VALUE));
+        // Then
+        result.andExpect(status().isOk());
+        result.andExpect(jsonPath("$.googleAnalyticsTrackingId", is("UA-1337-33")));
+        result.andExpect(jsonPath("$._links", aMapWithSize(14)));
     }
 
     @Test

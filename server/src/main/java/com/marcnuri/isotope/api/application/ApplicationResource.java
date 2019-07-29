@@ -99,6 +99,7 @@ public class ApplicationResource {
     @SuppressWarnings("ConstantConditions")
     private ConfigurationDto toDto(IsotopeApiConfiguration configuration) {
         final ConfigurationDto ret = new ConfigurationDto();
+        ret.setGoogleAnalyticsTrackingId(configuration.getGoogleAnalyticsTrackingId());
         ret.add(linkTo(methodOn(ApplicationResource.class)
                 .login(null))
                 .withRel(REL_APPLICATION_LOGIN));

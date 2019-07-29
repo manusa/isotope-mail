@@ -563,7 +563,7 @@ public class ImapService {
     }
 
     /**
-     * Returns a list of  {@link Attachment}s and replaces embedded images in {@link Message#content} if they are
+     * Returns a list of  {@link Attachment}s and replaces embedded images in {@link Message#getContent()} if they are
      * small in order to avoid future calls to the API which may result more expensive.
      *
      * @param finalMessage

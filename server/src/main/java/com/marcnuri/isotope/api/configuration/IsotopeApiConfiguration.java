@@ -56,6 +56,8 @@ public class IsotopeApiConfiguration {
     private static final String EMBEDDED_IMAGE_SIZE_THRESHOLD = "EMBEDDED_IMAGE_SIZE_THRESHOLD";
     private static final long EMBEDDED_IMAGE_SIZE_THRESHOLD_DEFAULT_50KB = 51200L;
 
+    private static final String GOOGLE_ANALYTICS_TRACKING_ID = "GOOGLE_ANALYTICS_TRACKING_ID";
+
     private static final int CREDENTIALS_DURATION_MINUTES = 15;
     private static final int CREDENTIALS_REFRESH_BEFORE_DURATION_MINUTES = 10;
 
@@ -85,6 +87,10 @@ public class IsotopeApiConfiguration {
 
     public long getEmbeddedImageSizeThreshold() {
         return environment.getProperty(EMBEDDED_IMAGE_SIZE_THRESHOLD, Long.class, EMBEDDED_IMAGE_SIZE_THRESHOLD_DEFAULT_50KB);
+    }
+
+    public String getGoogleAnalyticsTrackingId() {
+        return environment.getProperty(GOOGLE_ANALYTICS_TRACKING_ID);
     }
 
     public TemporalAmount getCredentialsDuration() {
