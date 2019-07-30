@@ -8,6 +8,7 @@ import debounce from './services/debounce';
 import i18n from './services/i18n';
 import {loadState, saveState} from './services/state';
 import Routes from './routes/routes';
+import GoogleAnalytics from './google-analytics';
 import rootReducer from './reducers';
 
 const SAVE_STATE_DEBOUNCE_PERIOD_IN_MILLIS = 500;
@@ -29,11 +30,14 @@ async function init () {
   store.subscribe(debounce(() => saveState(store.dispatch, store.getState()), SAVE_STATE_DEBOUNCE_PERIOD_IN_MILLIS));
 
   ReactDOM.render(
-    <Provider store={store}>
-      <I18nextProvider i18n={i18n}>
-        <Routes />
-      </I18nextProvider>
-    </Provider>,
+    <>
+      <Provider store={store}>
+        <I18nextProvider i18n={i18n}>
+          <Routes />
+        </I18nextProvider>
+      </Provider>
+      <GoogleAnalytics />
+    </>,
     document.getElementById('root')
   );
 }
