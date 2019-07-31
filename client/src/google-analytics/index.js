@@ -1,2 +1,4 @@
-
-export {default} from './google-analytics';
+export {
+  useAnalytics,
+  updateAnalytics
+} from './hooks';
