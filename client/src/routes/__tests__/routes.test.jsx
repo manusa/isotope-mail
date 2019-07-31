@@ -5,9 +5,11 @@ import Routes from '../routes';
 
 describe('Routes component test suite', () => {
   test('Snapshot render', () => {
-    // When
+    // Given
     const routes = shallow(<Routes />);
+    // When
+    const wrappedSwitch = routes.find('SwitchWrapper').dive();
     // Then
-    expect(routes).toMatchSnapshot();
+    expect(wrappedSwitch).toMatchSnapshot();
   });
 });
