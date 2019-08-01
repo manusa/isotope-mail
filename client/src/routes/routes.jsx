@@ -5,12 +5,11 @@ import ApplicationReadyRoute from './application-ready-route';
 import App from '../components/app';
 import ConfigurationNotFound from '../components/error-pages/configuration-not-found';
 import Login from '../components/login/login';
-import {useAnalytics, updateAnalytics} from '../google-analytics';
+import {useAnalytics} from '../google-analytics';
 import '../styles/main.scss';
 
 const SwitchWrapper = () => {
   useAnalytics();
-  updateAnalytics();
   return (
     <Switch>
       <Route exact path="/configuration-not-found" render={() => <ConfigurationNotFound />} />

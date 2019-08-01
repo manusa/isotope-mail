@@ -4,16 +4,19 @@ import isFunction from 'lodash/isFunction';
 import {googleAnalyticsTrackingId} from './selectors';
 
 const updateLocation = trackingId => {
-  if (isFunction(window.gtag)) {
-    window.gtag('config', trackingId, {
-      page_path: get(window, 'location.pathname')
-    });
-  }
+  window.gtag('config', trackingId, {
+    page_path: get(window, 'location.pathname')
+  });
 };
 
 export const useAnalytics = () => {
   const trackingId = googleAnalyticsTrackingId();
   if (trackingId) {
+    useEffect(() => {
+      if (isFunction(window.gtag)) {
+        updateLocation(trackingId);
+      }
+    });
     useEffect(() => {
       const scriptLoader = document.createElement('script');
       scriptLoader.async = true;
@@ -27,14 +30,5 @@ export const useAnalytics = () => {
       updateLocation(trackingId);
       return () => document.body.removeChild(scriptLoader);
     }, []);
-  }
-};
-
-export const updateAnalytics = () => {
-  const trackingId = googleAnalyticsTrackingId();
-  if (trackingId) {
-    useEffect(() => {
-      updateLocation(trackingId);
-    });
   }
 };
