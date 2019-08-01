@@ -1,4 +1,3 @@
 export {
-  useAnalytics,
-  updateAnalytics
+  useAnalytics
 } from './hooks';
