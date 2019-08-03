@@ -49,7 +49,8 @@
       "more": "Mehr",
       "messageViewerMenu": {
         "download": "Download (.eml)",
-        "listUnsubscribe": "Von der Liste abmelden"
+        "listUnsubscribe": "Von der Liste abmelden",
+        "reply": "Reply"
       },
       "deleteFromTrashDialog": {
         "title": "Löschen bestätigen",
@@ -131,4 +132,3 @@
       "newMail": "Neue Nachrichten erhalten"
     }
   }
-  

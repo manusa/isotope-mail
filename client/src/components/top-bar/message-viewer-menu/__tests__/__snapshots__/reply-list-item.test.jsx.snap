@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ReplyListItem component test suite Snapshot render Snapshot render, should render DownloadListItem 1`] = `
+<li
+  className="mdc-list-item"
+  onClick={[MockFunction]}
+>
+  <span
+    className="mdc-list-item__graphic material-icons"
+  >
+    reply
+  </span>
+  topBar.messageViewerMenu.reply
+</li>
+`;

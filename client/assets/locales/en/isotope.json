@@ -49,7 +49,8 @@
     "more": "More",
     "messageViewerMenu": {
       "download": "Download (.eml)",
-      "listUnsubscribe": "Unsubscribe from this list"
+      "listUnsubscribe": "Unsubscribe from this list",
+      "reply": "Reply"
     },
     "deleteFromTrashDialog": {
       "title": "Confirm deletion",

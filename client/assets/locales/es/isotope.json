@@ -49,7 +49,8 @@
     "more": "Más",
     "messageViewerMenu": {
       "download": "Descargar (.eml)",
-      "listUnsubscribe": "Cancelar la suscripción a esta lista"
+      "listUnsubscribe": "Cancelar la suscripción a esta lista",
+      "reply": "Responder"
     },
     "deleteFromTrashDialog": {
       "title": "Confirmar borrado",

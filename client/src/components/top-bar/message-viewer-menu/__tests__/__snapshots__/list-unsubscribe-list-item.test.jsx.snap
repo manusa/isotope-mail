@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ListUnsubscribeListItem component test suite Snapshot render Snapshot render, listUnsubscribe with invalid entry, should render empty ListUnsubscribeListItem 1`] = `""`;
+
+exports[`ListUnsubscribeListItem component test suite Snapshot render Snapshot render, listUnsubscribe with valid entries, should render ListUnsubscribeListItem 1`] = `
+<li>
+  <a
+    className="mdc-list-item"
+    href="mailto:unsubscribe@list.com"
+    rel="noopener noreferrer"
+    target="_blank"
+  >
+    <span
+      className="mdc-list-item__graphic material-icons"
+    >
+      unsubscribe
+    </span>
+    topBar.messageViewerMenu.listUnsubscribe
+  </a>
+</li>
+`;
+
+exports[`ListUnsubscribeListItem component test suite Snapshot render Snapshot render, no listUnsubscribe, should render empty ListUnsubscribeListItem 1`] = `""`;

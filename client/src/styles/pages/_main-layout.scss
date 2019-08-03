@@ -66,6 +66,13 @@ $global-spinner-color: #333333;
         width: 100%;
       }
     }
+    & .mdc-menu {
+      & .mdc-list-item {
+        & .mdc-list-item__graphic {
+          margin-right: $default-spacing;
+        }
+      }
+    }
   }
   & &__content-wrapper {
     $parent: &;
