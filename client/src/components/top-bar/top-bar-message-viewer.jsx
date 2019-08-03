@@ -4,7 +4,7 @@ import {translate} from 'react-i18next';
 import ButtonCollapse from './button-collapse';
 import ButtonForward from './button-forward';
 import ButtonMore from './button-more';
-import ButtonReply from './button-reply';
+import ButtonReplyAll from './button-reply-all';
 import {MessageViewerMenu} from './message-viewer-menu';
 import TopBarButton from './top-bar-button';
 import mainCss from '../../styles/main.scss';
@@ -12,7 +12,7 @@ import mainCss from '../../styles/main.scss';
 export const TopBarMessageViewer = (
   {
     t, collapsed, sideBarToggle, clearSelectedMessage,
-    outboxEmpty, onReplyMessageClick, onForwardMessageClick,
+    outboxEmpty, onReplyAllMessageClick, onForwardMessageClick,
     onDeleteClick,
     onMarkUnreadClick
   }) => (
@@ -28,7 +28,7 @@ export const TopBarMessageViewer = (
       </span>
     </section>
     <section className={`${mainCss['mdc-top-app-bar__section']} ${mainCss['mdc-top-app-bar__section--align-end']}`}>
-      <ButtonReply outboxEmpty={outboxEmpty} replyMessage={onReplyMessageClick}/>
+      <ButtonReplyAll outboxEmpty={outboxEmpty} replyAllMessage={onReplyAllMessageClick}/>
       <ButtonForward outboxEmpty={outboxEmpty} forwardMessage={onForwardMessageClick}/>
       <span isotip={t('topBar.delete')} isotip-position='bottom' isotip-size='small'>
         <TopBarButton onClick={onDeleteClick}>delete</TopBarButton>
@@ -46,7 +46,7 @@ TopBarMessageViewer.propTypes = {
   sideBarToggle: PropTypes.func.isRequired,
   clearSelectedMessage: PropTypes.func.isRequired,
   outboxEmpty: PropTypes.bool.isRequired,
-  onReplyMessageClick: PropTypes.func.isRequired,
+  onReplyAllMessageClick: PropTypes.func.isRequired,
   onForwardMessageClick: PropTypes.func.isRequired,
   onDeleteClick: PropTypes.func.isRequired,
   onMarkUnreadClick: PropTypes.func.isRequired

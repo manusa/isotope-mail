@@ -3,16 +3,16 @@ import PropTypes from 'prop-types';
 import {translate} from 'react-i18next';
 import TopBarButton from './top-bar-button';
 
-export const ButtonReply = ({t, outboxEmpty, replyMessage}) => (
+export const ButtonReplyAll = ({t, outboxEmpty, replyAllMessage}) => (
   outboxEmpty && (
     <span isotip={t('topBar.replyAll')} isotip-position='bottom' isotip-size='small'>
-      <TopBarButton onClick={replyMessage}>reply_all</TopBarButton>
+      <TopBarButton onClick={replyAllMessage}>reply_all</TopBarButton>
     </span>)
 );
 
-ButtonReply.propTypes = {
+ButtonReplyAll.propTypes = {
   outboxEmpty: PropTypes.bool.isRequired,
-  replyMessage: PropTypes.func.isRequired
+  replyAllMessage: PropTypes.func.isRequired
 };
 
-export default translate()(ButtonReply);
+export default translate()(ButtonReplyAll);

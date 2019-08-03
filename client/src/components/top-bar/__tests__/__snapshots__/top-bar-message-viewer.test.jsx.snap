@@ -27,9 +27,9 @@ exports[`TopBarMessageViewer component test suite Snapshot render, should render
   <section
     className="mdc-top-app-bar__section mdc-top-app-bar__section--align-end"
   >
-    <Translate(ButtonReply)
+    <Translate(ButtonReplyAll)
       outboxEmpty={true}
-      replyMessage={[MockFunction]}
+      replyAllMessage={[MockFunction]}
     />
     <Translate(ButtonForward)
       forwardMessage={[MockFunction]}

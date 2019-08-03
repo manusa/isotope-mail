@@ -7,10 +7,11 @@ import ListUnsubscribeListItem from './list-unsubscribe-list-item';
 import ReplyListItem from './reply-list-item';
 import {getCredentials, selectedMessage as selectedMessageSelector} from '../../../selectors/application';
 import {getSelectedFolder} from '../../../selectors/folders';
+import {replyMessage as applicationReplyMessage} from '../../../services/application';
 import {downloadMessage as downloadMessageService} from '../../../services/message';
 import mainCss from '../../../styles/main.scss';
 
-export const MessageViewerMenu = ({t, visible, selectedFolder, selectedMessage, downloadMessage}) =>
+export const MessageViewerMenu = ({t, visible, selectedFolder, selectedMessage, replyMessage, downloadMessage}) =>
   selectedFolder && selectedMessage && (
     <div
       className={`${mainCss['message-viewer-menu']} ${mainCss['mdc-menu']} ${mainCss['mdc-menu-surface']}
@@ -18,7 +19,7 @@ export const MessageViewerMenu = ({t, visible, selectedFolder, selectedMessage, 
       aria-hidden={!visible}
     >
       <ul className={`${mainCss['mdc-list']} ${mainCss['mdc-list--dense']}`} >
-        <ReplyListItem t={t}/>
+        <ReplyListItem t={t} replyAction={replyMessage}/>
         <DownloadListItem t={t} downloadMessage={downloadMessage}/>
         <ListUnsubscribeListItem t={t} message={selectedMessage}/>
       </ul>
@@ -31,6 +32,7 @@ MessageViewerMenu.propTypes = {
   credentials: PropTypes.object,
   selectedFolder: PropTypes.object,
   selectedMessage: PropTypes.object,
+  replyMessage: PropTypes.func,
   downloadMessage: PropTypes.func
 };
 
@@ -40,9 +42,14 @@ const mapStateToProps = state => ({
   selectedMessage: selectedMessageSelector(state)
 });
 
+const mapDispatchToProps = dispatch => ({
+  replyMessage: applicationReplyMessage(dispatch)
+});
+
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
   downloadMessage: async () =>
-    downloadMessageService(stateProps.credentials, stateProps.selectedFolder, stateProps.selectedMessage)
+    downloadMessageService(stateProps.credentials, stateProps.selectedFolder, stateProps.selectedMessage),
+  replyMessage: () => dispatchProps.replyMessage(stateProps.selectedMessage)
 }));
 
-export default connect(mapStateToProps, null, mergeProps)(translate()(MessageViewerMenu));
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(translate()(MessageViewerMenu));

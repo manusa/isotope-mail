@@ -7,7 +7,7 @@ describe('TopBarMessageViewer component test suite', () => {
     // Given
     const props = {t: jest.fn(arg => arg), collapsed: true, sideBarToggle: jest.fn(), clearSelectedMessage: jest.fn(),
       onDeleteClick: jest.fn(), onForwardMessageClick: jest.fn(), onMarkUnreadClick: jest.fn(),
-      onReplyMessageClick: jest.fn(), outboxEmpty: true};
+      onReplyAllMessageClick: jest.fn(), outboxEmpty: true};
     // When
     const topBarMessageViewer = shallow(<TopBarMessageViewer {...props}/>);
     // Then

@@ -171,8 +171,8 @@ describe('Application service test suite', () => {
       expect(dispatch).toHaveBeenCalledTimes(1);
     });
   });
-  describe('replyMessage', () => {
-    test('replyMessage with valid message and all recipient types, should dispatch editMessage', () => {
+  describe('replyAllMessage', () => {
+    test('replyAllMessage with valid message and all recipient types, should dispatch editMessage', () => {
       // Given
       const dispatch = jest.fn(action => {
         expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
@@ -201,12 +201,12 @@ describe('Application service test suite', () => {
       };
 
       // When
-      applicationService.replyMessage(dispatch, message);
+      applicationService.replyAllMessage(dispatch)(message);
 
       // Then
       expect(dispatch).toHaveBeenCalledTimes(1);
     });
-    test('replyMessage with valid message, reply-to address and all recipient types, should dispatch editMessage', () => {
+    test('replyAllMessage with valid message, reply-to address and all recipient types, should dispatch editMessage', () => {
       // Given
       const dispatch = jest.fn(action => {
         expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
@@ -236,7 +236,38 @@ describe('Application service test suite', () => {
       };
 
       // When
-      applicationService.replyMessage(dispatch, message);
+      applicationService.replyAllMessage(dispatch)(message);
+
+      // Then
+      expect(dispatch).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe('replyMessage', () => {
+    test('replyMessage with valid message and all recipient types, should dispatch editMessage', () => {
+      // Given
+      const dispatch = jest.fn(action => {
+        expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
+        const editedMessage = action.payload;
+        expect(editedMessage.to).toHaveLength(1);
+        expect(editedMessage.to).toContain('from@mail.com');
+        expect(editedMessage.cc).toHaveLength(0);
+        expect(editedMessage.bcc).toHaveLength(0);
+      });
+      const message = {
+        messageId: '1337-from@mail.com',
+        references: '',
+        from: ['from@mail.com'],
+        recipients: [
+          {type: 'To', address: 'to@mail.com'},
+          {type: 'Cc', address: 'cc@mail.com'},
+          {type: 'Bcc', address: 'bcc@mail.com'}
+        ],
+        subject: 'This message will be replied',
+        attachments: [{fileName: 'file.1st', size: 1337, contentType: 'application/octet-stream'}]
+      };
+
+      // When
+      applicationService.replyMessage(dispatch)(message);
 
       // Then
       expect(dispatch).toHaveBeenCalledTimes(1);
