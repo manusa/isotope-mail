@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ButtonReply component test suite Snapshot render, not outboxEmpty, should NOT render button 1`] = `""`;
+exports[`ButtonReplyAll component test suite Snapshot render, not outboxEmpty, should NOT render button 1`] = `""`;
 
-exports[`ButtonReply component test suite Snapshot render, outboxEmpty, should render button 1`] = `
+exports[`ButtonReplyAll component test suite Snapshot render, outboxEmpty, should render button 1`] = `
 <span
   isotip="topBar.replyAll"
   isotip-position="bottom"

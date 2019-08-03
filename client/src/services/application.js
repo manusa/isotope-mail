@@ -128,24 +128,25 @@ export function editMessageAsNew(dispatch, message) {
   dispatch(editMessage({...message, to, cc, bcc}));
 }
 
-export function replyMessage(dispatch, originalMessage) {
-  const recipients = [...originalMessage.recipients];
-  const recipientMapper = r => r.address;
-  const inReplyTo = [originalMessage.messageId];
-  const references = originalMessage.references.concat([originalMessage.messageId]);
-  const replyTo = originalMessage.replyTo && originalMessage.replyTo.length > 0 ?
-    originalMessage.replyTo : originalMessage.from;
-  const to = recipients.filter(r => r.type === 'To').map(recipientMapper).concat(replyTo);
-  const cc = recipients.filter(r => r.type === 'Cc').map(recipientMapper);
-  const bcc = recipients.filter(r => r.type === 'Bcc').map(recipientMapper);
-  const attachments = [];
-  const subject = `${originalMessage.subject.toLowerCase().indexOf('re:') === 0 ? '' : 'Re: '}${originalMessage.subject}`;
-  const formattedDate = new Date(originalMessage.receivedDate).toLocaleString(navigator.language, {
-    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'
-  });
+const reply = (toSelector = () => [], ccSelector = () => [], bccSelector = () => []) =>
+  dispatch => originalMessage => {
+    const recipients = [...originalMessage.recipients];
+    const recipientMapper = r => r.address;
+    const inReplyTo = [originalMessage.messageId];
+    const references = originalMessage.references.concat([originalMessage.messageId]);
+    const replyTo = originalMessage.replyTo && originalMessage.replyTo.length > 0 ?
+      originalMessage.replyTo : originalMessage.from;
+    const to = toSelector(recipients).map(recipientMapper).concat(replyTo);
+    const cc = ccSelector(recipients).map(recipientMapper);
+    const bcc = bccSelector(recipients).map(recipientMapper);
+    const attachments = [];
+    const subject = `${originalMessage.subject.toLowerCase().indexOf('re:') === 0 ? '' : 'Re: '}${originalMessage.subject}`;
+    const formattedDate = new Date(originalMessage.receivedDate).toLocaleString(navigator.language, {
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
 
-  const t = i18n.t.bind(i18n);
-  const content = `
+    const t = i18n.t.bind(i18n);
+    const content = `
     <p></p>
     <hr/>
     <p>
@@ -157,9 +158,15 @@ export function replyMessage(dispatch, originalMessage) {
     ${sanitize.sanitize(originalMessage.content)}
   `;
 
-  dispatch(editMessage({inReplyTo, references, to, cc, bcc, attachments, subject, content
-  }));
-}
+    dispatch(editMessage({inReplyTo, references, to, cc, bcc, attachments, subject, content
+    }));
+  };
+export const replyAllMessage = reply(
+  recipients => recipients.filter(r => r.type === 'To'),
+  recipients => recipients.filter(r => r.type === 'Cc'),
+  recipients => recipients.filter(r => r.type === 'Bcc')
+);
+export const replyMessage = reply();
 
 export function forwardMessage(dispatch, originalMessage) {
   const t = i18n.t.bind(i18n);

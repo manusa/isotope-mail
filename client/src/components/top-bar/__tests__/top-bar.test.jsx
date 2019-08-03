@@ -83,20 +83,22 @@ describe('TopBar component test suite', () => {
       // Then
       expect(applicationService.clearSelectedMessage).toHaveBeenCalledTimes(1);
     });
-    test('replyMessage, application service function invoked', () => {
+    test('replyAllMessage, application service function invoked', () => {
       // Given
       const initialState = {...INITIAL_STATE, application: {...INITIAL_STATE.application}};
       initialState.application.selectedMessage = {};
-      applicationService.replyMessage = jest.fn((dispatch, sm) =>
-        expect(sm).toBe(initialState.application.selectedMessage));
+      const replyAllMessage = jest.fn(sm => expect(sm).toBe(initialState.application.selectedMessage));
+      // noinspection JSUnresolvedVariable
+      applicationService.replyAllMessage = jest.fn(() => replyAllMessage);
       const props = {sideBarToggle: () => {}, sideBarCollapsed: false};
       const topBar = shallow(<TopBarConnected store={createMockStore(initialState)} {...props}/>);
 
       // When
-      topBar.props().replyMessage();
+      topBar.props().replyAllMessage();
 
       // Then
-      expect(applicationService.replyMessage).toHaveBeenCalledTimes(1);
+      expect(applicationService.replyAllMessage).toHaveBeenCalledTimes(1);
+      expect(replyAllMessage).toHaveBeenCalledTimes(1);
     });
     test('forwardMessage, application service function invoked', () => {
       // Given

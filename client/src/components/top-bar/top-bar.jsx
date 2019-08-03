@@ -9,7 +9,7 @@ import {getCredentials, selectedMessage as selectedMessageSelector} from '../../
 import {getSelectedFolder} from '../../selectors/folders';
 import {selectedFolderMessagesFilteredAndSelected, selectedMessagesIds} from '../../selectors/messages';
 import {findTrashFolder, FolderTypes} from '../../services/folder';
-import {forwardMessage, replyMessage, clearSelectedMessage} from '../../services/application';
+import {forwardMessage, replyAllMessage, clearSelectedMessage} from '../../services/application';
 import {deleteMessages, moveMessages, setMessagesSeen} from '../../services/message';
 import mainCss from '../../styles/main.scss';
 
@@ -50,7 +50,7 @@ export class TopBar extends Component {
           && (<TopBarMessageViewer
             collapsed={collapsed} sideBarToggle={sideBarToggle} clearSelectedMessage={props.clearSelectedMessage}
             outboxEmpty={outbox === null}
-            onReplyMessageClick={props.replyMessage} onForwardMessageClick={props.forwardMessage}
+            onReplyAllMessageClick={props.replyAllMessage} onForwardMessageClick={props.forwardMessage}
             onDeleteClick={() => this.onDelete(props.deleteMessage)} onMarkUnreadClick={toggleMessageSeen}/>)
         }
         {isEditing
@@ -114,8 +114,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
   clearSelectedMessage: () => clearSelectedMessage(dispatch),
-  replyMessage: selectedMessaage => replyMessage(dispatch, selectedMessaage),
-  forwardMessage: selectedMessaage => forwardMessage(dispatch, selectedMessaage),
+  replyAllMessage: replyAllMessage(dispatch),
+  forwardMessage: selectedMessage => forwardMessage(dispatch, selectedMessage),
   deleteMessage: (credentials, folders, selectedFolder, selectedMessage) => {
     const trashFolder = findTrashFolder(folders);
     if (selectedMessage && selectedFolder && trashFolder) {
@@ -149,7 +149,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => (Object.assign({}, stateProps, dispatchProps, ownProps, {
-  replyMessage: () => dispatchProps.replyMessage(stateProps.selectedMessage),
+  replyAllMessage: () => dispatchProps.replyAllMessage(stateProps.selectedMessage),
   forwardMessage: () => dispatchProps.forwardMessage(stateProps.selectedMessage),
   deleteMessage: () =>
     dispatchProps.deleteMessage(
