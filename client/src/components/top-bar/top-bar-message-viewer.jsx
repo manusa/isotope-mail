@@ -5,7 +5,7 @@ import ButtonCollapse from './button-collapse';
 import ButtonForward from './button-forward';
 import ButtonMore from './button-more';
 import ButtonReply from './button-reply';
-import MessageViewerMenu from './message-viewer-menu';
+import {MessageViewerMenu} from './message-viewer-menu';
 import TopBarButton from './top-bar-button';
 import mainCss from '../../styles/main.scss';
 

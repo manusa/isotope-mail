@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DownloadListItem component test suite Snapshot render Snapshot render, should render DownloadListItem 1`] = `
+<li
+  className="mdc-list-item "
+  onClick={[Function]}
+>
+  <span
+    className="mdc-list-item__graphic material-icons"
+  >
+    save_alt
+  </span>
+  topBar.messageViewerMenu.download
+</li>
+`;

@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MessageViewerMenu component test suite Snapshot render MessageViewerMenu Snapshot render, visible, should render message-viewer-menu 1`] = `
+<div
+  aria-hidden={false}
+  className="message-viewer-menu mdc-menu mdc-menu-surface
+      mdc-menu-surface--open"
+>
+  <ul
+    className="mdc-list mdc-list--dense"
+  >
+    <ReplyListItem
+      t={[MockFunction]}
+    />
+    <DownloadListItem
+      t={[MockFunction]}
+    />
+    <ListUnsubscribeListItem
+      message={Object {}}
+      t={[MockFunction]}
+    />
+  </ul>
+</div>
+`;
+
+exports[`MessageViewerMenu component test suite Snapshot render MessageViewerMenu Snapshot render, visible=false, should render message-viewer-menu "hidden 1`] = `
+<div
+  aria-hidden={true}
+  className="message-viewer-menu mdc-menu mdc-menu-surface
+      "
+>
+  <ul
+    className="mdc-list mdc-list--dense"
+  >
+    <ReplyListItem
+      t={[MockFunction]}
+    />
+    <DownloadListItem
+      t={[MockFunction]}
+    />
+    <ListUnsubscribeListItem
+      message={Object {}}
+      t={[MockFunction]}
+    />
+  </ul>
+</div>
+`;
