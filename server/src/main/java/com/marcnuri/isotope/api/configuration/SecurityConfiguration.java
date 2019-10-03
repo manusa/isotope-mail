@@ -42,8 +42,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private static final String CONFIGURATION_REGEX = ".*v1/application/configuration";
-    private static final String LOGIN_REGEX = ".*v1/application/login";
+    private static final String ACTUATOR_REGEX = "(/api)?/actuator/health";
+    private static final String CONFIGURATION_REGEX = "(/api)?/v1/application/configuration";
+    private static final String LOGIN_REGEX = "(/api)?/v1/application/login";
     private final CredentialsService credentialsService;
 
     @Autowired
@@ -54,6 +55,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         final RequestMatcher negatedPublicMatchers =  new NegatedRequestMatcher(new OrRequestMatcher(
+                new RegexRequestMatcher(ACTUATOR_REGEX, "GET"),
                 new RegexRequestMatcher(CONFIGURATION_REGEX, "GET"),
                 new RegexRequestMatcher(LOGIN_REGEX, "POST")
         ));
