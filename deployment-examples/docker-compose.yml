@@ -2,7 +2,7 @@ version: '3'
 
 services:
   reverse-proxy:
-    image: traefik
+    image: traefik:1.7
     command: --api --docker
     ports:
       - "80:80"
