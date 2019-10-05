@@ -21,7 +21,7 @@ Just run the following commands:
 
 ```
 git clone https://github.com/manusa/isotope-mail.git
-cd isotope-mail/docker/traefik
+cd isotope-mail/deployment-examples
 docker-compose pull && docker-compose up --force-recreate
 ```
 
