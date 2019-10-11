@@ -64,6 +64,11 @@ In order to guarantee top code quality the project is using
 [Sonar Cloud](https://sonarcloud.io/dashboard?id=manusa_isotope-mail) and
 [LGTM - Looks Good To Me](https://lgtm.com/projects/g/manusa/isotope-mail/) to perform static code analysis.
 
+## How to deploy
+
+Following is a list of resources that can help you deploy Isotope Mail Client in different environments
+- [How to deploy to a Kubernetes cluster](https://blog.marcnuri.com/isotope-mail-how-to-deploy-isotopetraefik-into-kubernetes/)
+
 ## License
 
 Isotope is [Apache 2.0 Licensed](./LICENSE).
