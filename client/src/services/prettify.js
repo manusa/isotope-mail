@@ -14,11 +14,11 @@ export function round(value, decimalPlaces) {
 /**
  * Returns a pretty string representation of a date relative to the current date.
  *
- * @param date {Date}
+ * @param inputDate {Date|string|number}
  * @returns {string}
  */
-export function prettyDate(date) {
-  date = new Date(date);
+export function prettyDate(inputDate) {
+  const date = new Date(inputDate);
   const currentDate = new Date();
   const truncDate = new Date(date);
   [currentDate, truncDate].forEach(d => d.setHours(0, 0, 0, 0));

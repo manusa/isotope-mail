@@ -81,10 +81,10 @@ class HeaderTo extends Component {
   }
 
   _renderExpandedEntries(entries) {
-    entries = entries.map(entry => addressGroups(entry.address));
+    const expandedEntries = entries.map(entry => addressGroups(entry.address));
     return (
       <span className={styles.expandedEntries}>
-        {this._renderEntries(entries)}
+        {this._renderEntries(expandedEntries)}
       </span>);
   }
 

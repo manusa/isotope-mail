@@ -8,7 +8,7 @@ function add32(a, b) {
 }
 
 function cmn(q, a, b, x, s, t) {
-  a = add32(add32(a, q), add32(x, t));
+  a = add32(add32(a, q), add32(x, t)); // NOSONAR
   return add32((a << s) | (a >>> (32 - s)), b);
 }
 
@@ -138,7 +138,7 @@ function md51(s) {
   for (i = 64; i <= s.length; i += 64) {
     md5cycle(state, md5blk(s.substring(i - 64, i)));
   }
-  s = s.substring(i - 64);
+  s = s.substring(i - 64); // NOSONAR
   const tail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   for (i = 0; i < s.length; i++) {
     tail[i >> 2] |= s.charCodeAt(i) << ((i % 4) << 3);

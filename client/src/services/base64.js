@@ -9,8 +9,8 @@ export function unicodeUrlBtoa(string) {
 }
 
 export function unicodeUrlAtob(string) {
-  string = string.replace(/-/g, '+').replace(/_/g, '/');
-  return decodeURIComponent(atob(string)
+  const replacedString = string.replace(/-/g, '+').replace(/_/g, '/');
+  return decodeURIComponent(atob(replacedString)
     .split('')
     // eslint-disable-next-line prefer-template
     .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))

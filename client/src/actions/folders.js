@@ -6,11 +6,11 @@ export const setFolders = folders => ({
   type: ActionTypes.FOLDERS_SET, payload: processFolders(folders)
 });
 export const updateFolder = folder => {
-  folder = processFolders([folder])[0];
-  return ({type: ActionTypes.FOLDERS_UPDATE, payload: folder});
+  const processedFolder = processFolders([folder])[0];
+  return ({type: ActionTypes.FOLDERS_UPDATE, payload: processedFolder});
 };
 export const updateFolderProperties = folder => {
-  folder = processFolders([folder])[0];
-  return ({type: ActionTypes.FOLDERS_UPDATE_PROPERTIES, payload: folder});
+  const processedFolder = processFolders([folder])[0];
+  return ({type: ActionTypes.FOLDERS_UPDATE_PROPERTIES, payload: processedFolder});
 };
 

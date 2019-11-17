@@ -293,10 +293,7 @@ export async function deleteMessageCache(userId, hash, foldersToDeleteIds) {
  * @param content
  * @returns {Promise<void>}
  */
-export async function persistApplicationNewMessageContent(application, content) {
-  if (!content) {
-    content = '';
-  }
+export async function persistApplicationNewMessageContent(application, content = '') {
   const worker = new SjclWorker();
   worker.onmessage = async m => {
     const newMessage = {
