@@ -1,6 +1,10 @@
 import {notify, notifyNewMail} from '../notification';
 
 describe('Notification service test suite', () => {
+  const expectNoNotification = async result => {
+    expect(global.Notification).toHaveBeenCalledTimes(0);
+    expect(result).toEqual(null);
+  };
   test('notify, requests permission but not granted, should do nothing', done => {
     // Given
     global.Notification = jest.fn();
@@ -8,11 +12,7 @@ describe('Notification service test suite', () => {
     global.Notification.requestPermission = jest.fn(() => Promise.resolve('denied'));
 
     // When
-    notify('I\'m a loser baby').then(result => {
-      expect(global.Notification).toHaveBeenCalledTimes(0);
-      expect(result).toEqual(null);
-      done();
-    });
+    notify('I\'m a loser baby').then(expectNoNotification).then(() => done());
 
     // Then
     expect(global.Notification.requestPermission).toHaveBeenCalledTimes(1);
@@ -24,11 +24,7 @@ describe('Notification service test suite', () => {
     global.Notification.requestPermission = jest.fn(() => Promise.resolve('denied'));
 
     // When
-    notify('I\'m a loser baby').then(result => {
-      expect(global.Notification).toHaveBeenCalledTimes(0);
-      expect(result).toEqual(null);
-      done();
-    });
+    notify('I\'m a loser baby').then(expectNoNotification).then(() => done());
 
     // Then
     expect(global.Notification.requestPermission).toHaveBeenCalledTimes(0);

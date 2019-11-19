@@ -2,11 +2,11 @@ import {INITIAL_STATE} from './';
 import {ActionTypes} from '../actions/action-types';
 import {explodeFolders, FolderTypes, gatherFolderIds, removeAttributesFromFolders} from '../services/folder';
 
-function _updateFolder(folderToReplace, folders) {
-  if (!folders || folders.length === 0) {
+function _updateFolder(folderToReplace, foldersToBeReplaced) {
+  if (!foldersToBeReplaced || foldersToBeReplaced.length === 0) {
     return [];
   }
-  return folders.map(f => {
+  return foldersToBeReplaced.map(f => {
     if (f.children && f.children.length > 0) {
       f.children = _updateFolder(folderToReplace, f.children);
     }

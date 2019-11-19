@@ -19,11 +19,11 @@ describe('MessageRead service test suite', () => {
       fetch.abortFetch = jest.fn();
       const dispatch = jest.fn(action => {
         if (action.type === ActionTypes.APPLICATION_MESSAGE_REFRESH) {
-          const {message, folder} = action.payload;
-          expect(folder.unreadMessageCount).toEqual(1337);
-          expect(message.fromBackend).toEqual(true);
-          expect(message.folder.unreadMessageCount).toEqual(1337);
-          expect(message.seen).toEqual(true);
+          const {message: dispatchedMessage, folder: dispatchedFolder} = action.payload;
+          expect(dispatchedFolder.unreadMessageCount).toEqual(1337);
+          expect(dispatchedMessage.fromBackend).toEqual(true);
+          expect(dispatchedMessage.folder.unreadMessageCount).toEqual(1337);
+          expect(dispatchedMessage.seen).toEqual(true);
         } else if (action.type === ActionTypes.APPLICATION_MESSAGE_REPLACE_IMAGE) {
           done();
         }

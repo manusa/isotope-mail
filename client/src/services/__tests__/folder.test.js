@@ -321,7 +321,7 @@ describe('Folder service test suite', () => {
       fetch.abortFetch = jest.fn();
       window.isotopeConfiguration = {_links: {folders: {href: '/folders'}}};
       global.fetch = jest.fn((url, options) => {
-        expect(options.body).toMatch('new-folder-name');
+        expect(options.body).toMatch('Alex\'s new folder');
         return Promise.resolve({ok: true, url, options,
           json: () => ([])});
       });
@@ -342,7 +342,7 @@ describe('Folder service test suite', () => {
       });
 
       // When
-      folderService.createRootFolder(dispatch, {credentials: {}}, 'new-folder-name');
+      folderService.createRootFolder(dispatch, {credentials: {}}, 'Alex\'s new folder');
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);
@@ -385,7 +385,7 @@ describe('Folder service test suite', () => {
       // Given
       fetch.abortFetch = jest.fn();
       global.fetch = jest.fn((url, options) => {
-        expect(options.body).toMatch('new-folder-name');
+        expect(options.body).toMatch('Aitana\'s new folder');
         return Promise.resolve({ok: true, url, options,
           json: () => ([])});
       });
@@ -407,7 +407,7 @@ describe('Folder service test suite', () => {
       window.isotopeConfiguration = {_links: {'folders.self': {href: '://url/parent'}}};
 
       // When
-      folderService.createChildFolder(dispatch, {credentials: {}}, {}, 'new-folder-name');
+      folderService.createChildFolder(dispatch, {credentials: {}}, {}, 'Aitana\'s new folder');
 
       // Then
       expect(fetch.abortFetch).toHaveBeenCalledTimes(1);

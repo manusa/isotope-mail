@@ -175,19 +175,6 @@ describe('messages selectors test suite', () => {
       expect(result).toHaveLength(1);
       expect(result).toEqual([messageArray[0]]);
     });
-    test('state.messages.cache containing selectedFolderId and messageFilterKey=ALL and messageFilterText matching from,' +
-      'should return sorted array of matched messages', () => {
-      // Given
-      const state = {
-        application: {selectedFolderId: '1337', messageFilterKey: 'ALL', messageFilterText: 'Alex'},
-        messages: {cache: {1337: new Map(messageArray.map(m => [m.uid, m]))}}
-      };
-      // When
-      const result = selectedFolderMessagesFiltered(state);
-      // Then
-      expect(result).toHaveLength(1);
-      expect(result).toEqual([messageArray[0]]);
-    });
     test('state.messages.cache containing selectedFolderId and messageFilterKey=ALL and messageFilterText matching recipient,' +
       'should return sorted array of matched messages', () => {
       // Given

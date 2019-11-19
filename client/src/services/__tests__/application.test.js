@@ -102,7 +102,7 @@ describe('Application service test suite', () => {
       const dispatch = jest.fn(action => {
         expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
         const editedMessage = action.payload;
-        expect(editedMessage.to).toEqual(['to@be.com']);
+        expect(editedMessage.to).toEqual(['reactive@isotope.com']);
         expect(editedMessage.cc).toHaveLength(0);
         expect(editedMessage.bcc).toHaveLength(0);
         expect(editedMessage.attachments).toHaveLength(0);
@@ -111,7 +111,7 @@ describe('Application service test suite', () => {
       });
       const to = null;
       const headers = {
-        to: 'to@be.com'
+        to: 'reactive@isotope.com'
       };
       // When
       applicationService.mailto(dispatch, to, headers);
