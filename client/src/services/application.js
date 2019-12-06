@@ -1,4 +1,5 @@
 import sjcl from 'sjcl';
+import get from 'lodash/get';
 import {
   backendRequest,
   backendRequestCompleted,
@@ -140,7 +141,8 @@ const reply = (toSelector = () => [], ccSelector = () => [], bccSelector = () =>
     const cc = ccSelector(recipients).map(recipientMapper);
     const bcc = bccSelector(recipients).map(recipientMapper);
     const attachments = [];
-    const subject = `${originalMessage.subject.toLowerCase().indexOf('re:') === 0 ? '' : 'Re: '}${originalMessage.subject}`;
+    const originalSubject = get(originalMessage, 'subject') || '';
+    const subject = `${originalSubject.toLowerCase().indexOf('re:') === 0 ? '' : 'Re: '}${originalSubject}`;
     const formattedDate = new Date(originalMessage.receivedDate).toLocaleString(navigator.language, {
       year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit'
     });
