@@ -243,17 +243,9 @@ describe('Application service test suite', () => {
     });
   });
   describe('replyMessage', () => {
-    test('replyMessage with valid message and all recipient types, should dispatch editMessage', () => {
-      // Given
-      const dispatch = jest.fn(action => {
-        expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
-        const editedMessage = action.payload;
-        expect(editedMessage.to).toHaveLength(1);
-        expect(editedMessage.to).toContain('from@mail.com');
-        expect(editedMessage.cc).toHaveLength(0);
-        expect(editedMessage.bcc).toHaveLength(0);
-      });
-      const message = {
+    let message;
+    beforeEach(() => {
+      message = {
         messageId: '1337-from@mail.com',
         references: '',
         from: ['from@mail.com'],
@@ -265,7 +257,32 @@ describe('Application service test suite', () => {
         subject: 'This message will be replied',
         attachments: [{fileName: 'file.1st', size: 1337, contentType: 'application/octet-stream'}]
       };
+    });
+    test('replyMessage with valid message and all recipient types, should dispatch editMessage', () => {
+      // Given
+      const dispatch = jest.fn(action => {
+        expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
+        const editedMessage = action.payload;
+        expect(editedMessage.to).toHaveLength(1);
+        expect(editedMessage.to).toContain('from@mail.com');
+        expect(editedMessage.cc).toHaveLength(0);
+        expect(editedMessage.bcc).toHaveLength(0);
+      });
+      // When
+      applicationService.replyMessage(dispatch)(message);
 
+      // Then
+      expect(dispatch).toHaveBeenCalledTimes(1);
+    });
+    test('replyMessage, valid message undefined subject, dispatch editMessage', () => {
+      // Given
+      delete message.subject;
+      const dispatch = jest.fn(action => {
+        expect(action.type).toEqual(ActionTypes.APPLICATION_MESSAGE_EDIT);
+        const editedMessage = action.payload;
+        expect(editedMessage.to).toHaveLength(1);
+        expect(editedMessage.subject).toBe('Re: ');
+      });
       // When
       applicationService.replyMessage(dispatch)(message);
 
