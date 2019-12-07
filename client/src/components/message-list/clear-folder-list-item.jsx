@@ -9,9 +9,11 @@ import {FolderTypes} from '../../services/folder';
 import {deleteAllFolderMessages} from '../../services/message';
 import styles from './message-list.scss';
 
+const isVisible = selectedFolder => [FolderTypes.TRASH, FolderTypes.JUNK].includes(selectedFolder.type);
+
 export const ClearFolderListItem = ({t, selectedFolder, clearFolder}) => {
   const [dialogVisible, setDialogVisible] = useState(false);
-  return (selectedFolder.type === FolderTypes.TRASH && (
+  return (isVisible(selectedFolder) && (
     <div className={styles.clearFolderListItem}>
       <Button
         className={styles.emptyFolder}
