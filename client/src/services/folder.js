@@ -17,6 +17,7 @@ export const FolderTypes = Object.freeze({
   DRAFTS: {attribute: '\\Drafts', icon: 'drafts', position: 1},
   SENT: {attribute: '\\Sent', icon: 'send', position: 2},
   TRASH: {attribute: '\\Trash', icon: 'delete', position: 3},
+  JUNK: {attribute: '\\Junk', icon: 'report', position: 4},
   FOLDER: {icon: 'folder'}
 });
 
@@ -99,7 +100,7 @@ export function processFolders(initialFolders) {
       folder.type = FolderTypes.FOLDER;
       // Identify special folder
       let special = false;
-      for (const t of [FolderTypes.DRAFTS, FolderTypes.SENT, FolderTypes.TRASH]) {
+      for (const t of [FolderTypes.DRAFTS, FolderTypes.SENT, FolderTypes.TRASH, FolderTypes.JUNK]) {
         if (folder.attributes && folder.attributes.includes(t.attribute)) {
           folder.type = t;
           specialFolders[folder.type.position] = folder;

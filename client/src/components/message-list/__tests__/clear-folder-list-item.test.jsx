@@ -7,7 +7,7 @@ import * as messageService from '../../../services/message';
 
 describe('ClearFolderListItem component test suite', () => {
   describe('Snapshot render', () => {
-    test('Selected folder NOT trash, should not render', () => {
+    test('Selected folder NOT trash nor junk, should not render', () => {
       // Given
       const props = {
         selectedFolder: {}
@@ -28,6 +28,17 @@ describe('ClearFolderListItem component test suite', () => {
       // Then
       expect(clearFolderListItem).toMatchSnapshot();
     });
+  });
+  test('Selected folder is junk, should render', () => {
+    // Given
+    const props = {
+      t: key => key,
+      selectedFolder: {type: FolderTypes.JUNK}
+    };
+    // When
+    const clearFolderListItem = shallow(<ClearFolderListItem {...props} />);
+    // Then
+    expect(clearFolderListItem).toMatchSnapshot();
   });
   describe('nested component functions', () => {
     test('Button.onclick, should set dialog visible', () => {
