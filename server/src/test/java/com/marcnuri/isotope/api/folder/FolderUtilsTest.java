@@ -47,6 +47,7 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -58,14 +59,10 @@ public class FolderUtilsTest {
     @Test
     public void addSystemFolders_listWithTrashAttribute_shouldDoNothing() throws Exception {
         // Given
-        final Folder trashFolder = Mockito.mock(Folder.class);
-        doReturn(Stream.of("\\Trash").collect(Collectors.toSet())).when(trashFolder).getAttributes();
-        final List<Folder> originalFolders = Collections.singletonList(trashFolder);
+        final List<Folder> originalFolders = Collections.singletonList(mockTrashFolder());
         final IMAPFolder rootFolder = Mockito.mock(IMAPFolder.class);
-
         // When
         final List<Folder> result = addSystemFolders(rootFolder, originalFolders);
-
         // Then
         verify(rootFolder, times(0)).getFolder(Mockito.eq("Trash"));
         int expectedSize = 1;
@@ -74,20 +71,36 @@ public class FolderUtilsTest {
     }
 
     @Test
-    public void addSystemFolders_listWithTrashFolderName_shouldAddAttributeToExistingTrash() throws Exception {
+    public void addSystemFolders_listWithNestedTrashAttribute_shouldDoNothing() throws Exception {
         // Given
-        final Folder trashFolder = Mockito.mock(Folder.class);
-        doReturn(new HashSet<>()).when(trashFolder).getAttributes();
-        doReturn("Trash").when(trashFolder).getName();
-        final List<Folder> originalFolders = Collections.singletonList(trashFolder);
+        final Folder nestedParent = spy(Folder.class);
+        doReturn(Collections.emptySet()).when(nestedParent).getAttributes();
+        doReturn(new Folder[]{mockTrashFolder()}).when(nestedParent).getChildren();
+        final List<Folder> originalFolders = Collections.singletonList(nestedParent);
         final IMAPFolder rootFolder = Mockito.mock(IMAPFolder.class);
-
         // When
         final List<Folder> result = addSystemFolders(rootFolder, originalFolders);
-
         // Then
         verify(rootFolder, times(0)).getFolder(Mockito.eq("Trash"));
-        assertThat(trashFolder.getAttributes(), contains("\\Trash"));
+        final long expectedSize = 2;
+        assertThat(result, is(originalFolders));
+        assertThat(result.stream().flatMap(Folder::flatStream).count(), equalTo(expectedSize));
+    }
+
+    @Test
+    public void addSystemFolders_listWithTrashFolderName_shouldAddAttributeToExistingTrash() throws Exception {
+        // Given
+        final Folder trashNamedFolder = spy(Folder.class);
+        doReturn(new HashSet<>()).when(trashNamedFolder).getAttributes();
+        doReturn("Trash").when(trashNamedFolder).getName();
+        doReturn(new Folder[0]).when(trashNamedFolder).getChildren();
+        final List<Folder> originalFolders = Collections.singletonList(trashNamedFolder);
+        final IMAPFolder rootFolder = Mockito.mock(IMAPFolder.class);
+        // When
+        final List<Folder> result = addSystemFolders(rootFolder, originalFolders);
+        // Then
+        verify(rootFolder, times(0)).getFolder(Mockito.eq("Trash"));
+        assertThat(trashNamedFolder.getAttributes(), contains("\\Trash"));
         int expectedSize = 1;
         assertThat(result, is(originalFolders));
         assertThat(result, hasSize(expectedSize));
@@ -207,5 +220,12 @@ public class FolderUtilsTest {
         // Then
         assertThat(result, equalTo(urlName.getFile()));
         assertThat(result, equalTo("Inbox/FolderWithNoHash"));
+    }
+
+    private static Folder mockTrashFolder() {
+        final Folder trashFolder = spy(Folder.class);
+        doReturn(Stream.of("\\Trash").collect(Collectors.toSet())).when(trashFolder).getAttributes();
+        doReturn(new Folder[0]).when(trashFolder).getChildren();
+        return trashFolder;
     }
 }

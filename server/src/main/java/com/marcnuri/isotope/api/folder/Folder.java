@@ -167,6 +167,15 @@ public class Folder extends IsotopeResource implements Serializable {
         this.children = children;
     }
 
+    /**
+     * Returns a {@link Stream} of {@link Folder}s containing the current folder and all its traversed children
+     *
+     * @return stream of folders
+     */
+    public Stream<Folder> flatStream() {
+        return Stream.concat(Stream.of(this), Stream.of(getChildren()).flatMap(Folder::flatStream));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

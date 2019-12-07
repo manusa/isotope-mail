@@ -53,10 +53,8 @@ public class FolderUtils {
             throws MessagingException {
 
         // Add Trash folder if none matches, or arbitrarily set Trash attribute
-        if (existingFolders.stream().noneMatch(f -> f.getAttributes().contains(ATTR_TRASH))) {
-            final Optional<Folder> existingTrash = existingFolders.stream()
-                    .filter(f -> f.getName().equalsIgnoreCase(TRASH_FOLDER_NAME))
-                    .findAny();
+        if (!existsSystemTrash(existingFolders)) {
+            final Optional<Folder> existingTrash = getExistingArbitraryTrash(existingFolders);
             if (existingTrash.isPresent()) {
                 existingTrash.get().getAttributes().add(ATTR_TRASH);
             } else {
@@ -69,6 +67,17 @@ public class FolderUtils {
             }
         }
         return existingFolders;
+    }
+
+    private static boolean existsSystemTrash(@NonNull List<Folder> existingFolders) {
+        return existingFolders.stream()
+                .flatMap(Folder::flatStream).anyMatch(f -> f.getAttributes().contains(ATTR_TRASH));
+    }
+
+    private static Optional<Folder> getExistingArbitraryTrash(@NonNull List<Folder> existingFolders) {
+        return existingFolders.stream()
+                .filter(f -> f.getName().equalsIgnoreCase(TRASH_FOLDER_NAME))
+                .findAny();
     }
 
     /**
