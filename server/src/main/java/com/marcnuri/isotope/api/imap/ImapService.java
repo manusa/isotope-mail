@@ -144,7 +144,9 @@ public class ImapService {
                     .map(mf -> Folder.from(mf, loadChildren))
                     .sorted(Comparator.comparing(Folder::getName))
                     .collect(Collectors.toList());
-            addSystemFolders(rootFolder, folders);
+            if (Boolean.TRUE.equals(loadChildren)) {
+                addSystemFolders(rootFolder, folders);
+            }
             // Clear \Recent flags by opening and closing the INBOX
             if (folders.stream().anyMatch(
                     f -> f.getName().equalsIgnoreCase("INBOX") && f.getNewMessageCount() > 0)) {
