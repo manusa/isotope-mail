@@ -6,6 +6,9 @@ on:
       - 'master'
   pull_request:
 
+env:
+  SONAR_SCANNER_VERSION: 4.2.0.1873
+
 jobs:
   build-server:
     name: 'Build Server'
@@ -70,8 +73,16 @@ jobs:
           mkdir -p ./server/build ./client/coverage \
           && mv ./server-build/* ./server/build \
           && mv ./client-coverage/* ./client/coverage
+      - name: Download and install sonar-scanner
+        run: |
+          mkdir -p $HOME/.sonar \
+          && wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip -O sonar-scanner.zip \
+          && unzip sonar-scanner.zip -d $HOME/.sonar/ \
+          && rm sonar-scanner.zip
       - name: SonarCloud
-        uses: sonarsource/sonarcloud-github-action@v1.1
+        run: |
+          $HOME/.sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux/bin/sonar-scanner
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+          SONAR_SCANNER_OPTS: "-server"
