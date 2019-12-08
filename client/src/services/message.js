@@ -12,10 +12,17 @@ import {
 } from '../actions/messages';
 import {updateFolder, updateFolderProperties} from '../actions/folders';
 import {getIsotopeConfiguration} from '../selectors/globals';
-import {abortControllerWrappers, abortFetch, AuthenticationException, credentialsHeaders, toJson} from './fetch';
+import {
+  abortControllerWrappers,
+  abortFetch,
+  AuthenticationException,
+  credentialsHeaders,
+  toJson
+} from './fetch';
 import {persistMessageCache} from './indexed-db';
 import {notifyNewMail} from './notification';
 import {FolderTypes} from './folder';
+import {prettySize, round} from './prettify';
 
 const _eventSourceWrappers = {};
 
@@ -362,4 +369,38 @@ export async function downloadMessage(credentials, folder, message) {
     document.body.removeChild(tempLink);
     URL.revokeObjectURL(url);
   }
+}
+
+export async function showOriginal(credentials, folder, message) {
+  const downloadUrl = getIsotopeConfiguration()._links['folders.message'].href
+    .replace('{folderId}', folder.folderId)
+    .replace('{messageId}', message.uid);
+  const getMessageRequest = new XMLHttpRequest();
+  getMessageRequest.open('GET', downloadUrl);
+  Object.entries(credentialsHeaders(credentials, {Accept: 'message/rfc822'}))
+    .forEach(([key, value]) => getMessageRequest.setRequestHeader(key, value));
+  const newWindow = window.open('');
+  newWindow.document.title = message.subject;
+  const loadingInterval = setInterval(() => {
+    newWindow.document.body.innerHTML += '.';
+  }, 300);
+  newWindow.document.body.innerHTML = '';
+  getMessageRequest.onreadystatechange = () => {
+    if (getMessageRequest.readyState === XMLHttpRequest.DONE) {
+      clearInterval(loadingInterval);
+      newWindow.document.body.innerHTML = '';
+      const pre = newWindow.document.createElement('pre');
+      newWindow.document.body.append(pre);
+      pre.innerText = getMessageRequest.responseText;
+    }
+  };
+  getMessageRequest.onprogress = e => {
+    clearInterval(loadingInterval);
+    if (e.total > 0) {
+      newWindow.document.body.innerHTML = `${round(e.loaded / e.total, 2)}%`;
+    } else {
+      newWindow.document.body.innerHTML = `${prettySize(e.loaded)}`;
+    }
+  };
+  getMessageRequest.send(null);
 }

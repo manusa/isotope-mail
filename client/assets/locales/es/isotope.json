@@ -50,7 +50,8 @@
     "messageViewerMenu": {
       "download": "Descargar (.eml)",
       "listUnsubscribe": "Cancelar la suscripción a esta lista",
-      "reply": "Responder"
+      "reply": "Responder",
+      "showOriginal": "Show original"
     },
     "deleteFromTrashDialog": {
       "title": "Confirmar borrado",
