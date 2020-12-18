@@ -25,7 +25,7 @@
     "abortcontroller-polyfill": "^1.1.9",
     "babel-polyfill": "^6.26.0",
     "compression": "^1.7.2",
-    "dompurify": "^1.0.7",
+    "dompurify": "^2.0.17",
     "eventsource": "^1.0.7",
     "history": "^4.7.2",
     "i18next": "^15.0.4",
