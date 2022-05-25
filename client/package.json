@@ -26,7 +26,7 @@
     "babel-polyfill": "^6.26.0",
     "compression": "^1.7.2",
     "dompurify": "^1.0.7",
-    "eventsource": "^1.0.7",
+    "eventsource": "^2.0.2",
     "history": "^4.7.2",
     "i18next": "^15.0.4",
     "i18next-xhr-backend": "^2.0.1",
