@@ -1,0 +1,148 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: isotope-secrets
+type: Opaque
+data:
+  encryptionPassword: U2VjcmV0SzhzUGFzd29yZA==
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: isotope-server
+  labels:
+    app: isotope
+    component: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: isotope
+      component: server
+      version: latest
+  template:
+    metadata:
+      labels:
+        app: isotope
+        component: server
+        version: latest
+    spec:
+      containers:
+        - name: isotope-server
+          image: marcnuri/isotope:server-latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9010
+          env:
+            - name: ENCRYPTION_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: isotope-secrets
+                  key: encryptionPassword
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9010
+            failureThreshold: 6
+            periodSeconds: 5
+          # Use startupProbe instead if your k8s version supports it
+            initialDelaySeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9010
+            failureThreshold: 2
+            periodSeconds: 5
+#          startupProbe:
+#            httpGet:
+#              path: /actuator/health
+#              port: 9010
+#            initialDelaySeconds: 20
+#            failureThreshold: 15
+#            periodSeconds: 10
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: isotope-client
+  labels:
+    app: isotope
+    component: client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: isotope
+      component: client
+      version: latest
+  template:
+    metadata:
+      labels:
+        app: isotope
+        component: client
+        version: latest
+    spec:
+      containers:
+        - name: isotope-client
+          image: marcnuri/isotope:client-latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /favicon.ico
+              port: 80
+            failureThreshold: 6
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: isotope-server
+spec:
+  ports:
+    - name: http
+      targetPort: 9010
+      port: 80
+  selector:
+    app: isotope
+    component: server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: isotope-client
+spec:
+  ports:
+    - name: http
+      targetPort: 80
+      port: 80
+  selector:
+    app: isotope
+    component: client
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: isotope
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/x-forwarded-prefix: "/api"
+spec:
+  rules:
+    - host: isotope.minikube
+      http:
+        paths:
+          - path: /(.*)
+            backend:
+              service:
+                name: isotope-client
+                port:
+                  number: 80
+          - path: /api/(.*)
+            backend:
+              service:
+                name: isotope-server
+                port:
+                  number: 80
